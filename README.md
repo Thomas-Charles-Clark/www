@@ -22,13 +22,13 @@
             development was created from staging.
         </li>
         <li>
-            Features and bugfixes are created from development, worked, then committed.
+            features and bugfixes are created from development, worked, then committed.
         </li>
         <li>
-            Completed features and bugfixes are merged into development via pull request.
+            completed features and bugfixes are merged into development via pull request.
         </li>
         <li>
-            Once successfully merged into development, feature_# (bugfix_#) are deleted.
+            once successfully merged into development, feature_# (bugfix_#) are deleted.
         </li>
         <li>
             development is then pull-requested into staging.
