@@ -2833,7 +2833,6 @@
     <Content Include="js\src\view-model-template.txt" />
     <Content Include="js\src\lib\kendo\dist\kendo.2018.3.1017.all.js" />
     <Content Include="js\dist\lib\jszip\dist\jszip.min.js.map" />
-    <None Include="Properties\PublishProfiles\VM-WEB1.pubxml" />
     <Content Include="Views-New\LandingPages\PageSections\_PageSectionPager.cshtml" />
     <Content Include="Content\images\logo\dg-logo-b2b-1340-73.webp" />
     <Content Include="Content\images\logo\dg-logo-b2b-2680-145.webp" />
@@ -2868,6 +2867,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="package.json" />
+    <None Include="Properties\PublishProfiles\Development.pubxml" />
+    <None Include="Properties\PublishProfiles\Preview.pubxml" />
+    <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
