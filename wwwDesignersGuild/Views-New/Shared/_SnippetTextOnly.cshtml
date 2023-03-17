@@ -1,0 +1,14 @@
+﻿@model wwwDesignersGuild.Models.Classes.passSnippet
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{
+    Layout = null;
+
+    @* 
+        The position of the call to Html.Raw in this file is significant.
+        In the _shopProductPage template, where some tabs of product information
+        are filled out with snippets, a requirement was presented to hide those tabs
+        with no content. An actually null value was processed and found to contain multiple newline characters; these were being lent by newlines being rendered
+        by this partial view.
+    *@
+}@Html.Raw(Model?.snippetContent?.HTMLContent)

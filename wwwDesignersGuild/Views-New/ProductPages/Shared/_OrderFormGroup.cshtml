@@ -1,0 +1,70 @@
+﻿@model OrderFormGroupViewModel
+@{
+    var l = Model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.MasterDefinition.UrlBreakdown.ContentDate;
+    var cd = Model.MasterDefinition.UrlBreakdown.countryDetails;
+}
+<div data-init 
+     class="order-form-group">
+   @if (!String.IsNullOrEmpty(Model.Name))
+    {
+        <h5 class="text-uppercase pb-3">
+            @Model.Name
+        </h5>
+    }
+   @if (Model.UseSizeButtons)
+    {
+    <span class="d-block mb-2 select-a-size"
+          data-bs-parent="#@Model.OrderFormCarouselID">
+        @HtmlHelperExtra.Resource("SelectASize", l, c, d)
+    </span>
+    <div class="grid justify-content-between align-items-center">
+       @foreach (var obj in Model.Items.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
+        {
+            var item = obj.value;
+            var index = obj.index + 1;
+            <button class="btn btn-light size-button g-col-1"
+                    type="button"
+                    aria-controls="@(item.OrderFormCarouselID.Replace("#", ""))"
+                    data-bs-target="#@(Model.OrderFormCarouselID)"
+                    data-bs-slide-to="@(index)">
+                @item.OrderFormName
+            </button>
+        }
+    </div>
+    <div id="@(Model.OrderFormCarouselID)" class="pt-2 carousel slide carousel-fade order-form-group-carousel" data-bs-interval="false" data-bs-touch="false">
+        <div class="carousel-inner">
+            <div class="order-form-product carousel-item active mt-0 mb-4 placeholder">
+            </div>
+            <!-- ko foreachInit: { name: 'ko-blank-template', data: sizeGroups, createElement: createSizeGroup } -->
+           @foreach (var item in Model.Items.OrderBy(p => p.SortOrder))
+            {
+                <div id="@(item.OrderFormCarouselID.Replace("#", ""))"
+                     class="order-form-product carousel-item"
+                     data-init>
+                    @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", item)
+                </div>
+            }
+            <!-- /ko -->
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.querySelector('#@(Model.OrderFormCarouselID)').addEventListener('slide.bs.carousel', (event) => {
+            
+            let selectSizeElement = event.target.parentElement.querySelector('.select-a-size');
+
+            if (selectSizeElement) {
+                selectSizeElement.remove();
+            }
+        });
+    </script>
+    }
+    else
+    {
+        foreach (var item in Model.Items)
+        {
+            @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", item)
+        }
+    }
+</div>

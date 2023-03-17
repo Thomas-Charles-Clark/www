@@ -1,0 +1,653 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+    
+    var tradeUser = objMaster.TradeAllowed;
+}<div class="modal fade" tabindex="-1" id="back-in-stock-success-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    @HtmlHelperExtra.Resource("BISRSuccess1", l, c, d)
+                </p>
+                <p class="mb-0">
+                    @HtmlHelperExtra.Resource("BISRSuccess2", l, c, d)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="back-in-stock-login-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @HtmlHelperExtra.Resource("BISRHeader", l, c, d)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    @HtmlHelperExtra.Resource("BISRLoginMessage", l, c, d)
+                </p>
+                <div class="grid" style="--bs-columns: 2">
+                    <div>
+                        <p class="text-center">
+                            @HtmlHelperExtra.Resource("BISRExistingCustomers", l, c, d)
+                        </p>
+                        <a class="btn btn-secondary w-100 text-center" rel="nofollow" href="@dgFramework.buildLoginRedirectToCurrentUrl(ci, objMaster.UrlBreakdown.ContentType, objMaster.UrlBreakdown.ContentId)">
+                            @HtmlHelperExtra.Resource("BISRLogInToCreate", l, c, d)
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-center">
+                            @HtmlHelperExtra.Resource("BISRNewCustomers", l, c, d)
+                        </p>
+                        <a class="btn btn-secondary w-100 text-center" rel="nofollow" href="@dgFramework.buildRegisterRedirectToCurrentUrl(ci, objMaster.UrlBreakdown.ContentType, objMaster.UrlBreakdown.ContentId)">
+                            @HtmlHelperExtra.Resource("BISRRegisterToCreate", l, c, d)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="confirm-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark" onclick="window.confirmModalInstance.confirmFn()">
+                    @HtmlHelperExtra.Resource("Yes", l, c, d)
+                </button>
+                <button class="btn btn-light" onclick="window.confirmModalInstance.rejectFn()">
+                    @HtmlHelperExtra.Resource("No", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="info-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="window.infoModalInstance.closeFn()">
+                    @HtmlHelperExtra.Resource("Ok", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="error-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @HtmlHelperExtra.Resource("Error", l, c, d)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    @HtmlHelperExtra.Resource(tradeUser ? "MajorErrorTrade" : "MajorError", l, c, d)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="stock-modal">
+    <!-- ko if: typeof stockInfoModel !== 'undefined' -->
+    <div class="modal-dialog modal-lg" role="document" data-bind="with: stockInfoModel,
+            css: { 
+                'modal-lg modal-xl modal-fullscreen-lg-down': $data.hasOwnProperty('deliveryAddressFactory') ? deliveryAddressFactory.actingCutLength() : false 
+            }">    
+        <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="stock-title" class="modal-title" data-bind="with: product">
+                    <span data-bind="text: name"></span>
+                </h4>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div id="stock-container" class="modal-body">
+                <table class="table table-bordered table-striped mb-3">
+                    <thead>
+                        <tr>
+                            <th>
+                                @HtmlHelperExtra.Resource("Product", l, c, d): 
+                                <span style="font-weight: normal" data-bind="with: product">
+                                    <span data-bind="text: code"></span>
+                                    -
+                                    <span data-bind="text: name"></span>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="grid">
+                    <div data-bind="style: { 'grid-column': parent.hasOwnProperty('deliveryAddressFactory') ? '': 'auto/span 12' }">
+                        <div id="stock-tab-menu">
+                            <ul class="nav nav-tabs nav-justified" id="stock-tabs">
+                                <li class="nav-item">
+                                    <button id="in-tab"
+                                            class="nav-link active"
+                                            type="button"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#stock-tab-in"
+                                            role="tab"
+                                            aria-controls="stock-tab-in"
+                                            aria-selected="true">
+                                        <span>
+                                            @HtmlHelperExtra.Resource("InStock", l, c, d)
+                                            (<span data-bind="text: totalInStock"></span>)
+                                        </span>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button id="due-in-tab"
+                                            class="nav-link"
+                                            type="button"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#stock-tab-due"
+                                            role="tab"
+                                            aria-controls="stock-tab-due"
+                                            aria-selected="false">
+                                        <span>
+                                            @HtmlHelperExtra.Resource("DueIn", l, c, d)
+                                            (<span data-bind="text: totalDueIn"></span>)
+                                        </span>
+                                    </button>
+                                </li>
+                                <!-- ko if: supplierHasStock() -->
+                                <li class="nav-item">
+                                    <button id="sup-tab"
+                                            class="nav-link"
+                                            type="button"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#stock-tab-supplier"
+                                            aria-controls="stock-tab-supplier"
+                                            aria-selected="false">
+                                        <span>
+                                            @HtmlHelperExtra.Resource("SupplierStock", l, c, d)
+                                            (<span data-bind="text: totalSupplier"></span>)
+                                        </span>
+                                    </button>
+                                </li>
+                                <!-- /ko -->
+                            </ul>
+                            <div class="tab-content">
+                                <div id="stock-tab-in" class="tab-pane active">
+                                    <table class="stock-table stock-total-table table table-bordered mb-3">
+                                        <colgroup>
+                                            <col>
+                                            <col style="width: 182px;">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    @HtmlHelperExtra.Resource("AvailableStock", l, c, d)
+                                                </th>
+                                                <th class="text-right">
+                                                    <span class="text-bold" data-bind="text: totalInStock"></span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <!-- ko with: inStockData -->
+                                    <table class="stock-table table table-bordered">
+                                        <colgroup>
+                                            <col style="width: 25%">
+                                            <col>
+                                            <col style="width: 182px">
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    @HtmlHelperExtra.Resource("BatchNo", l, c, d)
+                                                </th>
+                                                <th class="text-right">
+                                                    @HtmlHelperExtra.Resource("Length", l, c, d)
+                                                </th>
+                                                <th class="total-heading text-right">
+                                                    @HtmlHelperExtra.Resource("Total", l, c, d)
+                                                </th>
+                                            </tr>
+                                            <!-- ko foreach: $data -->
+                                            <!-- ko if: Pieces != null --> 
+                                            <!-- ko foreach: Pieces -->
+                                                <!-- ko if: $index() == 0 -->
+                                                <tr>
+                                                    <th class="batch-no" rowspan="7" data-bind="attr: { 'rowspan': $parent.Pieces.length + +1 }, text: $parent.BatchNumber"></th>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: $index() == 0 -->
+                                                <tr>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                            <tr>
+                                                <th class="total text-right"></th>
+                                                <th class="total text-right text-bold" data-bind="text: totalStock + $parentContext.$parent.unit()"></th>
+                                            </tr>
+                                            <!-- /ko -->
+                                            <!-- /ko -->
+                                        </tbody>
+                                    </table>
+                                    <!-- /ko -->
+                                </div>
+                                <div id="stock-tab-due" class="tab-pane">
+                                    <table class="stock-table stock-total-table table table-bordered mb-3">
+                                        <colgroup>
+                                            <col>
+                                            <col style="width: 182px;">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th style="border-right: 0;">
+                                                    @HtmlHelperExtra.Resource("IncomingStock", l, c, d)
+                                                </th>
+                                                <th class="stock-total total-heading" style="border-left: 0;">
+                                                    <span class="text-bold" data-bind="text: totalPurchaseOrderStock"></span><span class="text-bold" data-bind="text: unit"></span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <table class="stock-table table table-bordered">
+                                        <colgroup>
+                                            <col style="width: 385px;">
+                                            <col style="width: 182px;">
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th class="due-date-heading">
+                                                    @HtmlHelperExtra.Resource("DueDate", l, c, d)
+                                                </th>
+                                                <th class="length-heading text-right">
+                                                    @HtmlHelperExtra.Resource("Length", l, c, d)
+                                                </th>
+                                            </tr>
+                                            <!-- ko foreach: dueInData -->
+                                            <tr>
+                                                <td class="due-date-heading" data-bind="text: (DueDate || '') + (POConfirmed == null ? '' : (POConfirmed ? ' (confirmed)' : ' (unconfirmed)'))"></td>
+                                                <td class="text-right" data-bind="text: Number(Length).toFixed(2) + $parent.unit()"></td>
+                                            </tr>
+                                            <!-- /ko -->
+                                            <tr>
+                                                <th class="total">Total</th>
+                                                <th class="total text-right" data-bind="text: totalDueIn()"></th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- ko if: supplierHasStock() -->
+                                <div id="stock-tab-supplier" class="tab-pane">
+                                    <table class="stock-table stock-total-table table table-bordered">
+                                        <colgroup>
+                                            <col>
+                                            <col style="width: 182px;">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th style="border-right: 0;">
+                                                    @HtmlHelperExtra.Resource("AvailableStock", l, c, d)
+                                                </th>
+                                                <th class="stock-total total-heading" style="border-left: 0;">
+                                                    <span class="text-bold" data-bind="text: totalSupplier"></span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <!-- ko if: supplierStockAvailabilityMessage() -->
+                                    <p class="margin-bottom-15" data-bind="text: supplierStockAvailabilityMessage"></p>
+                                    <!-- /ko -->
+                                    <!-- ko with: supplierData -->
+                                    <table class="stock-table table table-bordered">
+                                        <colgroup>
+                                            <col style="width: 25%">
+                                            <col>
+                                            <col style="width: 182px">
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    @HtmlHelperExtra.Resource("BatchNo", l, c, d)
+                                                </th>
+                                                <th class="text-right">
+                                                    @HtmlHelperExtra.Resource("Length", l, c, d)
+                                                </th>
+                                                <th class="total-heading text-right">
+                                                    @HtmlHelperExtra.Resource("Total", l, c, d)
+                                                </th>
+                                            </tr>
+                                            <!-- ko foreach: $data -->
+                                            <!-- ko if: Pieces != null --> 
+                                            <!-- ko foreach: Pieces -->
+                                                <!-- ko if: $index() == 0 -->
+                                                <tr>
+                                                    <th class="batch-no" rowspan="7" data-bind="attr: { 'rowspan': $parent.Pieces.length + +1 }, text: $parent.BatchNumber"></th>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: $index() == 0 -->
+                                                <tr>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                    <td class="text-right" data-bind="text: Number($data.Length).toFixed(2) + $parentContext.$parentContext.$parent.unit()"></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                            <!-- /ko -->
+                                            <!-- /ko -->
+                                        </tbody>
+                                    </table>
+                                    <!-- /ko -->
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ko if: parent.hasOwnProperty('deliveryAddressFactory') -->
+                    <!-- ko with: $parent.deliveryAddressFactory.actingCutLength -->
+                    <!-- ko if: PermitBatch || PermitCutLengthBreakdown -->
+                    <div>
+                        <div data-bind="with: cutLengthBreakdown">
+                            <!-- ko if: PermitBatch -->
+                            <h5 id="batch-header"
+                                class="cut-header">
+                                @HtmlHelperExtra.Resource("Batch", l, c, d)
+                                <small class="d-block">
+                                    <small>
+                                        (optional) - if required you may request a specific batch from the list of available batches below.
+                                    </small>
+                                </small>
+                            </h5>
+                            <div class="mb-8">
+                                <select id="available-batches"
+                                        class="form-select"
+                                        aria-labelledby="batch-header"
+                                        data-bind="options: availableBatches,
+                                                   optionsText: 'text',
+                                                   optionsValue: 'batch',
+                                                   value: selectedBatch,
+                                                   optionsCaption: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d)))'">
+                                </select>
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko ifnot: PermitBatch -->
+                            <!-- ko ifnot: $parentContext.$parent.sufficientSinglePieceAvailable() -->
+                            <div class="alert alert-danger mb-3">
+                                <p class="validation-message text-danger mb-0">
+                                    We don't currently have a single piece large enough to satisfy your order. Please specify a breakdown.
+                                </p>
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko if: $parentContext.$parent.sufficientSinglePieceAvailable() -->
+                            <div class="alert alert-warning my-3">
+                                <p class="validation-message text-danger margin-bottom-0">
+                                    We have sufficient stock to satisfy your order. A cut piece breakdown is not required. You may request a breakdown if you require specific cuts.
+                                </p>
+                            </div>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                        <!-- ko if: PermitCutLengthBreakdown -->
+                        <h5 id="cut-header"
+                            class="cut-header">
+                            @HtmlHelperExtra.Resource("CutPieceBreakdown", l, c, d)*
+                            <small class="d-flex justify-content-between align-items-center">
+                                <small>
+                                    Please continue to add cuts until your full line quantity is accounted for.
+                                </small>
+                                <span class="text-right">
+                                    Order Quantity: <span data-bind="text: Quantity + 'm'"></span>
+                                </span>
+                            </small>
+                        </h5>
+                        <table class="allocation-table table table-condensed" data-bind="with: cutLengthBreakdown">
+                            <colgroup>
+                                <col />
+                            </colgroup>
+                            <tbody>
+                                <tr class="batch-row">
+                                    <td>
+                                        <table class="cut-table piece-table margin-bottom-15">
+                                            <colgroup>
+                                                <col style="width: 50%" />
+                                                <col style="width: 50%" />
+                                            </colgroup>
+                                            <tbody>
+                                                <!-- ko if: cuts().length -->
+                                                <tr>
+                                                    <td>
+                                                        <!-- ko foreach: cuts -->
+                                                        <div class="cut-input me-5 mb-3" data-bind="component: { name: 'mdc-text-field-numeric-component', params: cutLengthParams }"></div>
+                                                        <!-- /ko -->
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <button class="btn btn-secondary me-3" data-bind="click: function () { addCut(); }, visible: remainingToCut() > 0">
+                                                                Add Cut
+                                                            </button>
+                                                            <!-- ko if: !cuts.isValid() -->
+                                                            <span class="text-danger margin-left-15" data-bind="visible: remainingToCut() > 0">
+                                                                (<span data-bind="text: remainingToCut().toFixed(1) + 'm'"></span> Remaining)
+                                                            </span>
+                                                            <!-- /ko -->
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <small class="cut-piece-note">
+                            *Our stock is constantly changing, if we are unable to fulfil your cut piece breakdown request a member of our customer services team will contact you to discuss your options.
+                        </small>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+                <!-- ko if: Number(totalStock()) + Number(totalPurchaseOrderStock()) == 0 -->
+                <p class="mt-3 mb-0" >
+                    <a href="/l111">
+                        @HtmlHelperExtra.Resource("OutOfStockContact", l, c, d)
+                    </a>
+                </p>
+                <!-- /ko -->
+            </div>
+            <div class="modal-footer">
+                <button id="stock-close" type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">
+                    @HtmlHelperExtra.Resource("CloseProperCase", l, c, d)
+                </button>
+                <!-- ko if: parent.hasOwnProperty('deliveryAddressFactory') -->
+                <!-- ko with: $parent.deliveryAddressFactory.actingCutLength -->
+                <!-- ko if: PermitBatch || PermitCutLengthBreakdown -->
+                <button class="btn btn-light" data-bind="click: cutLengthBreakdown.removeCutLengthBreakdown">
+                    @HtmlHelperExtra.Resource("MoodboardSearchReset", l, c, d)
+                </button>
+                <!-- ko if: PermitBatch && !PermitCutLengthBreakdown -->
+                <button class="btn btn-success" data-bind="click: cutLengthBreakdown.saveCutLengthBreakdown">
+                    @HtmlHelperExtra.Resource("MoodboardSave", l, c, d)
+                </button>
+                <!-- /ko -->
+                <!-- ko if: PermitBatch && PermitCutLengthBreakdown -->
+                <button class="btn btn-success" data-bind="enable: cutLengthBreakdown.cuts.isValid, click: cutLengthBreakdown.saveCutLengthBreakdown">
+                    @HtmlHelperExtra.Resource("MoodboardSave", l, c, d)
+                </button>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>
+@if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
+    Model.HasEcommercePopupBanners)
+{
+    var b = Model.EcommercePopupBanners.First().banners[0];
+<div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="ecommerce-pop-modal">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="grid" data-bind="visible: !complete()">
+                    <div>
+                        <img width="512"
+                             height="749"
+                             class="d-block w-100"
+                             alt="@(b.altText ?? b.overlayText)"
+                             loading="lazy"
+                             @HtmlHelperExtra.BannerImageSourceSetSizes(b.bannerId, b.version, ImageSize.Twelve) />
+                    </div>
+                    <div class="d-flex flex-column justify-content-center align-items-center">
+                        <p class="text-center" data-bind="with: pageSectionForm">
+                            <span data-bind="html: HeaderText"></span>
+                        </p>
+                        <div class="mb-3"
+                             data-bind="validationOptions: { insertMessages: false }">
+                            <label for="email" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsEmail", l, c, d)
+                            </label>
+                            <input id="email"
+                                   name="email"
+                                   class="form-control"
+                                   type="text"
+                                   aria-errormessage="email-error"
+                                   data-bind="keepElement: email,
+                                              textInput: email,
+                                              attr:{
+                                                'aria-invalid': !email.isValid()
+                                              }"
+                                   />
+                            <span id="email-error" class="validation-message" data-bind="validationMessage: email"></span>
+                        </div>
+                        <div class="mb-3"
+                             data-bind="validationOptions: { insertMessages: false }">
+                            <label for="confirm-email" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
+                            </label>
+                            <input id="confirm-email"
+                                   name="confirm-email"
+                                   class="form-control"
+                                   aria-errormessage="confirm-email-error"
+                                   type="text"
+                                   data-bind="keepElement: emailConfirmation,
+                                              textInput: emailConfirmation"
+                                   />
+                            <span id="confirm-email-error" class="validation-message" data-bind="validationMessage: emailConfirmation"></span>
+                        </div>
+                        <div class="mb-3"
+                             data-bind="validationOptions: { insertMessages: false }">
+                            <label for="country" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
+                            </label>
+                            <select id="country"
+                                    name="country"
+                                    class="form-select"
+                                    data-bind="keepElement: marketingCountryId,
+                                               options: availableCountries,
+                                               optionsText: 'Name',
+                                               optionsValue: 'CountryID',
+                                               optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                                               value: marketingCountryId,
+                                               attr: {
+                                                  'aria-invalid': !marketingCountryId.isValid()
+                                               }">
+                            </select>
+                            <span id="country-error" class="validation-message" data-bind="validationMessage: marketingCountryId"></span>
+                        </div>
+                        <div style="display: none"
+                             class="mb-3"
+                             data-bind="visible: currentlyAvailableLanguages().length > 1">
+                            <label for="country" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
+                            </label>
+                            <select id="register-language"
+                                   class="form-select"
+                                   data-bind="value: languageId,
+                                    options: currentlyAvailableLanguages,
+                                    optionsText: 'Name',
+                                    optionsValue: 'LanguageID'">
+                            </select>
+                        </div>
+                        <!-- ko foreach: marketingPermissions -->
+                        <!-- ko ifnot: Hidden -->
+                        <div class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
+                            <input class="form-check-input" type="checkbox" data-bind="checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
+                            <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
+                                <span data-bind="html: Label"></span>
+                            </label>
+                        </div>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <div data-bind="with: pageSectionForm">
+                            <button type="button"
+                                    class="btn btn-dark"
+                                    data-bind="html: SubmitButtonText, click: $parent.submit"></button>
+                        </div>
+                        <p class="text-center mt-4 small" data-bind="with: pageSectionForm">
+                            <span data-bind="html: FooterText"></span>
+                        </p>
+                    </div>
+                </div>
+                <div id="popup-complete"
+                     data-bind="visible: complete, with: banner">
+                    <img width="1024"
+                         height="749"
+                         data-bind="attr: {
+                            src: '/imagebanner@(Framework.WebPFallback)/1024/' + bannerId + '-B?v=' + version,
+                            alt: altText
+                         }"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+@Render.ScriptDefer("~/bundles/js/commmon-modals")

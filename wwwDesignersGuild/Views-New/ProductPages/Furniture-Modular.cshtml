@@ -1,0 +1,585 @@
+﻿@model ProductPageViewModel_Furniture_Modular
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+}
+@section LateTemplateScripts {
+    @Render.Script("~/bundles/js/product-page")
+}
+@section TemplateStyles {
+    @Render.StylesPreload("~/bundles/css/furniture-modular")
+    @if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/furniture-modular-mobile")
+    }
+}
+@Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
+<div id="ko-wrapper">
+    @if (Model.AllProductsUnavailable)
+    {
+        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+            @JsonConvert.SerializeObject(new ProductPageViewModel_Empty())
+        </div>
+    }
+    else
+    {
+        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+            @JsonConvert.SerializeObject(Model)
+        </div>
+    }
+    <div id="product-page-main" class="grid">
+        <div id="product-page-carousel-wrapper">
+            <div class="mb-3">
+                @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+            </div>
+        </div>
+        <div id="product-page-order-form-wrapper">
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-top">
+                    <div>
+                        <h4 class="text-uppercase">
+                            @Model.Definition.heading
+                            @if (Model.Definition.isNew)
+                            {
+                                <sup class="heading-new">
+                                    @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                                </sup>
+                            }
+                        </h4>
+                        <h6 class="text-uppercase">
+                            @Model.Definition.brand
+                        </h6>
+                        <h6>
+                            @Model.Definition.subHeading
+                        </h6>
+                        @Model.ReviewStarsDisplay()
+                    </div>
+                    @if (!Model.AllProductsUnavailable && JObject.FromObject(Model.ProductPagePrice)["discountMessage"] != null)
+                    {
+                        <div class="text-end">
+                            <h4 class="discount">
+                                @JObject.FromObject(Model.ProductPagePrice).SelectToken("discountMessage")
+                            </h4>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="my-4">
+                <hr />
+            </div>
+            @if (Model.Modules.Any())
+            {
+                <div class="grid modules-grid">
+                    @foreach (var module in Model.Modules)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <button class="btn btn-light"
+                                        aria-controls="module-@(module.ModuleID)-modal"
+                                        data-bs-target="#module-@(module.ModuleID)-modal"
+                                        data-bs-toggle="modal">
+                                    @module.Name
+                                    <span class="d-block">
+                                        (@module.OptionsCount)
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    @for (var i = 3 - Model.Modules.Count; i > 0; i--)
+                    {
+                        <div class="card"></div>
+                    }
+                    @foreach (var module in Model.Modules)
+                    {
+                        <div class="card">
+                            <button class="btn btn-link"
+                                    aria-controls="module-@(module.ModuleID)-modal"
+                                    data-bs-target="#module-@(module.ModuleID)-modal"
+                                    data-bs-toggle="modal">
+                                <img src="/image@(Framework.WebPFallback)/322/@(module.Current.ModuleOptionImageID)"
+                                     width="322"
+                                     height="322"
+                                     altText="@(module.Name)"
+                                     titleText="@(module.Name)"
+                                     @HtmlHelperExtra.ImageSourceSetSizes(module.Current.ModuleOptionImageID, ImageSize.Two) />
+                            </button>
+                        </div>
+                    }
+                    @for (var i = 3 - Model.Modules.Count; i > 0; i--)
+                    {
+                        <div class="card"></div>
+                    }
+                </div>
+            }
+            <div class="my-4">
+                <hr />
+            </div>
+            @if (Model.AllProductsUnavailable)
+            {
+                <h3>
+                    @HtmlHelperExtra.Resource("AllProductsUnavailable", l, c, d)
+                </h3>
+            }
+            else
+            {
+                if (!Model.UseOrderFormGrouping)
+                {
+                    <!-- ko foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup } -->
+                    <div data-init
+                         class="order-form-group">
+                        @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", Model.MainProduct)
+                    </div>
+                    foreach (var op in Model.OtherProducts)
+                    {
+                        <div data-init
+                             class="order-form-group">
+                            @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", op)
+                        </div>
+                    }
+                    <!-- /ko -->
+                }
+                else
+                {
+                    <!-- ko foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup } -->
+                    foreach (var ofg in Model.OrderFormGroups)
+                    {
+                        @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormGroup.cshtml", ofg)
+                    }
+                    <!-- /ko -->
+                }
+            }
+            <div id="product-page-accordion" class="my-3 accordion accordion-flush">
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="description-panel-heading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description-panel" aria-expanded="true" aria-controls="description-panel">
+                            @HtmlHelperExtra.Resource("Description", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="description-panel" class="accordion-collapse collapse show" aria-labelledby="description-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            @Html.Raw(JObject.FromObject(Model.Definition.json).SelectToken("description"))
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="information-panel-heading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#information-panel" aria-expanded="false" aria-controls="information-panel">
+                            @HtmlHelperExtra.Resource("Information", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="information-panel" class="accordion-collapse collapse" aria-labelledby="information-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            @if (JObject.FromObject(Model.Definition.json).SelectToken("attributes").Type != JTokenType.Null)
+                            {
+                                <dl class="grid">
+                                    @foreach (var attribute in JObject.FromObject(Model.Definition.json).SelectToken("attributes").Children())
+                                    {
+                                        <dt>
+                                            @(attribute.SelectToken("attributeGroup"))
+                                        </dt>
+                                        <dd>
+                                            @(attribute.SelectToken("attribute"))
+                                        </dd>
+                                    }
+                                </dl>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="reviews-panel-heading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviews-panel" aria-expanded="false" aria-controls="reviews-panel">
+                            @HtmlHelperExtra.Resource("Reviews", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="reviews-panel" class="accordion-collapse collapse" aria-labelledby="reviews-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            @if (!Model.Reviews.Any())
+                            {
+                                @HtmlHelperExtra.Resource("NoReviewsYet", l, c, d)
+                            }
+                            else
+                            {
+                                foreach (var r in Model.Reviews)
+                                {
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                @r.Date
+                                            </h5>
+                                            <h6 class="card-subtitle my-2">
+                                                @r.ReviewStarsDisplay()
+                                            </h6>
+                                            <p class="card-text">
+                                                @Html.Raw(r.Review)
+                                            </p>
+                                            <a href="@r.ReadMoreURL" target="_blank" rel="nofollow">
+                                                @r.ReadMoreURL
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.RelatedProductPages.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
+}
+@foreach (var mod in Model.Modules)
+{
+    <div class="modal module-option-modal" tabindex="-1" id="module-@(mod.ModuleID)-modal">
+        <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(mod.Name)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="grid module-option-preview">
+                        <div id="module-@(mod.ModuleID)-carousel-a"
+                             class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="false">
+                            <div class="carousel-inner">
+                                @if (mod.GroupedOptions.Any())
+                                {
+                                    foreach (var mog in mod.GroupedOptions)
+                                    {
+                                        foreach (var mo in mog.Options)
+                                        {
+                                            <div class="carousel-item @(mo.ModuleOptionID == mod.Current.ModuleOptionID ? "active" : "")">
+                                                <a href="@mo.URL">
+                                                    <img src="/image@(Framework.WebPFallback)/654/@mo.ProductPageImageID"
+                                                         class="preview"
+                                                         alt="@mo.Name"
+                                                         title="@mo.Name"
+                                                         width="488"
+                                                         height="488"
+                                                         @HtmlHelperExtra.ImageSourceSetSizes(mo.ProductPageImageID, ImageSize.Three) />
+
+                                                </a>
+                                                <div class="carousel-caption px-0">
+                                                    <a class="btn btn-secondary btn-large" href="@mo.URL">
+                                                        @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="carousel-item active">
+                                        <a href="@mod.Current.URL">
+                                            <img src="/image@(Framework.WebPFallback)/654/@mod.Current.ProductPageImageID"
+                                                 class="preview"
+                                                 alt="@mod.Current.Name"
+                                                 title="@mod.Current.Name"
+                                                 width="488"
+                                                 height="488"
+                                                 @HtmlHelperExtra.ImageSourceSetSizes(mod.Current.ProductPageImageID, ImageSize.Three) />
+                                        </a>
+                                        <div class="carousel-caption px-0">
+                                            <a class="btn btn-secondary btn-large" href="@mod.Current.URL">
+                                                @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                            </a>
+                                        </div>
+                                    </div>
+                                    foreach (var o in mod.OptionsExceptCurrent)
+                                    {
+                                        <div class="carousel-item">
+                                            <a href="@o.URL">
+                                                <img src="/image@(Framework.WebPFallback)/654/@o.ProductPageImageID"
+                                                     class="preview"
+                                                     alt="@o.Name"
+                                                     title="@o.Name"
+                                                     width="488"
+                                                     height="488"
+                                                     @HtmlHelperExtra.ImageSourceSetSizes(o.ProductPageImageID, ImageSize.Three)
+                                                     loading="lazy" />
+                                            </a>
+                                            <div class="carousel-caption px-0">
+                                                <a class="btn btn-secondary btn-large" href="@o.URL">
+                                                    @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div id="module-@(mod.ModuleID)-carousel-b"
+                             class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="false">
+                            <div class="carousel-inner">
+                                @if (mod.GroupedOptions.Any())
+                                {
+                                    foreach (var mog in mod.GroupedOptions)
+                                    {
+                                        foreach (var mo in mog.Options)
+                                        {
+                                            <div class="carousel-item @(mo.ModuleOptionID == mod.Current.ModuleOptionID ? "active" : "")">
+                                                <a href="@mo.URL">
+                                                    <img src="/image@(Framework.WebPFallback)/654/@mo.ModuleOptionImageID"
+                                                         class="preview"
+                                                         alt="@mo.Name"
+                                                         title="@mo.Name"
+                                                         width="488"
+                                                         height="488"
+                                                         @HtmlHelperExtra.ImageSourceSetSizes(mo.ModuleOptionImageID, ImageSize.Three) />
+                                                    <div class="carousel-caption">
+                                                        <h5>
+                                                            @if (!String.IsNullOrEmpty(mo.Name))
+                                                            {
+                                                                <span class="d-block">
+                                                                    @mo.Name
+                                                                </span>
+                                                            }
+                                                            @if (!String.IsNullOrEmpty(mo.ModuleOptionGroupName))
+                                                            {
+                                                                <strong class="d-block">
+                                                                    @mo.ModuleOptionGroupName
+                                                                </strong>
+                                                            }
+                                                            @if (!String.IsNullOrEmpty(mo.Code))
+                                                            {
+                                                                <span class="d-block">
+                                                                    @mo.Code
+                                                                </span>
+                                                            }
+                                                        </h5>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="carousel-item active">
+                                        <a href="@mod.Current.URL">
+                                            <img src="/image@(Framework.WebPFallback)/654/@mod.Current.ModuleOptionImageID"
+                                                 class="preview"
+                                                 alt="@mod.Current.Name"
+                                                 title="@mod.Current.Name"
+                                                 width="488"
+                                                 height="488"
+                                                 @HtmlHelperExtra.ImageSourceSetSizes(mod.Current.ModuleOptionImageID, ImageSize.Three) />
+                                            <div class="carousel-caption">
+                                                <h5>
+                                                    @if (!String.IsNullOrEmpty(mod.Current.Name))
+                                                    {
+                                                        <span class="d-block">
+                                                            @mod.Current.Name
+                                                        </span>
+                                                    }
+                                                    @if (!String.IsNullOrEmpty(mod.Current.ModuleOptionGroupName))
+                                                    {
+                                                        <strong class="d-block">
+                                                            @mod.Current.ModuleOptionGroupName
+                                                        </strong>
+                                                    }
+                                                    @if (!String.IsNullOrEmpty(mod.Current.Code))
+                                                    {
+                                                        <span class="d-block">
+                                                            @mod.Current.Code
+                                                        </span>
+                                                    }
+                                                </h5>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    foreach (var o in mod.OptionsExceptCurrent)
+                                    {
+                                        <div class="carousel-item">
+                                            <a href="@o.URL">
+                                                <img src="/image@(Framework.WebPFallback)/654/@o.ModuleOptionImageID"
+                                                     class="preview"
+                                                     alt="@o.Name"
+                                                     title="@o.Name"
+                                                     width="488"
+                                                     height="488"
+                                                     @HtmlHelperExtra.ImageSourceSetSizes(o.ModuleOptionImageID, ImageSize.Three)
+                                                     loading="lazy" />
+                                                <div class="carousel-caption">
+                                                    <h5>
+                                                        @if (!String.IsNullOrEmpty(o.Name))
+                                                        {
+                                                            <span class="d-block">
+                                                                @o.Name
+                                                            </span>
+                                                        }
+                                                        @if (!String.IsNullOrEmpty(o.ModuleOptionGroupName))
+                                                        {
+                                                            <strong class="d-block">
+                                                                @o.ModuleOptionGroupName
+                                                            </strong>
+                                                        }
+                                                        @if (!String.IsNullOrEmpty(o.Code))
+                                                        {
+                                                            <span class="d-block">
+                                                                @o.Code
+                                                            </span>
+                                                        }
+                                                    </h5>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (mod.GroupedOptions.Any())
+                    {
+                        var index = 0;
+                        <div class="accordion-wrapper">
+                            <div id="module-@(mod.ModuleID)-option-group-accordion"
+                                 class="accordion accordion-flush">
+                                @foreach (var obj in mod.GroupedOptions.Select((g, i) => new { g, i }))
+                                {
+                                    var mog = obj.g;
+                                    var open = obj.i == 0;
+                                    <div class="accordion-item">
+                                        <h4 class="accordion-header" id="module-option-group-@(mog.ModuleOptionGroupID)-heading">
+                                            <button class="accordion-button @(open ? "" : "collapsed")" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#module-option-group-@(mog.ModuleOptionGroupID)"
+                                                    aria-expanded="@(open ? "true" : "false")"
+                                                    aria-controls="module-option-group-@(mog.ModuleOptionGroupID)">
+                                                <span>
+                                                    @(mog.Name)
+                                                    <small class="d-block mt-2">
+                                                        @(mog.Description)
+                                                    </small>
+                                                </span>
+                                            </button>
+                                        </h4>
+                                        <div id="module-option-group-@(mog.ModuleOptionGroupID)"
+                                             class="accordion-collapse collapse @(open ? "show" : "")"
+                                             aria-labelledby="module-option-group-@(mog.ModuleOptionGroupID)"
+                                             data-bs-parent="#module-@(mod.ModuleID)-option-group-accordion">
+                                            <div class="accordion-body grid">
+                                                @foreach (var mo in mog.Options)
+                                                {
+                                                    <button class="card"
+                                                            data-bs-target="#module-@(mod.ModuleID)-carousel-a"
+                                                            data-bs-slide-to="@(index++)">
+                                                        <img src="/image@(Framework.WebPFallback)/322/@(mo.ModuleOptionImageID)"
+                                                             width="322"
+                                                             height="322"
+                                                             altText="@(mo.Name)"
+                                                             titleText="@(mo.Name)"
+                                                             @HtmlHelperExtra.ImageSourceSetSizes(mo.ModuleOptionImageID, ImageSize.Two)
+                                                             loading="@(open ? "eager" : "lazy")" />
+                                                        @*<div class="card-body">
+                                                               @if (!String.IsNullOrEmpty(mo.Code))
+                                                                {
+                                                                    <h6 class="card-title">
+                                                                        @mo.Name
+                                                                    </h6>
+                                                                    <p class="card-text">
+                                                                        @mo.Code
+                                                                    </p>
+                                                                }
+                                                            </div>*@
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="grid">
+                            <button class="card"
+                                    data-bs-target="#module-@(mod.ModuleID)-carousel-a"
+                                    data-bs-slide-to="0">
+                                <img src="/image@(Framework.WebPFallback)/322/@(mod.Current.ModuleOptionImageID)"
+                                     width="322"
+                                     height="322"
+                                     altText="@(mod.Current.Name)"
+                                     titleText="@(mod.Current.Name)"
+                                     @HtmlHelperExtra.ImageSourceSetSizes(mod.Current.ModuleOptionImageID, ImageSize.Two) />
+                                @*<div class="card-body">
+                                        @if (!String.IsNullOrEmpty(mod.Current.Name))
+                                        {
+                                            <div class="card-title">
+                                                <p class="card-text">
+                                                    @mod.Current.Name
+                                                </p>
+                                            </div>
+                                        }
+                                    </div>*@
+                            </button>
+                            @foreach (var obj in mod.OptionsExceptCurrent.Select((value, index) => new { value, index }))
+                            {
+                                var mo = obj.value;
+                                var moIndex = obj.index + 1;
+                                <button class="card"
+                                        data-bs-target="#module-@(mod.ModuleID)-carousel-a"
+                                        data-bs-slide-to="@(moIndex)">
+                                    <img src="/image@(Framework.WebPFallback)/322/@(mo.ModuleOptionImageID)"
+                                         width="322"
+                                         height="322"
+                                         altText="@(mo.Name)"
+                                         titleText="@(mo.Name)"
+                                         @HtmlHelperExtra.ImageSourceSetSizes(mo.ModuleOptionImageID, ImageSize.Two) />
+                                    @*<div class="card-body">
+                                            @if (!String.IsNullOrEmpty(mo.Name))
+                                            {
+                                                <div class="card-title">
+                                                    <p class="card-text">
+                                                        @mo.Name
+                                                    </p>
+                                                </div>
+                                            }
+                                        </div>*@
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <script>
+            (() => {
+                let a = document.getElementById('module-@(mod.ModuleID)-carousel-a')
+                let b = document.getElementById('module-@(mod.ModuleID)-carousel-b')
+
+                a.addEventListener('slide.bs.carousel', function(e) {
+                    let car = bootstrap.Carousel.getOrCreateInstance(b)
+                    car.to(e.to)
+                })
+            })();
+        </script>
+    </div>
+}
+@if (Model.ShowRecentlyViewed)
+{
+    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+}
+@if (Model.RelatedSearches.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml", Model)
+}

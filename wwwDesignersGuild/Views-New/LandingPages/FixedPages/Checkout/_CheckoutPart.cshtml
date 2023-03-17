@@ -1,0 +1,23 @@
+﻿@model BaseViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{ 
+    Layout = null;
+
+    if (Model.MasterDefinition.UrlBreakdown.ContentId == (int)dgFixedPage.checkoutAddress)
+    {
+        @Html.Action("_checkoutAddress", "Section", Model.MasterDefinition);
+    }
+    else if (Model.MasterDefinition.UrlBreakdown.ContentId == (int)dgFixedPage.checkoutDispatch)
+    {
+        @Html.Action("_checkoutDespatch", "Section", Model.MasterDefinition);
+    }
+    else if (Model.MasterDefinition.UrlBreakdown.ContentId == (int)dgFixedPage.checkoutTotals)
+    {
+        @Html.Action("_checkoutTotal", "Section", Model.MasterDefinition);
+    }
+    else if (Model.MasterDefinition.UrlBreakdown.ContentId == (int)dgFixedPage.checkoutPay)
+    {
+        @Html.Action("_checkoutPay", "Section", Model.MasterDefinition);
+    }
+}

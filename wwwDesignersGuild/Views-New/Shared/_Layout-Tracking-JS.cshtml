@@ -1,0 +1,158 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var tradeAllowed = objMaster.TradeAllowed;
+}
+@*
+    DotDigital Tracking Explained
+
+    - Only actual DotDigital contacts can be tracked
+    - You can only be a DotDigital contact if you've given us permission to market to you
+    - We don't have contacts being auto-created by DotDigital tracking code (this is an optional feature, we do NOT want it enabled)
+    - Currently the only way to get into a DotDigital account is via the overnight data merge
+    -- We should probably be submitting people sooner than this
+
+    -- I should only be calling Identify for users which have granted marketing permission.
+
+    -- Soooooooooo... The VisitorSelect should probably give me marketing permission
+    -- This should be maintained in Session... and updated when altered...
+
+    -- Is there an 'unidentify' function?
+
+    Checkout and Confirm pages should not call identify themselves
+*@
+@if (!tradeAllowed)
+{
+<script type="text/javascript" defer>
+    window.addLoadFunction(() => {
+        if (typeof updateDotDigital === 'function')
+            updateDotDigital();
+    });
+</script>
+    if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]))
+    //if (true)
+    {
+        if (!String.IsNullOrEmpty(Model.DotDigitalBehaviourProfile?.WebBehaviourTrackingProfileID))
+        {
+<script type="text/javascript" defer>
+    (function(w,d,u,t,o,c){w['dmtrackingobjectname']=o;c=d.createElement(t);c.async=1;c.src=u;t=d.getElementsByTagName
+    (t)[0];t.parentNode.insertBefore(c,t);w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments);};
+    })(window, document, '//static.trackedweb.net/js/_dmptv4.js', 'script', 'dmPt');
+    window.dmPt('create', '@(Model.DotDigitalBehaviourProfile.WebBehaviourTrackingProfileID)', 'designersguild.com');
+    @if (Model.MasterDefinition.UrlBreakdown.ContentType != dgContentType.landingPage && (Session["memberEmail"] != null))
+    {
+        @:window.dmPt("identify", "@(Session["memberEmail"])");
+    }
+    else if ((Model.MasterDefinition.UrlBreakdown.ContentId != 213 && 
+            Model.MasterDefinition.UrlBreakdown.ContentId != 271 && 
+            Model.MasterDefinition.UrlBreakdown.ContentId != 281) && (Session["memberEmail"] != null))
+    {
+        @:window.dmPt("identify", "@(Session["memberEmail"])");
+    }
+
+    window.addLoadFunction(function () {
+        if (typeof productPageModel === 'object') {
+
+            let dotDigitalModel = null;
+
+            let price = productPageModel.products().length ? Enumerable.From(productPageModel.products()).Select('$.displayPrice').Min() : null;
+            let salePrice = productPageModel.products().length ? Enumerable.From(productPageModel.products()).Select('$.displaySalePrice').Min() || price : null;
+            let priceMessage = null;
+            if (productPageModel.hasOwnProperty('ProductPagePrice')) {
+
+                priceMessage = productPageModel.ProductPagePrice.priceMessage || productPageModel.ProductPagePrice.rRPMessage || '';
+
+                let priceMessageSplit = priceMessage.split('<br/>');
+
+                let productPriceWas = '';
+                let productPriceNow = '';
+
+                if (priceMessageSplit.length == 1) {
+                    productPriceNow = priceMessageSplit[0];
+                } else {
+                    productPriceWas = priceMessageSplit[0].replace('<span class="strike">', '').replace('</span>', '');
+                    productPriceNow = priceMessageSplit[1].replace('<span class="discount">', '').replace('</span>', '');
+                }
+
+                dotDigitalModel = {
+                    product_name: productPageModel.Definition.heading || '',
+                    product_url: window.location.href,
+                    product_image_path: ('https://www.designersguild.com/image/600/' + productPageModel.images()[0].imageId) || '',
+                    product_description: productPageModel.Definition.json.description || '',
+                    product_sku: ('P' + productPageModel.Definition.productPageId) || '',
+                    product_price: price || '',
+                    product_status: document.querySelector('#no-products-available') ? 'Not Available' : 'Available',
+                    product_currency: '@(objMaster.UrlBreakdown.countryDetails.CurrencyCode)',
+                    product_specialPrice: salePrice || '',
+                    product_price_was: productPriceWas || '',
+                    product_price_now: productPriceNow || '',
+                    product_categories: productPageModel.Definition.json.category || '',
+                    product_brand: productPageModel.Definition.json.brand || ''
+                };
+
+                if (dotDigitalModel != null) {
+                    console.log('dotDigital is pushing track with', dotDigitalModel);
+                    window.dmPt('track', dotDigitalModel);
+                }
+
+            } else {
+                dotDigitalModel = {
+                    product_name: productPageModel.Definition.heading || '',
+                    product_url: window.location.href,
+                    product_image_path: ('https://www.designersguild.com/image/600/' + productPageModel.images()[0].imageId) || '',
+                    product_description: productPageModel.Definition.json.description || '',
+                    product_sku: ('P' + productPageModel.Definition.productPageId) || '',
+                    product_price: price || '',
+                    product_status: document.querySelector('#no-products-available') ? 'Not Available' : 'Available',
+                    product_currency: '@(objMaster.UrlBreakdown.countryDetails.CurrencyCode)',
+                    product_specialPrice: salePrice || '',
+                    product_price_was: '',
+                    product_price_now: '',
+                    product_categories: productPageModel.Definition.json.category || '',
+                    product_brand: productPageModel.Definition.json.brand || ''
+                };
+
+                if (dotDigitalModel != null) {
+                    console.log('dotDigital is pushing track with', dotDigitalModel);
+                    window.dmPt('track', dotDigitalModel);
+                }
+
+            }
+        } else {
+            console.log('dotDigital is pushing track without details');
+            window.dmPt('track');
+        }
+    });
+
+    function updateDotDigital() {
+        
+        let payload = JSON.stringify(getMasterDefinition());
+        fetch('/api/basket/DotDigitalJSON', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: payload
+        })
+        .then(async (response) => {
+            return JSON.parse(await window.handleFetchResponse(response, payload));
+        })
+        .then((reply) => {
+            if (reply && typeof reply === 'object' && !reply.hasOwnProperty('error')) {
+                reply.cartUrl = window.location.href;
+                console.log('dotDigital is pushing cartInsight with', reply);
+                if (typeof window.dmPt === 'function') {
+                    window.dmPt("cartInsight", reply);
+                }
+            }
+        })
+        .catch(window.catchFetchErrors);
+    }
+</script>
+        }
+    }
+}

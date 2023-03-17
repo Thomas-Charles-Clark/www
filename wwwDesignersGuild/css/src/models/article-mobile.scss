@@ -1,0 +1,20 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+#article-main {
+    > article {
+        grid-column: auto/span 12;
+    }
+    > div {
+        grid-column: auto/span 12;
+        
+        .related-articles {
+            grid-template-columns: repeat(1,1fr);
+        }
+    }
+    .w-75 {
+        width: 100% !important;
+    }
+}

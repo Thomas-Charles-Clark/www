@@ -1,0 +1,106 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+
+    var objMenu = Model.MasterDefinition.Menu;
+}
+@if (Convert.ToBoolean(WebConfigurationManager.AppSettings["productionVersion"]) == false 
+    || (Model.Visitor.memberId == 8 || Model.Visitor.memberId == 39 || Model.Visitor.memberId == 431394))
+{
+<nav id="debug-navbar" class="navbar navbar-dark bg-dark">
+        <div class="navbar-container">
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#debug-navbar-content"
+                    aria-controls="debug-navbar-content"
+                    aria-expanded="false"
+                    aria-label="@HtmlHelperExtra.Resource("ToggleNavigation", l, c, d)">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <label>
+                MemberID @(Session["memberIdFromDatabase"] ?? "is NULL")
+            </label>
+            <label>
+                VisitorID @(Session["visitorIdFromDatabase"] ?? "is NULL")
+            </label>
+            <label>
+                SessionID @(HttpContext.Current.Session.SessionID)
+            </label>
+            <label>
+                Login @(Session["loginStatus"])
+            </label>
+       @if (!String.IsNullOrEmpty(Session["checkoutId"]?.ToString()))
+        {
+            <label>
+                CheckoutID @(Session["checkoutId"])
+            </label>
+        }
+       @if (!String.IsNullOrEmpty(ViewBag.DebugMessage))
+        {
+            <label>
+                @ViewBag.DebugMessage
+            </label>
+        }
+        <label id="breakpoint-display"></label>
+        </div>
+        <div class="collapse navbar-collapse" id="debug-navbar-content">
+            <div class="navbar-nav bg-dark">
+                <label class="nav-link">
+                    CloudFlare IP Country: @(Request.Headers["CF-IPCountry"] ?? "is NULL")
+                </label>
+                <label class="nav-link">
+                    CloudFlare Device Type: @(HttpContext.Current.Request.Headers["CF-Device-Type"] ?? "is NULL")
+                </label>
+                <label class="nav-link">
+                    CloudFlare Device Type Override: @(HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ?? "is NULL")
+                </label>
+                <label class="nav-link">
+                    CloudFlare Device Type Final: @(HttpContext.Current.Request.Headers["CF-Device-Type"] ?? HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ?? "desktop")
+                </label>
+                <label class="nav-link">
+                    Trade Features Active: @(tradeUser)
+                </label>
+                @if (tradeUser)
+        {
+                <div class="nav-link">
+                    <div class="form-check">
+                        <input id="display-trade-price" type="checkbox" class="form-check-input" onchange="tradePriceChange()" @(Convert.ToBoolean(Session["memberDisplayTradePrice"]) ? "checked" : "") />
+                        <label class="form-check-label" for="display-trade-price" aria-label="#display-trade-price">
+                            Display Trade Price
+                        </label>
+                    </div>
+                </div>
+                } 
+                <label class="nav-link">
+                    @{
+                        var csb = new System.Data.SqlClient.SqlConnectionStringBuilder(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
+}
+Database: <span style="text-transform: uppercase">@(csb.InitialCatalog)</span>
+
+</label>
+@foreach(var k in Session.Keys)
+                {
+                    <label class="nav-link">
+                        @k: @Session[k.ToString()]
+                    </label>
+                }
+                <label class="nav-link">
+                    IsNewSession: @Session.IsNewSession
+                </label>
+            </div>
+        </div>
+    </nav>
+}

@@ -1,0 +1,34 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var contentId = objMaster.UrlBreakdown.ContentId;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+}
+<div id="cookie-notice"
+     class="d-none p-3"
+     data-bind="toggleOpacity: visible">
+    <p class="p-3">
+        <span>
+            @HtmlHelperExtra.Resource("CookieNoticeOne", l, c, d)
+        </span>
+        <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.privacyPolicy, cd)">
+            @HtmlHelperExtra.Resource("ByReadingOurPrivacyPolicyHere", l, c, d)
+        </a>
+    </p>
+    <button class="btn btn-secondary"
+            data-bind="click: accept">
+        @HtmlHelperExtra.Resource("CookieAcceptButton", l, c, d)
+    </button>
+</div>
+@Render.ScriptDefer("~/bundles/js/cookie-notice")

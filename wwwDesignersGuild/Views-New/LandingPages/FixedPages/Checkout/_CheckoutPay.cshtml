@@ -1,0 +1,165 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutPayment
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+    nfi.NumberDecimalSeparator = ".";
+    nfi.CurrencyDecimalSeparator = ".";
+
+    var regionId = Model.masterDefinition.UrlBreakdown.countryDetails.RegionID;
+    Boolean threeDSecureRequired = regionId != 2 && regionId != 175;
+}
+
+@{
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<div>
+    <h5 class="mb-3">
+        <strong>@HtmlHelperExtra.Resource("CheckoutSinglePagePaymentMethodTitle", l, c, d)</strong>
+    </h5>
+    <div id="payment-method-content">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: busy, toggleOpacity: busy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="gift-voucher-div">
+            @if (Model.checkoutMethod == dgCheckoutType.Guest ||
+                 Model.checkoutMethod == dgCheckoutType.Member)
+            {
+            <!-- ko if: getSavedCards().length > 0 -->
+                <p>
+                    @HtmlHelperExtra.Resource("CheckoutPayDefaultSelected", l, c, d)
+                    <br />
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#gift-voucher-modal">
+                        @HtmlHelperExtra.Resource("CheckoutPayWithGiftVoucherAlt", l, c, d)
+                    </a>
+                </p>
+            <!-- /ko -->
+            <!-- ko if: getSavedCards().length == 0 -->
+                <p>
+                    @HtmlHelperExtra.Resource("CheckoutPaymentDetailsOrGiftVoucher", l, c, d)
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#gift-voucher-modal">
+                        @HtmlHelperExtra.Resource("CheckoutPayWithGiftVoucher", l, c, d)
+                    </a>
+                </p>
+            <!-- /ko -->
+            }
+        </div>
+       @switch (Model.checkoutMethod)
+        {
+            case dgCheckoutType.Member:
+            case dgCheckoutType.Guest:
+            case dgCheckoutType.Paypal:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentCardComponent.cshtml", Model)
+                break;
+            case dgCheckoutType.Amazon:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentAmazon.cshtml", Model)
+                break;
+            case dgCheckoutType.Trade:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentTrade.cshtml", Model)
+                break;
+        }
+
+       @if (Model.checkoutMethod != dgCheckoutType.Trade)
+        {
+            @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentVoucher.cshtml", Model);
+        }
+
+        @if (Model.checkoutMethod != dgCheckoutType.Trade)
+        {
+            <!-- ko if: deliveryAddress() == null && checkoutType != 4 -->
+            <div id="checkoutInfoWrapper" style="display:none;" class="col-3-quarters">
+                <div class="checkout-info-box" style="margin-top: 12px;">
+                    <span class="checkout-info-symbol">*</span>
+                    <p class="checkout-info-content">
+                        @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchUnavailable", l, c, d)
+                    </p>
+                </div>
+            </div>
+            <!-- /ko -->
+        }
+        @*<div id="payment-processing-error" class="overlay-bg" data-bind="click: closeError" style="z-index: 100005">
+            <div class="overlay-content checkout-error-box" style="width:400px;">
+                <a data-bind="click: closeError" class="close-btn"></a>
+                <div style="margin-top:20px;">
+                    <span class="checkout-error-symbol">!</span>
+                    <p id="payment-processing-error-text" style="margin-bottom: 30px;">@Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreePaymentDeclined", Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID, Model.masterDefinition.UrlBreakdown.countryDetails.CountryID, Model.masterDefinition.UrlBreakdown.ContentDate).ToString())</p>
+                </div>
+            </div>
+        </div>*@
+    </div>
+    @if (Model.checkoutMethod != dgCheckoutType.Trade)
+    {
+        <div id="checkoutPaymentInfoWrapper" style="display:none;" class="col-3-quarters">
+            <div class="checkout-info-box" style="margin-top: 12px;">
+                <p class="checkout-info-content">
+
+                </p>
+            </div>
+        </div>
+    }
+</div>
+<div id="checkout-complete-waiting" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="page-blocker">
+                    <div class="spinner-border"></div>
+                    <p>
+                        @HtmlHelperExtra.Resource("CheckoutCompleteWaiting", l, c, d)
+                        <br />
+                        <br />
+                        @HtmlHelperExtra.Resource("CheckoutDoNotRefresh", l, c, d)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="payment-processing-error" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                </h4>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="payment-processing-error-text" class="validation-message mb-0">
+                    @Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreePaymentDeclined", l, c, d))
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="payment-processing-error-no-details" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    @HtmlHelperExtra.Resource("CheckoutErrorInstruction", l, c, d)
+                </h4>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="validation-message mb-0">
+                    @Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreePaymentNoCardDetails", l, c, d))
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    if (typeof viewModel !== 'undefined') {
+        viewModel.balanceNumber(Number('@Model.checkoutPayments.paymentTotals[0].TotalBalance.ToString(nfi)'));
+    }
+</script>

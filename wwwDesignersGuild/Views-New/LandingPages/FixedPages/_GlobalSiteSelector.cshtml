@@ -1,0 +1,55 @@
+﻿@model FixedPageViewModel_GlobalSiteSelector
+@{ 
+    Layout = "../../Shared/_Layout-GlobalSiteSelector.cshtml";
+
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+<div id="site-selector-background">
+    <div id="site-selector-wrapper">
+        <img id="navbar-logo" width="512" height="37" title="@HtmlHelperExtra.Resource("DesignersGuild", l, c, d)" alt="@HtmlHelperExtra.Resource("DesignersGuildLogo", l, c, d)" 
+                src="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension)"
+                srcset="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension) 1x,
+                        /Content/images/logo/dg-logo-1024-73@(Framework.WebpOrPngExtension) 2x,
+                        /Content/images/logo/dg-logo-2048-145@(Framework.WebpOrPngExtension) 4x"
+                sizes="(max-width: 992px) 512px, (max-width: 1200px) 1024px, 2048px"/>
+        <form id="site-selector-form">
+            <select id="site-selector" class="form-select border-dark">
+                <option value="">
+                    @HtmlHelperExtra.Resource("PleaseSelectCountry", l, c, d)
+                </option>
+               @foreach(var s in Model.Sites.OrderBy(s => s.SortOrder))
+                {
+                    <option value="@($"/{s.URL}/l0")" @(s.CountryLanguageID == Model.PreSelectedCountryLanguageID ? "selected" : "")>
+                        @s.Name - @s.LanguageCode.ToUpperInvariant()
+                    </option>
+                }
+            </select>
+            <button id="site-selector-go" type="submit" class="btn btn-dark">
+                @HtmlHelperExtra.Resource("Go", l, c, d)
+            </button>
+        </form>
+    </div>
+</div>
+<div class="visually-hidden">
+   @foreach(var s in Model.Sites.OrderBy(s => s.SortOrder))
+    {
+        <a href="@($"{Request.Url.GetLeftPart(UriPartial.Path)}{s.URL}/l0")">
+            Designers Guild @s.Name - @s.LanguageCode.ToUpperInvariant()
+        </a>
+    }
+</div>
+<script type="text/javascript">
+    document.querySelector('#site-selector-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        let d = document.querySelector('#site-selector').value;
+        if (d != '') {
+            window.location.href = d;
+        }
+    })
+</script>

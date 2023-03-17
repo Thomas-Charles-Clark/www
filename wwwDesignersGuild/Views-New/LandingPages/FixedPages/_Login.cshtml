@@ -1,0 +1,456 @@
+﻿@model FixedPageViewModel_Login
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@Render.Script("~/bundles/js/login-page")
+@if (Model.BaseViewModel.ContentID == (int)dgFixedPage.checkoutLogin)
+{
+    <script type="text/javascript">
+        (() => {
+            let memberGuestLoginReady = false;
+            let checkoutLoginReady = false;
+
+            document.querySelector('#body-content').addEventListener('memberGuestLoginReady', () => {
+                console.log('memberGuestLoginReady');
+
+                memberGuestLoginReady = true;
+
+                if (memberGuestLoginReady && checkoutLoginReady) {
+                    window.loginModel.busy.subscribe(nv => window.pageModel.fixedPage().checkoutLoginModel.busy(nv));
+                }
+            })
+            document.querySelector('#body-content').addEventListener('checkoutLoginReady', () => {
+                console.log('checkoutLoginReady');
+
+                checkoutLoginReady = true;
+
+                if (checkoutLoginReady && memberGuestLoginReady) {
+                    window.loginModel.busy.subscribe(nv => window.pageModel.fixedPage().checkoutLoginModel.busy(nv));
+                }
+            })
+        })();
+    </script>
+}
+@Render.StylesPreload("~/bundles/css/login-page")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/login-page-mobile")
+}
+<div data-bind="stopBinding">
+    <div id="login-wrapper" class="login-form-wrapper my-5">
+        <span class="d-none" data-bind="init: { convert: parseBool, field: registrationMode }, remove">
+            @(Model.BeginRegistration)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseString, field: redirect }">@(Model.Redirect)</span>
+        <form id="login-form">
+            <div class="page-blocker" data-bind="toggleOpacity: busy">
+                <div class="spinner-border" role="status"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <h5 class="p-3 bg-light">
+                @HtmlHelperExtra.Resource("SignInOrRegister", l, c, d)
+            </h5>
+            <div id="login-form-body"
+                 class="p-3">
+                <p>
+                    @HtmlHelperExtra.Resource("ToSignInWithDG", l, c, d)
+                </p>
+                <div class="form-check">
+                    <input id="already-registered"
+                           class="form-check-input"
+                           type="radio"
+                           name="form-state"
+                           value="false"
+                           @((Model.BeginRegistration ? "" : "checked"))
+                           data-bind="checked: registrationMode, checkedValue: false">
+                    <label class="form-check-label" for="already-registered">
+                        @HtmlHelperExtra.Resource("ImAlreadyRegistered", l, c, d)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input id="new-registration"
+                           class="form-check-input"
+                           type="radio"
+                           name="form-state"
+                           value="true"
+                           @((Model.BeginRegistration ? "checked" : ""))
+                           data-bind="checked: registrationMode, checkedValue: true">
+                    <label class="form-check-label" for="new-registration">
+                        @HtmlHelperExtra.Resource("ImNew", l, c, d)
+                    </label>
+                </div>
+                <div id="login-form-carousel"
+                     class="carousel slide carousel-fade carousel-dark"
+                     data-bs-ride="carousel"
+                     data-bs-interval="false">
+                    <div class="carousel-item @(Model.BeginRegistration ? "" : "active")">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationEmailLabel", l, c, d)
+                            </label>
+                            <input type="email"
+                                   id="login-email"
+                                   class="form-control"
+                                   data-bind="keepElement: loginEmailAddress,
+                                              textInput: loginEmailAddress">
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-password" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationPasswordLabel", l, c, d)
+                            </label>
+                            <input id="login-password"
+                                   class="form-control"
+                                   type="password"
+                                   data-bind="keepElement: loginPassword,
+                                              textInput: loginPassword">
+                        </div>
+                        <div id="invalid-login-alert"
+                             style="display: none"
+                             class="alert alert-danger"
+                             data-bind="style: { 'display': invalidLogin() ? 'flex' : 'none' }">
+                            <span class="material-icons me-3">
+                                close
+                            </span>
+                            <h6 class="alert-title mb-0">
+                                @HtmlHelperExtra.Resource("LoginInvalid", l, c, d)
+                            </h6>
+                        </div>
+                        <div style="display: none"
+                             class="valid-login-alert alert alert-success"
+                             data-bind="style: { 'display': validLogin() ? 'flex' : 'none' }">
+                            <span class="material-icons me-3">
+                                check
+                            </span>
+                            <h6 class="alert-title mb-0">
+                                @HtmlHelperExtra.Resource("SignInSuccessful", l, c, d)
+                            </h6>
+                        </div>
+                        <button type="submit"
+                                class="btn btn-secondary"
+                                data-bind="click: signIn">
+                            @HtmlHelperExtra.Resource("SignIn", l, c, d)
+                        </button>
+                        <hr />
+                        <a href="javascript:;"
+                           class="d-inline-block"
+                           data-bind="click: showForgottenPassword">
+                            @HtmlHelperExtra.Resource("LoginForgottenPassword", l, c, d)
+                        </a>
+                        <br />
+                        <p class="mt-5">
+                            <span class="extant-fields">
+                                @HtmlHelperExtra.Resource("MemberLegal", l, c, d)
+                            </span>
+                            <a href="@Model.TermsURL">
+                                @HtmlHelperExtra.Resource("RegistrationLegalTerms", l, c, d)
+                            </a>
+                            @HtmlHelperExtra.Resource("RegistrationLegalAnd", l, c, d)
+                            <a href="@Model.PrivacyURL">
+                                @HtmlHelperExtra.Resource("RegistrationLegalPrivacy", l, c, d)
+                            </a>
+                        </p>
+                    </div>
+                    <div class="carousel-item @(Model.BeginRegistration ? "active" : "")">
+                        <div class="mb-3">
+                            <label for="register-name" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationNameLabel", l, c, d)
+                            </label>
+                            <input type="text"
+                                   id="register-name"
+                                   class="form-control"
+                                   data-bind="keepElement: registrationName, textInput: registrationName"
+                                   autocomplete="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationEmailLabel", l, c, d)
+                            </label>
+                            <input type="text"
+                                   id="register-email"
+                                   class="form-control"
+                                   data-bind="keepElement: registrationEmail, textInput: registrationEmail">
+                            <span class="validation-message" data-bind="validationMessage: registrationExtantEmailCheckPassed"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email-confirm" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationEmailConfirmLabel", l, c, d)
+                            </label>
+                            <input type="text"
+                                   id="register-email-confirm"
+                                   class="form-control"
+                                   data-bind="keepElement: registrationEmailConfirm, textInput: registrationEmailConfirm">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationPasswordLabel", l, c, d)
+                            </label>
+                            <div class="input-group"
+                                 data-bind="validationOptions: { insertMessages: false }">
+                                <input id="register-password"
+                                       class="form-control"
+                                       type="password"
+                                       data-bind="keepElement: registrationPassword,
+                                                  textInput: registrationPassword,
+                                                  attr: { type: registrationShowPassword() ? 'text' : 'password' }">
+                                <div class="input-group-text"
+                                     data-bind="css: { 'validation-element': !registrationPassword.isValid() }">
+                                    <input id="password-display"
+                                           class="form-check-input mt-0 me-2"
+                                           type="checkbox"
+                                           data-bind="checked: registrationShowPassword, checkedValue: true">
+                                    <label for="password-display">
+                                        @HtmlHelperExtra.Resource("Show", l, c, d)
+                                    </label>
+                                </div>
+                            </div>
+                            <span class="validation-message" data-bind="validationMessage: registrationPassword"></span>
+                            <div style="display: none" data-bind="visible: registrationPassword() != null, with: registrationPassword.zxcvbn">
+                                <div class="meter-wrapper">
+                                    <meter value="0" min="0" low="2" high="3" max="4" optimum="4" data-bind="value: score">
+                                        <span class="meter-gauge">
+                                            <span class="meter-display" data-bind="visible: score == 1"></span>
+                                            <span class="meter-display" data-bind="visible: score == 2"></span>
+                                            <span class="meter-display" data-bind="visible: score == 3"></span>
+                                            <span class="meter-display" data-bind="visible: score == 4"></span>
+                                        </span>
+                                    </meter>
+                                    <span class="hint" data-bind="text: $parent.resources[`ManageAccountPasswordStrength${score}`]"></span>
+                                    <i class="fa fa-question password-tips" data-bs-toggle="modal" data-bs-target="#password-hint-modal"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="d-none" data-bind="init: { convert: JSON.parse, field: registrationAllCountries }, remove">
+                                @Html.Raw(JsonConvert.SerializeObject(Model.Countries.OrderBy(p => p.Name)))
+                            </span>
+                            <label for="register-country" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
+                            </label>
+                            <select id="register-country"
+                                    class="form-select"
+                                    data-bind="value: registrationCountry,
+                                    options: registrationAllCountries,
+                                    optionsText: 'Name',
+                                    optionsValue: $data">
+                                @foreach (var country in Model.Countries.OrderBy(p => p.Name))
+                                {
+                                    <option @((country.CountryID == c ? "selected" : ""))>
+                                        @country.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div style="display: none"
+                             class="mb-3"
+                             data-bind="visible: registrationAllLanguages().length > 1">
+                            <span class="d-none" data-bind="init: { convert: JSON.parse, field: registrationAllLanguages }, remove">
+                                @Html.Raw(JsonConvert.SerializeObject(Model.Languages))
+                            </span>
+                            <label for="register-language" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
+                            </label>
+                            <select id="register-language"
+                                    class="form-select"
+                                    data-bind="value: registrationLanguage,
+                                    options: registrationAllLanguages,
+                                    optionsText: 'Name',
+                                    optionsValue: $data">
+                                @foreach (var language in Model.Languages)
+                                {
+                                    <option @((language.LanguageID == l ? "selected" : ""))>
+                                        @language.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <!-- ko foreach: marketingPermissions -->
+                        <!-- ko ifnot: Hidden -->
+                        <div class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
+                            <input class="form-check-input" type="checkbox" data-bind="checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
+                            <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
+                                <span data-bind="html: Label"></span>
+                            </label>
+                        </div>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <div id="g-recaptcha" class="pt-3 pb-5"></div>
+                        <div id="g-recaptcha-tip"
+                             style="display: none"
+                             class="my-3 mb-4"
+                             data-bind="visible: captchaFailed">
+                            <span class="validation-message">
+                                @HtmlHelperExtra.Resource("FormsErrorCaptchaCompare", l, c, d)
+                            </span>
+                        </div>
+                        <script type="text/javascript">
+                            window.captchaLoadCallback = () => {
+                                grecaptcha.render('g-recaptcha', {
+                                    sitekey: '6LcHNDshAAAAAM05Kn3Y8tad1U4Sn7sWZW0Djzq8'
+                                });
+                            }
+                        </script>
+                        <script src='https://www.google.com/recaptcha/api.js?onload=captchaLoadCallback&render=explicit&hl=@(ci.LanguageCode)'></script>
+                        <div style="display: none"
+                             class="valid-login-alert alert alert-success"
+                             data-bind="style: { 'display': validLogin() ? 'flex' : 'none' }">
+                            <span class="material-icons me-3">
+                                check
+                            </span>
+                            <h6 class="alert-title mb-0">
+                                @HtmlHelperExtra.Resource("SignInSuccessful", l, c, d)
+                            </h6>
+                        </div>
+                        <button type="submit"
+                                class="btn btn-dark"
+                                data-bind="click: register">
+                            @HtmlHelperExtra.Resource("Register", l, c, d)
+                        </button>
+                        <hr />
+                        <p class="mt-5">
+                            <span class="new-fields">
+                                @HtmlHelperExtra.Resource("RegistrationLegal", l, c, d)
+                            </span>
+                            <a href="@Model.TermsURL">
+                                @HtmlHelperExtra.Resource("RegistrationLegalTerms", l, c, d)
+                            </a>,
+                            <a href="@Model.PrivacyURL">
+                                @HtmlHelperExtra.Resource("RegistrationLegalPrivacy", l, c, d)
+                            </a>
+                            @HtmlHelperExtra.Resource("RegistrationLegalAnd", l, c, d)
+                            <a href="@Model.CookieURL">
+                                @HtmlHelperExtra.Resource("RegistrationLegalCookie", l, c, d)
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div id="forgotten-password-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="page-blocker" data-bind="toggleOpacity: forgotBusy">
+                    <div class="spinner-border" role="status"></div>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h4>
+                </div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("PasswordReset", l, c, d)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label">
+                                @HtmlHelperExtra.Resource("RegistrationEmailLabel", l, c, d)
+                            </label>
+                            <input type="email"
+                                   id="forgotten-password-email"
+                                   class="form-control"
+                                   data-bind="textInput: loginEmailAddress,
+                                              disable: forgotSuccess">
+                        </div>
+                        <div class="alert alert-dark bg-light align-items-center mb-0" data-bind="style: { 'display': forgotSuccess() ? 'flex' : 'none' }">
+                            <i class="material-icons">
+                                check
+                            </i>
+                            <p class="mb-0 ms-3">
+                                @HtmlHelperExtra.Resource("PasswordResetRequestEmailSent", l, c, d)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-dark"
+                                data-bind="visible: !forgotSuccess(), click: submitForgottenPassword">
+                            @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary"
+                                data-bind="click: closeForgottenPassword">
+                            @HtmlHelperExtra.Resource("CloseProperCase", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (!tradeUser)
+        {
+            <div class="py-6 px-8">
+                <div class="hstack gap-2">
+                    <p class="mb-0">
+                        Business Customer?
+                    </p>
+                    <a href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeAccountRequest, ci))">
+                        @HtmlHelperExtra.Resource("RequestTradeAccount", l, c, d)
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="password-hint-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @HtmlHelperExtra.Resource("PasswordAdvice", l, c, d)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="header_h4">
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip1", l, c, d)
+                    </h4>
+                    <ul>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li1", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li2", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li3", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li4", l, c, d)
+                        </li>
+                    </ul>
+                    <h4 class="header_h4">
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip2", l, c, d)
+                    </h4>
+                    <ol>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li1", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li2", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li3", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li4", l, c, d)
+                        </li>
+                    </ol>
+                    <h4 class="header_h4">
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3", l, c, d)
+                    </h4>
+                    <p>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3_p1", l, c, d)
+                    </p>
+                    <p>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3_p2", l, c, d)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var video = ((VideoPageSection)Model.Definition).Video;
+}
+<div class="video-section-inner" style="--aspect-ratio: @($"{video.AspectRatio}")">
+    @Html.Raw(video.VideoEmbedCode)
+</div>
+@if (!String.IsNullOrEmpty(Model.PageSection.Heading))
+{
+    <div class="mb-6">
+        <h4>
+            @Model.PageSection.Heading
+        </h4>
+    </div>
+}

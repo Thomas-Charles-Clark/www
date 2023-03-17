@@ -1,0 +1,50 @@
+/*$blue:  #0d6efd !default;*/
+/*$secondary:     $gray-600 !default;*/
+/*$link-color:                            $primary !default;*/
+/*$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#094fb6'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;*/
+:root {
+  --vsm-gutter: 0.25rem;
+  --sm-gutter: 0.5rem;
+  --m-gutter: 0.75rem;
+  --l-gutter: 1rem;
+  --mxl-gutter: 1.5rem;
+  --xl-gutter: 2rem;
+  --xxl-gutter: 3rem;
+  --disco-color: #e51f7c;
+  --letter-spacing-slight: 0.05rem;
+}
+
+.region-grid {
+  --bs-columns: 6;
+  gap: 2rem;
+  margin-bottom: var(--xxl-gutter);
+}
+.region-grid .region-header {
+  grid-column: auto/span 6;
+}
+.region-grid .region-header h4 {
+  margin-bottom: 0;
+}
+.region-grid .country a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.region-grid .country a img {
+  margin-inline-end: var(--sm-gutter);
+}
+.region-grid .country a span {
+  display: block;
+  font-size: 0.875rem;
+  color: #4E4E4E;
+}
+.region-grid .country a:hover span {
+  text-decoration: underline;
+}
+
+.region-grid + .region-grid {
+  margin-top: var(--xxl-gutter);
+  padding-top: var(--xl-gutter);
+  border-top: 1px solid #dee2e6;
+}
+/*# sourceMappingURL=change-country.css.map */

@@ -1,0 +1,127 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "variables";
+@import "mixins";
+
+.form-thanks-text {
+    display: none;    
+}
+
+.page-form {
+    font-size: $font-size-base;
+
+    .date-clear {
+        font-size: 22px;
+        padding: 0 4px;
+        line-height: 28px;
+        box-sizing: border-box;
+        vertical-align: middle;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    .date-wrapper {
+        > div {
+            display: flex;
+            align-items: center;
+        }
+
+        label.date-clear {
+            margin-inline-start: var(--sm-gutter);
+        }
+    }
+
+    .placeholder-hint {
+        display: block;
+        font-style: italic;
+        line-height: 2.5rem;
+    }
+
+    button {
+        text-transform: capitalize;
+        width: 100%;
+    }
+
+    .validation-message {
+        display: block;
+        margin-top: var(--sm-gutter);
+    }
+
+    .marketing-permission {
+        cursor: pointer;    
+        label {
+            cursor: pointer;    
+        }
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    .page-form {
+        width: 75%;
+
+        button {
+            width: 65%;
+        }
+    }
+}
+
+@include media-breakpoint-up(xl) {
+    .page-form {
+        button {
+            width: 45%;
+        }
+    }
+}
+
+.form-alert {
+    display: flex;
+
+    i.material-icons {
+        margin-inline-end: var(--l-gutter);    
+    }
+}
+
+.address-search-wrapper {
+    position: relative;
+    z-index: 1;
+
+    .address-autocomplete {
+        position: absolute;
+        z-index: 50;
+        cursor: pointer;
+        display: inline-block;
+        padding: 0;
+        border-top-right-radius: 0 !important;
+        border-bottom-left-radius: $border-radius !important;
+        box-shadow: 0 4px 16px 4px rgb(0 0 0 / 45%);
+        max-height: 640px;
+        overflow-y: auto;
+        min-width: 320px;
+
+        li.ui-menu-item {
+            cursor: pointer;
+
+            div.ui-menu-item-wrapper {
+                font-weight: $font-weight-base;
+                color: $gray-dg-body;
+                padding: $input-padding-y $input-padding-x;
+            }
+
+            div.ui-menu-item-wrapper.ui-state-active {
+                border: none;
+            }
+
+            div.ui-menu-item-wrapper.ui-state-active,
+            div.ui-menu-item-wrapper:hover,
+            div.ui-menu-item-wrapper:focus,
+            div.ui-menu-item-wrapper:focus-within {
+                background: $blue-100;
+            }
+        }
+
+        li:first-of-type {
+            border-top-right-radius: 0 !important;
+        }
+    }
+}

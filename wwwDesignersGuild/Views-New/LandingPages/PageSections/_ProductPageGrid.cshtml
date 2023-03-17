@@ -1,0 +1,509 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var grid = (ProductPageGridPageSection)Model.Definition;
+
+    var attributeGroupViewModels = grid.AttributeGroups.OrderBy(p => p.SortOrder).Select(p =>
+    {
+        var name = p.Name.Replace("'", "’");
+        return $"attributeGroupViewModel('{name}', productPageGrid)";
+    });
+
+    if (grid.FilterIndexingEnabled)
+    {
+        grid.AttributeGroups.ForEach(ag =>
+        {
+            ag.MultipleSelect = false;
+        });
+    }
+
+    var thisPage = new List<ProductPagePodViewModel>();
+
+    if (Model.PageSection.Paging || Model.PageSection.Filter)
+    {
+        thisPage = grid.GetProductPages(objMaster, (grid.Page - 1) * grid.PageSize, grid.TakeCount).ToList();
+    }
+    else
+    {
+        thisPage = grid.GetProductPages(objMaster, null, null).ToList();
+    }
+
+    var filterIndexRestrictions = grid.ProductTypes.SingleOrDefault(pt => pt.FormValue == grid.ProductType)?.FilterIndexRestrictions;
+}
+<script type="text/javascript">
+    //history.scrollRestoration = 'manual';
+    //window.addEventListener('scroll', (ev) => {
+    //    localStorage.scrollY = window.scrollY;
+    //});
+    //window.addLoadFunction(() => {
+    //    if (localStorage.scrollY) {
+    //        window.scrollTo(0, +localStorage.scrollY);
+    //    }
+    //});
+</script>
+<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: productPageGrid.pager.busy">
+    <div class="spinner-border" role="status"></div>
+    <h4>
+        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+    </h4>
+</div>
+<form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
+    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+        @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
+    </span>
+    <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText, remove">
+        @Model.Base.AttributeFilterText
+    </span>
+    <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle, remove">
+        @grid.OriginalTitle
+    </span>
+   @if (grid.Searchable)
+    {
+        <input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)"/>
+    }
+   @if (grid.AttributeGroups.Any())
+    {
+        <div id="grid-filters-@(Model.PageSection.PageSectionID)"
+             class="offcanvas offcanvas-start"
+             tabindex="-1"
+             data-bs-scroll="true"
+             aria-labelledby="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d)"
+             data-bind="keepElement: productPageGrid.offcanvas"
+             >
+            <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.offcanvas, remove">
+                Ready
+            </span>
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div class="offcanvas-header">
+                <div class="btn-toolbar">
+                    <!-- ko if: productPageGrid.selectedAttributes().length -->
+                    <div class="btn-group" style="display: @(grid.FilterCount > 0 ? $"block" : "none")" data-bind="visible: productPageGrid.selectedAttributes().length">
+                        <button class="btn btn-secondary" data-bind="visible: productPageGrid.filterCount(), click: productPageGrid.clearFilters">
+                            @HtmlHelperExtra.Resource("Clear", l, c, d)
+                        </button>
+                    </div>
+                    <div class="btn-group" style="display: @(grid.FilterCount > 0 ? $"block" : "none")" data-bind="visible: productPageGrid.selectedAttributes().length">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">
+                            @HtmlHelperExtra.Resource("ApplyFilters", l, c, d)
+                        </button>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: productPageGrid.selectedAttributes().length == 0 -->
+                    <div class="btn-group" style="display: @(grid.FilterCount == 0 ? $"inline-block" : "none")" data-bind="visible: productPageGrid.selectedAttributes().length === 0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">
+                            @HtmlHelperExtra.Resource("CloseProperCase", l, c, d)
+                        </button>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <div class="offcanvas-body filters d-none" data-bind="css: { 'd-none': false }">
+                <div>
+                    <span class="d-none" data-bind="init: { field: productPageGrid.attributeGroups, value: [@Html.Raw(String.Join(",", attributeGroupViewModels))] }, remove"></span>
+                   @{
+                        var productTypeViewModels = grid.ProductTypes.OrderBy(p => p.SortOrder).Select(p => $"productTypeViewModel(productPageGrid, {Html.Raw(JsonConvert.SerializeObject(p.ProductPageIDs))})");
+                        <span class="d-none" data-bind="init: { field: productPageGrid.productTypes, value: [@Html.Raw(String.Join(", ", productTypeViewModels))] }, remove"></span>
+                        foreach (var ptObj in grid.ProductTypes.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
+                        {
+                            var pt = ptObj.value;
+                            var i = ptObj.index;
+                            <!-- ko with: productPageGrid.productTypes()[@(i)] -->
+                            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                                @Html.Raw(JsonConvert.SerializeObject(pt))
+                            </span>
+                            <!-- /ko -->
+                        }
+                        <div class="attribute-group mb-3"
+                             data-bind="validationOptions: { insertMessages: false }">
+                            <h6 class="d-flex justify-content-between @(grid.ProductType != null ? "" : "collapsed")"
+                                    aria-expanded="true"
+                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)"
+                                data-bind="text: productPageGrid.productTypeId() === 0 ? '@HtmlHelperExtra.Resource("PleaseSelectProductType", l, c, d)' : '@HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)'">
+                                    @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)
+                            </h6>
+                            <div id="product-type-collapse" class="collapse show">
+                                <div class="attribute-group-inner">
+                                    <span data-bind="init: { field: productPageGrid.productType, value: '@(grid.ProductType)' }, remove"></span>
+                                    @if (grid.ProductTypes.Count < 5)
+                                    {
+                                        foreach (var ptObj in grid.ProductTypes.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
+                                        {
+                                            var pt = ptObj.value;
+                                            var i = ptObj.index;
+                                            var selected = grid.ProductType == pt.FormValue;
+                                            <div class="form-check attribute">
+                                                <a href="" target="self" onclick="(event) => { event.preventDefault(); }">
+                                                    <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter"
+                                                           for="product-type-@(pt.ProductTypeID)-radio">
+                                                        <input class="form-check-input" type="radio" name="product-type" value="@(pt.FormValue)" id="product-type-@(pt.ProductTypeID)-radio" @(selected ? "checked" : "")
+                                                               data-bind="checked: productPageGrid.productType,
+                                                                        checkedValue: '@(pt.FormValue)'" />
+                                                        @pt.Name
+                                                        <span>
+                                                            (@(pt.ProductPageIDs.Count()))
+                                                        </span>
+                                                    </label>
+                                                </a>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <select id="product-type"
+                                                name="product-type"
+                                                class="form-select"
+                                                data-bind="keepElement: productPageGrid.productType,
+                                                                   options: productPageGrid.productTypes,
+                                                                   value: productPageGrid.productType,
+                                                                   optionsValue: 'FormValue',
+                                                                   optionsText: 'label',
+                                                                   optionsAfterRender: productPageGrid.productTypeDisabler">
+                                            @if (grid.ProductTypes.Count == 1)
+                                            {
+                                                <option value="@(grid.ProductTypes[0].FormValue)" selected>
+                                                    @(grid.ProductTypes[0].Name) (@(grid.ProductTypes[0].ProductPageIDs.Count()))
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                foreach (var ptObj in grid.ProductTypes.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
+                                                {
+                                                    var pt = ptObj.value;
+                                                    var i = ptObj.index;
+                                                    var selected = grid.ProductType == pt.FormValue;
+                                                    <option value="@pt.FormValue" @(selected ? "selected" : "")>
+                                                        @pt.Name (@(pt.ProductPageIDs.Count()))
+                                                    </option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                   <!-- ko if: productPageGrid.productTypeId() -->
+                   @foreach (var attributeGroup in grid.AttributeGroups.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
+                   {
+                       var index = attributeGroup.index;
+                       var ag = attributeGroup.value;
+                       var attributeViewModels = ag.Attributes.OrderBy(p => p.SortOrder).Select(p => $"attributeViewModel($data, {Html.Raw(Json.Encode(p.ProductPageIDs))})");
+                        <!-- ko with: productPageGrid.attributeGroups()[@index] -->
+                        <span class="d-none" data-bind="init: { field: attributeGroupId, value: @ag.AttributeGroupID }, remove"></span>
+                        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productTypes, remove">
+                            @Html.Raw(JsonConvert.SerializeObject(ag.ProductTypes))
+                        </span>
+                        <span class="d-none" data-bind="init: { field: singular, value: @((!ag.MultipleSelect).ToString().ToLowerInvariant()) }, remove"></span>
+                        if (ag.MultipleSelect)
+                        {
+                            <span class="d-none" data-bind="init: { field: selection, value: [@Html.Raw(String.Join(", ", ag.Selection.Select(p => $"'{p}'")))] }, remove"></span>
+                        }
+                        else
+                        {
+                            <span class="d-none" data-bind="init: { field: selection, value: '@(ag.Selection.FirstOrDefault())' }, remove"></span>
+                        }
+                        <span class="d-none" data-bind="init: { field: attributes, value: [@Html.Raw(String.Join(", ", attributeViewModels))] }, remove"></span>
+                        if (ag.AttributeGroupID == 1)
+                        {
+                            <div class="attribute-group my-3" data-bind="visible: visible">
+                                <span class="d-none" data-bind="init: { convert: parseBool }, text: singular, remove">
+                                    @($"{!ag.MultipleSelect}".ToLowerInvariant())
+                                </span>
+                                <span class="d-none" data-bind="init: { convert: parseString }, text: logicalOperator, remove">
+                                    @ag.LogicalOperator
+                                </span>
+                                <h6 class="d-flex justify-content-between"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#attribute-group-@(ag.AttributeGroupID)-collapse"
+                                    aria-expanded="true"
+                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @(ag.Name)">
+                                    @ag.Name
+                                    <i class="fa fa-chevron-down"></i>
+                                </h6>
+                                <div id="attribute-group-@(ag.AttributeGroupID)-collapse" class="collapse show">
+                                    <div class="attribute-group-inner">
+                                       @foreach (var attribute in ag.Attributes.OrderBy(p => p.SortOrder).Select((value, attributeIndex) => new { value, attributeIndex }))
+                                        {
+                                            var a = attribute.value;
+                                            var attributeIndex = attribute.attributeIndex; 
+                                            <!-- ko with: attributes()[@attributeIndex]-->
+                                            var selected = ag.Selection.Contains(a.FormValue);
+                                            var unavailable = ag.MultipleSelect == false && ag.Selection.Count > 0 && !selected;
+                                            <div class="form-check attribute colour d-flex">
+                                                <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
+                                                    @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
+                                                </span>
+                                                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                                                    @Html.Raw(JsonConvert.SerializeObject(a))
+                                                </span>
+                                                <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions)" target="_self" onclick="(event) => { event.preventDefault() }">
+                                                    <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
+                                                            for="attribute-@(a.AttributeID)-check"
+                                                            data-bind="css: { 'unavailable': disabled }">
+                                                        <img width="783" height="153" src="/Content/images/icon/Attributes/@(a.AttributeID)@(Framework.WebpOrJpgExtension)" alt="@(a.Name)" loading="lazy"/>
+                                                        <span>
+                                                            @a.Name
+                                                            <span data-bind="text: availableProductPagesDisplay">
+                                                                (@(a.ProductPageIDs.Count))
+                                                            </span>
+                                                        </span>
+                                                        <i class="bi bi-check-circle-fill text-secondary visually-hidden" data-bind="css: { 'visually-hidden': !selected() }"></i>
+                                                        <span class="visually-hidden">
+                                                            <!-- ko if: disabled() -->
+                                                            <span>
+                                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                                            </span>
+                                                            <!-- /ko -->
+                                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
+                                                                   data-bind="checked: $parent.selection,
+                                                                              checkedValue: '@(a.FormValue)',
+                                                                              attr: { disabled: disabled }" />
+                                                        </span>
+                                                        <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
+                                                    </label>
+                                                </a>
+                                            </div>
+                                            <!-- /ko -->
+                                        }
+                                    </div>
+                                </div>
+                                <script type="text/javascript">
+                                    document.querySelector('#attribute-group-@(ag.AttributeGroupID)-collapse').addEventListener('show.bs.collapse', window.lazyImages);
+                                </script>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="attribute-group my-3" data-bind="visible: visible">
+                                <span class="d-none" data-bind="init: { convert: parseBool }, text: singular, remove">
+                                    @($"{!ag.MultipleSelect}".ToLowerInvariant())
+                                </span>
+                                <span class="d-none" data-bind="init: { convert: parseString }, text: logicalOperator, remove">
+                                    @ag.LogicalOperator
+                                </span>
+                                <h6 class="d-flex justify-content-between @(ag.InUse ? "" : "collapsed")"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#attribute-group-@(ag.AttributeGroupID)-collapse"
+                                    aria-expanded="false"
+                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @(ag.Name)">
+                                    @ag.Name
+                                    <span data-bind="text: selectionDisplay"></span>
+                                    <i class="fa fa-chevron-down"></i>
+                                </h6>
+                                <div id="attribute-group-@(ag.AttributeGroupID)-collapse" class="collapse @(ag.InUse ? "show" : "")">
+                                    <div class="attribute-group-inner">
+                                       @foreach (var attribute in ag.Attributes.OrderBy(p => p.SortOrder).Select((value, attributeIndex) => new { value, attributeIndex }))
+                                        {
+                                            var a = attribute.value;
+                                            var attributeIndex = attribute.attributeIndex; 
+                                            <!-- ko with: attributes()[@attributeIndex]-->
+                                            var selected = ag.Selection.Contains(a.FormValue);
+                                            var unavailable = ag.MultipleSelect == false && ag.Selection.Count > 0 && !selected;
+                                            <div class="form-check attribute">
+                                                <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
+                                                    @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
+                                                </span>
+                                                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                                                    @Html.Raw(JsonConvert.SerializeObject(a))
+                                                </span>
+                                               @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
+                                                {
+                                                    <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
+                                                           for="attribute-@(a.AttributeID)-check"
+                                                           data-bind="css: { 'unavailable': disabled }">
+                                                        <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
+                                                                data-bind="checked: $parent.selection,
+                                                                           checkedValue: '@(a.FormValue)',
+                                                                           attr: { disabled: disabled }"/>
+                                                        @a.Name
+                                                        <span data-bind="text: availableProductPagesDisplay">
+                                                            (@(a.ProductPageIDs.Count))
+                                                        </span>
+                                                        <!-- ko if: disabled() -->
+                                                        <span class="visually-hidden">
+                                                            @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                                        </span>
+                                                        <!-- /ko -->
+                                                       @if (!ag.MultipleSelect)
+                                                        {
+                                                           <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
+                                                        } 
+                                                    </label>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions)" target="self" onclick="(event) => { event.preventDefault(); }">
+                                                        <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
+                                                               for="attribute-@(a.AttributeID)-check"
+                                                               data-bind="css: { 'unavailable': disabled }">
+                                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
+                                                                    data-bind="checked: $parent.selection,
+                                                                               checkedValue: '@(a.FormValue)',
+                                                                               attr: { disabled: disabled }"/>
+                                                            @a.Name
+                                                            <span data-bind="text: availableProductPagesDisplay">
+                                                                (@(a.ProductPageIDs.Count))
+                                                            </span>
+                                                            <!-- ko if: disabled() -->
+                                                            <span class="visually-hidden">
+                                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                                            </span>
+                                                            <!-- /ko -->
+                                                           @if (!ag.MultipleSelect)
+                                                            {
+                                                               <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
+                                                            } 
+                                                        </label>
+                                                    </a>
+                                                }
+                                            </div>
+                                            <!-- /ko -->
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <!-- /ko -->
+                    }
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            document.querySelector('#grid-filters-@(Model.PageSection.PageSectionID)').addEventListener('show.bs.offcanvas', window.lazyImages);
+        </script>
+    }
+    else
+    {
+        <span data-bind="init: { field: productPageGrid.productType, value: '@(String.IsNullOrEmpty(grid.ProductType) ? grid.ProductTypes.FirstOrDefault()?.FormValue : grid.ProductType)' }, remove"></span>
+        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.productTypes, remove">
+            @Html.Raw(JsonConvert.SerializeObject(grid.ProductTypes))
+        </span>    
+    }
+   @if (!String.IsNullOrEmpty(Model.PageSection.Heading))
+    {
+        <div class="my-3">
+            <h4 class="text-uppercase my-4">
+                <span data-bind="text: productPageGrid.filteredContentLabel">
+                    @Model.PageSection.Heading
+                </span>
+            </h4>
+        </div>
+    }
+   @if (tradeUser && Model.PageSection.PageSectionID == 7899)
+    {
+        @* Trade Clearance Funtimes *@
+        @Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_TradeClearanceNav.cshtml", Model)
+    }
+   @if ((Model.PageSection.Paging || Model.PageSection.Filter) && grid.Contents.Any())
+    { 
+        grid.Index = 0;
+        <!-- ko with: productPageGrid -->
+        @Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+        <!-- /ko -->
+    }
+   @if ((!Framework.ProductionVersion) && (!Model.PageSection.Paging && !Model.PageSection.Filter)) 
+    { 
+        if (Request.QueryString["dateOverride"] != null)
+        {
+            <input type="hidden" name="dateOverride" value="@(Request.QueryString["dateOverride"])" />
+        }
+        if (Request.QueryString["countryOverride"] != null)
+        {
+            <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
+        }
+    }
+    <div class="product-page-grid-wrapper my-4">
+        <span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable, remove">
+            @grid.Searchable
+        </span>
+       @if (!grid.Searchable)
+        {
+            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
+                @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>()))
+            </span>
+        }
+        else
+        {
+            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
+                @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>().Select(p => p.ProductPageID)))
+            </span>
+        }
+       @if (Model.PageSection.Paging || Model.PageSection.Filter)
+        {
+            <div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
+              @if (Model.PageSection.PreviewColourways)
+               {
+
+               }
+               else
+               {
+                   foreach (var p in thisPage)
+                   {
+                        @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+                   }
+               }
+            </div>
+        }
+        else
+        {
+            <div class="product-page-grid grid">
+               @if (Model.PageSection.PreviewColourways)
+                {
+
+                }
+                else
+                {
+                    foreach (var p in thisPage)
+                    {
+                        @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+                    }
+                }
+            </div>
+        }
+    </div>
+    @if ((Model.PageSection.Paging || Model.PageSection.Filter) && grid.Contents.Any())
+    { 
+        grid.Index = 1;
+        <!-- ko with: productPageGrid -->
+        @Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+        <!-- /ko -->
+    }
+</form>
+
+<script type="text/javascript" defer>
+    window.addLoadFunction(() => {
+        if (typeof window.gTagViewList === 'function') {
+            window.gTagViewList({
+                    PageSectionID: @(Model.PageSection.PageSectionID),
+                    Name: '@(Model.Base.MasterDefinition.TitleTag)'
+                },
+                @(Html.Raw(JsonConvert.SerializeObject(thisPage.Select(pp => pp.ProductPage))))
+            )
+        }
+
+       @if (Session["productPageGridDeselectedAttributesNotice"] != null)
+        {
+            <text>
+            window.showInfo(
+                '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Sorry", l, c, d))',
+                '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ThereWereNoResultsForThatCombination", l, c, d))' +
+                ' @HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("WeHaveDeselectedTheFollowing", l, c, d)): <strong>@HtmlHelperExtra.EscapeForJS(Session["productPageGridDeselectedAttributesNotice"].ToString())</strong>')
+            </text>
+
+           HttpContext.Current.Session["productPageGridDeselectedAttributesNotice"] = null;
+       }
+    })
+</script>

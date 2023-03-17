@@ -1,0 +1,190 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutGift
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    var objMaster = Model.masterDefinition;
+    checkoutGift objGift = Model.checkoutGifts;
+    
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<div id="gift-wrap-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    @HtmlHelperExtra.Resource("CheckoutGiftWrapMessage", l, c, d)
+                </h4>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" data-bind="with: $parent.giftBoxFactory">
+                <h4 class="mb-3" data-bind="text: giftBoxPriceDisplay"></h4>
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="giftradio form-check-input" id="gift_yes" name="gift" data-bind="checked: giftBoxDesired, checkedValue: true" />
+                        <label class="form-check-label" for="gift_yes">
+                            @HtmlHelperExtra.Resource("Yes", l, c, d)
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="giftradio form-check-input" id="gift_no" name="gift" data-bind="checked: giftBoxDesired, checkedValue: false" />
+                        <label class="form-check-label" for="gift_no">
+                            @HtmlHelperExtra.Resource("No", l, c, d)
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="gift">
+                        <div id="gift_no_panel" class="gift_no_panel" data-bind="visible: !giftBoxDesired()"><img src="~/Content/images/checkout/gift-box.jpg" class="gift-box" alt="" /></div>
+                        <div id="gift_yes_panel" class="gift_yes_panel" data-bind="visible: giftBoxDesired()">
+                            <p class="gift-q">
+                                @HtmlHelperExtra.Resource("CheckoutGiftHowManyBoxes", l, c, d)
+                                <select class="gift-quantity form-select" id="gift-quantity" data-bind="value: desiredGiftBoxCount, options: giftBoxCountOptions, optionsText: 'text', optionsValue: 'value', optionsCaption: ''"></select>
+                            </p>
+                            <div data-bind="visible: desiredGiftBoxCount">
+                                <div class="gift-q mb-3">
+                                    <span data-bind="text: resources.CheckoutGiftTotalCost"></span>
+                                    <span data-bind="text: desiredGiftBoxCount() > 1 ? resources.CheckoutGiftGiftBoxes : resources.CheckoutGiftGiftBox"></span>
+                                    <span data-bind="text: giftBoxTotalCostDisplay"></span>
+                                </div>
+                                <hr class="mb-3">
+                                <div class="gift-boxes margin" data-bind="foreach: giftBoxes">
+                                    <div class="giftbox top">
+                                        <label class="gift-icon" data-bind="text: resources.CheckoutGiftGiftBox + ' ' + ($index() + 1)"></label>
+                                        <div class="giftarea">
+                                            <div data-bind="component: { name: 'mdc-text-area-component', params: messageParams }"></div>
+                                        </div>
+                                        <!-- ko if: products().length -->
+                                        <div class="gift-box-contents">
+                                            <label class="gift-box-contents-heading">
+                                                @HtmlHelperExtra.Resource("Contents", l, c, d)
+                                            </label>
+                                            <ul class="undotted-list">
+                                                <!-- ko foreach: products -->
+                                                <li class="gift-boxed-item">
+                                                    <span data-bind="text: Quantity"></span>
+                                                    &times;
+                                                    <span data-bind="text: Code"></span>
+                                                    -
+                                                    <span data-bind="text: BasketName"></span>
+                                                    <a href="javascript:;" data-bind="click: $parent.remove, text: $parent.resources.CheckoutPayGiftRemove"></a>
+                                                </li>
+                                                <!-- /ko -->
+                                            </ul>
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                                <hr class="mb-3"/>
+                                <div id="item-gifts">
+                                    <p class="gift-q">
+                                        @HtmlHelperExtra.Resource("CheckoutGiftChooseProducts", l, c, d)
+                                    </p>
+                                    <!-- ko foreach: products -->
+                                    <div class="gift-box-product">
+                                        <img data-bind="attr: { src: 'https://www.designersguild.com/image/156/' + ImageID }, text: BasketName" />
+                                        <div>
+                                            <p class="gift-basket-name" data-bind="text: BasketName"></p>
+                                            <span class="gift-quantity-remaining">
+                                                @HtmlHelperExtra.Resource("QuantityRemaining", l, c, d):
+                                                <span data-bind="text: remainingQuantity"></span>
+                                            </span>
+                                            <div class="gift-selector">
+                                                <!-- ko if: GiftWrappable && remainingQuantity() > 0 -->
+                                                    <span>
+                                                        @HtmlHelperExtra.Resource("Put", l, c, d)
+                                                    </span>
+                                                    <input type="text" class="gift-box-product-qty form-control" data-bind="numericWhole, textInput: addingQuantity, attr: { max: remainingQuantity }"/>
+                                                    <span> 
+                                                        @HtmlHelperExtra.Resource("OfTheseIntoGiftBox", l, c, d)
+                                                    </span>
+                                                    <select class="gift-box-select-box form-select" data-bind="value: addingToGiftBox, options: $parent.giftBoxes, optionsValue: $data, optionsText: 'name'"></select>
+                                                    <button class="btn btn-secondary" data-bind="click: $parent.applyChoice">
+                                                        @HtmlHelperExtra.Resource("Ok", l, c, d)
+                                                    </button>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: GiftWrappable -->
+                                                    <span class="no-gift validation-message">@HtmlHelperExtra.Resource("CheckoutGiftCannotGiftItem", l, c, d)</span>
+                                                <!-- /ko -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark" data-bind="click: $parent.giftBoxFactory.saveGiftBoxing">
+                    @HtmlHelperExtra.Resource("Continue", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="unused-giftbox-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    @HtmlHelperExtra.Resource("CheckoutGiftUnusedGiftBoxTitle", l, c, d)
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    @HtmlHelperExtra.Resource("CheckoutGiftUnusedGiftBoxMessage", l, c, d)
+                </p>
+                <p>
+                    @HtmlHelperExtra.Resource("WishToContinue", l, c, d)
+                </p>
+                <p style="font-style:italic;" class="mb-0">
+                    @HtmlHelperExtra.Resource("CheckoutGiftNoChargeMessage", l, c, d)
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-flat pull-right" onclick="proceedFromGift(false);">
+                    @HtmlHelperExtra.Resource("Continue", l, c, d)
+                </button>
+                <button type="button" class="btn btn-flat pull-left" onclick="hideUnusedPopup()">
+                    @HtmlHelperExtra.Resource("EditNegative", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function getGiftBoxModel() {
+        return @Html.Raw(JsonConvert.SerializeObject(objGift));
+    }
+
+    viewModel.giftBoxFactory.serverModel(getGiftBoxModel());
+
+    function getUnitPrice() {
+        return Number(@objGift.checkoutGiftBoxPrices[0].GiftBoxPriceInc);
+    }
+
+    function allGiftBoxes() {
+        return @Html.Raw(Json.Encode(objGift.checkoutGiftBoxs));
+    }
+
+    function allBasketsWithAGiftBox() {
+        return @Html.Raw(Json.Encode(objGift.checkoutGiftGroupedBaskets.Where(b => b.CheckoutGiftBoxID != null)));
+    }
+
+    function numberOfGiftWrappableItems() {
+        return @objGift.checkoutGiftGroupedBaskets.Where(g => g.GiftWrappable).Count();
+    }
+
+</script>

@@ -1,0 +1,693 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var objMenu = Model.MasterDefinition.Menu;
+}
+<nav id="shortcuts-navbar" class="navbar menu-navbar" role="navigation">
+    <ul class="container">
+        @if (!tradeUser)
+        {
+        <li>
+            <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.newsletter, cd)"
+               class="btn navbar-btn">
+                @HtmlHelperExtra.Resource("JoinOurMailingListSubmitButtonText", l, c, d)
+            </a>
+        </li>
+        }
+        @if (objMaster.LoginStatus == dgLoginStatus.notLoggedIn)
+        {
+            <li>
+                <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd)"
+                   rel="nofollow"
+                    class="btn navbar-btn">
+                    @HtmlHelperExtra.Resource("SignIn", l, c, d) / @HtmlHelperExtra.Resource("Register", l, c, d)
+                </a>
+            </li>
+        }
+        else
+        {
+            if (!tradeUser)
+            {
+                <li>
+                    <a class="btn navbar-btn"
+                        href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberMenu, cd)"
+                        target="_self">
+                        @HtmlHelperExtra.Resource("Hello", l, c, d)
+                        <span id="topnav-name">
+                            @Session["memberName"],
+                        </span>
+                        @HtmlHelperExtra.Resource("YourAccount", l, c, d)
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a class="btn navbar-btn">
+                        @HtmlHelperExtra.Resource("Hello", l, c, d)
+                        <span id="topnav-name">
+                            @Session["memberName"]
+                        </span>
+                    </a>
+                </li>
+            }
+            <li>
+                <a class="btn nav-link" href="javascript:;" onclick="logout()">
+                    @HtmlHelperExtra.Resource("Logout", l, c, d)
+                </a>
+            </li>
+        }
+        <li id="trade-menu">
+            <a class="btn navbar-btn" aria-haspopup="true" href="#">
+                @HtmlHelperExtra.Resource("Trade", l, c, d)
+            </a>
+            <ul class="dropdown" aria-label="submenu">
+                <li>
+                    <a class="btn btn-link"
+                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeHomePage, cd))">
+                        @HtmlHelperExtra.Resource("NewTradeWebsite", l, c, d)
+                    </a>
+                </li>
+               @if (!tradeUser)
+                {
+                <li>
+                    <a class="btn btn-link"
+                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeAccountRequest, cd))">
+                        @HtmlHelperExtra.Resource("RequestTradeAccount", l, c, d)
+                    </a>
+                </li>
+                }
+                <li class="dropdown-divider"></li>
+                <li>
+                    <a class="btn btn-link"
+                        target="_blank"
+                        rel="nofollow"
+                        href="https://trade.designersguild.com">
+                        @HtmlHelperExtra.Resource("ExistingTradeWebsite", l, c, d)
+                    </a>
+                </li>
+                <li>
+                    <a class="btn btn-link"
+                        target="_blank"
+                        rel="nofollow"
+                        href="https://trade.designersguild.com">
+                        @HtmlHelperExtra.Resource("ExistingTradeStatistics", l, c, d)
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.dgWorld, cd)"
+                class="btn navbar-btn">
+                @HtmlHelperExtra.Resource("DGWorld", l, c, d)
+            </a>
+        </li>
+       @if (cd.ShopEnabled)
+        {
+            <li id="basket-menu"
+                data-bind="event: {  mouseenter: showBasketSummary, mouseleave: hideBasketSummary }"> 
+                <a id="basket-menu-inner"
+                   class="btn navbar-btn"
+                   href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, cd)"
+                   aria-haspopup="true"
+                   target="_self">
+                    <span>
+                        @HtmlHelperExtra.Resource("ViewBasket", l, c, d)
+                    </span>
+                    <i class="bi bi-bag"></i>
+                    <span class="badge rounded-pill bg-secondary" style="display: @(objMaster.ItemsInBasket > 0 ? "block" : "none")" data-bind="visible: +itemsInBasket()">
+                        <span data-bind="init, text: itemsInBasket">
+                            @($"{objMaster.ItemsInBasket:#.##}")
+                        </span>
+                        <span class="visually-hidden">
+                            <span class="visually-hidden" data-bind="init, text: itemsInBasket">
+                                @($"{objMaster.ItemsInBasket:#.##}")
+                            </span>
+                            @HtmlHelperExtra.Resource(objMaster.ItemsInBasket > 0 ? "ShoppingProductsInBasket" : "EmptyBasket", l, c, d)
+                        </span>
+                    </span>
+                </a>
+                <div id="basket-summary-dropdown"
+                     class="dropdown"
+                     aria-label="submenu">
+                    <div id="basket-summary-blocker"
+                         class="page-blocker"
+                         data-bind="toggleOpacity: busy">
+                        <div class="spinner-border" role="status"></div>
+                        <h5>
+                            @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                        </h5>
+                    </div>
+                    <div id="basket-summary-contents">
+                        <!-- ko if: basketItems().length == 0 -->
+                        <h6 class="text-center my-3">
+                            @HtmlHelperExtra.Resource("EmptyBasket", l, c, d)
+                        </h6>
+                        <!-- /ko -->
+                        <div id="basket-summary-items" data-bind="foreach: basketItems">
+                            <div class="basket-summary-item">
+                                <img width="90"
+                                     height="90"
+                                     data-bind="attr: { src: `/image@(Framework.WebPFallback)/90/${ImageID}`,
+                                                        alt: Code,
+                                                        title: Code,
+                                                        srcset: window.imageAttributeSourceSet(ImageID, imageSizeIcon),
+                                                        sizes: window.imageAttributeSizes(ImageID, imageSizeIcon) }" />
+                                <p>
+                                    <span data-bind="text: DisplayLine"></span>
+                                    <span data-bind="text: `${ko.unwrap($parent.resources).Quantity}: ${Quantity}${StockMessaging.Unit}`"></span>
+                                   @if (tradeUser)
+                                    {
+                                        <span data-bind="text: BasketLineType"></span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                        <div id="basket-summary-controls">
+                            <a class="btn btn-secondary" href="@dgFramework.buildUrl(dgContentType.landingPage, 201, ci)">
+                                <span>
+                                    @HtmlHelperExtra.Resource("ViewBasket", l, c, d)
+                                </span>
+                                <span data-bind="text: summaryMessage"></span>
+                            </a>
+                            <p class="message" data-bind="html: promotionalMessage"></p>
+                            <a class="btn btn-secondary" href="@dgFramework.buildUrl(dgContentType.landingPage, 201, ci)">
+                                @HtmlHelperExtra.Resource("BasketProceedCheckout", l, c, d)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        } 
+        <li class="underlay"></li>
+    </ul>
+</nav>
+<div id="logo-search-container"
+     class="container mt-4">
+    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.home, cd)">
+       @if (tradeUser) 
+        {
+        <img id="navbar-logo" width="512" height="37" title="@HtmlHelperExtra.Resource("DesignersGuild", l, c, d)" alt="@HtmlHelperExtra.Resource("DesignersGuildLogo", l, c, d)" 
+                src="/Content/images/logo/dg-logo-b2b-670-37@(Framework.WebpOrPngExtension)"
+                srcset="/Content/images/logo/dg-logo-b2b-670-37@(Framework.WebpOrPngExtension) 1x,
+                        /Content/images/logo/dg-logo-b2b-1340-73@(Framework.WebpOrPngExtension) 2x,
+                        /Content/images/logo/dg-logo-b2b-2680-145@(Framework.WebpOrPngExtension) 4x"
+                sizes="(max-width: 992px) 512px, (max-width: 1200px) 1024px, 2048px"/>
+        }
+        else
+        {
+        <img id="navbar-logo" width="512" height="37" title="@HtmlHelperExtra.Resource("DesignersGuild", l, c, d)" alt="@HtmlHelperExtra.Resource("DesignersGuildLogo", l, c, d)" 
+                src="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension)"
+                srcset="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension) 1x,
+                        /Content/images/logo/dg-logo-1024-73@(Framework.WebpOrPngExtension) 2x,
+                        /Content/images/logo/dg-logo-2048-145@(Framework.WebpOrPngExtension) 4x"
+                sizes="(max-width: 992px) 512px, (max-width: 1200px) 1024px, 2048px"/>
+        }
+    </a>
+    <div id="product-search-content"
+         class="@((Model.ContentID == 76 ? "open" : ""))"
+         data-bind="keepElement: searchTerm"> @* hold this guy open if on Search page *@
+        <form id="product-search-form"
+              method="get"
+              action="/@(cd.URL)/@(dgFramework.getUrlKeywordsForFixedPage(76, cd))/l76"
+              autocomplete="off"
+              aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
+              class="@((Model.ContentID == 76 ? "open" : ""))" @* this guy too *@
+              data-bind="submit: formSubmit">
+            <div class="input-group"
+                 data-bind="css: { 'busy': busy }">
+                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: availableProductTypes, remove">
+                    @Html.Raw(JsonConvert.SerializeObject(Model.MasterDefinition.ProductTypeDropDown.ProductTypes))
+                </span>
+               @if (!String.IsNullOrEmpty(Model.ProductType))
+                {
+                    <span class="d-none" data-bind="init: { convert: parseString }, text: productType, remove">
+                        @Model.ProductType
+                    </span>
+                }
+                <select id="product-type-select" name="product-type" class="form-select" data-bind="value: productType">
+                    <option value="" selected>
+                        @HtmlHelperExtra.Resource("All", l, c, d)
+                    </option>
+                    @foreach(var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
+                    {
+                        <option value="@(pt.FormValue)" @((pt.FormValue == Model.ProductType) ? "selected" : "")>
+                            @(pt.Name)
+                        </option>
+                    }
+                </select>
+               @if (HtmlHelperExtra.IsNonProductionVersion)
+                {
+                    if (!String.IsNullOrEmpty(Request.QueryString["dateOverride"]))
+                    {
+                        <input type="hidden" name="dateOverride" value="@(Request.QueryString["dateOverride"])" />
+                    }
+                    if (!String.IsNullOrEmpty(Request.QueryString["countryOverride"]))
+                    {
+                        <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
+                    }   
+                }
+                <input id="product-search-control"
+                       name="search-term" 
+                       type="text"
+                       class="form-control"
+                       aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
+                       value="@Model.SearchTerm"
+                       data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem"/>
+                <button class="btn btn-outline-secondary"
+                        type="submit"
+                        aria-label="@HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)">
+                    <span class="visually-hidden">
+                        @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                    </span>
+                    <i class="bi bi-search"></i>
+                </button>
+                @*<ul id="predictive-search-hints-dropdown"
+                    class="dropdown-menu"
+                    aria-labelledby="predictive-search-hints"
+                    data-bind="visible: anyPredictiveHints()">
+                    
+                    <!-- ko foreach: predictiveSearchDiscontinueds -->
+                    <li>
+                        <a class="dropdown-item hint hint-discontinued" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.discontinuedsIndexOffset() + $index() }">
+                            <span data-bind="text: Heading"></span>
+                            <span class="hint-type">
+                                @HtmlHelperExtra.Resource("ScrapbookDiscontinued", l, c, d)
+                                <span data-bind="text: ProductType"></span>
+                            </span>
+                        </a>
+                    </li>
+                    <!-- /ko -->
+                    <!-- ko foreach: predictiveSearchProducts -->
+                    <li>
+                        <a class="dropdown-item hint hint-product" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.productsIndexOffset() + $index() }">
+                            <span data-bind="text: Heading"></span>
+                            <span class="hint-type" data-bind="text: Code"></span>
+                        </a>
+                    </li>
+                    <!-- /ko -->
+                </ul>*@
+                <div class="dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </form>
+        <div id="search-keeper"></div>
+        <div id="search-overlay" onclick="document.querySelector('#product-search-control').focus()">
+            <span>
+                @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+            </span>
+             <i class="bi bi-search"></i>
+        </div>
+    </div>
+</div>
+<button id="predictive-search-hints"
+        class="d-none dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        data-bs-reference="parent"
+        data-bs-auto-close="outside"
+        aria-expanded="false">
+    @HtmlHelperExtra.Resource("SearchHints", l, c, d)
+</button>
+<div id="predictive-search-hints-dropdown"
+        class="dropdown-menu"
+    aria-labelledby="predictive-search-hints"
+    data-bind="visible: anyPredictiveHints()">
+    <div class="predictive-search-inner py-5">
+        <div class="container">
+            <div class="predictive-hints-grid grid">
+                <!-- ko if: predictiveSearchProductTypes().length -->
+                <div class="g-col-1">
+                    <h6>
+                        @HtmlHelperExtra.Resource("ProductTypes", l, c, d)
+                    </h6>
+                    <ul class="undotted-list">
+                        <!-- ko foreach: predictiveSearchProductTypes -->
+                            <li data-bind="attr: { tabindex: $index() }">
+                                <a class="hint hint-product-type" href="#" data-bind="attr: { href: URLKeywords }">
+                                    <span data-bind="text: Heading"></span>
+                                    <span class="hint-type">
+                                        @HtmlHelperExtra.Resource("ProductType", l, c, d)
+                                    </span>
+                                </a>
+                            </li>
+                         <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: predictiveSearchBrands().length -->
+                <div class="g-col-1">
+                    <h6>
+                        @HtmlHelperExtra.Resource("Brands", l, c, d)
+                    </h6>
+                    <ul class="undotted-list">
+                        <!-- ko foreach: predictiveSearchBrands -->
+                            <li data-bind="attr: { tabindex: $parent.brandsIndexOffset() + $index() }">
+                                <a class="hint hint-brand" href="#" data-bind="attr: { href: URLKeywords }">
+                                    <span data-bind="text: Heading"></span>
+                                    <span class="hint-type">
+                                        @HtmlHelperExtra.Resource("dropdownBrandOption", l, c, d)
+                                    </span>
+                                </a>
+                            </li>
+                         <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: predictiveSearchCollections().length -->
+                <div class="g-col-1">
+                    <h6>
+                        @HtmlHelperExtra.Resource("CollectionsPlural", l, c, d)
+                    </h6>
+                    <ul class="undotted-list">
+                        <!-- ko foreach: predictiveSearchCollections -->
+                        <li data-bind="attr: { tabindex: $parent.collectionsIndexOffset() + $index()  }">
+                            <a class="hint hint-collection" href="#" data-bind="attr: { href: URLKeywords }">
+                                <span data-bind="text: Heading"></span>
+                                <span class="hint-type">
+                                    <span data-bind="text: ProductType"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("ppCollection", l, c, d)
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: predictiveSearchDesigns().length -->
+                <div class="g-col-1">
+                    <h6>
+                        @HtmlHelperExtra.Resource("Designs", l, c, d)
+                    </h6>
+                    <ul class="undotted-list">
+                        <!-- ko foreach: predictiveSearchDesigns -->
+                        <li data-bind="attr: { tabindex: $parent.designsIndexOffset() + $index() }">
+                            <a class="hint hint-design" href="#" data-bind="attr: { href: URLKeywords }">
+                                <span data-bind="text: Heading"></span>
+                                <span class="hint-type">
+                                    <span data-bind="text: ProductType"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("ppDesign", l, c, d)
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: predictiveSearchResults().length -->
+                <div class="g-col-1">
+                    <h6>
+                        @HtmlHelperExtra.Resource("Suggestions", l, c, d)
+                    </h6>
+                    <ul class="undotted-list">
+                        <!-- ko foreach: predictiveSearchResults -->
+                        <li data-bind="attr: { tabindex: $parent.resultsIndexOffset() + $index() }">
+                            <a class="hint hint-result" href="#" data-bind="click: $parent.useResult">
+                                <span data-bind="text: Keyword"></span>
+                            </a>
+                        </li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- ko if: predictiveSearchProducts().length -->
+            <h6 class="mt-4">
+                @HtmlHelperExtra.Resource("Products", l, c, d)
+            </h6>
+            <div id="predictive-search-products" class="grid">
+                <!-- ko foreach: predictiveSearchProducts -->
+                <a class="pod-card" data-bind="attr: { href: URL, tabindex: $parent.productsIndexOffset() }">
+                    <div class="card">
+                        <img class="card-img-top"
+                             width="322"
+                             height="322"
+                             data-bind="attr: { src: `/image@(Framework.WebPFallback)/322/${ImageID}`, 
+                                                title: Heading, 
+                                                alt: Heading,
+                                                srcset: window.imageAttributeSourceSet(ImageID, window.imageSizeSmall),
+                                                sizes: window.imageAttributeSizes(ImageID, window.imageSizeSmall)
+                             }"
+                             loading="lazy"/>
+                        <div class="card-body">
+                            <!-- ko if: $data.New -->
+                            <h6 class="card-new">
+                                @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                            </h6>
+                            <!-- /ko -->
+                            <h6 class="card-title text-uppercase mb-2" data-bind="html: Heading"></h6>
+                            <h6 class="card-title text-uppercase" data-bind="html: Code"></h6>
+                        </div>
+                    </div>
+                </a>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+            <button class="btn btn-secondary mt-4" data-bind="click: submit">
+                @HtmlHelperExtra.Resource("ViewAllResults", l, c, d)
+            </button>
+        </div>
+    </div>
+    <div class="underlay" data-bind="click: hideDropdown"></div>
+</div>
+<nav id="main-menu"
+     class="navbar menu-navbar"
+     role="navigation">
+    <ul class="container px-0">
+        @foreach (var group in objMenu.menuGroups.Where(p => p.MenuID != 0).OrderBy(p => p.SortOrder))
+        {
+            @BuildMenuGroup(Model, group)
+        }
+        <li class="underlay"></li>
+    </ul>
+</nav>
+@Render.Script("~/bundles/js/menu-scripts")
+@helper BuildMenuGroup(BaseViewModel model, menuGroup group) 
+{
+    var objMenu = model.MasterDefinition.Menu;
+
+    var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+
+    var children = objMenu.menuItems.Where(p => p.MenuID == group.MenuID)
+                                    .OrderBy(p => p.SortOrder)
+                                    .ToList();
+    
+    if (!children.Any())
+    {
+        <li>
+            @if (!String.IsNullOrEmpty(group.Name))
+            {
+                <a id="menu-@(group.MenuID)"
+                   class="nav-link @group.FontClass"
+                   aria-label="@(group.Name)"
+                   href="@Framework.URLFixup((group.FontClass == "menu-spacer" ? "javascript:;" :
+                    $"{group.URL}{group.QueryStringParameters}"))"
+                   target="@(group.NewWindow ? "_blank" : "_self")"
+                   onclick="@(group.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                   rel="@(group.NoFollow ? "nofollow noopener" : "")">
+                    @(group.Name)
+                </a>
+            }
+            else
+            {
+                <span id="menu-@(group.MenuID)" class="nav-link @group.FontClass"></span>
+            }
+        </li>
+    }
+    else
+    {
+        <li>
+            <a  id="menu-@(group.MenuID)"
+                class="nav-link @group.FontClass"
+                href="@Framework.URLFixup(group.URL ?? "javascript:;")"
+                target="@(group.NewWindow ? "_blank" : "_self")"
+                onmouseenter="this.focus()"
+                onmouseout="this.blur()"
+                onclick="@(group.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                rel="@(group.NoFollow ? "nofollow noopener" : "")">
+                @(group.Name)
+            </a>
+            <div>
+                @{
+                    var columns = children.GroupBy(ch => ch.Column).OrderBy(ch => ch.Key);
+                }
+                <div class="container grid sub-menu-grid px-0" style="--bs-columns: @(columns.Count())">
+                   @foreach(var column in columns)
+                    {
+                        @BuildMenuColumn(model, column)
+                    }
+                </div>
+                @if (group.HasMessageHTML)
+                {
+                    <div class="container">
+                        <div class="menu-message mt-3">
+                            @Html.Raw(group.MessageHTML)
+                        </div>
+                    </div>
+                }
+            </div>
+        </li>
+    }
+}
+
+@helper BuildMenuColumn(BaseViewModel model, IGrouping<byte, menuItem> column)
+{
+    <ul id="column-@(column.Key)">
+        @foreach (var menuItem in column) 
+        {
+            @BuildMenuItem(model, menuItem)
+        }
+    </ul>
+}
+
+@helper BuildMenuItem(BaseViewModel model, menuItem item)
+{
+    var objMenu = model.MasterDefinition.Menu;
+
+    var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = model.MasterDefinition.UrlBreakdown.countryDetails;
+
+    if (item.BannerLocationID == null)
+    {
+        <li>
+           @if (!String.IsNullOrEmpty(item.Name))
+            {
+                <a id="menu-item-@(item.MenuItemID)"
+                   class="nav-link @item.FontClass d-flex align-items-center gap-2"
+                   aria-label="@(item.Name)"
+                   href="@Framework.URLFixup(item.FinalURL(ci.URL))"
+                   target="@(item.NewWindow ? "_blank" : "_self")"
+                   onclick="@(item.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                   rel="@(item.NoFollow ? "nofollow noopener" : "")"
+                   @if (item.FontClass?.Contains("menu-spacer") == true) { <text>
+                   tabindex="-1" ;
+                   </text>  }>
+                    @if (item.Header)
+                    {
+                        <strong>
+                            @Html.Raw(item.Name)
+                        </strong>
+                    }
+                    else
+                    {
+                        @Html.Raw(item.Name)
+                        if (item.QueryStringParameters?.Contains("product-type") == true)
+                        {
+                            <i class="bi bi-search"></i>
+                        }
+                    }
+                </a>
+            }
+            else
+            {
+                <span id="menu-item-@(item.MenuItemID)" class="nav-link  @(item.FontClass)"></span>
+            }
+        </li>
+    }
+    else 
+    {
+        var banners = model
+            .Banners
+            .Where(bl => bl.id == item.BannerLocationID).SelectMany(bl => bl.banners)
+            .Where(b => b.restrictions.menuIds == null || b.restrictions.menuIds.Contains(item.MenuID))
+            .ToList();
+
+        if (banners.Any())
+        {
+            <li>
+               @if (banners.Count() == 1)
+                {
+                   var banner = banners.First();
+                    <a  id="menu-item-@(item.MenuItemID)"
+                        class="nav-link @item.FontClass"
+                        aria-label="@(item.Name)"
+                        href="@Framework.URLFixup(($"{(String.IsNullOrEmpty(banner.linkURL) ? "javascript:;" : banner.linkURL)}{item.QueryStringParameters}").TrimEnd(Framework.QueryStringTrim))"
+                        target="@(banner.newWindow ? "_blank" : "_self")"
+                        onclick="@(item.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                        rel="@(item.NoFollow ? "nofollow noopener" : "")">
+                        <img width="256"
+                             height="@(((float)banner.height / (float)banner.width) * 256)"
+                             src="/imagebanner@(Framework.WebPFallback)/256/@(banner.bannerId)"
+                             alt="@(banner.altText ?? banner.overlayText ?? item.Name)" 
+                             title="@(banner.titleText ?? banner.overlayText ?? item.Name)" 
+                             @HtmlHelperExtra.BannerImageSourceSetSizes((long)banner.bannerId, banner.version, ImageSize.Three) />
+                       @if (!String.IsNullOrEmpty(banner.overlayText))
+                        {
+                            <h6>
+                                @banner.overlayText.Replace(">", "").TrimEnd()
+                            </h6>
+                        }
+                    </a>
+                }
+                else
+                {
+                    <div class="carousel slide carousel-fade carousel-dark"
+                         data-bs-ride="carousel"
+                         data-bs-interval="3000">
+                        <div class="carousel-inner">
+                           @foreach (var b in banners.Select((value, index) => new { value, index }))
+                            {
+                                var banner = b.value;
+                                var index = b.index;
+                                <div class="carousel-item @(index == 0 ? "active" : "")">
+                                   @if (!String.IsNullOrEmpty(banner.linkURL))
+                                    {
+                                        <a href="@Framework.URLFixup(banner.linkURL.TrimEnd(Framework.QueryStringTrim))"
+                                           target="@(banner.newWindow ? "_blank" : "_self")">
+                                            <img src="/imagebanner@(Framework.WebPFallback)/256/@banner.bannerId?v=@banner.version"
+                                                    class="d-block w-100 pointer"
+                                                    alt="@(banner.altText ?? item.Name)"
+                                                    width="256"
+                                                    height="@(((float)banner.height / (float)banner.width) * 256)"
+                                                    @HtmlHelperExtra.BannerImageSourceSetSizes(banner.bannerId, banner.version, ImageSize.Three)>
+                                           @if (!String.IsNullOrEmpty(banner.overlayText))
+                                            {
+                                                <h6>
+                                                    @banner.overlayText.Replace(">", "").TrimEnd()
+                                                </h6>
+                                            }
+                                        </a>   
+                                    }
+                                    else
+                                    {
+                                        <img src="/imagebanner@(Framework.WebPFallback)/256/@banner.bannerId?v=@banner.version"
+                                                class="d-block w-100 pointer"
+                                                alt="@(banner.altText ?? item.Name)"
+                                                width="256"
+                                                height="@(((float)banner.height / (float)banner.width) * 256)"
+                                                @HtmlHelperExtra.BannerImageSourceSetSizes(banner.bannerId, banner.version, ImageSize.Three)>
+                                        if (!String.IsNullOrEmpty(banner.overlayText))
+                                        {
+                                            <h6>
+                                                @banner.overlayText.Replace(">", "").TrimEnd()
+                                            </h6>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </li>
+        }
+    }
+}

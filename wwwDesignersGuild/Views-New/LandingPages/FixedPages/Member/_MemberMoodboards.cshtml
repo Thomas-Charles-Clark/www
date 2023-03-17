@@ -1,0 +1,635 @@
+﻿@model FixedPageViewModel_MemberMoodboard
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var firstTab = 0;
+
+    if (Request.QueryString.AllKeys.Contains("tab"))
+    {
+        switch (Request.QueryString["tab"])
+        {
+            case "compose":
+                firstTab = 1;
+                break;
+            case "how-to":
+                firstTab = 2;
+                break;
+            default:
+                break;
+        }
+    }
+}
+<script src='https://www.google.com/recaptcha/api.js?hl=@(ci.LanguageCode)' async="async" defer="defer"></script>
+@Render.StylesPreload("~/bundles/css/moodboards")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/moodboards-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+<script id="moodboard-row-template" type="text/html">
+    <tr data-bind="click: $parent.edit">
+        <td>
+            <span data-bind="text: kendo.toString(kendo.parseDate(CreatedDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy')"></span>
+        </td>
+        <td>
+            <span data-bind="text: name"></span>
+        </td>
+        <td data-bind="with: room">
+            <span data-bind="text: Name"></span>
+        </td>
+        <td>
+            <span data-bind="text: reference"></span>
+        </td>
+        <td>
+            <a href="javascript:;" data-bind="click: $parent.edit">
+                @HtmlHelperExtra.Resource("MoodboardViewEdit", l, c, d)
+            </a>
+        </td>
+        <td>
+            <a href="javascript:;" data-bind="click: $parent.ordering">
+                @HtmlHelperExtra.Resource("OrderProducts", l, c, d)
+            </a>
+        </td>
+        <td>
+            <a href="javascript:;" data-bind="click: $parent.share">
+                @HtmlHelperExtra.Resource("MoodboardShare", l, c, d)
+            </a>
+        </td>
+        <td>
+            <a href="javascript:;" data-bind="click: $parent.delete">
+                @HtmlHelperExtra.Resource("Delete", l, c, d)
+            </a>
+        </td>
+    </tr>
+</script>
+<script type="text/javascript">
+    window.getMoodboards = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.Moodboards));
+    }
+    window.getScrapbook = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.Scrapbook));
+    }
+    window.getBrands = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.Brands));
+    }
+    window.getRooms = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.Rooms));
+    }
+    window.getUserEmail = () => {
+        return '@Html.Raw(Session["memberEmail"])';
+    }
+    window.getUserName = () => {
+        return '@Html.Raw(Session["memberName"])';
+    }
+    window.getBaseViewModel = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel));
+    }
+</script>
+<div data-bind="stopBinding">
+    <div id="member-wrapper" data-bind="css: { 'expanded': expanded }">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="visible: busy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="moodboard-tabs-container">
+            <ul class="nav nav-pills">
+                <li class="nav-item"
+                    role="presentation">
+                    <button type="button"
+                            class="nav-link @(firstTab == 0 ? "active" : "")"
+                            data-bs-toggle="tab"
+                            data-bs-target="#moodboard-grid"
+                            role="tab">
+                        @HtmlHelperExtra.Resource("MyMoodboards", l, c, d)
+                    </button>
+                </li>
+                <li class="nav-item"
+                    role="presentation">
+                    <button type="button"
+                            class="nav-link @(firstTab == 1 ? "active" : "")"
+                            data-bs-toggle="tab"
+                            data-bs-target="#moodboard-composer"
+                            role="tab">
+                        @HtmlHelperExtra.Resource("EditMoodboard", l, c, d)
+                    </button>
+                </li>
+                <li class="nav-item"
+                    role="presentation">
+                    <button type="button"
+                            class="nav-link @(firstTab == 3 ? "active" : "")"
+                            data-bs-toggle="tab"
+                            data-bs-target="#how-to"
+                            role="tab">
+                        @HtmlHelperExtra.Resource("MoodboardHowToGuide", l, c, d)
+                    </button>
+                </li>
+                <li class="nav-item"
+                    role="presentation">
+                    <button id="expand-toggle" class="nav-link" data-bind="click: toggleFullscreen">
+                        <span data-bind="text: expanded() ? '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Collapse", l, c, d)) (ESC / F11)' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Fullscreen", l, c, d))'">
+                            @HtmlHelperExtra.Resource("Fullscreen", l, c, d)
+                        </span>
+                        <i class="bi bi-fullscreen" data-bind="css: { 'bi-fullscreen': !expanded(), 'bi-fullscreen-exit': expanded() }"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div id="moodboard-grid" class="tab-pane fade @(firstTab == 0 ? "show active" : "")">
+                <div data-bind="kendoGrid: moodboardGrid"></div>
+            </div>
+            <div id="moodboard-composer" class="tab-pane fade @(firstTab == 1 ? "show active" : "")">
+                <div id="moodboard-control-wrapper">
+                    <div id="moodboard-properties" class="grid" data-bind="with: selectedMoodboard">
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: nameParams }"></div>
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: referenceParams }"></div>
+                        <select id="moodboard-room" class="form-select" data-bind="value: roomId">
+                            <option value="">
+                                @HtmlHelperExtra.Resource("MoodboardRoomSelector", l, c, d)
+                            </option>
+                            @foreach (var r in Model.Definition.Rooms)
+                            {
+                                <option value="@r.RoomID">
+                                    @r.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div id="moodboard-controls" class="grid" data-bind="with: selectedMoodboard">
+                        <button class="btn btn-dark" data-bind="click: $parent.download">
+                            @HtmlHelperExtra.Resource("MoodboardDownload", l, c, d)
+                        </button>
+                        <button id="share-btn" class="btn btn-dark" data-bind="click: $parent.share">
+                            @HtmlHelperExtra.Resource("MoodboardShare", l, c, d)
+                            <div class="share"></div>
+                        </button>
+                        <button class="btn btn-dark" data-bind="click: $parent.print">
+                            @HtmlHelperExtra.Resource("MoodboardPrint", l, c, d)
+                        </button>
+                        <button class="btn btn-dark" data-bind="click: $parent.fetchOrdering">
+                            @HtmlHelperExtra.Resource("OrderProducts", l, c, d)
+                        </button>
+                        <span></span>
+                        <button class="btn btn-dark" data-bind="click: $parent.createNew">
+                            @HtmlHelperExtra.Resource("NewMoodboard", l, c, d)
+                        </button>
+                    </div>
+                    <div id="canvas-controls" class="grid" data-bind="with: selectedMoodboard">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bind="click: addText">
+                                @HtmlHelperExtra.Resource("MoodboardAddText", l, c, d)
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                <span class="visually-hidden">
+                                    Dropdown Toggle
+                                </span>
+                            </button>
+                            <ul id="add-text-dropdown" class="dropdown-menu">
+                                <li class="d-flex align-items-center gap-3 px-3">
+                                    <label for="font-size">
+                                        @HtmlHelperExtra.Resource("Size", l, c, d)
+                                    </label>
+                                    <select id="font-size" class="form-select" data-bind="value: fontSize">
+                                        <option value="8">
+                                            8px
+                                        </option>
+                                        <option value="9">
+                                            9px
+                                        </option>
+                                        <option value="10">
+                                            10px
+                                        </option>
+                                        <option value="11">
+                                            11px
+                                        </option>
+                                        <option value="12">
+                                            12px
+                                        </option>
+                                        <option value="14">
+                                            14px
+                                        </option>
+                                        <option value="16">
+                                            16px
+                                        </option>
+                                        <option value="18">
+                                            18px
+                                        </option>
+                                        <option value="20">
+                                            20px
+                                        </option>
+                                        <option value="22">
+                                            22px
+                                        </option>
+                                        <option value="24">
+                                            24px
+                                        </option>
+                                        <option value="26">
+                                            26px
+                                        </option>
+                                        <option value="28">
+                                            28px
+                                        </option>
+                                        <option value="36">
+                                            36px
+                                        </option>
+                                        <option value="48">
+                                            48px
+                                        </option>
+                                        <option value="72">
+                                            72px
+                                        </option>
+                                    </select>
+                                    <label for="font-style">
+                                        @HtmlHelperExtra.Resource("Style", l, c, d)
+                                    </label>
+                                    <select id="font-style" class="form-select" data-bind="value: fontStyle">
+                                        <option value="normal">
+                                            @HtmlHelperExtra.Resource("Normal", l, c, d)
+                                        </option>
+                                        <option value="bold">
+                                            @HtmlHelperExtra.Resource("Bold", l, c, d)
+                                        </option>
+                                        <option value="italic">
+                                            @HtmlHelperExtra.Resource("Italic", l, c, d)
+                                        </option>
+                                    </select>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a id="arial"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Arial' }, click: (d, e) => { setFont('Arial', e) }">
+                                        Arial (san-serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="courier-new"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Courier New' }, click: (d, e) => { setFont('Courier New', e) }">
+                                        Courier New (monospace)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="garamond"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Garamond' }, click: (d, e) => { setFont('Garamond', e) }">
+                                        Garamond (serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="georgia"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Georgia' }, click: (d, e) => { setFont('Georgia', e) }">
+                                        Georgia (serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="lucida-calligraphy-italic"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Lucida Calligraphy Italic' }, click: (d, e) => { setFont('Lucida Calligraphy Italic', e) }">
+                                        Lucida Calligraphy Italic (serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="open-sans"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Open Sans' }, click: (d, e) => { setFont('Open Sans', e) }">
+                                        Open Sans (sans-serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="tahoma"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Tahoma' }, click: (d, e) => { setFont('Tahoma', e) }">
+                                        Tahoma (sans-serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="times-new-roman"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Times New Roman' }, click: (d, e) => { setFont('Times New Roman', e) }">
+                                        Times New Roman (serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="trebuchet-ms"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Trebuchet MS' }, click: (d, e) => { setFont('Trebuchet MS', e) }">
+                                        Trebuchet MS (sans-serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="trixie"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Trixie' }, click: (d, e) => { setFont('Trixie', e) }">
+                                        Trixie (serif)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="verdana"
+                                       class="dropdown-item"
+                                       href="javascript:;"
+                                       data-bind="css: { active: font() === 'Verdana' }, click: (d, e) => { setFont('Verdana', e) }">
+                                        Verdana (sans-serif)
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: moveToFront">
+                            @HtmlHelperExtra.Resource("MoodboardMoveToFront", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: moveToBack">
+                            @HtmlHelperExtra.Resource("MoodboardMoveToBack", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: moveForward">
+                            @HtmlHelperExtra.Resource("MoodboardMoveForward", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: moveBackward">
+                            @HtmlHelperExtra.Resource("MoodboardMoveBackward", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: group">
+                            @HtmlHelperExtra.Resource("MoodboardGroup", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: ungroup">
+                            @HtmlHelperExtra.Resource("MoodboardUngroup", l, c, d)
+                        </button>
+                        <button class="btn btn-secondary btn-sm" data-bind="click: remove">
+                            @HtmlHelperExtra.Resource("MoodboardRemove", l, c, d)
+                        </button>
+                        <span></span>
+                        <div class="hstack gap-2">
+                            <button id="undo" class="btn btn-secondary btn-sm"
+                                    data-bind="attr: { disabled: undoDisabled }, click: () => { replay(undo, redo) }">
+                                <i class="material-icons">
+                                    undo
+                                </i>
+                            </button>
+                            <button id="redo" class="btn btn-secondary btn-sm"
+                                    data-bind="attr: { disabled: redoDisabled }, click: () => { replay(redo, undo) }">
+                                <i class="material-icons">
+                                    redo
+                                </i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm" data-bind="click: clear">
+                                @HtmlHelperExtra.Resource("MoodboardClear", l, c, d)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="canvas-wrapper">
+                    <div id="save-timer">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span>
+                                @HtmlHelperExtra.Resource("MoodboardSaveOK", l, c, d)
+                                <i class="material-icons">
+                                    check
+                                </i>
+                            </span>
+                            <div class="countdown">
+                                <svg viewBox="-50 -50 100 100" stroke-width="10">
+                                    <circle r="45"></circle>
+                                    <circle r="45" stroke-dasharray="282.7433388230814" stroke-dashoffset="282.7433388230814px"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="canvas-background-text">
+                        <span>
+                            <a class="d-inline" href="#scrapbook-controls">
+                                @(Html.Raw(HtmlHelperExtra.Resource("MoodboardComposePlaceholderLine1", l, c, d)))
+                            </a>
+                        </span>
+                        <span>
+                            @(Html.Raw(HtmlHelperExtra.Resource("MoodboardComposePlaceholderLine2", l, c, d)))
+                        </span>
+                        <span>
+                            <button class="btn btn-link d-inline-block"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#moodboard-grid">
+                                @(Html.Raw(HtmlHelperExtra.Resource("MoodboardComposePlaceholderLine0", l, c, d)))
+                            </button>
+                        </span>
+                        <span>
+                            <button class="btn btn-link d-inline-block"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#how-to">
+                                @(Html.Raw(HtmlHelperExtra.Resource("MoodboardComposePlaceholderLine0a", l, c, d)))
+                            </button>
+                        </span>
+                    </div>
+                    <canvas id="moodboard-canvas"></canvas>
+                    <div id="canvas-height-handle" class="ui-resizable-handle ui-resizable-s"></div>
+                </div>
+                <div id="scrapbook-controls" class="grid">
+                    <select id="scrapbook-brand" class="form-select" data-bind="value: scrapbookFilterBrandId">
+                        <option value="">
+                            @HtmlHelperExtra.Resource("dropdownBrandOption", l, c, d)
+                        </option>
+                        @foreach (var b in Model.Definition.Brands)
+                        {
+                            <option value="@b.BrandID">
+                                @b.Name
+                            </option>
+                        }
+                    </select>
+                    <select id="scrapbook-product-type" class="form-select" data-bind="value: scrapbookFilterProductTypeId">
+                        <option value="">
+                            @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)
+                        </option>
+                        @foreach (var pt in Model.Definition.ProductTypes)
+                        {
+                            <option value="@pt.ProductTypeID">
+                                @pt.Name
+                            </option>
+                        }
+                    </select>
+                    <div class="form-check">
+                        <input id="scrapbook-new" class="form-check-input" type="checkbox" data-bind="checked: scrapbookFilterNew" />
+                        <label class="form-check-label">
+                            @HtmlHelperExtra.Resource("MoodboardNew", l, c, d)
+                        </label>
+                    </div>
+                    <div id="product-data-check"
+                         class="form-check">
+                        <input id="include-product-data" class="form-check-input" type="checkbox" data-bind="checked: includeProductData" />
+                        <label class="form-check-label">
+                            @HtmlHelperExtra.Resource("MoodboardIncludeProductData", l, c, d)
+                        </label>
+                    </div>
+                    <select id="add-brand-logo" class="form-select" data-bind="value: addingBrandLogo,
+                            options: availableBrands,
+                            optionsText: 'Name',
+                            optionsValue: $data,
+                            optionsCaption: '@HtmlHelperExtra.Resource("MoodboardAddBrandLogo", l, c, d)'">
+                    </select>
+                </div>
+                <div id="scrapbook-wrapper">
+                    <p class="mb-0" style="display: none" data-bind="visible: scrapbookFilteredNoResults">
+                        @HtmlHelperExtra.Resource("NothingToDisplay", l, c, d)
+                    </p>
+                    <p class="mb-0" style="display: none" data-bind="visible: scrapbookEmpty">
+                        @HtmlHelperExtra.Resource("YourScrapbookIsEmpty", l, c, d)
+                    </p>
+                    <div id="scrapbook-grid" data-bind="foreach: visibleScrapbookItems">
+                        <div class="scrapbook-pod">
+                            <div class="scrapbook-pod-inner">
+                                <img data-bind="attr: { src: `/image@(Framework.WebPFallback)/1024/${ImageID}` }" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="how-to" class="tab-pane fade @(firstTab == 3 ? "show active" : "")">
+                @Html.Action("_displaySnippetTextOnly", "Section", new passSnippet
+                {
+                    masterDefinition = Model.MasterDefinition,
+                    SnippetLocationID = (byte)snippetDefinitions.moodboardHelp
+                })
+            </div>
+        </div>
+        <div id="moodboard-share-modal" class="modal fade">
+            <div class="container">
+                <div class="modal-dialog">
+                    <div class="modal-content" data-bind="with: selectedMoodboard">
+                        <div class="page-blocker" data-bind="flexVisible: shareBusy, toggleOpacity: shareBusy">
+                            <div class="spinner-border"></div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                            </h4>
+                        </div>
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                @HtmlHelperExtra.Resource("MoodboardShare", l, c, d)
+                            </h4>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img id="share-moodboard-img" src="" data-bind="attr: { src: savedImageUrl }" />
+                            <div id="twitter-collapse" class="collapse">
+                                <div id="comment-wrapper" class="p-3 pb-0">
+                                    <div class="hstack gap-3">
+                                        <div data-bind="component: { name: 'mdc-text-area-component', params: shareTextParams }"></div>
+                                        <a class="btn btn-secondary" href="#" target="_blank"
+                                           data-bind="click: fetchTwitterAuth">
+                                            <span class="twitter"></span>
+                                            <span>
+                                                @HtmlHelperExtra.Resource("Tweet", l, c, d)
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="email-collapse" class="collapse" data-bind="event: { 'show.bs.collapse': () => { $parent.emailer.initCaptcha(); $parent.emailer.reflowLabels(); return true; } }">
+                                <div id="email-share-wrapper" class="p-3 pb-0" data-bind="with: $parent.emailer">
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: recipientNameParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: toParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: subjectParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: userNameParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: replyToParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-area-component', params: bodyParams }"></div>
+                                    <div class="hstack gap-3">
+                                        <div id="include-product-detail" data-bind="component: { name: 'mdc-checkbox-component', params: $parentContext.$parent.detailedProductInfoParams }"></div>
+                                        <div id="email-share-captcha"></div>
+                                        <a class="btn btn-secondary" href="#" target="_blank"
+                                           data-bind="click: send">
+                                            <span class="email"></span>
+                                            <span>
+                                                @HtmlHelperExtra.Resource("MoodboardShareSendEmail", l, c, d)
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="hstack gap-3">
+                                <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#email-collapse">
+                                    <span class="email"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("email", l, c, d)
+                                    </span>
+                                </button>
+                                <a class="btn btn-secondary" href="#" data-bind="click: shareOnFacebook">
+                                    <span class="facebook"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("shareOnFacebook", l, c, d)
+                                    </span>
+                                </a>
+                                <a class="btn btn-secondary" target="_blank" href="https://www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark" data-pin-custom="true">
+                                    <span class="pinterest"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("shareOnPinterest", l, c, d)
+                                    </span>
+                                </a>
+                                <a class="btn btn-secondary" href="#" target="_blank" data-bs-toggle="collapse" data-bs-target="#twitter-collapse">
+                                    <span class="twitter"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("shareOnTwitter", l, c, d)
+                                    </span>
+                                </a>
+                                <button class="btn btn-secondary" href="#" data-bind="click: (data, event) => { window.copyToClipboard(savedImageUrl(), event.target.closest('button')) }">
+                                    <span class="copy"></span>
+                                    <span>
+                                        @HtmlHelperExtra.Resource("CopyLink", l, c, d)
+                                    </span>
+                                    <span class="copied material-icons fade">
+                                        check
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="moodboard-products-modal" class="modal fade">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content" data-bind="with: selectedMoodboard">
+                    <div class="page-blocker" data-bind="flexVisible: $parent.productsBusy, toggleOpacity: $parent.productsBusy">
+                        <div class="spinner-border"></div>
+                        <h4>
+                            @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                        </h4>
+                    </div>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("OrderProducts", l, c, d)
+                        </h4>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div id="products-container"
+                         class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-light" data-bs-dismiss="modal">
+                            @HtmlHelperExtra.Resource("Close", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Render.Script("~/bundles/js/moodboard-signalr-prerequisites")
+@Render.Script("~/signalr/hubs")
+@Render.Script("~/bundles/js/moodboards")

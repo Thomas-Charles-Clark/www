@@ -1,0 +1,1 @@
+{"version":3,"sources":["models/change-country-mobile.scss"],"names":[],"mappings":"AAAA;EACI;;AACA;EACI","file":"change-country-mobile.css","sourcesContent":[".region-grid {\r\n    --bs-columns: 2;\r\n    .region-header {\r\n        grid-column: auto/span 2;\r\n    }\r\n}"]}

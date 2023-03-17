@@ -1,0 +1,11 @@
+﻿
+
+Consider marking your touch and wheel event listeners as `passive` to improve your page's scroll performance.
+
+bootstrap.bundle.js[473]
+
+if (typeEvent.indexOf('touch') === 0) {
+    Object.assign(delegation, {
+        passive: true
+    })
+}

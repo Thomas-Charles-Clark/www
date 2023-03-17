@@ -1,0 +1,558 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutAddress
+@{
+    Layout = null;
+
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+
+    bool showCollectionOptions = Model.deliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 2).Count() > 0;
+    bool isMemberCheckout = Model.checkoutMethod == dgCheckoutType.Trade || Model.checkoutMethod == dgCheckoutType.Member;
+}
+
+<script id="member-address-template" type="text/html">
+    <div class="page-blocker" data-bind="toggleOpacity: busy">
+        <div class="spinner-border"></div>
+        <h4>
+            @HtmlHelperExtra.Resource("CheckoutSinglePageSavingAddress", l, c, d)
+        </h4>
+    </div>
+
+    <div id="checkout-delivery-address-form" class="checkout-section-content" data-bind="template: { name: 'address-template', data: currentAddress }"></div>
+
+</script>
+
+@* 175 - NZ, 16 - AU = George Isles request of 07/05/2021 *@
+@if (c == 175 ||
+     c == 16) 
+{
+    <script type="text/javascript">
+        window.forcePhoneRequired = true;
+
+        additionalValidation = function () {
+            let self = this;
+
+            /// fullName
+            self.fullName.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.fullNamePO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.fullName.subscribe(function (newValue) {
+                self.fullNamePO(newValue);
+            });
+
+            // companyName
+            self.companyName.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.companyNamePO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.companyName.subscribe(function (newValue) {
+                self.companyNamePO(newValue);
+            });
+
+            // addressLine1
+            self.addressLine1.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.addressLine1PO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.addressLine1.subscribe(function (newValue) {
+                self.addressLine1PO(newValue);
+            });
+
+            // addressLine2
+            self.addressLine2.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.addressLine2PO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.addressLine2.subscribe(function (newValue) {
+                self.addressLine2PO(newValue);
+            });
+
+            // town
+            self.town.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.townPO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.town.subscribe(function (newValue) {
+                self.townPO(newValue);
+            });
+
+            // county
+            self.county.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.countyPO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.county.subscribe(function (newValue) {
+                self.countyPO(newValue);
+            });
+
+            // postcode
+            self.postcode.extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.postcodePO = ko.observable().extend({
+                noPOBox: {
+                    params: true,
+                    onlyIf: function () {
+                        return true
+                    },
+                    message: self.resources.POBoxDetected
+                }
+            });
+
+            self.postcode.subscribe(function (newValue) {
+                self.postcodePO(newValue);
+            });
+
+            self.poboxErrors = new ko.validation.group([
+                self.fullNamePO,
+                self.companyNamePO,
+                self.addressLine1PO,
+                self.addressLine2PO,
+                self.townPO,
+                self.countyPO,
+                self.postcodePO
+            ]);
+        }
+    </script>
+}
+
+@if (isMemberCheckout)
+{
+    <div id="address-book-modal" class="modal fade" data-bind="with: deliveryAddressFactory">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @HtmlHelperExtra.Resource("CheckoutSelectFromAddressBook", l, c, d)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- ko if: addressItems().length > 0 -->
+                    <!-- ko foreach: addressItems -->
+                    <div class="address" data-bind="css: { 'default-address': isDefault() }">
+                        <div>
+                            <p>
+                                <strong data-bind="text: fullName, attr: { title : fullName }"></strong>
+                            </p>
+                            <p class="address-display-lines" data-bind="html: displayLines"></p>
+                            <div class="btn-toolbar">
+                                <div class="btn-group me-3">
+                                    <a class="btn btn-success" data-bind="click: $parent.selectFromAddressBook">
+                                        @HtmlHelperExtra.Resource("UseThisAddress", l, c, d)
+                                    </a>
+                                </div>
+                                @if (Model.checkoutMethod == dgCheckoutType.Member)
+                                {
+                                    <div class="btn-group pull-right">
+                                        <a href="javascript:;" class="btn btn-secondary" data-bind="click: $parent.deleteAddress">
+                                            @HtmlHelperExtra.Resource("ManageAddressBookDelete", l, c, d)
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div>
+                            <!-- ko if: !isDefault() -->
+                            <button type="button" class="btn btn-secondary btn-sm" data-bind="click: $parent.makeDefaultAddress">
+                                @HtmlHelperExtra.Resource("CheckoutMakeCardDefault", l, c, d)
+                            </button>
+                            <!-- /ko -->
+                            <!-- ko if: isDefault() -->
+                            <span class="default-label">
+                                @HtmlHelperExtra.Resource("CheckoutThisIsYourDefaultAddress", l, c, d)
+                            </span>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: addressItems().length == 0 -->
+                    <p class="mb-0">
+                        @HtmlHelperExtra.Resource("ManageAddressBookNoAddress", l, c, d)
+                    </p>
+                    <!-- /ko -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        @HtmlHelperExtra.Resource("Cancel", l, c, d)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script id="address-template" type="text/html">
+    <div class="address-form">
+        <div class="ui-front input-group searcher">
+            <select class="form-select" data-bind="value: PCACountry, options: availableCountries, optionsText: 'Name', optionsValue: $data" autocomplete="off"></select>
+            <input type="text" class="form-control" name="address-search" data-bind="keepElement: PCASearchTerm, textInput: PCASearchTerm" autocomplete="autofill-blocker" placeholder="@HtmlHelperExtra.Resource("FindAddressSearchForAddress", l, c, d)" />
+        </div>
+        <hr/>
+        <form>
+            <div class="grid mb-3">
+                <label for="delivery-name"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookFullName", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-7">
+                    <input name="delivery-name"
+                           class="form-control"
+                           data-bind="keepElement: fullName, textInput: fullName, css: controlClass, enable: deliveryOptionId() != 3" maxlength="50" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="delivery-company-name"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookCompanyName", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-7">
+                    <input name="delivery-company-name"
+                           class="form-control"
+                           data-bind="keepElement: companyName, textInput: companyName, css: controlClass, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="35" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="address1"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookLineOne", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-7">
+                    <input name="address1"
+                           class="form-control"
+                           data-bind="keepElement: addressLine1, textInput: addressLine1, css: controlClass, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="60" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="address2"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookLineTwo", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-7">
+                    <input name="address2"
+                           class="form-control"
+                           data-bind="keepElement: addressLine2, textInput: addressLine2, css: controlClass, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="60" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="addressTown"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookTown", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-7">
+                    <input name="addressTown"
+                           class="form-control"
+                           data-bind="keepElement: town, textInput: town, css: controlClass, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="50" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="addressCounty"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookCounty", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-5">
+                    <select name="addressCounty"
+                            class="country county_list form-select"
+                            style="display: none;"
+                            data-bind="keepElement: countyFromList, visible: countyListOrText() == true, options: availableCounties, optionsText: 'CountyName', optionsValue: 'County', value: countyFromList, optionsCaption: '@(HtmlHelperExtra.Resource("AddAddressBookCounty", l, c, d))', enable: deliveryOptionId() != 2 && deliveryOptionId() != 3"></select>
+                    <input name="addressCounty"
+                           type="text"
+                           class="field county form-control"
+                           data-bind="visible: countyListOrText() == false, textInput: county, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="40" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="addressPostcode"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookPostCode", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-5">
+                    <input name="addressPostcode"
+                           class="form-control"
+                           data-bind="keepElement: postcode, textInput: postcode, css: controlClass, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3" maxlength="20" />
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="addressCountry"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("AddAddressBookCountry", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-5">
+                    <select name="addressCountry"
+                            class="form-select"
+                            data-bind="value: country, options: availableCountries, optionsText: 'Name', optionsValue: $data, enable: deliveryOptionId() != 2 && deliveryOptionId() != 3"></select>
+                </div>
+            </div>
+            <div class="grid mb-3">
+                <label for="delivery-phone"
+                       class="g-col-12 g-col-lg-3 col-form-label">
+                    @HtmlHelperExtra.Resource("mobileNumber", l, c, d)
+                </label>
+                <div class="g-col-12 g-col-lg-5">
+                    <input name="delivery-phone"
+                           x-name="addressPhone"
+                           class="form-control"
+                           data-bind="phoneInput, value: phone, keepElement: phone, css: controlClass, enable: deliveryOptionId() != 3" maxlength="20" />
+                </div>
+            </div>
+            <div class="grid">
+                <div class="g-col-12 g-col-lg-3"></div>
+                <div class="g-col-12 g-col-lg-9">
+                    <!-- ko if: typeof poboxErrors !== 'undefined' -->
+                    <!-- ko if: poboxErrors.isAnyMessageShown() -->
+                    <div class="alert alert-danger margin-top-15">
+                        <h4 class="alert-title">
+                            @HtmlHelperExtra.Resource("POBoxesTitle", l, c, d)
+                        </h4>
+                        <p class="margin-bottom-0">
+                            @HtmlHelperExtra.Resource("POBoxesWarning", l, c, d)
+                        </p>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <p id="phone-accuracy">
+                        @HtmlHelperExtra.Resource("ManagePhoneInstructions", l, c, d)
+                    </p>
+                    <p id="address-accuracy">
+                        <span>
+                            @HtmlHelperExtra.Resource("ManageAddressAccuracy", l, c, d)
+                        </span>
+                        @HtmlHelperExtra.Resource("ManageAddressInstructions", l, c, d)
+                    </p>
+                    <div class="clearfix"></div>
+                    <!-- ko if: isDefault() -->
+                    <p class="note">
+                        @HtmlHelperExtra.Resource("CheckoutThisIsYourDefaultAddress", l, c, d)
+                    </p>
+                    <!-- /ko -->
+                    <!-- ko if: errors().length && errors.isAnyMessageShown() -->
+                    <span class="validation-message text-danger my-3">
+                        @HtmlHelperExtra.Resource("PleaseCorrectAllAddressErrors", l, c, d)
+                    </span>
+                    <!-- /ko -->
+                    <button type="button" class="btn btn-secondary address-confirm w-100" data-bind="text: useThisAddressText, click: confirm"></button>
+                    @if (isMemberCheckout)
+                    {
+                        <button type="button" class="btn btn-secondary mt-3 address-confirm w-100" data-bs-toggle="modal" data-bs-target="#address-book-modal">
+                            @HtmlHelperExtra.Resource("CheckoutSelectFromAddressBook", l, c, d)
+                        </button>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- ko if: ko.ignoreDependencies(() => { initLateExtenders() }) -->
+    <div class="clearfix"></div>
+    <!-- /ko -->
+</script>
+
+<div style="display: none;" data-bind="with: deliveryAddressFactory, visible: true">
+    <!-- ko if: addressConfirmed() == true -->
+    <div class="delivery-confirmed">
+        <div class="page-blocker" data-bind="toggleOpacity: busy()">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("CheckoutSinglePageSavingAddress", l, c, d)
+            </h4>
+        </div>
+
+        <p class="delivery-address-display" data-bind="html: currentAddress().displayLines"></p>
+
+        @if (Model.checkoutMethod == dgCheckoutType.Paypal)
+        {
+            <div class="address-form" data-bind="with: currentAddress">
+                <div>
+                    <div class="grid mb-3"
+                         data-bind="validationOptions: { insertMessages: false }">
+                        <label for="delivery-phone"
+                                class="g-col-12 g-col-lg-3 col-form-label">
+                            @HtmlHelperExtra.Resource("mobileNumber", l, c, d)
+                        </label>
+                        <div id="phone-container"
+                             class="g-col-12 g-col-lg-6 d-flex"
+                             data-bind="css: { 'phone-confirmed': confirmed() }">
+                            <input name="delivery-phone"
+                                    x-name="addressPhone"
+                                    class="form-control"
+                                    data-bind="phoneInput, textInput: phone, keepElement: phone, css: controlClass, enable: deliveryOptionId() != 3" maxlength="20" />
+                            <button class="btn btn-success" style="text-transform: capitalize; display: none" data-bind="visible: phoneChanged(), click: phoneSave">
+                                @HtmlHelperExtra.Resource("MoodboardSave", l, c, d)
+                            </button>
+                        </div>
+                    </div>
+                    <span class="validation-message text-danger mb-3" data-bind="validationMessage: phone"></span>
+                    <!-- ko if: initLateExtenders() --><!-- /ko -->
+                </div>
+                <div style="display: none;"
+                     class="mb-3"
+                     data-bind="visible: phoneChanged">
+                    <span>
+                        @HtmlHelperExtra.Resource("MoodboardUnsavedChanges", l, c, d)
+                    </span>
+                </div>
+                <p id="phone-accuracy">
+                    @HtmlHelperExtra.Resource("ManagePhoneInstructions", l, c, d)
+                </p>
+            </div>
+        }
+
+        @if (Model.checkoutMethod != dgCheckoutType.Paypal && Model.checkoutMethod != dgCheckoutType.Amazon)
+        {
+            <button type="button" class="btn btn-secondary w-100" data-bind="click: function() { unconfirmAddress() }">
+                @HtmlHelperExtra.Resource("CheckoutChangeDeliveryAddress", l, c, d)
+            </button>
+        }
+
+        <!-- ko if: isUPSDelivery() -->
+
+        <div class="address-form">
+            <div class="separator"></div>
+        </div>
+        <h5 id="identification-address-heading" class="pt-4 mb-2">
+            <strong>
+                @HtmlHelperExtra.Resource("CheckoutSinglePageIdentificationTitle", l, c, d)
+            </strong>
+        </h5>
+        <a class="@(dgFramework.getSnippetId((byte)snippetDefinitions.upsIdentificationProof)) my-3 d-block" href="javascript:;" data-bs-target="#snippet-id-240" data-bs-toggle="modal">@HtmlHelperExtra.Resource("CheckoutAddressUpsSnippetLink", l, c, d)</a>
+        
+        <!-- ko if: identificationAddressConfirmed() == false -->
+        <div id="checkout-ups-id-address-form" class="checkout-section-content" data-bind="template: { name:  'address-template', data: upsIdAddress }"></div>
+        <!-- /ko -->
+        <!-- ko if: identificationAddressConfirmed() == true -->
+        <p class="delivery-address-display" data-bind="html: upsIdAddress().displayLines"></p>
+        @if (Model.checkoutMethod != dgCheckoutType.Paypal && Model.checkoutMethod != dgCheckoutType.Amazon)
+        {
+            <button type="button" class="btn btn-secondary" data-bind="click: function() { unconfirmUPSIdentificationAddress() }">
+                @HtmlHelperExtra.Resource("CheckoutChangeIdentificationAddress", l, c, d)
+            </button>
+        }
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+    @if (showCollectionOptions)
+    {
+        <!-- ko if: addressConfirmed() == false -->
+        <p class="mt-3">
+            @HtmlHelperExtra.Resource("CheckoutAddressClickCollectOption", l, c, d)
+            <br/>
+            <a class="d-inline-block my-2 bold" data-bind="click: showClickCollect" href="#" data-bs-target="#collection-modal" data-bs-toggle="modal">
+                @HtmlHelperExtra.Resource("CheckoutAddressClickCollectLink", l, c, d)
+            </a>
+        </p>
+        <!-- /ko -->
+
+        @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressCollection.cshtml", Model)
+    }
+    @if (Model.checkoutMethod != dgCheckoutType.Paypal && Model.checkoutMethod != dgCheckoutType.Amazon)
+    {
+        <!-- ko if: addressConfirmed() == false -->
+        <div class="delivery-address" data-bind="template: { name: 'member-address-template', data: $data }"></div>
+        <!-- /ko -->
+    }
+</div>

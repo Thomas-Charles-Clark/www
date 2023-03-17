@@ -1,0 +1,490 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeAccountOrderStatusModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var firstTab = 0;
+    var firstStatus = "outstanding";
+
+    if (Request.QueryString.AllKeys.Contains("tab"))
+    {
+        switch (Request.QueryString["tab"])
+        {
+            case "backOrders":
+                firstTab = 1;
+                firstStatus = Request.QueryString["tab"];
+                break;
+            case "reserveOrders":
+                firstTab = 2;
+                firstStatus = Request.QueryString["tab"];
+                break;
+            case "dispatched":
+            case "despatched":
+            case "dispatchedOrders":
+            case "despatchedOrders":
+                firstTab = 3;
+                firstStatus = "despatchedOrders";
+                break;
+            case "ordersInProgress":
+                firstTab = 4;
+                firstStatus = Request.QueryString["tab"];
+                break;
+            case "held":
+                firstTab = 5;
+                firstStatus = Request.QueryString["tab"];
+                break;
+            default:
+                break;
+        }
+    }
+
+    @* Checked 13/07/2022 *@
+}
+
+@if (!Model.permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureOrderStatus", l, c, d)
+            @(Model.tradeAccountModel.AccountDetails.Code) - @(Model.tradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.tradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+
+    <script id="search-controls-template" type="text/html">
+        <div class="invoice-search-controls">
+            <div>
+                <div class="select-group">
+                    <select class="form-select" data-bind="value: dateRangeType, options: availableDateRangeTypes, optionsValue: 'dateRangeTypeId', optionsText: 'name'"></select>
+                    <select class="form-select" data-bind="value: dateRange, options: dateRanges, optionsValue: 'dateRangeId', optionsText: 'name'"></select>
+                </div>
+                <!-- ko if: dateRange() == -1 -->
+                <div class="custom-date-wrapper">
+                    <label>
+                        @HtmlHelperExtra.Resource("FromProperCase", l, c, d)
+                    </label>
+                    <input id="custom-from-date" class="date-picker" data-bind="kendoDatePicker: customFromDatePicker, click: function () { customFromDatePicker.widget().open(); }" />
+                    <button type="button" class="btn btn-close" data-bind="click: function () { customFromDatePicker.clear(); }">
+                        <span class="visually-hidden">
+                            @HtmlHelperExtra.Resource("Clear", l, c, d)
+                        </span>
+                    </button>
+                    <span class="validation-message text-danger" data-bind="validationMessage: customFromDate"></span>
+                    <span class="validation-message text-danger" data-bind="validationMessage: fromPreceedsTo"></span>
+                </div>
+                <div class="custom-date-wrapper">
+                    <label>
+                        @HtmlHelperExtra.Resource("ToProperCase", l, c, d)
+                    </label>
+                    <input id="custom-to-date" class="date-picker" data-bind="kendoDatePicker: customToDatePicker, click: function () { customToDatePicker.widget().open(); }" />
+                    <button type="button" class="btn btn-close" data-bind="click: function () { customToDatePicker.clear(); }">
+                        <span class="visually-hidden">
+                            @HtmlHelperExtra.Resource("Clear", l, c, d)
+                        </span>
+                    </button>
+                    <span class="validation-message text-danger" data-bind="validationMessage: customToDate"></span>
+                </div>
+                <!-- /ko -->
+            </div>
+            <div>
+                <div class="input-group">
+                    <input type="text" class="form-control" data-bind="enterKey: search, textInput: searchTerm,
+                            attr: { placeholder: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("SearchByInvoice", l, c, d))' }" />
+
+                    <button class="btn btn-outline-secondary" data-bind="click: search">
+                        <span class="visually-hidden">
+                            @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                        </span>
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </script>
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div id="accounts-menu" style="display: none" data-bind="visible: ready">
+                <ul class="nav nav-pills">
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 0 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#outstanding-orders"
+                                data-bind="click: () => { viewingStatus('outstanding') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("AllOutstandingOrders", l, c, d)
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 1 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#back-orders"
+                                data-bind="click: () => { viewingStatus('backOrders') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("BackOrders", l, c, d)
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 2 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#reserve-orders"
+                                data-bind="click: () => { viewingStatus('reserveOrders') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("ReservedStock", l, c, d)
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 3 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#despatched-orders"
+                                data-bind="click: () => { viewingStatus('despatchedOrders') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("DespatchedOrders", l, c, d)
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 4 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#orders-in-progress"
+                                data-bind="click: () => { viewingStatus('ordersInProgress') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("OrdersInProgress", l, c, d)
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button type="button"
+                                class="nav-link @(firstTab == 4 ? "active" : "")"
+                                data-bs-toggle="tab"
+                                data-bs-target="#held-orders"
+                                data-bind="click: () => { viewingStatus('held') }"
+                                role="tab">
+                            @HtmlHelperExtra.Resource("HeldOrders", l, c, d)
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="outstanding-orders" class="tab-pane fade @(firstTab == 0 ? "show active" : "")" data-refresh="outstanding">
+                        <div class="page-blocker" data-bind="flexVisible: outstandingOrdersBusy, toggleOpacity: outstandingOrdersBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("AllOutstandingOrders", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(outstandingOrdersGrid); }"></a>
+                        </h6>
+                        <div class="accounts-grid" data-bind="kendoGrid: outstandingOrdersGrid"></div>
+                    </div>
+                    <div id="back-orders" class="tab-pane fade @(firstTab == 1 ? "show active" : "")" data-refresh="backOrders">
+                        <div class="page-blocker" data-bind="flexVisible: backOrdersBusy, toggleOpacity: backOrdersBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("BackOrders", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(backOrdersGrid); }"></a>
+                        </h6>
+                        <div data-bind="kendoGrid: backOrdersGrid"></div>
+                    </div>
+                    <div id="reserve-orders" class="tab-pane fade @(firstTab == 2 ? "show active" : "")" data-refresh="reserveOrders">
+                        <div class="page-blocker" data-bind="flexVisible: reserveOrdersBusy, toggleOpacity: reserveOrdersBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("ReservedStock", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(reserveOrdersGrid); }"></a>
+                        </h6>
+                        <div data-bind="kendoGrid: reserveOrdersGrid"></div>
+                    </div>
+                    <div id="despatched-orders" class="tab-pane fade @(firstTab == 3 ? "show active" : "")" data-refresh="despatchedOrders">
+                        <div class="page-blocker" data-bind="flexVisible: despatchedOrdersBusy, toggleOpacity: despatchedOrdersBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("DespatchedOrders", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(despatchedOrdersGrid); }"></a>
+                        </h6>
+                        <div data-bind="kendoGrid: despatchedOrdersGrid"></div>
+                    </div>
+                    <div id="orders-in-progress" class="tab-pane fade @(firstTab == 4 ? "show active" : "")" data-refresh="ordersInProgress">
+                        <div class="page-blocker" data-bind="flexVisible: ordersInProgressBusy, toggleOpacity: ordersInProgressBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("OrdersInProgress", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(ordersInProgressGrid); }"></a>
+                        </h6>
+                        <div data-bind="kendoGrid: ordersInProgressGrid"></div>
+                    </div>
+                    <div id="held-orders" class="tab-pane fade @(firstTab == 5 ? "show active" : "")" data-refresh="held">
+                        <div class="page-blocker" data-bind="flexVisible: heldOrdersBusy, toggleOpacity: heldOrdersBusy">
+                            <div class="spinner-border" data-bind="visible: !exportingBusy()"></div>
+                            <h4 data-bind="visible: !exportingBusy()">
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                            <h4 data-bind="visible: exportingBusy()">
+                                @HtmlHelperExtra.Resource("Exporting", l, c, d)
+                            </h4>
+                            <div class="exporting-progress" data-bind="visible: exportingBusy">
+                                <span class="barberpole"></span>
+                                <span class="cover" data-bind="style: { 'width': 100 - exportingProgress() + '%' }"></span>
+                                <span class="progress" data-bind="text: Math.round(((exportingProgress())*100)/100) + ' %'"></span>
+                            </div>
+                            <h5 data-bind="visible: showLongSearch">
+                                @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
+                            </h5>
+                        </div>
+                        <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <h6 class="accounts-title">
+                            @HtmlHelperExtra.Resource("HeldOrders", l, c, d)
+                            <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                                click: function () { saveAsExcel(heldOrdersGrid); }"></a>
+                        </h6>
+                        <div class="accounts-grid" data-bind="kendoGrid: heldOrdersGrid"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="tracking-modal" class="modal fade">
+                <div class="container">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    @HtmlHelperExtra.Resource("Order", l, c, d):
+                                    <span data-bind="text: trackingOrderNumber"></span>
+                                    -
+                                    @HtmlHelperExtra.Resource("TrackingInformation", l, c, d)
+                                </h4>
+                                <button type="button" class="btn-close" aria-label="Close" data-bind="click: hideTrackingModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="list-group mb-0">
+                                    <!-- ko foreach: trackingResults -->
+                                    <li class="list-group-item">
+                                        <label class="display-block" data-bind="text: Parcel"></label>
+                                        <span class="display-block" data-bind="text: ProductCodes"></span>
+                                        <span class="display-block" data-bind="text: Descriptions"></span>
+                                        <a class="display-block" data-bind="attr: { href: TrackingURL }, text: TrackingURL"></a>
+                                    </li>
+                                    <!-- /ko -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="order-detail-modal" class="modal fade">
+                <div class="container">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    @HtmlHelperExtra.Resource("OrderDetails", l, c, d):
+                                    <span data-bind="text: orderDetailsOrderNumber"></span>
+                                </h4>
+                                <button type="button" class="btn-close" aria-label="Close" data-bind="click: hideOrderDetailModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <dl class="grid mb-3">
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("OrderDate", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="with: orderDetailsOrderDate">
+                                        <span data-bind="text: kendo.toString(new Date($data), 'D')"></span>
+                                    </dd>
+                                </dl>
+                                <dl class="grid" data-bind="with: orderDetailsDeliveryInfo">
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("DeliveryName", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: DeliveryName"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsAddressLineOne", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: AddressLine1"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsAddressLineTwo", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: AddressLine2"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsTown", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: AddressLine3"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsCounty", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: AddressLine4"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsPostCode", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: PostalCode"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("FormsPhoneNumber", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: PhoneNumber"></dd>
+                                    <dt class="g-col-2">
+                                        @HtmlHelperExtra.Resource("Haulier", l, c, d)
+                                    </dt>
+                                    <dd class="g-col-10" data-bind="text: HaulierDescription"></dd>
+                                </dl>
+                                <div data-bind="with: orderDetailsDeliveryInfo">
+
+                                </div>
+                                <div data-bind="kendoGrid: ordersDetailsGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        window.getOutstandingOrders = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.outstandingOrders.Results));
+        }
+
+        window.getBackOrders = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.backOrders.Results));
+        }
+
+        window.getReserveOrders = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.reserveOrders.Results));
+        }
+
+        window.getDespatchedOrders = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.despatchOrders.Results));
+        }
+
+        window.getOrdersInProgress = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.ordersInProgress.Results));
+        }
+
+        window.getHeldOrders = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.heldOrders.Results));
+        }
+
+        window.getFirstStatus = () => {
+            return '@firstStatus';
+        }
+
+    </script>
+
+    @Render.Script("~/bundles/js/trade-order-status")
+}

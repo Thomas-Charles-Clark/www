@@ -1,0 +1,189 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+.member-wrapper {
+    position: relative;
+    min-height: 320px;
+    margin-bottom: $xxl-gutter;
+}
+
+#login-details-grid,
+#password-resetter,
+#unsubscribe-wrapper,
+#resubscribe-wrapper {
+    --bs-columns: 2;
+    gap: 4rem;
+
+    > div {
+        > h4 {
+            margin-bottom: $xl-gutter;
+        }
+    }
+
+    .member-account-row + .member-account-row {
+        margin-top: $xl-gutter;
+    }
+
+    .field-label {
+        margin-bottom: $vsm-gutter;
+    }
+
+    .form-group + .form-group,
+    .form-group + .member-account-row {
+        margin-top: $l-gutter;
+    }
+
+    .validation-message {
+        margin-top: $vsm-gutter;
+        display: block;
+    }
+
+    .member-account-row.save-successful::after {
+        content: 'check';
+        font-family: 'Material Icons';
+        color: $green-400;
+        position: absolute;
+        font-size: 24px;
+        right: -38px;
+        top: 24px;
+    }
+}
+
+#unsubscribe-wrapper {
+    .form-control {
+        min-width: 420px;
+    }
+}
+
+#resubscribe-wrapper {
+    display: flex;
+    justify-content: center;
+    .alert {
+        max-width: 640px;
+    }
+}
+
+.marketing-permission {
+    .form-check-input,
+    .form-check-label {
+        cursor: pointer;
+    }
+}
+
+#marketing-country {
+    .mdc-notched-outline__notch {
+        padding: 0 !important;
+    }
+}
+
+.member-account-row {
+    position: relative;
+}
+
+#login-details-grid {
+    --bs-columns: 2;
+
+    .member-account-row + .member-account-row {
+        margin-top: $xl-gutter;
+    }
+
+    .field-label {
+        margin-bottom: $vsm-gutter;
+    }
+
+    .form-group + .form-group,
+    .form-group + .member-account-row {
+        margin-top: $l-gutter;
+    }
+
+    .validation-message {
+        margin-top: $vsm-gutter;
+        display: block;
+    }
+
+    .member-account-row.save-successful::after {
+        content: 'check';
+        font-family: 'Material Icons';
+        color: $green-400;
+        position: absolute;
+        font-size: 24px;
+        right: -38px;
+        top: 24px;
+    }
+
+    .member-account-row.relative {
+        .member-account-row.save-successful::after {
+            top: 0;
+        }
+    }
+
+    .form-check {
+        padding-left: $xl-gutter;
+
+        .form-check-input {
+            width: 16px;
+            height: 16px;
+            margin-left: calc($xl-gutter * -1);
+        }
+    }
+}
+
+#marketing-permissions {
+    .member-account-row {
+        margin-right: 48px;
+    }
+    .member-account-row.relative {
+        padding: $l-gutter;
+    }
+}
+
+.member-account-row.save-successful::after {
+    opacity: 1.0;
+    transition: opacity 300ms ease-in-out;
+}
+
+.member-account-row.save-successful.hide::after {
+    opacity: 0.0;
+}
+
+#password-resetter {
+    > div {
+        min-width: 420px;
+    }
+}
+
+.section {
+
+    > h1,
+    > h2,
+    > h3,
+    > h4,
+    > h5,
+    > h6 {
+        padding: var(--l-gutter);
+        margin-bottom: 0;
+    }
+
+    .section-body {
+        padding: var(--l-gutter);
+
+        p:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.section.dark-grey-section {
+    border: 1px solid $gray-400;
+
+    > h1,
+    > h2,
+    > h3,
+    > h4,
+    > h5,
+    > h6 {
+        background-color: $gray-200;
+    }
+}

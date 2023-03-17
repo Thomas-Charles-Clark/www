@@ -1,0 +1,79 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+<script id="mdc-text-field-component" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : ko.unwrap(readOnly) },
+             enterKey: typeof enterKey === 'undefined' ? null : enterKey">
+            <label for="input" class="mdc-floating-label">
+                <span data-bind="text: label"></span>
+            </label>
+            <input type="text" class="mdc-text-field__input form-control" data-bind="keepElement: observable, forceNullOnEmpty: observable, textInput: observable, charsRemaining: charsRemainingOptions, enable: typeof readOnly == 'undefined' ? true : !ko.unwrap(readOnly), hasFocus: (typeof focusObservable === 'undefined' ? ko.observable() : focusObservable), css: { 'ui-autocomplete-loading': typeof busy === 'undefined' ? false : busy }" />
+        </div>
+    </div>
+</script>
+<script id="mdc-text-area-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-text-field mdc-text-field--textarea" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : readOnly }">
+            <label for="input" class="mdc-floating-label">
+                <span data-bind="text: label"></span>
+            </label>
+            <textarea class="mdc-text-field__input form-control" data-bind="maxNewLines: typeof maxNewLines === 'undefined' ? null : maxNewLines, keepElement: observable, textInput: observable, charsRemaining: charsRemainingOptions, attr: { rows: rows, readonly: typeof readOnly == 'undefined' ? false : readOnly }" rows="6" maxlength="500"></textarea>
+        </div>
+    </div>
+</script>
+<script id="mdc-text-field-numeric-component" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : readOnly }">
+            <label for="input" class="form-label">
+                <span data-bind="text: label"></span>
+            </label>
+            <div class="d-flex justify-content-between align-items-center">
+                <input type="text" class="mdc-text-field__input mdc-text-field__numeric form-control text-right me-3" data-bind="numeric: observable, 
+                        keepElement: observable, 
+                        value: observable.formatted, 
+                        enable: typeof readOnly == 'undefined' ? true : !readOnly(),
+                        hasFocus: (typeof focusObservable === 'undefined' ? ko.observable() : focusObservable),
+                        css: { clearable: showClear, revertable: typeof revertFunction === 'function' }
+                        " />
+                <!-- ko if: typeof permitRevert != 'undefined' && permitRevert && typeof revertFunction === 'function' && typeof originalValue != 'undefined' -->
+                <div class="close revert" data-bind="click: revertFunction">
+                    <i class="material-icons">
+                        replay
+                    </i>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+                <div class="btn btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/javascript" defer>
+    window.addLoadFunction(() => {
+        ko.components.register('mdc-text-field-component', {
+            template: { element: document.getElementById('mdc-text-field-component') }
+        });
+        ko.components.register('mdc-text-area-component', {
+            template: { element: document.getElementById('mdc-text-area-component') }
+        });
+        ko.components.register('mdc-text-field-numeric-component', {
+            template: { element: document.getElementById('mdc-text-field-numeric-component') }
+        });
+    });
+</script>

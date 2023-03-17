@@ -1,0 +1,246 @@
+﻿@model TradeQuickOrderingViewModel
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+
+    var proceedUrl = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+        null,
+        dgContentType.landingPage,
+        (int)dgFixedPage.checkoutLogin,
+        Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    @* Checked 13/07/2022 *@
+}
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+<script id="ko-order-form-item-template" type="text/html">
+    <div class="order-form-product">
+        <div class="my-3">
+            <div class="order-form-details">
+                <a data-bind="attr: {
+                        href: url
+                   }">
+                    <img class="order-form-image"
+                         width="90"
+                         height="90"
+                         src="/image@(Framework.WebPFallback)/90/117989"
+                         loading="lazy"
+                         data-bind="attr: {
+                                src: `/image@(Framework.WebPFallback)/90/${imageId}`,
+                                alt: imageAltText,
+                                title: imageTitleText,
+                                srcset: window.imageAttributeSourceSet(imageId, imageSizeXS),
+                                sizes: window.imageAttributeSizes(imageId, imageSizeXS)
+                            }" />
+                </a>
+                <div class="order-form-item-properties" data-bind="foreach: orderFormProperties">
+                    <span data-bind="text: key"></span>
+                    <span data-bind="text: value"></span>
+                </div>
+                <div class="flex-grow-0 text-end product-price" data-bind="html: priceMessage"></div>
+            </div>
+            <!-- ko if: controls.allowSample -->
+            <!-- ko with: getProductByBasketLineType(sample.productId, @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: controls.allowLargeSample -->
+            <!-- ko with: getProductByBasketLineType(largeSample.productId, @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: controls.allowOrder -->
+            <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: controls.allowReserve -->
+            <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.Reserve.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: controls.allowReserveWithBatchSample -->
+            <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            @*<!-- ko ifnot: controls.allowOrder -->
+                <div class="order-form-item">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)" class="btn btn-dark">
+                            @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
+                        </a>
+                    </div>
+                </div>
+                <!-- /ko -->*@
+        </div>
+    </div>
+</script>
+<script id="ko-order-form-item-button-template" type="text/html">
+    <div class="order-form-item">
+        <!-- ko if: basketLineTypeId < 2 -->
+        <div class="stock-messages">
+            <!-- ko foreach: stockMessage.basketQuantityThresholds -->
+            <!-- ko foreach: stockMessages -->
+            <h6 class="order-form-stock-message" data-bind="class: $data.class,
+                html: stockMessage,
+                css: { 'pointer' : $parentContext.$parent.stockMessage.allowStockCheck },
+                click: ()=>
+                { $parentContext.$parent.stockMessage.allowStockCheck ? window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 0) : null }">
+            </h6>
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <div class="order-form-controls">
+            <label for="-quantity" data-bind="attr: {  for: `product-${productId}-order-form-type-${basketLineTypeId}-qty` }">
+                @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
+            </label>
+            <input type="number" class="form-control"
+                   autocomplete="off"
+                   data-bind="keepElement: quantity,
+                                            validationOptions: { insertMessages: false },
+                                            validationElement: quantity,
+                                            numeric: quantity,
+                                            textInput: quantity,
+                                            attr: {
+                                                id: `product-${productId}-order-form-type-${basketLineTypeId}-qty`,
+                                                'aria-invalid': !quantity.isValid(),
+                                                'disabled': !enabled(),
+                                                'min': stockMessage.quantityMinimum,
+                                                'max': stockMessage.quantityMaximum,
+                                                'step': stockMessage.quantityIncrement
+                                            }" />
+            <button class="btn btn-secondary" data-bind="enable: enabled, click: basketModel.addToBasket">
+                <!-- ko if: orderFormTypeId == 0 -->
+                <span data-bind="text: orderButtonText"></span>
+                <!-- /ko -->
+                <!-- ko if: orderFormTypeId == 1 -->
+                <span data-bind="text: orderButtonText" class="me-2"></span>
+                <span data-bind="html: priceMessage"></span>
+                <!-- /ko -->
+                <!-- ko if: orderFormTypeId == 2 -->
+                <span data-bind="text: orderButtonText" class="me-2"></span>
+                <span data-bind="html: priceMessage"></span>
+                <!-- /ko -->
+                <!-- ko if: orderFormTypeId == 3 -->
+                <span data-bind="text: reserveButtonText"></span>
+                <!-- /ko -->
+                <!-- ko if: orderFormTypeId == 4 -->
+                <span data-bind="text: reserveWithBatchSampleButtonText"></span>
+                <!-- /ko -->
+            </button>
+        </div>
+        <span style="display: none;" class="validation-message" data-bind="validationMessage: quantity"></span>
+        <!-- ko if: stockMessage.allowBackInStockReminder -->
+        <div class="back-in-stock-wrapper mt-2 text-right">
+            <a href="javascript:;" data-bind="click: window.basketModel.backInStockReminder">
+                @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+            </a>
+        </div>
+        <!-- /ko -->
+    </div>
+</script>
+
+@if (!String.IsNullOrEmpty(Model.Heading))
+{
+    <div class="row">
+        <div class="col-full header check">
+            <h2>@(Model.Heading)</h2>
+        </div>
+    </div>
+}
+@if (!Model.Permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure1", l, c, d)
+            @(Model.TradeAccountModel.AccountDetails.Code) - @(Model.TradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.TradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div id="quick-ordering"
+                 class="grid">
+                <div id="quick-search-container">
+                    <div class="basket-title py-4">
+                        <h1 class="text-uppercase">
+                            @HtmlHelperExtra.Resource("tradeQuickOrder", l, c, d)
+                        </h1>
+                        <span class="btn">
+                            &nbsp;
+                        </span>
+                    </div>
+                    <div class="product-search-content">
+                        <div class="input-group">
+                            <select class="form-select product-type-select"
+                                    data-bind="value: productTypeId">
+                                <option value="" selected>
+                                    @HtmlHelperExtra.Resource("All", l, c, d)
+                                </option>
+                                @foreach (var pt in Model.ProductTypes)
+                                {
+                                    <option value="@pt.ProductTypeID">
+                                        @pt.Name
+                                    </option>
+                                }
+                            </select>
+                            <input type="text"
+                                   class="form-control product-search-control"
+                                   data-bind="init: { parseString },
+                                                enterKey: search,
+                                                textInput: searchTerm,
+                                                attr: {
+                                                    placeholder: resources.EnterSearch
+                                                }"
+                                   placeholder="@HtmlHelperExtra.Resource("EnterSearch", l, c, d)" />
+                            <button class="btn btn-outline-secondary" data-bind="click: search">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="results-pane">
+                        <h5 class="no-search-results"
+                            style="display: none"
+                            data-bind="visible: haveSearched() && !busy() && results().length == 0">
+                            @HtmlHelperExtra.Resource("tradeQuickSearchNoResults", l, c, d)
+                        </h5>
+                        <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                            <div class="spinner-border"></div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("Searching", l, c, d)
+                            </h4>
+                        </div>
+                        <!-- ko foreachInit: { name: 'ko-order-form-item-template', data: results, afterQueueFlush: window.lazyImages } --><!-- /ko -->
+                    </div>
+                </div>
+                <div id="quick-basket-container">
+                    @Html.Action("Basket", "NewSection", Model.BaseViewModel)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@Render.Script("~/bundles/js/trade-quick-ordering")

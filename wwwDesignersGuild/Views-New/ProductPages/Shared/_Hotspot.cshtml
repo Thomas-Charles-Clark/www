@@ -1,0 +1,13 @@
+﻿@model OrderFormItemViewModel
+@{
+    var l = Model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.MasterDefinition.UrlBreakdown.ContentDate;
+    var cd = Model.MasterDefinition.UrlBreakdown.countryDetails;
+    
+    var tradeUser = Model.MasterDefinition.TradeAllowed;
+}
+<h5 class="hotspot-heading bg-light">
+    @Model.BasketName
+</h5>
+@Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", Model)

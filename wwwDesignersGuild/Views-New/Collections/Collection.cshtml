@@ -1,0 +1,145 @@
+﻿@model CollectionViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var previewColourways = Model.Definition.CollectionDetails.PreviewColourways;
+
+    var collectionImageSize = ImageSize.Four;
+}
+@section TemplateStyles {
+    @Styles.Render("~/bundles/css/collection")
+}
+@section LateTemplateScripts {
+    @Render.Script("~/bundles/js/collection-page")
+}
+<nav class="breadcrumb-social-wrapper"
+     aria-label="breadcrumb">
+    @Model.Breadcrumbs()
+    @Html.Partial("~/Views-New/Shared/_SocialMediaDrop.cshtml", Model.SocialMediaViewModel)
+</nav>
+<div id="ko-wrapper">
+    <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+        @JsonConvert.SerializeObject(Model)
+    </div>
+    <div id="collection-wrapper"
+         class="grid">
+        <div>
+            <div class="my-3">
+                <h2 class="trixie semi-bold text-uppercase">
+                    @Model.Definition.CollectionDetails.Heading
+                </h2>
+                <h5>
+                    @Model.Definition.CollectionDetails.SubHeading
+                </h5>
+                <p>
+                    @Model.Definition.CollectionDetails.Description
+                </p>
+            </div>
+            <div class="my-3">
+                <div class="vstack gap-4">
+                    @if (!tradeUser)
+                    {
+                        <a class="btn btn-secondary"
+                           href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, objMaster.UrlBreakdown.countryDetails)"
+                           target="_self">
+                            @HtmlHelperExtra.Resource("LifestyleGalleryFindLocalStockist", l, c, d)
+                        </a>
+                    }
+                    <a class="btn btn-light"
+                       href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.moodboard, objMaster.UrlBreakdown.countryDetails)"
+                       target="_self">
+                        @HtmlHelperExtra.Resource("MoodboardCreateView", l, c, d)
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="my-3">
+                @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+            </div>
+        </div>
+    </div>
+    <div class="my-4">
+        <hr />
+    </div>
+    <div class="my-3">
+        <h4 class="text-uppercase my-4">
+            @HtmlHelperExtra.Resource("AllProducts", l, c, d)
+        </h4>
+        <div class="product-page-grid grid">
+            @if (previewColourways)
+            {
+                @*
+                    Bit miffed at this: spent a good while developing it for the previous templates, they never used it.
+                    Will only bother rebuilding it for these new templates if they miss it. They won't.
+                *@
+            }
+            else
+            {
+                foreach (var p in Model.Definition.GetProductPages(objMaster))
+                {
+                    @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+                }
+            }
+        </div>
+    </div>
+    @if (Model.Definition.collectionRelatedCollectionSelects.Any())
+    {
+        <div class="my-4">
+            <hr />
+        </div>
+        <div class="my-3">
+            <h5 class="text-uppercase my-4">
+                @HtmlHelperExtra.Resource("collectionRelated", l, c, d)
+            </h5>
+            <div class="collection-grid grid">
+                @if (previewColourways)
+                {
+
+                }
+                else
+                {
+                    if (previewColourways)
+                    {
+
+                    }
+                    else
+                    {
+                        foreach (var rc in Model.Definition.collectionRelatedCollectionSelects)
+                        {
+                            <div>
+                                <a href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, rc.URLKeywords, (dgContentType)dgContentType.collectionPage, rc.CollectionID)"
+                                   target="_self"
+                                   class="pod-card">
+                                    <div class="card">
+                                        <img class="card-img-top"
+                                             width="@(HtmlHelperExtra.InitialImageFolderSize(collectionImageSize))"
+                                             height="@($"{(int)(Convert.ToDouble(HtmlHelperExtra.InitialImageFolderSize(collectionImageSize).ToString()) / 1.64)}")"
+                                             alt="@(rc.Heading)"
+                                             title="@(rc.Heading)"
+                                             src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(collectionImageSize))/@(rc.ImageID)"
+                                             @HtmlHelperExtra.ImageSourceSetSizes(rc.ImageID, collectionImageSize) />
+                                        <div class="card-body">
+                                            <h6 class="card-title text-uppercase">
+                                                @rc.Heading
+                                            </h6>
+                                            <p class="card-text">
+                                                @rc.SubHeading
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>

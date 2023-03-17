@@ -1,0 +1,287 @@
+﻿@model FixedPageViewModel_MemberLoginDetails
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+}
+@Render.Script("~/bundles/js/member-login-details")
+@Render.StylesPreload("~/bundles/css/member-login-details")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/member-login-details-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+<div data-bind="with: memberLoginModel">
+    <div class="member-wrapper p-3 mt-4">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: saveBusy, toggleOpacity: saveBusy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="login-details-grid" class="grid" style="display: none;" data-bind="visible: true">
+            <div>
+                <h4>
+                    @HtmlHelperExtra.Resource("MyAccountLoginDetails", l, c, d)
+                </h4>
+                <div class="member-account-row">
+                    <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                        <label class="field-label">
+                            @HtmlHelperExtra.Resource("ManageAccountDetailsName", l, c, d)
+                        </label>
+                        <div class="input-group" data-bind="with: fullName">
+                            <input class="form-control" data-bind="keepElement: observable, textInput: observable, charsRemaining: charsRemainingOptions" />
+                            <!-- ko if: observable() == originalValue() -->
+                            <button class="btn btn-secondary" data-bind="click: function() { $(observable.DOMElement).select(); }, text: $parent.resources.ManageTradeAccount_Edit"></button>
+                            <!-- /ko -->
+                            <!-- ko if: observable() != originalValue() -->
+                            <button class="btn btn-success" data-bind="click: function() { $parent.save(null, [observable]) }, text: $parent.resources.MoodboardSave"></button>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <span class="validation-message text-success" style="display: none" data-bind="visible: fullName.updated, text: resources.ChangedName"></span>
+                    <span class="validation-message text-danger" data-bind="validationMessage: fullName.observable"></span>
+                </div>
+                <div class="member-account-row">
+                    <div>
+                        <div class="page-blocker" data-bind="flexVisible: checkEmailBusy, toggleOpacity: checkEmailBusy">
+                            <div class="spinner-border"></div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                            </h4>
+                        </div>
+                        <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                            <label class="field-label">
+                                @HtmlHelperExtra.Resource("ManageAccountDetailsEmail", l, c, d)
+                            </label>
+                            <div class="input-group" data-bind="with: email">
+                                <input id="current-email" class="form-control" data-bind="keepElement: observable, textInput: observable, enable: $parent.editingEmail, validationElement: $parent.extantEmailCheckPassed, hasFocus: focus, charsRemaining: charsRemainingOptions" />
+                                <button class="btn btn-secondary" data-bind="click: function() { $parent.editingEmail(!$parent.editingEmail()); }, text: $parent.editingEmail() ? $parent.resources.Cancel : $parent.resources.ManageTradeAccount_Edit"></button>
+                            </div>
+                            <span class="validation-message text-success" style="display: none" data-bind="visible: email.updated, text: resources.ChangedEmail"></span>
+                            <span class="validation-message text-danger" data-bind="validationMessage: email.observable"></span>
+                        </div>
+                        <div class="member-account-row" data-bind="visible: editingEmail">
+                            <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                                <label class="field-label">
+                                    @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
+                                </label>
+                                <div class="input-group" data-bind="with: confirmEmail">
+                                    <input id="confirm-email" class="form-control" data-bind="textInput: observable, enable: $parent.editingEmail, validationElement: $parent.extantEmailCheckPassed, hasFocus: focus, charsRemaining: charsRemainingOptions" />
+                                    <button class="btn btn-success" data-bind="click: function() { $parent.save(null, [observable]) }, text: $parent.resources.MoodboardSave"></button>
+                                </div>
+                            </div>
+                            <span class="validation-message text-danger" data-bind="validationMessage: confirmEmail.observable"></span>
+                            <span class="validation-message text-danger" data-bind="validationMessage: extantEmailCheckPassed"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="member-account-row">
+                    <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                        <label class="field-label">
+                            @HtmlHelperExtra.Resource("ManageAccountDetailsCurrentPassword", l, c, d)
+                        </label>
+                        <div class="input-group" data-bind="with: currentPassword">
+                            <input id="current-password" type="password" class="form-control" data-bind="keepElement: observable, textInput: observable, charsRemaining: charsRemainingOptions, enable: $parent.editingPassword" />
+                            <button class="btn btn-secondary" data-bind="click: function() { $parent.editingPassword(!$parent.editingPassword()); }, text: $parent.editingPassword() ? $parent.resources.Cancel : $parent.resources.ManageTradeAccount_Edit"></button>
+                        </div>
+                        <span class="validation-message text-success" style="display: none" data-bind="visible: currentPassword.updated, text: resources.ChangedPassword"></span>
+                        <!-- ko if: currentPassword.observable() -->
+                        <span class="validation-message text-danger" data-bind="validationMessage: currentPassword.observable"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="form-group" data-bind="visible: editingPassword, validationOptions: { insertMessages: false }">
+                        <label class="field-label">
+                            @HtmlHelperExtra.Resource("RegistrationNewPasswordLabel", l, c, d)
+                        </label>
+                        <div class="input-group new-password-group" data-bind="with: newPassword">
+                            <input id="new-password" autocomplete="new-password" type="password" class="form-control" data-bind="keepElement: observable, textInput: observable, attr: { 'type': $parent.showPassword() ? 'text' : 'password' }, charsRemaining: charsRemainingOptions" />
+                            <div class="btn btn-secondary show-password-lbl pointer">
+                                <input id="show-password" type="checkbox" data-bind="checked: $parent.showPassword, checkedValue: true" />
+                                <label for="show-password">
+                                    @HtmlHelperExtra.Resource("Show", l, c, d)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ko if: newPassword.observable() -->
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div data-bind="with: newPassword.observable.zxcvbn">
+                                <div class="meter-wrapper">
+                                    <meter value="0" min="0" low="2" high="3" max="4" optimum="4" data-bind="value: score">
+                                        <span class="meter-gauge">
+                                            <span class="meter-display" data-bind="visible: score == 1"></span>
+                                            <span class="meter-display" data-bind="visible: score == 2"></span>
+                                            <span class="meter-display" data-bind="visible: score == 3"></span>
+                                            <span class="meter-display" data-bind="visible: score == 4"></span>
+                                        </span>
+                                    </meter>
+                                    <span class="hint" data-bind="text: ($parent.resources['ManageAccountPasswordStrength' + score])"></span>
+                                    @*<i class="fas fa-question password-tips pointer"></i>*@
+                                </div>
+                            </div>
+                        </div>
+                        <span class="validation-message text-danger" data-bind="validationElement: newPassword.observable">
+                            <span data-bind="validationMessage: newPassword.observable"></span>
+                            <!-- ko ifnot: newPassword.observable.isValid() -->
+                            <a class="pointer" data-bs-toggle="modal" data-bs-target="#password-hint-modal" style="display: block; margin-top: 10px; text-decoration: none;">
+                                @HtmlHelperExtra.Resource("ManageAccountPasswordHint", l, c, d)
+                            </a>
+                            <!-- /ko -->
+                        </span>
+                    </div>
+                    <!-- /ko -->
+                    <div class="form-group" data-bind="visible: editingPassword, validationOptions: { insertMessages: false }">
+                        <label class="field-label">
+                            @HtmlHelperExtra.Resource("RegistrationPasswordConfirmLabel", l, c, d)
+                        </label>
+                        <div class="input-group new-password-group" data-bind="with: confirmNewPassword">
+                            <input id="new-password-confirm" autocomplete="new-password" type="password" class="form-control" data-bind="keepElement: observable, textInput: observable, attr: { 'type': $parent.showPassword() ? 'text' : 'password' }, charsRemaining: charsRemainingOptions" />
+                            <div class="btn btn-secondary show-password-lbl pointer">
+                                <input id="show-confirm-password" type="checkbox" data-bind="checked: $parent.showPassword, checkedValue: true" />
+                                <label for="show-confirm-password">
+                                    @HtmlHelperExtra.Resource("Show", l, c, d)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ko if: confirmNewPassword.observable() -->
+                    <span class="validation-message text-danger" data-bind="validationElement: confirmNewPassword.observable">
+                        <span data-bind="validationMessage: confirmNewPassword.observable"></span>
+                    </span>
+                    <!-- /ko -->
+                    <!-- ko if: newPassword.observable() -->
+                    <!-- ko if: passwordErrors.isAnyMessageShown() == false && newPassword.observable.zxcvbn().score >= 2 -->
+                    <span class="mt-3 d-flex justify-content-end">
+                        <button class="btn btn-success" data-bind="click: () => { save(null, [observable]); }, text: resources.Save"></button>
+                    </span>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+            <div id="marketing-permissions">
+                <h4>
+                    @HtmlHelperExtra.Resource("MyAccountMarketingPermissions", l, c, d)
+                </h4>
+                <div class="member-account-row">
+                    <div id="marketing-country">
+                        <label for="marketing-language" class="field-label">
+                            @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
+                        </label>
+                        <select id="marketing-country"
+                                class="form-select"
+                                data-bind="
+                                    keepElement: marketingCountryId,
+                                    value: marketingCountryId,
+                                    options: availableMarketingCountries,
+                                    optionsText: 'Name',
+                                    optionsValue: 'CountryID'">
+                        </select>
+                    </div>
+                </div>
+                <div style="display: none"
+                     class="member-account-row"
+                     data-bind="visible: currentlyAvailableLanguages().length > 1">
+                    <label for="marketing-language" class="field-label">
+                        @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
+                    </label>
+                    <select id="marketing-language"
+                            class="form-select"
+                            data-bind="
+                                keepElement: marketingLanguageId,
+                                value: marketingLanguageId,
+                                options: currentlyAvailableLanguages,
+                                optionsText: 'Name',
+                                optionsValue: 'LanguageID'">
+                    </select>
+                </div>
+                <div class="member-account-row relative mt-5">
+                    <!-- ko foreach: marketingPermissions -->
+                    <!-- ko ifnot: Hidden -->
+                    <div class="member-account-row">
+                        <div id="marketing-country" class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
+                            <input class="form-check-input" type="checkbox" data-bind="keepElement: Checked, checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
+                            <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
+                                <span data-bind="html: Label"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <div id="password-hint-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("PasswordAdvice", l, c, d)
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h4 class="header_h4">
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1", l, c, d)
+                        </h4>
+                        <ul>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip1_li1", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip1_li2", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip1_li3", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip1_li4", l, c, d)
+                            </li>
+                        </ul>
+                        <h4 class="header_h4">
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2", l, c, d)
+                        </h4>
+                        <ol>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip2_li1", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip2_li2", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip2_li3", l, c, d)
+                            </li>
+                            <li>
+                                @HtmlHelperExtra.Resource("PasswordAdviceTip2_li4", l, c, d)
+                            </li>
+                        </ol>
+                        <h4 class="header_h4">
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip3", l, c, d)
+                        </h4>
+                        <p>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip3_p1", l, c, d)
+                        </p>
+                        <p>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip3_p2", l, c, d)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    window.getFullName = () => '@Model.Definition.FullName';
+    window.getEmail = () => '@Model.Definition.Email';
+    window.getMarketingPermissions = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.MarketingPermissions));
+    }
+    window.getMarketingCountryId = () => @Model.Definition.MarketingCountryID;
+    window.getMarketingLanguageId = () => @Model.Definition.MarketingLanguageID;
+    window.getMarketingCountries = () => @Html.Raw(JsonConvert.SerializeObject(Model.Countries.OrderBy(co => co.Name)));
+    window.getMarketingLanguages = () => @Html.Raw(JsonConvert.SerializeObject(Model.Languages));
+</script>

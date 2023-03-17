@@ -1,0 +1,6 @@
+﻿.region-grid {
+    --bs-columns: 2;
+    .region-header {
+        grid-column: auto/span 2;
+    }
+}

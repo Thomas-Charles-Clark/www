@@ -1,0 +1,1131 @@
+﻿[
+  {
+    "outputFileName": "css/fonts/bootstrap-icons.min.css",
+    "inputFiles": [
+      "css/fonts/bootstrap-icons.css"
+    ]
+  },
+  {
+    "outputFileName": "css/fonts/font-awesome.min.css",
+    "inputFiles": [
+      "css/fonts/font-awesome.css"
+    ]
+  },
+  {
+    "outputFileName": "css/fonts/fonts.min.css",
+    "inputFiles": [
+      "css/fonts/fonts.css"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/jquery-ui/dist/jquery-ui-1.12.1.reduced.min.js",
+    "inputFiles": [
+      "js/lib/jquery-ui/dist/jquery-ui-1.12.1.reduced.js"
+    ],
+    "skipBabel": true
+  },
+  {
+    "outputFileName": "js/lib/jquery-ui/dist/jquery-ui-extensions.min.js",
+    "inputFiles": [
+      "js/lib/jquery-ui/dist/jquery-ui-extensions.js"
+    ],
+    "skipBabel": true
+  },
+  {
+    "outputFileName": "js/lib/material/dist/material-components-web.min.js",
+    "inputFiles": [
+      "js/lib/material/dist/material-components-web.js"
+    ],
+    "skipBabel": true
+  },
+  {
+    "outputFileName": "js/lib/knockout/custom/knockout-extensions.min.js",
+    "inputFiles": [
+      "js/lib/knockout/custom/knockout-extensions.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/knockout/custom/knockout-components.min.js",
+    "inputFiles": [
+      "js/lib/knockout/custom/knockout-components.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/knockout/custom/knockout-validation-custom-rules.min.js",
+    "inputFiles": [
+      "js/lib/knockout/custom/knockout-validation-custom-rules.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/bootstrap/dist/bootstrap.bundle.min.js",
+    "inputFiles": [
+      "js/lib/bootstrap/dist/bootstrap.bundle.js"
+    ],
+    "sourceMap": false,
+    "skipBabel": false
+  },
+  {
+    "outputFileName": "js/lib/bootstrap/custom/bootstrap.onload.min.js",
+    "inputFiles": [
+      "js/lib/bootstrap/custom/bootstrap.onload.js"
+    ],
+    "sourceMap": false,
+    "skipBabel": false
+  },
+  {
+    "outputFileName": "js/lib/bootstrap/dist/bootstrap-datetimepicker.min.js",
+    "inputFiles": [
+      "js/lib/bootstrap/dist/bootstrap-datetimepicker.js"
+    ],
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "js/lib/bootstrap/custom/bootstrap.onload.min.js",
+    "inputFiles": [
+      "js/lib/bootstrap/custom/bootstrap.onload.js"
+    ],
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "js/lib/knockout/dist/knockout-kendo.min.js",
+    "inputFiles": [
+      "js/lib/knockout/dist/knockout-kendo.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/moment/dist/moment-with-locales.min.js",
+    "inputFiles": [
+      "js/lib/moment/dist/moment-with-locales.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/linq/dist/linq.min.js",
+    "inputFiles": [
+      "js/lib/linq/dist/linq.js"
+    ],
+    "skipBabel": true
+  },
+  {
+    "outputFileName": "js/lib/fabric/dist/fabric.min.js",
+    "inputFiles": [
+      "js/lib/fabric/dist/fabric.js"
+    ],
+    "skipBabel": true
+  },
+  {
+    "outputFileName": "js/lib/masonry/dist/imagesloaded.pkgd.min.js",
+    "inputFiles": [
+      "js/lib/masonry/dist/imagesloaded.pkgd.js"
+    ]
+  },
+  {
+    "outputFileName": "js/lib/masonry/dist/masonry.pkgd.min.js",
+    "inputFiles": [
+      "js/lib/masonry/dist/masonry.pkgd.js"
+    ]
+  },
+  {
+    "outputFileName": "js/util/extensions.min.js",
+    "inputFiles": [
+      "js/util/extensions.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/basket-page/basket-page.min.js",
+    "inputFiles": [
+      "js/models/basket-page/basket-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/basket-page/basket-item.min.js",
+    "inputFiles": [
+      "js/models/basket-page/basket-item.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/stock-info.min.js",
+    "inputFiles": [
+      "js/models/common/stock-info.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/common-models.min.js",
+    "inputFiles": [
+      "js/models/common/common-models.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/common-functions.min.js",
+    "inputFiles": [
+      "js/models/common/common-functions.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/ecommerce-popup.min.js",
+    "inputFiles": [
+      "js/models/common/ecommerce-popup.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/landing-page.min.js",
+    "inputFiles": [
+      "js/models/landing-page/landing-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/attribute-group.min.js",
+    "inputFiles": [
+      "js/models/landing-page/attribute-group.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/attribute.min.js",
+    "inputFiles": [
+      "js/models/landing-page/attribute.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/product-type.min.js",
+    "inputFiles": [
+      "js/models/landing-page/product-type.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/page-section.min.js",
+    "inputFiles": [
+      "js/models/landing-page/page-section.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/pager.min.js",
+    "inputFiles": [
+      "js/models/landing-page/pager.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/product-page-grid.min.js",
+    "inputFiles": [
+      "js/models/landing-page/product-page-grid.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/product-page-grid-trade-clearance.min.js",
+    "inputFiles": [
+      "js/models/landing-page/product-page-grid-trade-clearance.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/collection-grid.min.js",
+    "inputFiles": [
+      "js/models/landing-page/collection-grid.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/collection-pod.min.js",
+    "inputFiles": [
+      "js/models/landing-page/collection-pod.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/banner-grid.min.js",
+    "inputFiles": [
+      "js/models/landing-page/banner-grid.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/banner-pod.min.js",
+    "inputFiles": [
+      "js/models/landing-page/banner-pod.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/page-grid.min.js",
+    "inputFiles": [
+      "js/models/landing-page/page-grid.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/page-pod.min.js",
+    "inputFiles": [
+      "js/models/landing-page/page-pod.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/article-grid.min.js",
+    "inputFiles": [
+      "js/models/landing-page/article-grid.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/article-pod.min.js",
+    "inputFiles": [
+      "js/models/landing-page/article-pod.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/product-page-pod.min.js",
+    "inputFiles": [
+      "js/models/landing-page/product-page-pod.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/landing-page/forms.min.js",
+    "inputFiles": [
+      "js/models/landing-page/forms.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/login-page/login-page.min.js",
+    "inputFiles": [
+      "js/models/login-page/login-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/login-page/zxcvbn.min.js",
+    "inputFiles": [
+      "js/models/login-page/zxcvbn.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/product-page/coverage-calculator.min.js",
+    "inputFiles": [
+      "js/models/product-page/coverage-calculator.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/product-page/product-page.min.js",
+    "inputFiles": [
+      "js/models/product-page/product-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/checkout/checkout-login.min.js",
+    "inputFiles": [
+      "js/models/checkout/checkout-login.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/checkout/checkout-single-page.min.js",
+    "inputFiles": [
+      "js/models/checkout/checkout-single-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/collection/collection-page.min.js",
+    "inputFiles": [
+      "js/models/collection/collection-page.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/error-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/error-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/confirm-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/confirm-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/info-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/info-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/back-in-stock-login-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/back-in-stock-login-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/back-in-stock-success-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/back-in-stock-success-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/modals/large-image-modal.min.js",
+    "inputFiles": [
+      "js/models/common/modals/large-image-modal.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/basket.min.js",
+    "inputFiles": [
+      "js/models/common/basket.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/stock-info.min.js",
+    "inputFiles": [
+      "js/models/common/stock-info.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/search.min.js",
+    "inputFiles": [
+      "js/models/common/search.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/site-corrector.min.js",
+    "inputFiles": [
+      "js/models/common/site-corrector.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/cookie-notice.min.js",
+    "inputFiles": [
+      "js/models/common/cookie-notice.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/address.min.js",
+    "inputFiles": [
+      "js/models/common/address.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/polyfills.min.js",
+    "inputFiles": [
+      "js/models/common/polyfills.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/common/emailer.min.js",
+    "inputFiles": [
+      "js/models/common/emailer.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/stockists/stockists.min.js",
+    "inputFiles": [
+      "js/models/stockists/stockists.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-quick-ordering.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-quick-ordering.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-address-management.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-address-management.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-contact-details.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-contact-details.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-invoices.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-invoices.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-order-status.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-order-status.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-proforma-invoices.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-proforma-invoices.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-reserve-orders.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-reserve-orders.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-downloads.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-downloads.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-order-uploads.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-order-uploads.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-request-access.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-request-access.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-login-details.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-login-details.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-price-display.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-price-display.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-user-management.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-user-management.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-account-request.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-account-request.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/trade/trade-registration.min.js",
+    "inputFiles": [
+      "js/models/trade/trade-registration.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-address-management.min.js",
+    "inputFiles": [
+      "js/models/member/member-address-management.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-order-history.min.js",
+    "inputFiles": [
+      "js/models/member/member-order-history.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-login-details.min.js",
+    "inputFiles": [
+      "js/models/member/member-login-details.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-moodboards.min.js",
+    "inputFiles": [
+      "js/models/member/member-moodboards.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-password-reset.min.js",
+    "inputFiles": [
+      "js/models/member/member-password-reset.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/member/member-unsubscribe.min.js",
+    "inputFiles": [
+      "js/models/member/member-unsubscribe.js"
+    ]
+  },
+  {
+    "outputFileName": "js/models/test.min.js",
+    "inputFiles": [
+      "js/models/test.js"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/bootstrap/dist/bootstrap.min.css",
+    "inputFiles": [
+      "css/lib/bootstrap/dist/bootstrap.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/bootstrap/dist/bootstrap.css",
+    "inputFiles": [
+      "css/lib/bootstrap/scss/bootstrap.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/bootstrap/dist/bootstrap-mobile.min.css",
+    "inputFiles": [
+      "css/lib/bootstrap/dist/bootstrap-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/bootstrap/dist/bootstrap-mobile.css",
+    "inputFiles": [
+      "css/lib/bootstrap/scss/bootstrap-mobile.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.common.min.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.common.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.common.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.common.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.bootstrap.min.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.bootstrap.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.bootstrap.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.bootstrap.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.common-bootstrap.min.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.common-bootstrap.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.common-bootstrap.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.common-bootstrap.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.default.min.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.default.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist/2018.3.1017/kendo.default.css",
+    "inputFiles": [
+      "css/lib/kendo/dist/2018.3.1017/kendo.default.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/kendo/dist-datepicker/datepicker.min.css",
+    "inputFiles": [
+      "css/lib/kendo/dist-datepicker/datepicker.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/material/dist/material-components-web.min.css",
+    "inputFiles": [
+      "css/lib/material/dist/material-components-web.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/material/dist/material-components-web.css",
+    "inputFiles": [
+      "css/lib/material/dist/material-components-web.scss"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/material/mdc-custom.min.css",
+    "inputFiles": [
+      "css/lib/material/mdc-custom.css"
+    ]
+  },
+  {
+    "outputFileName": "css/lib/intl-tel-input/dist/intlTelInput.min.css",
+    "inputFiles": [
+      "css/lib/intl-tel-input/dist/intlTelInput.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/debug.css",
+    "inputFiles": [
+      "css/common/debug.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/mixins.css",
+    "inputFiles": [
+      "css/common/mixins.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/debug.min.css",
+    "inputFiles": [
+      "css/common/debug.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/common.css",
+    "inputFiles": [
+      "css/common/common.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/common.min.css",
+    "inputFiles": [
+      "css/common/common.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/forms.css",
+    "inputFiles": [
+      "css/common/forms.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/forms.min.css",
+    "inputFiles": [
+      "css/common/forms.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/desktop.css",
+    "inputFiles": [
+      "css/common/desktop.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/desktop.min.css",
+    "inputFiles": [
+      "css/common/desktop.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/mobile.css",
+    "inputFiles": [
+      "css/common/mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/mobile.min.css",
+    "inputFiles": [
+      "css/common/mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/landing-page.css",
+    "inputFiles": [
+      "css/common/landing-page.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/landing-page.min.css",
+    "inputFiles": [
+      "css/common/landing-page.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/landing-page.css",
+    "inputFiles": [
+      "css/common/landing-page.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/landing-page.min.css",
+    "inputFiles": [
+      "css/common/landing-page.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/collection.css",
+    "inputFiles": [
+      "css/common/collection.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/collection.min.css",
+    "inputFiles": [
+      "css/common/collection.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/furniture-modular.css",
+    "inputFiles": [
+      "css/models/furniture-modular.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/furniture-modular.min.css",
+    "inputFiles": [
+      "css/models/furniture-modular.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/furniture-modular-mobile.css",
+    "inputFiles": [
+      "css/models/furniture-modular-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/furniture-modular-mobile.min.css",
+    "inputFiles": [
+      "css/models/furniture-modular-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/furniture-wholesale.css",
+    "inputFiles": [
+      "css/models/furniture-wholesale.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/furniture-wholesale.min.css",
+    "inputFiles": [
+      "css/models/furniture-wholesale.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/furniture-wholesale-mobile.css",
+    "inputFiles": [
+      "css/models/furniture-wholesale-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/furniture-wholesale-mobile.min.css",
+    "inputFiles": [
+      "css/models/furniture-wholesale-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/article.css",
+    "inputFiles": [
+      "css/models/article.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/article.min.css",
+    "inputFiles": [
+      "css/models/article.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/article-mobile.css",
+    "inputFiles": [
+      "css/models/article-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/article-mobile.min.css",
+    "inputFiles": [
+      "css/models/article-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/change-country.css",
+    "inputFiles": [
+      "css/models/change-country.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/change-country.min.css",
+    "inputFiles": [
+      "css/models/change-country.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/change-country-mobile.css",
+    "inputFiles": [
+      "css/models/change-country-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/change-country-mobile.min.css",
+    "inputFiles": [
+      "css/models/change-country-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/basket-page.min.css",
+    "inputFiles": [
+      "css/models/basket-page.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/basket-page.css",
+    "inputFiles": [
+      "css/models/basket-page.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/basket-page-mobile.min.css",
+    "inputFiles": [
+      "css/models/basket-page-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/basket-page-mobile.css",
+    "inputFiles": [
+      "css/models/basket-page-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/login-page.min.css",
+    "inputFiles": [
+      "css/models/login-page.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/login-page.css",
+    "inputFiles": [
+      "css/models/login-page.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/login-page-mobile.min.css",
+    "inputFiles": [
+      "css/models/login-page-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/login-page-mobile.css",
+    "inputFiles": [
+      "css/models/login-page-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/checkout-page.min.css",
+    "inputFiles": [
+      "css/models/checkout-page.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/checkout-page.css",
+    "inputFiles": [
+      "css/models/checkout-page.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/checkout-page-mobile.min.css",
+    "inputFiles": [
+      "css/models/checkout-page-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/checkout-page-mobile.css",
+    "inputFiles": [
+      "css/models/checkout-page-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/stockists.min.css",
+    "inputFiles": [
+      "css/models/stockists.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/stockists.css",
+    "inputFiles": [
+      "css/models/stockists.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/stockists-mobile.min.css",
+    "inputFiles": [
+      "css/models/stockists-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/stockists-mobile.css",
+    "inputFiles": [
+      "css/models/stockists-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/careers.min.css",
+    "inputFiles": [
+      "css/models/careers.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/careers.css",
+    "inputFiles": [
+      "css/models/careers.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/careers-mobile.min.css",
+    "inputFiles": [
+      "css/models/careers-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/careers-mobile.css",
+    "inputFiles": [
+      "css/models/careers-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/trade-document-wrapper.min.css",
+    "inputFiles": [
+      "css/models/trade-document-wrapper.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/trade-document-wrapper.css",
+    "inputFiles": [
+      "css/models/trade-document-wrapper.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-address-management.min.css",
+    "inputFiles": [
+      "css/models/member-address-management.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-address-management.css",
+    "inputFiles": [
+      "css/models/member-address-management.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-address-management-mobile.min.css",
+    "inputFiles": [
+      "css/models/member-address-management-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-address-management-mobile.css",
+    "inputFiles": [
+      "css/models/member-address-management-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-order-history.min.css",
+    "inputFiles": [
+      "css/models/member-order-history.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-order-history.css",
+    "inputFiles": [
+      "css/models/member-order-history.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-order-history-mobile.min.css",
+    "inputFiles": [
+      "css/models/member-order-history-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-order-history-mobile.css",
+    "inputFiles": [
+      "css/models/member-order-history-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-login-details.min.css",
+    "inputFiles": [
+      "css/models/member-login-details.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-login-details.css",
+    "inputFiles": [
+      "css/models/member-login-details.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-login-details-mobile.min.css",
+    "inputFiles": [
+      "css/models/member-login-details-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-login-details-mobile.css",
+    "inputFiles": [
+      "css/models/member-login-details-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-moodboards.min.css",
+    "inputFiles": [
+      "css/models/member-moodboards.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-moodboards.css",
+    "inputFiles": [
+      "css/models/member-moodboards.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/models/member-moodboards-mobile.min.css",
+    "inputFiles": [
+      "css/models/member-moodboards-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/models/member-moodboards-mobile.css",
+    "inputFiles": [
+      "css/models/member-moodboards-mobile.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/trade.min.css",
+    "inputFiles": [
+      "css/common/trade.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/trade.css",
+    "inputFiles": [
+      "css/common/trade.scss"
+    ],
+    "polyfillGap": false
+  },
+  {
+    "outputFileName": "css/common/trade-mobile.min.css",
+    "inputFiles": [
+      "css/common/trade-mobile.css"
+    ]
+  },
+  {
+    "outputFileName": "css/common/trade-mobile.css",
+    "inputFiles": [
+      "css/common/trade-mobile.scss"
+    ],
+    "polyfillGap": false
+  }
+]

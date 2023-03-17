@@ -1,0 +1,37 @@
+﻿@model PageSectionViewModel
+@{ 
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+
+    var htmlSection = (HtmlPageSection)Model.Definition;
+}
+@Html.Raw(HtmlHelperExtra.ProcessHTMLSection(htmlSection, Model.Base))
+@if (Request.QueryString["p"] == "1")
+{
+    <script type="text/javascript">
+        window.addLoadFunction(() => {
+            const reg = new RegExp(/#.*$/g);
+            let res = reg.exec(window.location.href);
+            if (res != null) {
+                let collapseTarget = document.querySelector(res[0]);
+                if (collapseTarget) {
+                    bootstrap.Collapse.getOrCreateInstance(collapseTarget).show();
+                    window.setTimeout(() => {
+                        window.scrollTo(0, collapseTarget.offsetTop);
+                    }, 300)
+                }
+            }
+        });
+    </script>
+}

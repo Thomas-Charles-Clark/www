@@ -1,0 +1,75 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeContactUsViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+    var countryId = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var languageId = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = objMaster.UrlBreakdown.ContentDate;
+}
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+<div class="member-account-row">
+    <div id="trade-contact-us-grid" class="grid">
+       @foreach (var d in Model.ContactDetails.Details)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        @(d.Department)
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        @if (!String.IsNullOrEmpty(d.Name))
+                        {
+                            <li>
+                                @(d.Name)
+                            </li>
+                        }
+                        @if (!String.IsNullOrEmpty(d.PhoneNumber))
+                        {
+                            <li>
+                                <a href="tel:@(d.PhoneNumber)">
+                                    @(d.PhoneNumber)
+                                </a>
+                            </li>
+                        }
+                        @if (!String.IsNullOrEmpty(d.MobileNumber))
+                        {
+                            <li>
+                                <a href="tel:@(d.MobileNumber)">
+                                    @(d.MobileNumber)
+                                </a>
+                            </li>
+                        }
+                        @if (!String.IsNullOrEmpty(d.Email))
+                        {
+                            <li>
+                                <a href="mailto:@(d.Email)">
+                                    @(d.Email)
+                                </a>
+                            </li>
+                        }
+                        @if (!String.IsNullOrEmpty(d.OpeningHours))
+                        {
+                            <li>
+                                @Html.Raw(d.OpeningHours)
+                            </li>
+                        }
+                        @if (!String.IsNullOrEmpty(d.Notes))
+                        {
+                            <li>
+                                @Html.Raw(d.Notes)
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>

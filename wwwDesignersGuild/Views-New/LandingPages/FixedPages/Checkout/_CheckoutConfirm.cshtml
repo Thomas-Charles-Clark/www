@@ -1,0 +1,481 @@
+﻿@model FixedPageViewModel_CheckoutConfirm
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{
+    var objMaster = Model.PassCheckoutConfirm.masterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var objReceipt = Model.PassCheckoutConfirm.checkoutReceipt;
+
+    String urlDate = "";
+
+    if (Request.QueryString["dateOverride"] == null) { }
+    else
+    {
+        urlDate = String.Format("?dateOverride={0}", Request.QueryString["dateOverride"].ToString());
+    }
+
+    Boolean tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+
+    String receiptThankyou = "";
+    if (objReceipt.checkoutReceiptOrders.Count == 1)
+    {
+        receiptThankyou = HtmlHelperExtra.Resource("CheckoutReceiptThankyouSingle", l, c, d).ToString();
+
+        if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+        {
+            receiptThankyou = HtmlHelperExtra.Resource("TradeCheckoutReceiptThankyouSingle", l, c, d).ToString();
+        }
+    }
+    else
+    {
+        receiptThankyou = HtmlHelperExtra.Resource("CheckoutReceiptThankyouMultiple", l, c, d).ToString();
+
+        if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+        {
+            receiptThankyou = HtmlHelperExtra.Resource("TradeCheckoutReceiptThankyouMultiple", l, c, d).ToString();
+        }
+    }
+
+    String basketTotalExVat = "0.00";
+    if (objReceipt.checkoutReceiptTotalExVats.Count > 0)
+    {
+        if (objReceipt.checkoutReceiptTotalExVats[0].TotalExVAT == null) { }
+        else
+        {
+            basketTotalExVat = ((decimal)objReceipt.checkoutReceiptTotalExVats[0].TotalExVAT).ToString("0.00");
+        }
+    }
+
+    string linesTotalExVAT = "0.00";
+    if (objReceipt.checkoutReceiptOrderLines.Count > 0)
+    {
+        linesTotalExVAT = objReceipt.checkoutReceiptOrderLines.Select(p => p.PriceEx * p.Quantity).Sum().ToString("0.00");
+    }
+
+    decimal grandTotal = objReceipt.checkoutReceiptTransactionDetails[0].Revenue.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Revenue.Value : 0;
+    grandTotal += objReceipt.checkoutReceiptTransactionDetails[0].Shipping.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Shipping.Value : 0;
+
+    var gbNFI = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+
+    gbNFI.NumberGroupSeparator = "";
+}
+
+<div id="ko-wrapper">
+    <div class="mt-2 mb-5">
+        <h4 class="mb-3">
+            @receiptThankyou
+        </h4>
+        @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+        {
+            <p>
+                @HtmlHelperExtra.Resource("TradeCheckoutReceiptEmailNotification", l, c, d)
+            </p>
+        }
+        else
+        {
+            <p>
+                @HtmlHelperExtra.Resource("CheckoutReceiptEmailNotification", l, c, d)
+            </p>
+        }
+    </div>
+    <div class="mb-5">
+        @foreach (checkoutReceiptOrder objOrder in objReceipt.checkoutReceiptOrders)
+        {
+            var order = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderNumber", l, c, d), objOrder.OrderNumber.ToString());
+
+            var delivery = "";
+
+            if (objOrder.TotalQuantity == 1)
+            {
+                delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivery", l, c, d), objOrder.displayAddress);
+            }
+            else
+            {
+                delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivies", l, c, d), objOrder.displayAddress);
+            }
+
+            var estimate = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderEstimate", l, c, d), objOrder.displayEstimatedDelivery);
+
+            <text>
+                <h4 class="mb-3">
+                    @Html.Raw(order)
+                </h4>
+                <p>
+                    @Html.Raw(delivery)
+                </p>
+                <p class="mb-0">
+                    @Html.Raw(estimate)
+                </p>
+            </text>
+        }
+    </div>
+    <a class="btn btn-lg btn-dark" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.home, ci)">
+        @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
+    </a>
+</div>
+
+<script>
+
+    Number.prototype.formatCurrency = function () {
+        return this.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    function getCountryDetail() {
+        return '@Model.PassCheckoutConfirm.masterDefinition.UrlBreakdown.countryDetails.URL';
+    }
+
+    function getUrlDate() {
+        return '@urlDate';
+    }
+
+    function getResource(resourceKey) {
+        var resourceText = '';
+
+        switch (resourceKey) {
+            case 'currency':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("currencySymbol", l, c, d))';
+                break;
+
+            case 'productCode':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("BasketProductCode", l, c, d))';
+                break;
+
+            case 'giftWrappingAvailable':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("BasketGiftWrappingAvailable", l, c, d))';
+                break;
+
+            case 'giftWrappingUnavailable':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("BasketGiftWrappingUnavailable", l, c, d))';
+                break;
+
+            case 'thankYou':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ThankYou", l, c, d))'
+                break;
+
+            case 'majorError':
+                resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("MajorError", l, c, d))';
+                break;
+        }
+
+        return resourceText;
+    }
+
+</script>
+
+@{
+    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-GB");
+}
+
+@* Permit status@designersguild.com to reload this ad nauseam *@
+@if ((HtmlHelperExtra.IsProductionVersion && !objReceipt.ReceiptViewed) ||
+    Model.Visitor?.memberId == 1547882)
+{
+    if (objMaster.UrlBreakdown.countryDetails.CountryID == 238)
+    {
+        <!-- Google Code for Purchase Conversion Page -->
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 868505575;
+            var google_conversion_language = "en";
+            var google_conversion_format = "3";
+            var google_conversion_color = "ffffff";
+            var google_conversion_label = "RmotCKPY32sQ56-RngM";
+            var google_conversion_value = Number('@Html.Raw(basketTotalExVat)');
+            var google_conversion_currency = "USD";
+            var google_remarketing_only = false;
+            /* ]]> */
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+            <div style="display:inline;">
+                <img height="1" width="1" style="border-style:none;" alt="" src="//www.googleadservices.com/pagead/conversion/868505575/?value=@(Html.Raw(basketTotalExVat))&amp;currency_code=@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)&amp;label=bi-ZCMCxvgEQ3JGa6wM&amp;guid=ON&amp;script=0" />
+            </div>
+        </noscript>
+        <!-- End Google Tracking Code -->
+    }
+    else if (objMaster.UrlBreakdown.countryDetails.CountryID == 114)
+    {
+        <!-- Google Code for Sale Conversion Page -->
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 861878472;
+            var google_conversion_language = "en";
+            var google_conversion_format = "3";
+            var google_conversion_color = "ffffff";
+            var google_conversion_label = "2gvECLmlpW4QyPH8mgM";
+            var google_conversion_value = Number('@Html.Raw(basketTotalExVat)');
+            var google_conversion_currency = "EUR";
+            var google_remarketing_only = false;
+            /* ]]> */
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+            <div style="display:inline;">
+                <img height="1" width="1" style="border-style:none;" alt="" src="//www.googleadservices.com/pagead/conversion/861878472/?value=@(Html.Raw(basketTotalExVat))&amp;currency_code=@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)&amp;label=2gvECLmlpW4QyPH8mgM&amp;guid=ON&amp;script=0" />
+            </div>
+        </noscript>
+    }
+    else
+    {
+        <!-- Google Code for Purchase Conversion Page -->
+        @* Defunction 19/01/2023 - we're now using gtag for this, calling config on our AW account, firing the conversion event having constructed enhanced data beforehand *@
+        @*<script type="text/javascript">
+                /* <![CDATA[ */
+                var google_conversion_id = 1030129884;
+                var google_conversion_language = "en";
+                var google_conversion_format = "2";
+                var google_conversion_color = "ffffff";
+                var google_conversion_label = "bi-ZCMCxvgEQ3JGa6wM";
+                var google_conversion_value = Number('@Html.Raw(basketTotalExVat)');
+                var google_conversion_currency = "GBP";
+                var google_remarketing_only = false;
+                /* ]]> */
+            </script>
+            <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+            </script>
+            <noscript>
+                <div style="display:inline;">
+                    <img height="1" width="1" style="border-style:none;" alt="" src="//www.googleadservices.com/pagead/conversion/1030129884/?value=@(Html.Raw(basketTotalExVat))&amp;currency_code=@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)&amp;label=bi-ZCMCxvgEQ3JGa6wM&amp;guid=ON&amp;script=0" />
+                </div>
+            </noscript>*@
+        <!-- End Google Tracking Code -->
+    }
+
+    <!-- Begin Google Analytics eCommerce Code -->
+    <script type="text/javascript" defer>
+        console.log('calling window.addLoadFunction for google');
+        window.addLoadFunction(() => {
+            console.log('window.gtag', window.gtag);
+            if (typeof gtag === 'function') {
+                let purchaseEvent = {
+                    'transaction_id': '@(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID)',
+                    'value': @($"{objReceipt.checkoutReceiptTransactionDetails[0].Revenue:F}"),
+                    'affiliation': '@(objReceipt.checkoutReceiptTransactionDetails[0].Affiliation)',
+                    'shipping': @($"{objReceipt.checkoutReceiptTransactionDetails[0].Shipping:F}"),
+                    'tax': @($"{objReceipt.checkoutReceiptTransactionDetails[0].Tax:F}"),
+                    'currency': '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)',
+                    'items': [
+                        @foreach (var ol in objReceipt.checkoutReceiptOrderLines)
+                        {
+                            <text>
+                        {
+                            'item_id': '@(ol.SKU)',
+                            'item_name': '@(ol.ProductName)',
+                            'item_category': '@(ol.Category)',
+                            'quantity': @($"{ol.Quantity:F}"),
+                            'price': @($"{ol.PriceInc:F}")
+                        },
+                            </text>
+                        }
+                    ],
+                    @if (objReceipt.checkoutReceiptTransactionDetails[0].PromotionCode != null)
+                    {
+                        <text>
+                    'coupon': '@objReceipt.checkoutReceiptTransactionDetails[0].PromotionCode'
+                        </text>
+                    }
+                }
+
+                @switch(Model.CountryID)
+                {
+                    case 16:
+                        @:purchaseEvent['send_to'] = ['default', 'aus'];
+                        break;
+                    case 175:
+                        @:purchaseEvent['send_to'] = ['default', 'nz'];
+                        break;
+                    default:
+                        @:purchaseEvent['send_to'] = ['default'];
+                        break;
+                }
+
+                console.log('gtag is pushing purchase', purchaseEvent);
+
+                gtag('event', 'purchase', purchaseEvent);
+
+                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                let googleEnhancedData = {
+                    'email': '@(objReceipt.checkoutReceiptOrders[0].Email)'
+                }
+
+                let googleEnhancedAddress = {
+
+                };
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].PhoneNumber))
+                {
+                    @:googleEnhancedData['phone_number'] = '@(objReceipt.checkoutReceiptOrders[0].PhoneNumber)';
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].FullName))
+                {
+                    var nameSplit = objReceipt.checkoutReceiptOrders[0].FullName.Split(new char[] { ' ' });
+
+                    if (nameSplit.Length == 1)
+                    {
+                        @:googleEnhancedAddress['first_name'] = '@(nameSplit[0])';
+                    }
+                    else if (nameSplit.Length >= 2)
+                    {
+                        @:googleEnhancedAddress['first_name'] = '@(nameSplit[0])';
+                        @:googleEnhancedAddress['last_name'] = '@(nameSplit[1])';
+                    }
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].AddressLine1))
+                {
+                    @:googleEnhancedAddress['street'] = '@(objReceipt.checkoutReceiptOrders[0].AddressLine1)';
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].Town))
+                {
+                    @:googleEnhancedAddress['city'] = '@(objReceipt.checkoutReceiptOrders[0].Town)';
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].County))
+                {
+                    @:googleEnhancedAddress['region'] = '@(objReceipt.checkoutReceiptOrders[0].County)';
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].PostCode))
+                {
+                    @:googleEnhancedAddress['postal_code'] = '@(objReceipt.checkoutReceiptOrders[0].PostCode)';
+                }
+
+               @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].CountryCode))
+                {
+                    @:googleEnhancedAddress['country'] = '@(objReceipt.checkoutReceiptOrders[0].CountryCode)';
+                }
+
+                if (Object.keys(googleEnhancedAddress).length) {
+                    googleEnhancedData['address'] = googleEnhancedAddress;
+                }
+
+                console.log('gtag is setting user_data with', googleEnhancedData);
+
+                gtag('set', 'user_data', googleEnhancedData);
+
+                let awConversionEvent = {
+                    'send_to': ['AW-1030129884/bi-ZCMCxvgEQ3JGa6wM'],
+                    'value': purchaseEvent.value,
+                    'currency': purchaseEvent.currency,
+                    'transction_id': '@(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID)'
+                }
+
+                console.log('gtag is pushing conversion to AW-1030129884/bi-ZCMCxvgEQ3JGa6wM', awConversionEvent);
+
+                gtag('event', 'conversion', awConversionEvent);
+            } else {
+                console.log('gtag events were not pushed: gtag was not defined')
+            }
+        });
+    </script>
+    <!-- End Google Analytics eCommerce Code -->
+    <div id="order-complete-phase" style="display: none;"></div>
+    <script type="text/javascript">
+        window.addLoadFunction(() => {
+            if(typeof fbq === 'function') {
+                fbq('track', 'Purchase', {
+                    value: @(grandTotal.ToString("N2", gbNFI)),
+                    currency: "@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)"
+                });
+            }
+        })
+    </script>
+    <script type="text/javascript">
+        var brontoCart = {
+            "phase": "ORDER_COMPLETE",
+            "customerOrderId": @(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID),
+            "currency": "@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)",
+            "grandTotal": @(grandTotal.ToString("N2", gbNFI)),
+            "taxAmount": @(objReceipt.checkoutReceiptTransactionDetails[0].Tax.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Tax.Value.ToString("N2", gbNFI) : "0"),
+            "emailAddress": "@(objReceipt.checkoutReceiptOrders[0].Email)",
+            "cartUrl": "@(Request.Url.OriginalString)",
+            "lineItems": [
+               @foreach (var line in objReceipt.checkoutReceiptBrontoLines)
+               {
+                    <text> {
+                    "sku": "@(line.SKU)",
+                    "name": "@HtmlHelperExtra.EscapeForJS(line.Name.Replace("\"", ""))",
+                    "description": "@HtmlHelperExtra.EscapeForJS(line.Description.Replace("\"", ""))",
+                    "category": "@HtmlHelperExtra.EscapeForJS(line.Category.Replace("\"", ""))",
+                    "unitPrice": @(line.UnitPrice?.ToString("N2", gbNFI)),
+                   @if (line.SalePrice.HasValue)
+                    {
+                        <text>"salePrice": @(line.SalePrice.Value.ToString("N2", gbNFI)),</text>
+                    }
+                    "quantity": @(line.Quantity.ToString("N2", gbNFI)),
+                    "totalPrice": @(line.TotalPrice?.ToString("N2", gbNFI)),
+                    "imageUrl": "@(line.ImageURL)",
+                    "productUrl": "@(line.ProductURL)"
+                    },
+                    </text>
+                }
+            ]
+        };
+
+        window.addLoadFunction(function () {
+           if (typeof bronto === 'function') {
+                console.log('bronto is pushing cart:send with', brontoCart);
+                bronto('cart:send', brontoCart);
+            }
+            if (typeof _dmTrack != 'undefined') {
+
+               @foreach (var line in objReceipt.checkoutReceiptOrderLines)
+               {
+                    <text>
+
+                    _dmTrack('productId', '@(line.ProductID)');
+                    _dmTrack('productSku', '@(line.SKU)');
+                    _dmTrack('productName', '@(HtmlHelperExtra.EscapeForJS(line.ProductName.Replace("'", "")))');
+                    _dmTrack('productCategory', '@(HtmlHelperExtra.EscapeForJS(line.Category.Replace("'", "")))');
+                    _dmTrack('productPriceEx', '@(line.PriceEx.ToString("N2", gbNFI))');
+                    _dmTrack('productPriceInc', '@(line.PriceInc.ToString("N2", gbNFI))');
+                    _dmTrack('productQuantity', '@(line.Quantity.ToString("N2", gbNFI))');
+                    _dmTrack('productTotalPriceEx', '@((line.PriceEx * line.Quantity).ToString("N2", gbNFI))');
+                    _dmTrack('productTotalPriceInc', '@((line.PriceInc * line.Quantity).ToString("N2", gbNFI))');
+
+                    </text>
+               }
+
+                _dmTrack('transactionId', '@(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID)');
+                _dmTrack('currency', '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)');
+                _dmTrack('grandTotal', '@(grandTotal.ToString("N2", gbNFI))');
+                _dmTrack('taxAmount', '@(objReceipt.checkoutReceiptTransactionDetails[0].Tax.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Tax.Value.ToString("N2", gbNFI) : "0")');
+                _dmTrack('shipping', '@(objReceipt.checkoutReceiptTransactionDetails[0].Shipping.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Shipping.Value.ToString("N2", gbNFI) : "0")');
+                _dmTrack('emailAddress', '@(objReceipt.checkoutReceiptOrders[0].Email)');
+                _dmTrack('cartUrl', '@(Request.Url.OriginalString)')
+            }
+        });
+    </script>
+
+    <script>
+        window.uetq = window.uetq || [];
+        window.uetq.push({ 'gv': @(grandTotal.ToString("N2", gbNFI)), 'gc': '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)'});
+    </script>
+}
+
+@if (Framework.ProductionVersion)
+{
+    <script type="text/javascript">
+        window.addLoadFunction(function () {
+            fetch('/api/checkout/receiptViewed', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                cache: 'no-store',
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    checkoutId: '@(objReceipt.checkoutReceiptTransactionDetails[0].CheckoutID)'
+                })
+            });
+        });
+    </script>
+}

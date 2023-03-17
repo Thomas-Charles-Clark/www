@@ -1,0 +1,636 @@
+﻿@model FixedPageViewModel_Checkout
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.masterDefinition;
+
+    System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+    nfi.NumberDecimalSeparator = ".";
+    nfi.CurrencyDecimalSeparator = ".";
+
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+    var ci = Model.masterDefinition.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var urlCheckoutAddressBase = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                    null,
+                                    dgContentType.checkoutPart,
+                                    (int)dgFixedPage.checkoutAddress,
+                                    Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutDeliveryOptions = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                            null,
+                                            dgContentType.checkoutPart,
+                                            (int)dgFixedPage.checkoutDispatch,
+                                            Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutPaymentMethods = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                            null,
+                                            dgContentType.checkoutPart,
+                                            (int)dgFixedPage.checkoutPay,
+                                            Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutSummary = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                    null,
+                                    dgContentType.checkoutPart,
+                                    (int)dgFixedPage.checkoutTotals,
+                                    Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlGiftWrapOptions = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                    null,
+                                    dgContentType.checkoutPart,
+                                    (int)dgFixedPage.checkoutGift,
+                                    Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutSessionExpired = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                                            null,
+                                                            dgContentType.landingPage,
+                                                            (int)dgFixedPage.checkoutSessionExpired,
+                                                            Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutAddressFull = urlCheckoutAddressBase;
+
+    if (!String.IsNullOrEmpty(Request["appuId"])) // append selected UPS address if required... what? why?
+    {
+        appendQueryParam(ref urlCheckoutAddressFull, "appuId");
+        appendQueryParam(ref urlCheckoutAddressFull, "name");
+        appendQueryParam(ref urlCheckoutAddressFull, "addLine1");
+        appendQueryParam(ref urlCheckoutAddressFull, "city");
+        appendQueryParam(ref urlCheckoutAddressFull, "postal");
+        appendQueryParam(ref urlCheckoutAddressFull, "country");
+        appendQueryParam(ref urlCheckoutAddressFull, "hours");
+    }
+
+    List<MemberAddress> objAddresses = Model.checkoutAddressModel.memberAddressSelect.Addresses;
+    List<Country> objCountryItems = Model.checkoutAddressModel.countryItems;
+    List<CountyItem> objCountyItems = Model.checkoutAddressModel.countyItems;
+    var currentCheckoutAddress = Model.checkoutAddressModel.deliveryOptions.selectedAddresses.FirstOrDefault();
+
+    MemberAddress defaultMemberAddress = null;
+
+    if (Model.checkoutAddressModel.memberAddressSelect != null)
+    {
+        defaultMemberAddress = Model.checkoutAddressModel.memberAddressSelect.Addresses.Where(p => p.IsDefault).FirstOrDefault();
+    }
+    // right, if we've had to fall back on memberAddressSelect address it is not yet
+
+
+    String CustomerServiceEmail = Model.checkoutAddressModel.deliveryOptions.customerServiceDetails[0].CustomerServiceEmail;
+    String TradeCustomerServiceEmail = Model.checkoutAddressModel.deliveryOptions.customerServiceDetails[0].TradeCustomerServiceEmail;
+    Boolean DisplayCSEmail = !String.IsNullOrEmpty(CustomerServiceEmail);
+    Boolean DisplayTCSEmail = !String.IsNullOrEmpty(TradeCustomerServiceEmail);
+    String CustomerServicePhone = Model.checkoutAddressModel.deliveryOptions.customerServiceDetails[0].CustomerServicePhone;
+    String TradeCustomerServicePhone = Model.checkoutAddressModel.deliveryOptions.customerServiceDetails[0].TradeCustomerServicePhone;
+    String CustomerServiceHours = HtmlHelperExtra.Resource("CheckoutCustomerServicesHours", l, c, d).ToHtmlString();
+    String CustomerServiceWeekendHours = HtmlHelperExtra.Resource("CheckoutCustomerServicesWeekendHours", l, c, d).ToHtmlString();
+    String CustomerServiceWeekendPhone = HtmlHelperExtra.Resource("CheckoutCustomerServicesWeekendPhone", l, c, d).ToHtmlString();
+    Boolean DisplayCSPhone = !String.IsNullOrEmpty(CustomerServicePhone);
+    Boolean DisplayTCSPhone = !String.IsNullOrEmpty(TradeCustomerServicePhone);
+
+    Boolean displayHelp = DisplayCSEmail || DisplayCSPhone;
+
+    Session["DisplayTCSEmail"] = DisplayTCSEmail;
+    Session["TradeCustomerServiceEmail"] = TradeCustomerServiceEmail;
+    Session["DisplayTCSPhone"] = DisplayTCSPhone;
+    Session["TradeCustomerServicePhone"] = TradeCustomerServicePhone;
+    Session["CustomerServiceHours"] = CustomerServiceHours;
+}
+
+@Render.Script("~/bundles/js/ko")
+@Render.Script("~/bundles/js/checkout-single-page")
+
+@functions {
+    public void appendQueryParam(ref string source, string name)
+    {
+        if (!String.IsNullOrEmpty(Request[name]))
+            source = String.Format("{0}&{1}={2}", source, name, Request[name]);
+    }
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/3.2.0/material-components-web.min.js"></script>
+
+@Render.Script("~/bundles/js/kendo")
+
+<script type="text/javascript">
+
+    if (window.ko) {
+        ko.validation.init({
+            decorateInputElement: true,
+            errorElementClass: 'alert-danger',
+            errorMessageClass: 'validation-message text-danger'
+        });
+    }
+
+    function getCountryCode() {
+        return '@Model.masterDefinition.UrlBreakdown.countryDetails.CountryCode';
+    }
+    function getSiteCountry() {
+        return '@Model.masterDefinition.UrlBreakdown.countryDetails.URL';
+    }
+    function getMasterDefinition() {
+        return @Html.Raw(Json.Encode(Model.masterDefinition));
+    }
+    function getCheckoutType() {
+        return @((int)Model.checkoutType);
+    }
+    function getAllAddresses() {
+        return @Html.Raw(JsonConvert.SerializeObject(objAddresses));
+    }
+    function getAvailableCountries() {
+        return @Html.Raw(JsonConvert.SerializeObject(objCountryItems));
+    }
+    function getAvailableCounties(value) {
+        var initial = @Html.Raw(Json.Encode(objCountyItems));
+        var r = Enumerable.From(initial).Where(function (x) { return x.CountryCode === value }).OrderBy('$.County').ToArray();
+        return r;
+    }
+    function getUrlCheckoutAddressBase () {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutAddressBase)';
+    }
+    function getUrlCheckoutAddressFull () {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutAddressFull)';
+    }
+    function getUrlCheckoutDeliveryOptions() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutDeliveryOptions)';
+    }
+    function getUrlCheckoutPaymentMethods() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutPaymentMethods)';
+    }
+    function getUrlCheckoutSummary() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutSummary)';
+    }
+    function getUrlGiftWrapOptions() {
+        return '@HtmlHelperExtra.EscapeForJS(urlGiftWrapOptions)';
+    }
+    function getCheckoutSessionExpiredUrl() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutSessionExpired)';
+    }
+    function getDefaultMemberAddress() {
+        return @Html.Raw(JsonConvert.SerializeObject(defaultMemberAddress));
+    }
+    function getCurrentCheckoutAddress() {
+        return @Html.Raw(JsonConvert.SerializeObject(currentCheckoutAddress));
+    }
+    function getShowCollectionOptions() {
+        return @(Convert.ToInt32(Model.checkoutAddressModel.deliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 2).Count() > 0 && Model.checkoutType != dgCheckoutType.Trade))
+    }
+    function getNumberFormattingSeparatorIsComma() {
+        return @(Convert.ToInt32(System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator == ","));
+    }
+    function getBraintreeClientKey() {
+        return "@Model.checkoutPaymentModel.braintreeClient";
+    }
+    function getBraintreeEnvironment() {
+        return '@Model.checkoutPaymentModel.checkoutPayments.checkoutDetails[0].Environment';
+    }
+    function getBraintreeCurrency() {
+        return '@Model.checkoutPaymentModel.checkoutPayments.checkoutDetails[0].Currency';
+    }
+    function getSavedCards() {
+        @if (Model.checkoutType == dgCheckoutType.Member)
+        {
+        <text>
+        var cards = @Html.Raw(Json.Encode(Model.checkoutPaymentModel.savedCards));
+        var savedDefault = localStorage.getItem('defaultToken');
+        $.each(cards, function (i, card) {
+            var defaultCard = false;
+            if (savedDefault === null || savedDefault === undefined)
+                defaultCard = card.defaultCard;
+            else
+                defaultCard = card.token === savedDefault;
+
+            card.defaultCard = ko.observable(defaultCard);
+            var vault = card.vaultToken;
+            card.vaultToken = ko.observable(vault);
+        });
+        return cards
+        </text>
+        }
+        else
+        {
+        <text>
+        return [];
+        </text>
+        }
+    }
+    function getMarketingPermissions() {
+        return @Html.Raw(Json.Encode(Model.checkoutPaymentModel.marketingPermissions));
+    }
+    function getBalanceNumber() {
+        return Number('@Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalBalance.ToString(nfi)')
+    }
+    function getBalance() {
+        return Number('@Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalBalance.ToString().Replace(',', '.')')
+    }
+    function getAmazonClientId() {
+        return '@Model.amazonClientId';
+    }
+    function getAmazonMerchantId() {
+        return  '@Model.amazonMerchantId';
+    }
+</script>
+
+@if (Model.checkoutType == dgCheckoutType.Guest || Model.checkoutType == dgCheckoutType.Member || Model.checkoutType == dgCheckoutType.Paypal)
+{
+    <script src="https://js.braintreegateway.com/web/3.68.0/js/client.min.js"></script>
+
+    if (Model.checkoutType == dgCheckoutType.Guest || Model.checkoutType == dgCheckoutType.Member)
+    {
+        <script src="https://js.braintreegateway.com/web/3.68.0/js/hosted-fields.min.js"></script>
+        <script src="https://js.braintreegateway.com/web/3.68.0/js/three-d-secure.min.js"></script>
+    }
+    else if (Model.checkoutType == dgCheckoutType.Paypal)
+    {
+        <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
+        <script src="https://js.braintreegateway.com/web/3.68.0/js/paypal-checkout.min.js"></script>
+    }
+}
+<div data-bind="stopBinding">
+    <div id="checkout-wrapper"
+         class="checkout-wrapper">
+        <div class="grid">
+            <div class="g-col-12 g-col-lg-8">
+                <div>
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_CheckoutAddress.cshtml", Model.checkoutAddressModel)
+                </div>
+                <hr id="checkout-pay-region" class="mt-4 mb-5" />
+                <div>
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_CheckoutPay.cshtml", Model.checkoutPaymentModel)
+                </div>
+                <hr class="mt-4 mb-5" />
+                @if (Model.checkoutType == dgCheckoutType.Trade)
+                {
+                    <div>
+                        <h5 class="mb-3">
+                            <strong>
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageOrderReferenceTitle", l, c, d)
+                            </strong>
+                        </h5>
+                        <div class="grid address-form">
+                            <label for="order-reference" class="g-col-12 g-col-lg-3 col-form-label">
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageOrderReference", l, c, d)
+                            </label>
+                            <div class="g-col-12 g-col-lg-7">
+                                <input name="order-reference" class="form-control" data-bind="keepElement: orderReference, value: orderReference" maxlength="50">
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-5" />
+                }
+                @* This is always rendered initially to avoid a futile double call to _checkoutDespatch: the call is made from JS. *@
+                <div id="despatch-items-wrapper">
+                    <h5 class="mb-3">
+                        <strong>
+                            @if (Model.checkoutType == dgCheckoutType.Trade)
+                            {
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchTitleTrade", l, c, d)
+                            }
+                            else
+                            {
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchTitle", l, c, d)
+                            }
+                        </strong>
+                    </h5>
+                    <div>
+                        <!-- ko if: deliveryAddressFactory.addressConfirmed() -->
+                        <div class="page-blocker"
+                             style="display: flex; opacity: 1.0"
+                             data-bind="flexVisible: dispatchBusy(), toggleOpacity: dispatchBusy()">
+                            <div class="spinner-border"></div>
+                            <h5>
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageLoadingDeliveryOptions", l, c, d)
+                            </h5>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: !deliveryAddressFactory.addressConfirmed() -->
+                        <div>
+                            <p>
+                                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchUnavailable", l, c, d)
+                            </p>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <input id="nonce" style="display: none;" value="" />
+            </div>
+            <div class="g-col-12 g-col-lg-4">
+                <div id="checkout-total-wrapper">
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_CheckoutTotal.cshtml", Model.checkoutTotalModel)
+                </div>
+                @if (displayHelp)
+                {
+                    <div id="help-container">
+                        @if (Model.checkoutType == dgCheckoutType.Trade)
+                        {
+                            <div class="summary-help">
+                                <p class="summary-help-title">
+                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesTitle", l, c, d)
+                                </p>
+                                <p class="summary-help-body">
+                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d)
+                                </p>
+                                @if (DisplayTCSPhone)
+                                {
+                                    <p>
+                                        <a class="summary-help-phone" href="tel:@(TradeCustomerServicePhone)">@(TradeCustomerServicePhone)</a>&nbsp;@(CustomerServiceHours)
+                                    </p>
+                                }
+                                @if (DisplayTCSEmail)
+                                {
+                                    <p>
+                                        <a class="summary-help-email" href="mailto:@(TradeCustomerServiceEmail)">@(TradeCustomerServiceEmail)</a>
+                                    </p>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="summary-help">
+                                <p class="summary-help-title">
+                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesTitle", l, c, d)
+                                </p>
+                                <p class="summary-help-body">
+                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d)
+                                </p>
+                                @if (DisplayCSPhone)
+                                {
+                                    if (!String.IsNullOrEmpty(CustomerServicePhone) && !String.IsNullOrEmpty(CustomerServiceHours))
+                                    {
+                                        <p>
+                                            <a class="summary-help-phone" href="tel:@(CustomerServicePhone)">@(CustomerServicePhone)</a>&nbsp;@(CustomerServiceHours)
+                                        </p>
+                                    }
+                                    @*if (!String.IsNullOrEmpty(CustomerServiceWeekendPhone) && !String.IsNullOrEmpty(CustomerServiceWeekendHours))
+                                    {
+                                    <p>
+                                        <a class="summary-help-phone" href="tel:@(CustomerServiceWeekendPhone)">@(CustomerServiceWeekendPhone)</a>&nbsp;@(CustomerServiceWeekendHours)
+                                    </p>
+                                    }*@
+                                }
+                                @if (DisplayCSEmail)
+                                {
+                                    <p>
+                                        <a class="summary-help-email" href="mailto:@(CustomerServiceEmail)">@(CustomerServiceEmail)</a>
+                                    </p>
+                                }
+                            </div>
+                        }
+                        <!-- ko if: typeof $ZSIQChatWindow !== 'undefined' && $ZSIQChatWindow && $ZSIQChatWindow.openChatWindow -->
+                        <p>
+                            <a href="javascript:;" data-bind="text: resources.LiveChatNow, click: function () { $ZSIQChatWindow.openChatWindow(); }"></a>
+                        </p>
+                        <!-- /ko -->
+                    </div>
+                }
+            </div>
+
+            <a id="ups_about_snippetLink" class="@(dgFramework.getSnippetId((byte)snippetDefinitions.upsIdentificationProof))" style="display:none;" href="#" data-bs-toggle="modal" data-bs-target="#snippet-id-240">
+                @HtmlHelperExtra.Resource("CheckoutAddressUpsSnippetLink", l, c, d)
+            </a>
+        </div>
+
+
+        @Html.Action("_displaySnippet", "Section", new passSnippet
+        {
+            masterDefinition = Model.masterDefinition,
+            SnippetLocationID = (byte)snippetDefinitions.upsIdentificationProof,
+            height = 525,
+            width = 770
+        })
+
+        <div id="checkout-errors" class="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("CheckoutErrorTitle", l, c, d)
+                        </h4>
+                        <button type="button" class="btn btn-close ms-4" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="checkout-errors-list" class="dotted-list"></ul>
+                        <a class="btn btn-secondary" data-bs-dismiss="modal">
+                            @HtmlHelperExtra.Resource("CheckoutErrorReturn", l, c, d)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="invalid-zip-modal" class="modal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("CheckoutAddressInvalidZipCodeTitle", l, c, d)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            @HtmlHelperExtra.Resource("CheckoutAddressZipCodeInvalid", l, c, d)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="unavailable-zip-modal" class="modal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("CheckoutAddressZipCodeTitle", l, c, d)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            @HtmlHelperExtra.Resource("CheckoutAddressZipCodeProblem", l, c, d)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sales-tax-confirm-modal"
+             class="modal"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             data-bind="with: deliveryAddressFactory">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("CheckoutAddressSelectSalesTaxAddress", l, c, d)
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <select id="sales-tax-select" class="form-control" data-bind="value: salesTaxAddressFromList, options: salesTaxAddresses, optionsText: 'addressLine', optionsValue: $data"></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" data-bind="click: confirmSalesTaxAddress">
+                            @HtmlHelperExtra.Resource("CheckoutConfrmGiftVoucherMessage", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="payment-address-error" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="payment-address-error-text" class="mb-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cvv-hint-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("CVVHintTitle", l, c, d)
+                        </h5>
+                        <button type="button" class="btn btn-close" data-bs-toggle="modal" data-bs-target="#card-modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            @HtmlHelperExtra.Resource("CVVHintText", l, c, d)
+                        </p>
+                        <img src="~/Content/images/general/cvv-hint@(Framework.WebpOrPngExtension)" width="867" height="571" style="width: 100%; height: auto" alt="@HtmlHelperExtra.Resource("CVVHintTitle", l, c, d)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" defer>
+    //var singlePageCheckout = new SinglePageCheckout();
+
+    //$(document).ready(function () {
+    //    singlePageCheckout.initialise();
+    //    $('#divCheckoutErrors').click(function (e) {
+    //        e.stopPropagation();
+    //    });
+    //});
+
+    window.addLoadFunction(() => {
+
+        window.viewModel = checkoutSinglePageViewModel(getPrefetchedResources());
+
+        window.gb = viewModel.giftBoxFactory;
+
+        ko.options.deferUpdates = false;
+
+        ko.applyBindings(viewModel, $('#checkout-wrapper')[0]);
+
+        ko.applyBindings(viewModel, $('#stock-modal')[0]);
+
+        $('.braintree-input-wrapper').each(function (x) {
+            ko.cleanNode(x[0]);
+        });
+
+        viewModel.init();
+
+        $('#divCheckoutErrors').click(function (e) {
+            e.stopPropagation();
+        });
+
+        if ($('#collection-accordion > .panel > .panel-collapse').length == 1) {
+            $('#collection-accordion > .panel > .panel-collapse').first().collapse('show');
+        }
+
+        @if (Session["checkoutEmail"] != null)
+        {
+            <text>
+            if (typeof window.dmPt === 'function') {
+                console.log('dotDigital is pushing identify with: @(Session["checkoutEmail"])');
+                window.dmPt("identify", "@(Session["checkoutEmail"])");
+            }
+            </text>
+        }
+    });
+
+    if (typeof fbq === 'function') {
+        fbq('track', 'InitiateCheckout');
+    }
+
+    function getEmail() {
+        return '@(Model.email)';
+    }
+
+    function jumpToSessionExpired() {
+        @{
+#if DEBUG
+
+#else
+            @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
+#endif
+        }
+    }
+
+</script>
+
+@if (Model.checkoutType == dgCheckoutType.Amazon)
+{
+    <script src='@Html.Raw(Model.amazonClientUrl)' async defer></script>
+    <script type="text/javascript" defer>
+        window.addLoadFunction(() => {
+            viewModel.paymentMethodFactory.amazonAddressBookRebind();
+        });
+    </script>
+}
+
+@{
+    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-GB");
+}
+
+<script type="text/javascript">
+    window.addLoadFunction(() => {
+        if (typeof gtag === 'function') {
+            let data = {
+                "currency": getCurrencyCode(),
+                "items": [
+                   @foreach (var i in Model.products)
+                    {
+                        <text>
+                        {
+                            "item_id": '@HtmlHelperExtra.EscapeForJS(i.Code)',
+                            "item_name": '@HtmlHelperExtra.EscapeForJS(i.Name)',
+                            "item_brand": '@HtmlHelperExtra.EscapeForJS(i.Brand)',
+                            "quantity": '@($"{i.Quantity:F}")',
+                            "price": '@($"{i.Price:F}")'
+                        },
+                        </text>
+                    }
+                ],
+                @if (!String.IsNullOrEmpty(Model.promoCode?.PromoCode))
+                {
+                    <text>
+                "coupon": "@(Model.promoCode?.PromoCode)"
+                </text>
+                }
+                "value": @($"{Model.checkoutTotalModel?.checkoutSummarys.checkoutTotals[0].TotalPayable:F}")
+            };
+            console.log('gtag is pushing begin_checkout with', data);
+            gtag('event', 'begin_checkout', data);
+        }
+    });
+</script>

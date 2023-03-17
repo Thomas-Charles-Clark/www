@@ -1,0 +1,102 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@if(!tradeUser) 
+{
+    <form method="get"
+          action="/uk/join-our-mailing-list/l100"
+          target="_self"
+          class="container p-2">
+        <h5>
+            @Html.Raw(dgFramework.convertDescriptionForDisplay(HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d).ToString()))
+        </h5>
+        <div class="input-group">
+            <input name="mailing-email"
+                   class="form-control"
+                   type="text"
+                   aria-label="@HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)"
+                   placeholder="@HtmlHelperExtra.Resource("EnterEmailAddress", l, c, d)" />
+            <button type="submit"
+                    class="btn btn-outline-secondary">
+                @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+            </button>
+        </div>
+    </form>
+}
+<ul class="d-flex flex-row justify-content-center align-items-center">
+    <li>
+        <a href="https://www.facebook.com/designersguildgroup/" target="_blank">
+            <img src="~/Content/images/social/icon-facebook.png"
+                 width="24"
+                 height="24"
+                 alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)"
+                 title="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
+        </a>
+    </li>
+    <li>
+        <a href="https://www.pinterest.co.uk/designersguild/" target="_blank">
+            <img src="~/Content/images/social/icon-pinterest.png"
+                 width="24"
+                 height="24"
+                 alt="@HtmlHelperExtra.Resource("Pinterest", l, c, d)"
+                 title="@HtmlHelperExtra.Resource("Pinterest", l, c, d)" />
+        </a>
+    </li>
+    <li>
+        <a href="https://twitter.com/designersguild" target="_blank">
+            <img src="~/Content/images/social/icon-twitter.png"
+                 width="24"
+                 height="24"
+                 alt="@HtmlHelperExtra.Resource("Twitter", l, c, d)"
+                 title="@HtmlHelperExtra.Resource("Twitter", l, c, d)" />
+        </a>
+    </li>
+    <li>
+        <a href="https://www.youtube.com/c/designersguild" target="_blank">
+            <img src="~/Content/images/social/icon-youtube.png"
+                 width="24"
+                 height="24"
+                 alt="@HtmlHelperExtra.Resource("YouTube", l, c, d)"
+                 title="@HtmlHelperExtra.Resource("YouTube", l, c, d)" />
+        </a>
+    </li>
+    <li>
+        <a href="https://www.instagram.com/designersguild/?hl=en" target="_blank">
+            <img src="~/Content/images/social/icon-instagram.png"
+                 width="24"
+                 height="24"
+                 alt="@HtmlHelperExtra.Resource("Instagram", l, c, d)"
+                 title="@HtmlHelperExtra.Resource("Instagram", l, c, d)" />
+        </a>
+    </li>
+</ul>
+<div class="footer-copy">
+    &copy; @HtmlHelperExtra.Resource("FooterDGTitle", l, c, d) @DateTime.Now.Year.ToString()
+</div>
+@if (!tradeUser && c != 118)
+{
+    var feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-uk?displayFeedbackType=BOTH&timeFrame=ALL";
+    var feefoImgUrl = "https://site.feefo.com/hubfs/Feefo_rt_gold_service_2021_white.png";
+    if (c == 238)
+    {
+        feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-us?displayFeedbackType=BOTH&timeFrame=ALL";
+        feefoImgUrl = "https://site.feefo.com/hubfs/feefo_platinum_service_2021_wide_tag_light.png";
+    }
+    <a href="@(feefoUrl)" target="_blank" rel="noreferrer" title="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)">
+        <img id="feefo"
+             class="mb-3"
+             width="264"
+             height="52"
+             title="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)"
+             alt="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)"
+             src="@(feefoImgUrl)"
+             loading="lazy" />
+    </a>
+}

@@ -1,0 +1,134 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeAccountsProformaInvoicesViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+
+@if (!Model.permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureAccounts", l, c, d)
+            @(Model.tradeAccountModel.AccountDetails.Code) - @(Model.tradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.tradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div id="invoice-search" style="display: none;" data-bind="visible: true">
+                <div class="invoice-search-controls">
+                    <div>
+                        <div class="select-group">
+                            <select class="form-select" data-bind="value: proformaStatus">
+                                <option value="" selected>
+                                    @HtmlHelperExtra.Resource("ProformaStatus", l, c, d)
+                                </option>
+                                <option value="outstanding">
+                                    @HtmlHelperExtra.Resource("Outstanding", l, c, d)
+                                </option>
+                                <option value="released">
+                                    @HtmlHelperExtra.Resource("Released", l, c, d)
+                                </option>
+                            </select>
+                            <select class="form-select" data-bind="value: dateRange, options: dateRanges, optionsValue: 'dateRangeId', optionsText: 'name'"></select>
+                        </div>
+                        <!-- ko if: dateRange() == -1 -->
+                        <div class="custom-date-wrapper">
+                            <label>
+                                @HtmlHelperExtra.Resource("FromProperCase", l, c, d)
+                            </label>
+                            <input id="custom-from-date" class="date-picker" data-bind="kendoDatePicker: customFromDatePicker, click: function () { customFromDatePicker.widget().open(); }" />
+                            <button type="button" class="btn btn-close" data-bind="click: function () { customFromDatePicker.clear(); }">
+                                <span class="visually-hidden">
+                                    @HtmlHelperExtra.Resource("Clear", l, c, d)
+                                </span>
+                            </button>
+                            <span class="validation-message text-danger" data-bind="validationMessage: customFromDate"></span>
+                            <span class="validation-message text-danger" data-bind="validationMessage: fromPreceedsTo"></span>
+                        </div>
+                        <div class="custom-date-wrapper">
+                            <label>
+                                @HtmlHelperExtra.Resource("ToProperCase", l, c, d)
+                            </label>
+                            <input id="custom-to-date" class="date-picker" data-bind="kendoDatePicker: customToDatePicker, click: function () { customToDatePicker.widget().open(); }" />
+                            <button type="button" class="btn btn-close" data-bind="click: function () { customToDatePicker.clear(); }">
+                                <span class="visually-hidden">
+                                    @HtmlHelperExtra.Resource("Clear", l, c, d)
+                                </span>
+                            </button>
+                            <span class="validation-message text-danger" data-bind="validationMessage: customToDate"></span>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                    <div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" data-bind="enterKey: performInvoiceSearch, textInput: searchTerm,
+                                    attr: { placeholder: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("SearchByInvoice", l, c, d))' }" />
+                            <button class="btn btn-outline-secondary" data-bind="click: performInvoiceSearch">
+                                <span class="visually-hidden">
+                                    @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                                </span>
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="accounts-title mt-5">
+                    @HtmlHelperExtra.Resource("TradeMenuProformaInvoices", l, c, d)
+                    <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                        click: function () { proformaInvoicesGrid.widget().saveAsExcel(); }"></a>
+                </h4>
+                <div class="relative mt-5">
+                    <div class="page-blocker" data-bind="flexVisible: invoiceSearchBusy, toggleOpacity: invoiceSearchBusy">
+                        <div class="spinner-border"></div>
+                        <h4>
+                            @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                        </h4>
+                    </div>
+                    <div data-bind="kendoGrid: proformaInvoicesGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        function getProformaInvoices() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.proformaInvoices.Invoices))
+        }
+
+    </script>
+
+    @Render.Script("~/bundles/js/trade-proforma-invoices")
+}

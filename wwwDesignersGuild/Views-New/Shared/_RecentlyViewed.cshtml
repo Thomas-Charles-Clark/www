@@ -1,0 +1,28 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+}
+@if (Model.RecentlyViewed.Any())
+{
+<h5 class="my-3 text-uppercase">
+    @HtmlHelperExtra.Resource("productRecentlyViewed", l, c, d)
+</h5>
+<div class="product-page-grid recently-viewed grid mb-5">
+   @foreach(var rv in Model.RecentlyViewed)
+    {
+       @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", rv)
+    } 
+</div>
+}

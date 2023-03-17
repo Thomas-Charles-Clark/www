@@ -1,0 +1,66 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+#article-prev-next {
+    gap: $l-gutter;
+    margin-bottom: var(--l-gutter);
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
+
+    .nav-link {
+        padding: var(--sm-gutter) var(--vsm-gutter);
+    }
+}
+
+#article-main {
+    > article,
+    > div {
+        grid-column: auto/span 12;
+    }
+}
+
+.related-articles {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+
+@include media-breakpoint-up(xl) {
+
+    #article-main {
+        gap: 4rem;
+
+        > article {
+            grid-column: auto/span 8;
+        }
+
+        > div {
+            grid-column: auto/span 4;
+        }
+    }
+
+    .related-articles {
+        grid-template-columns: repeat(1, 1fr);
+
+        .pod-card {
+            .card {
+                img {
+                    width: 100%;
+                    height: auto;
+                }
+            }
+        }
+    }
+}
+
+
+
+@include media-breakpoint-up(xxl) {
+
+    #article-main {
+        gap: 8rem;
+    }
+}

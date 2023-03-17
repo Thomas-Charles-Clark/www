@@ -1,0 +1,35 @@
+﻿@model ArticlePodViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var art = Model.Article;
+}<div class="g-col-12 g-col-sm-6 g-col-md-6 g-col-lg-4">
+    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+        @Html.Raw(JsonConvert.SerializeObject(Model))
+    </span>
+    <a class="pod-card" href="@Framework.URLFixup(@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, art.URLKeywords, (dgContentType)dgContentType.articlePage, art.ArticleID))">
+        <div class="card">
+            @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", art.CarouselViewModel)
+            <div class="card-body">
+                @if (art.New)
+                {
+                    <h6 class="card-new">
+                        @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                    </h6>
+                }
+                <h6 class="card-title text-uppercase">
+                    @Html.Raw(art.Heading)
+                </h6>
+                <p>
+                    @Html.Raw(art.SubHeading)
+                </p>
+            </div>
+        </div>
+    </a>
+</div>

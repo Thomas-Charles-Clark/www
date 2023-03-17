@@ -1,0 +1,153 @@
+﻿@model PagerViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var grid = Model;
+
+    var index = grid.Index;
+}
+<div class="page-section-grid-nav my-2" data-bind="with: pager @((index == 0 ? ", keepElement: domElement" : ""))">
+    @if (index == 0)
+    {
+        if (!Framework.ProductionVersion)
+        {
+            if (Request.QueryString["dateOverride"] != null)
+            {
+                <input type="hidden" name="dateOverride" value="@($"{d:ddMMyyyy}")" />
+            }
+            if (Request.QueryString["countryOverride"] != null)
+            {
+                <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
+            }
+        }
+
+        <span class="d-none" data-bind="init: { convert: parseInt }, text: page, remove">
+            @(grid.Page)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseInt }, text: pages, remove">
+            @(grid.PageCount)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseInt }, text: breadth, remove">
+            @(grid.PagerBreadth)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseBool }, text: leftEllipsis, remove">
+            @(grid.DisplayLeftEllipsis)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseBool }, text: rightEllipsis, remove">
+            @(grid.DisplayRightEllipsis)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseBool }, text: ajax, remove">
+            @(grid.Ajax)
+        </span>
+        <span class="d-none" data-bind="init, text: ajaxEndpoint, remove">
+            @(grid.AjaxEndpoint)
+        </span>
+    }
+    <div class="grid">
+        <div class="filter-buttons g-col-12 g-col-sm-4 g-col-lg-4">
+            @if (grid.AttributeGroups.Any())
+            {
+                <button class="btn btn-secondary my-2 filters-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#grid-filters-@(Model.PageSectionID)" aria-controls="grid-filters-@(Model.PageSectionID)">
+                    @HtmlHelperExtra.Resource("Filters", l, c, d)
+                    <span data-bind="text: parent.filterCount() > 0 ? '(' + parent.filterCount() + ')' : ''">
+                        @(grid.FilterCount > 0 ? $"({grid.FilterCount})" : "")
+                    </span>
+                </button>
+                <button class="btn btn-secondary my-2 filters-button" style="display: @(grid.FilterCount > 0 ? $"inline-block" : "none")" data-bind="visible: parent.filterCount(), click: parent.clearFilters">
+                    @HtmlHelperExtra.Resource("Clear", l, c, d)
+                </button>
+            }
+            else
+            {
+                <span class="btn ps-3 my-2">
+                    @grid.DisplayCount
+                </span>
+            }
+        </div>
+        <div class="g-col-12 g-col-sm-4 g-col-lg-4 d-flex justify-content-center">
+        @if (Model.PagingEnabled)
+        {
+            @Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPager.cshtml", grid);
+        }
+        </div>
+        <div class="sort-container g-col-12 g-col-sm-4 g-col-lg-4 d-flex justify-content-end align-items-center">
+            @* class="page-size-sort d-flex justify-content-end align-items-center flex-wrap-reverse" *@
+           @if (index == 0)
+            {
+                <input type="hidden" name="pagesize" value="@(Model.PageSize)"/>
+                <span class="d-none" data-bind="init: { convert: parseInt }, text: pageSize, remove">
+                    @(Model.PageSize)
+                </span>
+            }
+            @*<label class="page-size d-flex justify-content-start align-items-center my-2">
+                <span class="d-block">
+                    @HtmlHelperExtra.Resource("PageSize", l, c, d)
+                </span>
+                <select class="form-select" name="pagesize" data-bind="value: pageSize">
+                    <option value="15" @(grid.PageSize == 15 ? "selected" : "") data-bind="value: 15">
+                        15
+                    </option>
+                    <option value="30" @(grid.PageSize == 30 ? "selected" : "") data-bind="value: 30">
+                        30
+                    </option>
+                    <option value="60" @(grid.PageSize == 60 ? "selected" : "") data-bind="value: 60">
+                        60
+                    </option>
+                    <option value="120" @(grid.PageSize == 120 ? "selected" : "") data-bind="value: 120">
+                        120
+                    </option>
+                </select>
+            </label>*@
+            <label>
+                <span class="visually-hidden">
+                    @HtmlHelperExtra.Resource("SortBy", l, c, d)
+                </span>
+                <select class="form-select" name="@(index == 0 ? "sort" : "")" data-bind="value: sort">
+                    <option value="default" @(grid.Sort == "default" ? "selected" : "")>
+                        @HtmlHelperExtra.Resource("sortDefault", l, c, d)
+                    </option>
+                    @if (Model.IsShop)
+                    {
+                        <option value="bestSellers" @(grid.Sort == "salesRank" ? "selected" : "")>
+                            @HtmlHelperExtra.Resource("BestSeller", l, c, d)
+                        </option>
+                        <option value="priceHighToLow" @(grid.Sort == "priceHighToLow" ? "selected" : "")>
+                            @HtmlHelperExtra.Resource("sortPriceHighToLow", l, c, d)
+                        </option>
+                        <option value="priceLowToHigh" @(grid.Sort == "priceLowToHigh" ? "selected" : "")>
+                            @HtmlHelperExtra.Resource("sortPriceLowToHigh", l, c, d)
+                        </option>
+                        if (objMaster.TradeAllowed)
+                        {
+                            <option value="discountHighToLow" @(grid.Sort == "discountHighToLow" ? "selected" : "")>
+                                @HtmlHelperExtra.Resource("sortDiscountHighToLow", l, c, d)
+                            </option>
+                            <option value="discountLowToHigh" @(grid.Sort == "discountLowToHigh" ? "selected" : "")>
+                                @HtmlHelperExtra.Resource("sortDiscountLowToHigh", l, c, d)
+                            </option>
+                            <option value="stockHighToLow" @(grid.Sort == "stockHighToLow" ? "selected" : "")>
+                                @HtmlHelperExtra.Resource("sortStockHighToLow", l, c, d)
+                            </option>
+                            <option value="stockLowToHigh" @(grid.Sort == "stockLowToHigh" ? "selected" : "")>
+                                @HtmlHelperExtra.Resource("sortStockLowToHigh", l, c, d)
+                            </option>
+                        }
+                    }
+                    <option value="alphaAZ" @(grid.Sort == "alphaAZ" ? "selected" : "")>
+                        @HtmlHelperExtra.Resource("sortAlphabeticallyAZ", l, c, d)
+                    </option>
+                    <option value="alphaZA" @(grid.Sort == "alphaZA" ? "selected" : "")>
+                        @HtmlHelperExtra.Resource("sortAlphabeticallyZA", l, c, d)
+                    </option>
+                    <option value="new" @(grid.Sort == "new" ? "selected" : "")>
+                        @HtmlHelperExtra.Resource("sortNew", l, c, d)
+                    </option>
+                </select>
+            </label>
+        </div>
+    </div>
+</div>

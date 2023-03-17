@@ -1,0 +1,46 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var grid = (PageGridPageSection)Model.Definition;
+}
+<div class="my-4">
+    <div class="page-grid grid" data-bind="foreachInit: { name: 'ko-blank-template', data: pageGrid.visiblePages, createElement: pageGrid.createPagePod }">
+       @foreach(var pa in grid.Pages.OrderBy(p => p.SortOrder))
+       {
+        <div>
+            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
+            </span>
+            <a class="pod-card" href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, pa.URLKeywords, (dgContentType)dgContentType.landingPage, pa.PageID)">
+                <div class="card">
+                    @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", pa.CarouselViewModel)
+                    <div class="card-body">
+                        @if (pa.New)
+                        {
+                            <h6 class="card-new">
+                                @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                            </h6>
+                        }
+                        <h6 class="card-title text-uppercase">
+                            @Html.Raw(pa.Heading)
+                        </h6>
+                       @if (!String.IsNullOrEmpty(pa.SubHeading))
+                        {
+                            <p>
+                                @Html.Raw(pa.SubHeading)
+                            </p>
+                        }
+                    </div>
+                </div>
+            </a>
+        </div>
+        }
+    </div>
+</div>

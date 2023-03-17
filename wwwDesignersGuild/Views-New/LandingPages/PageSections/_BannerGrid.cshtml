@@ -1,0 +1,133 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var grid = ((BannerGridPageSection)Model.Definition).BannerGrid;
+}
+@if (grid.BannerLocations.All(bl => bl.Banners != null && bl.Banners.Any()))
+{
+    <span class="d-none" data-bind="init: { convert: JSON.parse, field: data }, remove">
+        @Html.Raw(JsonConvert.SerializeObject(grid))
+    </span>
+    <div class="banner-grid grid" data-bind="foreachInit: { name: 'ko-blank-template', data: bannerGrid.visibleBanners, createElement: bannerGrid.createBannerPod, afterQueueFlush: window.lazyImages }">
+       @foreach (var loc in grid.BannerLocations)
+        {
+            <div class="@(grid.GridColumnClass)">
+               @if(loc.Banners.Count() > 1)
+                {
+                    <div id="@(loc.CarouselID)" class="carousel slide carousel-fade carousel-dark" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                           @foreach (var banner in loc.Banners.Select((value, index) => new { value, index }))
+                            {
+                                var b = banner.value;
+                                var index = banner.index;
+                                <div class="carousel-item @(index == 0 ? "active" : "") banner-image">
+                                   @if (!String.IsNullOrEmpty(b.LinkURL))
+                                    {
+                                        <a href="@b.LinkURL" target="@(b.NewWindow ? "_blank" : "_self")">
+                                            <div id="banner-@b.BannerID" class="banner-image">
+                                                <img src="/imagebanner@(Framework.WebPFallback)/@(grid.GetImageWidth())/@b.BannerID?v=@b.Version"
+                                                     class="d-block w-100"
+                                                     alt="@(b.AltText ?? b.OverlayTextDisplay)"
+                                                     width="@(grid.GetImageWidth())"
+                                                     height="@(grid.GetImageHeight(b.AspectRatio))"
+                                                     loading="lazy"
+                                                     @HtmlHelperExtra.BannerImageSourceSetSizes(b.BannerID, b.Version, grid.ImageSize)>
+                                               @if (!String.IsNullOrEmpty(b.OverlayTextDisplay))
+                                                {
+                                                    <h6 class="banner-overlay @b.FontClass" style="@b.InlineStyle">
+                                                        <span>
+                                                            @Html.Raw(b.OverlayTextDisplay)
+                                                        </span>
+                                                        <i class="material-icons">
+                                                            arrow_right
+                                                        </i>
+                                                    </h6>
+                                                }
+                                            </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div id="banner-@b.BannerID" class="banner-image">
+                                            <img src="/imagebanner@(Framework.WebPFallback)/@(grid.GetImageWidth())/@b.BannerID?v=@b.Version"
+                                                     class="d-block w-100"
+                                                     alt="@(b.AltText ?? b.OverlayTextDisplay)"
+                                                     width="@(grid.GetImageWidth())"
+                                                     height="@(grid.GetImageHeight(b.AspectRatio))"
+                                                     loading="lazy"
+                                                     @HtmlHelperExtra.BannerImageSourceSetSizes(b.BannerID, b.Version, grid.ImageSize)>
+                                           @if (!String.IsNullOrEmpty(b.OverlayTextDisplay))
+                                            {
+                                                <h6 class="banner-overlay @b.FontClass" style="@b.InlineStyle">
+                                                    <span>
+                                                        @Html.Raw(b.OverlayTextDisplay)
+                                                    </span>
+                                                </h6>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    var b = loc.Banners.First();
+                    if (!String.IsNullOrEmpty(b.LinkURL))
+                    {
+                        <a href="@b.LinkURL" target="@(b.NewWindow ? "_blank" : "_self")">
+                            <div id="banner-@b.BannerID" class="banner-image">
+                                <img src="/imagebanner@(Framework.WebPFallback)/@(grid.GetImageWidth())/@b.BannerID?v=@b.Version"
+                                        class="d-block w-100"
+                                        alt="@(b.AltText ?? b.OverlayTextDisplay)"
+                                        width="@(grid.GetImageWidth())"
+                                        height="@(grid.GetImageHeight(b.AspectRatio))"
+                                        loading="lazy"
+                                        @HtmlHelperExtra.BannerImageSourceSetSizes(b.BannerID, b.Version, grid.ImageSize)>
+                               @if (!String.IsNullOrEmpty(b.OverlayTextDisplay))
+                                {
+                                    <h6 class="banner-overlay @b.FontClass" style="@b.InlineStyle">
+                                        <span>
+                                            @Html.Raw(b.OverlayTextDisplay)
+                                        </span>
+                                        <i class="material-icons">
+                                            arrow_right
+                                        </i>
+                                    </h6>
+                                }
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <div id="banner-@b.BannerID" class="banner-image">
+                            <img src="/imagebanner@(Framework.WebPFallback)/@(grid.GetImageWidth())/@b.BannerID?v=@b.Version"
+                                    class="d-block w-100"
+                                    alt="@(b.AltText ?? b.OverlayTextDisplay)"
+                                    width="@(grid.GetImageWidth())"
+                                    height="@(grid.GetImageHeight(b.AspectRatio))"
+                                    loading="lazy"
+                                    @HtmlHelperExtra.BannerImageSourceSetSizes(b.BannerID, b.Version, grid.ImageSize)>
+                           @if (!String.IsNullOrEmpty(b.OverlayTextDisplay))
+                            {
+                                <h6 class="banner-overlay @b.FontClass" style="@b.InlineStyle">
+                                    <span>
+                                        @Html.Raw(b.OverlayTextDisplay)
+                                    </span>
+                                </h6>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+} 

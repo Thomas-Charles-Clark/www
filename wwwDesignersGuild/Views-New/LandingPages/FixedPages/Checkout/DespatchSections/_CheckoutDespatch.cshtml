@@ -1,0 +1,602 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutDispatch
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    var objMaster = Model.masterDefinition;
+    var objDispatch = Model.checkoutDispatchOptions;
+
+    var countryId = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var languageId = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = Model.masterDefinition.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+    nfi.NumberDecimalSeparator = ".";
+    nfi.CurrencyDecimalSeparator = ".";
+
+    Boolean tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+    Boolean hasGiftCard = Convert.ToBoolean(Session["checkoutDisplayGiftVoucherTab"]);
+    Boolean loadGiftWrap = Convert.ToBoolean(Session["checkoutDisplayGiftTab"]) && Model.checkoutMethod != dgCheckoutType.Trade;
+}
+
+<script type="text/javascript">
+    function getDispatchOptions() {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.checkoutDispatchOptions));
+    }
+    function getDispatchAvailable() {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.dispatchOptionsAvailable));
+    }
+</script>
+
+<div data-bind="with: deliveryAddressFactory">
+    <h5 class="mb-3">
+        <strong>
+           @if (Model.checkoutMethod == dgCheckoutType.Trade)
+            {
+                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchTitleTrade", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+            }
+            else
+            {
+                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchTitle", languageId, countryId, contentDate)
+            }
+        </strong>
+    </h5>
+   @if (!Model.dispatchOptionsAvailable)
+    {
+        <div id="despatch-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: parent.dispatchBusy(), toggleOpacity: parent.dispatchBusy()">
+                <div class="spinner-border"></div>
+                <h5>
+                    @HtmlHelperExtra.Resource("CheckoutSinglePageLoadingDeliveryOptions", languageId, countryId, contentDate)
+                </h5>
+            </div>
+            <p class="checkout-info-content" data-bind="visible: !parent.dispatchBusy()">
+                @HtmlHelperExtra.Resource("CheckoutSinglePageDispatchUnavailable", languageId, countryId, contentDate)
+            </p>
+        </div>
+    }
+    else
+    {
+        if (!String.IsNullOrEmpty(Model.checkoutDispatchOptions.checkoutDispatchNotice.Notification))
+        {
+            <div class="modal fade" id="dispatch-notice-modal" data-bs-keyboard="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg modal-vertically-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            @Html.Raw(Model.checkoutDispatchOptions.checkoutDispatchNotice.Notification)
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                @HtmlHelperExtra.Resource("CloseProperCase", languageId, countryId, contentDate)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                bootstrap.Modal.getOrCreateInstance(document.querySelector('#dispatch-notice-modal')).show();
+            </script>
+       }
+
+        <!-- ko if: parent.dispatchBusy(true) --><!-- /ko -->
+<div id="despatch-wrapper">
+    <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: parent.dispatchBusy(), toggleOpacity: parent.dispatchBusy()">
+        <div class="spinner-border"></div>
+        <h5>
+            @HtmlHelperExtra.Resource("CheckoutSinglePageLoadingDeliveryOptions", languageId, countryId, contentDate)
+        </h5>
+    </div>
+   @if (Model.checkoutMethod == dgCheckoutType.Trade)
+    {
+        <div class="trade-detail mb-3" data-bind="visible: currentAddress() ? currentAddress().deliveryOptionId() != 2 : true">
+            <a href="@Html.Raw(Model.checkoutDispatchOptions.checkoutDispatchNotice.TradeDeliveryURL)" target="_blank">
+                @HtmlHelperExtra.Resource("TradeDeliveryP1", languageId, countryId, contentDate)
+            </a>
+        </div>
+    }
+    <form>
+        <!-- ko foreach: dispatchOptions -->
+        <!-- ko if: dispatchName != null -->
+        <h5 class="my-3"
+            data-bind="text: dispatchName"></h5>
+        <!-- /ko -->
+        <!-- ko if: dispatchName == null -->
+        <h5 class="my-3"
+            data-bind="text: $parent.resources.DispatchDelivery + ' ' + ($index() + 1) + ' ' + $parent.resources.DispatchOf + ' ' + $parent.dispatchOptions().length"></h5>
+        <!-- /ko -->
+        <div class="dispatch-group-wrapper">
+            <div>
+                <!-- ko foreach: products -->
+                <div class="dispatch-product">
+                    <img width="156"
+                         height="156"
+                         data-bind="attr: {
+                                    src: ImageURL,
+                                    alt: BasketName,
+                                    srcset: window.imageAttributeSourceSet(ImageID, imageSizeXS),
+                                    sizes: window.imageAttributeSizes(ImageID, imageSizeXS)
+                                 }" />
+                    <div>
+                        <span data-bind="text: FullBasketName"></span>
+                        @if (Model.checkoutMethod == dgCheckoutType.Trade)
+                        {
+                            <span class="dispatch-prod-title" data-bind="text: Code"></span>
+                        }
+                        <span class="mb-2" data-bind="html: PriceMessage"></span>
+                        <div>
+                            <div>
+                                @HtmlHelperExtra.Resource("Quantity", languageId, countryId, contentDate):
+                                <span data-bind="text: Quantity"></span>
+                            </div>
+                            @if (tradeUser)
+                            {
+                                <span class="basketline-type mb-2" data-bind="text: BasketLineType"></span>
+                            }
+                            <!-- ko foreach: stockMessagesDisplay -->
+                            <span class="stock-message" data-bind="class: $data.class">
+                                <!-- ko if: $parent.stockMessageJson.allowStockCheck -->
+                                <a data-bind="text: $data.stockMessage, click: function () { $root.stockInfoModel.showStockInfo($parent, $data.stockBreakdownTab); }"></a>
+                                <!-- /ko -->
+                                <!-- ko ifnot: $parent.stockMessageJson.allowStockCheck -->
+                                <span data-bind="text: $data.stockMessage"></span>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        </div>
+                        <!-- ko if: IsGiftVoucher -->
+                        <span class="gift-card-option">
+                            <a href="javascript:;" data-bind="click: $root.displayGiftCardOptions">
+                                @HtmlHelperExtra.Resource("CheckoutAddVoucherMessage", languageId, countryId, contentDate)
+                            </a>
+                            <!-- ko if: $data.giftCard.message() -->
+                            <i class="material-icons text-success">
+                                check
+                            </i>
+                            <!-- /ko -->
+                        </span>
+                        <!-- /ko -->
+                        @if (loadGiftWrap)
+                        {
+                            <!-- ko if: GiftWrappable && $root.checkoutType != 2 -->
+                            <span class="voucher-action">
+                                <a href="javascript:;" data-bind="click: $root.displayGiftWrapOptions">
+                                    @HtmlHelperExtra.Resource("CheckoutGiftWrapMessage", languageId, countryId, contentDate)
+                                </a>
+                                <!-- ko if: $data.giftBoxed -->
+                                <i class="material-icons text-success">
+                                    check
+                                </i>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        }
+                        @if (Model.checkoutMethod == dgCheckoutType.Trade)
+                        {
+                            <span class="stock-message" data-bind="html: DespatchMessage"></span>
+                        }
+                        @if (Model.checkoutMethod == dgCheckoutType.Trade)
+                        {
+                            <span class="trade-option mt-3">
+                                <a href="javascript:;" data-bind="click: function () { $root.deliveryAddressFactory.showMemoModal($data); }">
+                                    @HtmlHelperExtra.Resource("TradeCheckoutProvideSpecialInstructions", languageId, countryId, contentDate)
+                                </a>
+                                <!-- ko if: $data.lineMemo.savedMemo() -->
+                                <i class="material-icons text-success">
+                                    check
+                                </i>
+                                <!-- /ko -->
+                            </span>
+                            <!-- ko if: PermitTreatment -->
+                            <span class="trade-option">
+                                <a href="javascript:;" data-bind="click: function () { $root.deliveryAddressFactory.showTreatmentsModal($data); }">
+                                    @HtmlHelperExtra.Resource("RequestTreatments", languageId, countryId, contentDate)
+                                </a>
+                                <!-- ko if: $data.lineTreatment.savedTreatments() -->
+                                <i class="material-icons text-success">
+                                    check
+                                </i>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                            <!-- ko if: PermitCutLengthBreakdown -->
+                            <span class="trade-option">
+                                <a href="javascript:;" data-bind="click: function () { $root.stockInfoModel.showStockInfo($data, 0) }">
+                                    Request Cut Length Breakdown
+                                </a>
+                                <!-- ko if: cutLengthBreakdown.savedCutLengthBreakdown() -->
+                                <i class="material-icons text-success">
+                                    check
+                                </i>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                            <!-- ko if: PermitBatch -->
+                            <span class="trade-option">
+                                <a href="javascript:;" data-bind="click: function () { $root.stockInfoModel.showStockInfo($data, 0) }">
+                                    @HtmlHelperExtra.Resource("RequestBatch", languageId, countryId, contentDate)
+                                </a>
+                                <!-- ko if: cutLengthBreakdown.selectedBatch() -->
+                                <i class="material-icons text-success">
+                                    check
+                                </i>
+                                <!-- /ko -->
+                            </span>
+                            <!-- /ko -->
+                        }
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+            <div>
+                @*@if (Model.checkoutMethod != dgCheckoutType.Trade)
+                    {*@
+                <h6 class="dispatch-estimate-title">
+                    @HtmlHelperExtra.Resource((Model.checkoutMethod != dgCheckoutType.Trade ? "DispatchEstimated" : "EstimatedDespatch"), languageId, countryId, contentDate)
+                </h6>
+                <div class="dispatch-estimates" data-bind="with: selected">
+                    <!-- ko if: $parent.singleDeliverySelected() -->
+                    <!-- ko if: MinDeliveryDate == MaxDeliveryDate -->
+                    <span data-bind="text: MinDeliveryEstimateDisplay"></span>
+                    <!-- /ko -->
+                    <!-- ko ifnot: MinDeliveryDate == MaxDeliveryDate -->
+                    <span data-bind="text: MinDeliveryEstimateDisplay + ' - ' + MaxDeliveryEstimateDisplay"></span>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko ifnot: $parent.singleDeliverySelected() -->
+                    <span data-bind="text: MinDeliveryEstimateWithPartShipDisplay"></span>
+                    <!-- /ko -->
+                </div>
+                @*}*@
+                @if (Model.checkoutMethod == dgCheckoutType.Trade)
+                {
+                    <!-- ko if: offerFullDispatch -->
+                    <h6 class="dispatch-option-title">
+                        @HtmlHelperExtra.Resource("TradeOrderDespatchQuestion", languageId, countryId, contentDate)
+                    </h6>
+                    <div class="form-check">
+                        <input type="radio"
+                               class="form-check-input delivery-option consolidation"
+                               data-bind="checkedValue: false, checked: fullDispatchSelection, event: { change: $parent.saveDispatch }" />
+                        <label class="form-check-label">
+                            @HtmlHelperExtra.Resource("TradeOrderDespatchAnswer1", languageId, countryId, contentDate)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio"
+                               class="form-check-input delivery-option consolidation"
+                               data-bind="checkedValue: true, checked: fullDispatchSelection, event: { change: $parent.saveDispatch }" />
+                        <label class="form-check-label">
+                            @HtmlHelperExtra.Resource("TradeOrderDespatchAnswer2", languageId, countryId, contentDate)
+                        </label>
+                    </div>
+                    <!-- /ko -->
+                }
+                <h6 class="dispatch-option-title">
+                    @HtmlHelperExtra.Resource("DispatchOptions", languageId, countryId, contentDate)
+                </h6>
+                <!-- ko foreach: deliveryOptions -->
+                <div class="form-check">
+                    <input class="form-check-input delivery-option"
+                           type="radio"
+                           data-bind="attr: {
+                                        id: `delivery-band-${DeliveryBandID}-price`,
+                                        name: `dispatch-${DispatchID}-price`
+                                    },
+                                    checkedValue: $data,
+                                    checked: $parent.selected,
+                                    event: { change: $parentContext.$parent.saveDispatch }">
+                    <label class="form-check-label"
+                           data-bind="attr: { for: `delivery-band-${DeliveryBandID}-price` }">
+                        <!-- ko if: PriceInc == 0 -->
+                        @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+                        {
+
+                        }
+                        else
+                        {
+                            <span style="text-transform: uppercase">
+                                @HtmlHelperExtra.Resource("Free", languageId, countryId, contentDate)
+                            </span>
+                        }
+                        <!-- /ko -->
+                        <!-- ko ifnot: PriceInc == 0 -->
+                        <!-- ko if: PerItem -->
+                        <span>
+                            <span data-bind="text: $parentContext.$parent.resources.currencySymbol + PriceInc"></span>
+                            /
+                            @HtmlHelperExtra.Resource("item", languageId, countryId, contentDate)
+                        </span>
+                        <!-- /ko -->
+                        <!-- ko ifnot: PerItem -->
+                        <span data-bind="text: $parentContext.$parent.resources.currencySymbol + PriceInc"></span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <span class="display-inline-block" data-bind="html: DisplayName"></span>
+                    </label>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: selected() -->
+                <!-- ko if: selected().DisplayPartShipOption -->
+                <h6 class="dispatch-option-title mt-3">
+                    @HtmlHelperExtra.Resource("DispatchPartAwaitingStock", languageId, countryId, contentDate)
+                </h6>
+                <div class="form-check">
+                    <input type="radio"
+                           class="form-check-input"
+                           data-bind="attr: {
+                                        id: `part-ship-${selected().DispatchID}-single`,
+                                        name: `part-ship-${selected().DispatchID}-option`
+                                    },
+                                    checkedValue: true,
+                                    checked: singleDeliverySelected,
+                                    event: { change: $parent.saveDispatch }" />
+                    <label class="form-check-label" data-bind="attr: { for: `part-ship-${selected().DispatchID}-single` }">
+                        @HtmlHelperExtra.Resource("DispatchPartSingleDeliveryMessage", languageId, countryId, contentDate)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input type="radio"
+                           class="form-check-input"
+                           data-bind="attr: {
+                                        id: `part-ship-${selected().DispatchID}-multiple`,
+                                        name: `part-ship-${selected().DispatchID}-option`
+                                    },
+                                    checkedValue: false,
+                                    checked: singleDeliverySelected,
+                                    event: { change: $parent.saveDispatch }" />
+                    <label class="form-check-label" data-bind="attr: { for: `part-ship-${selected().DispatchID}-multiple` }">
+                        @Html.Raw(String.Format("{0}{1} - {2}",
+                            HtmlHelperExtra.Resource("currencySymbol", languageId, countryId, contentDate).ToString(),
+                            dgFramework.convertPriceToDisplayWithDP(objDispatch.checkoutDispatchPartShipPrices[0].PartShipPriceInc),
+                            HtmlHelperExtra.Resource("DispatchPartMultipleDeliveryMessage", languageId, countryId, contentDate).ToString()))
+                    </label>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            <!-- ko if: ($index() + 1) == $parent.dispatchOptions().length -->
+            <div class="clearfix sep margin"></div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </form>
+
+    <div id="shipping-method-phase" style="display: none;"></div>
+
+    @if (hasGiftCard)
+    {
+        @Html.Action("_checkoutGiftCard", "Section", Model.masterDefinition);
+    }
+    @if (loadGiftWrap)
+    {
+        @Html.Action("_checkoutGiftWrap", "Section", Model.masterDefinition)
+    }
+</div>
+    }
+</div>
+
+@if  (Model.checkoutMethod == dgCheckoutType.Trade)
+{
+    <div id="cut-length-modal" class="modal fade" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" data-bind="with: deliveryAddressFactory.actingCutLength">
+                    <button type="button" class="close" data-bind="click: cutLengthBreakdown.cancelCutModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("CutPieceBreakdown", languageId, countryId, contentDate)
+                    </h4>
+                </div>
+                <div class="modal-body" data-bind="with: deliveryAddressFactory.actingCutLength">
+                    <table class="allocation-table table table-condensed">
+                        <colgroup>
+                            <col />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="text-right padding-right-35">
+                                    <span class="display-block">
+                                        <span class="text-bold">Product:</span>
+                                        <span data-bind="text: Code"></span>
+                                    </span>
+                                    <!-- ko if: BasketLineTypeID == 2 -->
+                                    <span class="display-block text-warning">
+                                        @HtmlHelperExtra.Resource("tradeQuickOrderReserve", languageId, countryId, contentDate)
+                                    </span>
+                                    <!-- /ko -->
+                                    <!-- ko if: BasketLineTypeID == 3 -->
+                                    <span class="display-block text-warning">
+                                        @HtmlHelperExtra.Resource("tradeQuickReserveWithBatchSample", languageId, countryId, contentDate)
+                                    </span>
+                                    <!-- /ko -->
+                                    <span class="display-block">
+                                        <span class="text-bold">Total Ordered:</span>
+                                        <span data-bind="text: (+Quantity).toFixed(1)"></span>
+                                        <span data-bind="text: 'm'"></span>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="batch-row">
+                                <td>
+                                    <table class="cut-table piece-table" data-bind="with: cutLengthBreakdown">
+                                        <colgroup>
+                                            <col style="width: 50%" />
+                                            <col style="width: 50%" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-right">
+                                                    <!-- ko if: !cuts.isValid() -->
+                                                    <span class="text-danger" data-bind="visible: remainingToCut() > 0">
+                                                        (<span data-bind="text: remainingToCut().toFixed(1) + 'm'"></span> Remaining)
+                                                    </span>
+                                                    <!-- /ko -->
+                                                </td>
+                                                <td class="text-right">
+                                                    <!-- ko foreach: cuts -->
+                                                    <div class="cut-wrapper margin-bottom-10"> 
+                                                        <button type="button" class="close" aria-label="Close" data-bind="click: $parent.removeCut">
+                                                            <span aria-hidden="true">
+                                                                &times;
+                                                            </span>
+                                                        </button>
+                                                        <div class="cut-input" data-bind="component: { name: 'mdc-text-field-numeric-component', params: cutLengthParams }"></div>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <!-- /ko -->
+                                                    <button class="btn btn-flat" data-bind="click: function () { addCut(); }, visible: remainingToCut() > 0">
+                                                        Add Cut
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer" data-bind="with: deliveryAddressFactory.actingCutLength">
+                    <button class="btn btn-flat pull-left" data-bind="click: cutLengthBreakdown.cancelCutModal">
+                        @HtmlHelperExtra.Resource("Cancel", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-red pull-left" data-bind="visible: cutLengthBreakdown.cuts().length, click: cutLengthBreakdown.removeCutLengthBreakdown">
+                        @HtmlHelperExtra.Resource("MoodboardRemove", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-success" data-bind="enable: cutLengthBreakdown.cuts.isValid, click: cutLengthBreakdown.saveCutLengthBreakdown">
+                        @HtmlHelperExtra.Resource("MoodboardSave", languageId, countryId, contentDate)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="line-memo-modal" class="modal fade" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" data-bind="with: deliveryAddressFactory.actingLineMemo">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("TradeCheckoutProvideSpecialInstructions", languageId, countryId, contentDate)
+                    </h4>
+                    <button type="button" class="btn btn-close" data-bind="click: cancelMemoModal"></button>
+                </div>
+                <div class="modal-body">
+                    <strong class="d-block mb-3">
+                        <span data-bind="text: BasketName"></span>
+                        -
+                        <span data-bind="text: Code"></span>
+                    </strong>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: referenceParams }"></div>
+                    <div data-bind="component: { name: 'mdc-text-area-component', params: memoParams }"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary me-auto" data-bind="visible: savedMemo, click: removeLineMemo">
+                        @HtmlHelperExtra.Resource("MoodboardRemove", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-secondary" data-bind="click: cancelMemoModal">
+                        @HtmlHelperExtra.Resource("Cancel", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-success" data-bind="click: saveLineMemo">
+                        @HtmlHelperExtra.Resource("MoodboardSave", languageId, countryId, contentDate)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="line-treatments-modal" class="modal fade" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" data-bind="with: deliveryAddressFactory.actingLineTreatment">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("RequestTreatments", languageId, countryId, contentDate)
+                    </h4>
+                    <button type="button" class="btn btn-close" data-bind="click: cancelTreatmentModal"></button>
+                </div>
+                <div class="modal-body">
+                    <strong class="d-block mb-3">
+                        <span data-bind="text: BasketName"></span>
+                        -
+                        <span data-bind="text: Code"></span>
+                    </strong>
+                    <div class="label-wrapper">
+                        <div class="form-check">
+                            <input id="dom-up-treat"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   data-bind="checked: domesticUpholsteryTreatment, valueChecked: true, valueUnchecked: false" />
+                            <label class="form-check-label" for="dom-up-treat">
+                                @HtmlHelperExtra.Resource("RequestDomesticUpholsteryTreatment", languageId, countryId, contentDate)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input id="crib-5-treat"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   data-bind="checked: crib5Treatment, valueChecked: true, valueUnchecked: false" />
+                            <label class="form-check-label"
+                                   for="crib-5-treat">
+                                @HtmlHelperExtra.Resource("RequestCrib5Treatment", languageId, countryId, contentDate)
+                            </label> 
+                        </div>
+                        <div class="form-check">
+                            <input id="stain-treat"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   data-bind="checked: stainTreatment, valueChecked: true, valueUnchecked: false" />
+                            <label class="form-check-label">
+                                @HtmlHelperExtra.Resource("RequestStainResistantTreatment", languageId, countryId, contentDate)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input id="other-treats-visible"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   data-bind="checked: otherTreatmentVisible, valueChecked: true, valueUnchecked: false" />
+                            <label class="form-check-label" for="other-treats-visible">
+                                @HtmlHelperExtra.Resource("RequestOtherTreatment", languageId, countryId, contentDate)
+                            </label>
+                        </div>
+                        <div id="other-treatment-collapse" class="collapse" data-bind="fadeSlideVisible: otherTreatmentVisible">
+                            <label class="form-check-label mt-2">
+                                @HtmlHelperExtra.Resource("DescribeOtherTreatment", languageId, countryId, contentDate)
+                            </label>
+                            <textarea class="form-control" rows="5" maxlength="500" data-bind="textInput: otherTreatment"></textarea>
+                        </div>
+                    </div>
+                    <hr class="my-3"/>
+                    <div class="form-check">
+                        <input id="express-treat"
+                               type="checkbox" 
+                               class="form-check-input"
+                               data-bind="checked: expressTreatment, valueChecked: true, valueUnchecked: false" />
+                        <label class="form-check-label" for="express-treat">
+                            @HtmlHelperExtra.Resource("RequestExpressTreatment", languageId, countryId, contentDate)
+                        </label>
+                    </div>
+                    <p class="mt-3 mb-0">
+                        @HtmlHelperExtra.Resource("TreatmentRequestHint", languageId, countryId, contentDate)
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary me-auto" data-bind="visible: savedTreatments, click: removeLineTreatments">
+                        @HtmlHelperExtra.Resource("MoodboardRemove", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-secondary" data-bind="click: cancelTreatmentModal">
+                        @HtmlHelperExtra.Resource("Cancel", languageId, countryId, contentDate)
+                    </button>
+                    <button class="btn btn-success" data-bind="click: saveLineTreatments">
+                        @HtmlHelperExtra.Resource("MoodboardSave", languageId, countryId, contentDate)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

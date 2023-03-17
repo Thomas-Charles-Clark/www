@@ -1,0 +1,13 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+.module-option-modal {
+    .accordion {
+        .accordion-button {
+            padding-left: $sm-gutter;
+            gap: $l-gutter;
+        }
+    }
+}

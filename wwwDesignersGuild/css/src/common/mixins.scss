@@ -1,0 +1,285 @@
+﻿@use 'sass:math';
+@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "variables";
+
+/* With thanks: https://embed.plnkr.co/plunk/HOWT1kfs9sFUdEHP */
+
+/*
+    Original: I modified this because it begat an additional wrapping element 
+@mixin flex-gap($row-gap, $column-gap: $row-gap) {
+  display: flex;
+  & > * {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -$column-gap;
+  }
+
+  & > * > * {
+    display: flex;
+    margin-top: $column-gap;
+  }
+
+  &:not([dir='rtl']) {
+    & > * {
+      margin-left: -$row-gap;
+    }
+    & > * > * {
+      margin-left: $row-gap;
+    }
+  }
+
+  &[dir='rtl'] {
+    & > * {
+      margin-right: -$row-gap;
+    }
+    & > * > * {
+      margin-right: $row-gap;
+    }
+  }
+}
+*/
+
+@mixin flex-gap($row-gap, $column-gap: $row-gap) {
+    display: flex;
+
+    & > * {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: $column-gap;
+    }
+
+    & > * > * {
+        display: flex;
+        margin-top: -$column-gap;
+    }
+
+    &:not([dir='rtl']) {
+        & > *:not(:first-child) {
+            margin-left: $row-gap;
+        }
+
+        & > * > * {
+            margin-left: -$row-gap;
+        }
+    }
+
+    &[dir='rtl'] {
+        & > * {
+            margin-right: $row-gap;
+        }
+
+        & > * > * {
+            margin-right: -$row-gap;
+        }
+    }
+}
+
+@mixin order($platform, $count) {
+    @for $i from 1 through $count {
+        .order-#{$platform}-#{$i} {
+            order: $i;
+        }
+    }
+}
+
+@mixin countdown-timer($time, $dimension-x, $dimension-y: $dimension-x) {
+    /*$colors: #8A9B0F #F8CA00 #E97F02 #BD1550 #490A3D;*/
+    $colors: #E97F02 #ffd800 #59caca #37d119;
+    $colorCount: length($colors);
+    $fader: calc(100% / ($colorCount - 1));
+    $stroke-width: 6px;
+
+    .countdown {
+        display: grid;
+        width: $dimension-x;
+        height: $dimension-y;
+
+        &::after {
+            grid-column: 1;
+            grid-row: 1;
+            place-self: center;
+            font: #{.25*$dimension-x}/ 2 ubuntu mono, consolas, monaco, monospace;
+            transition: background-color 300ms ease, color 300ms ease;
+        }
+
+        svg {
+            grid-column: 1;
+            grid-row: 1
+        }
+
+        [r] {
+            opacity: 0;
+            fill: $white;
+            stroke: silver;
+            stroke-width: $stroke-width;
+            transition: opacity 100ms ease-in-out;
+
+            + [r] {
+                transform: rotate(-90deg);
+                stroke-linecap: round;
+                stroke: nth($colors, 1);
+                stroke-width: $stroke-width;
+                fill: transparent;
+                /*transition: fill 300ms ease-in-out;*/
+            }
+        }
+    }
+
+    .countdown.counting {
+
+        &::after {
+            content: '0:' counter(s, decimal-leading-zero);
+            animation: num $time * 1s steps(1);
+        }
+
+        [r] {
+            opacity: 1.0;
+            + [r] {
+                animation: arc $time * 1s linear;
+                animation-name: arc, col
+            }
+        }
+    }
+
+    .countdown.complete {
+
+
+        /*&::after {
+            grid-column: 1;
+            grid-row: 1;
+            place-self: center;
+            color: #37d119;
+            font: 1.6rem 'Material Icons';
+            content: 'check';
+            position: absolute;
+            clip-path: circle(calc($dimension-x * 0.5));
+            text-shadow: 0 0 5px $white;
+            animation: none;
+            animation-name: none;
+        }*/
+
+        [r] {
+            opacity: 0;
+            + [r] {
+                animation: none;
+                animation-name: none;
+                /*fill: #37d119;*/
+            }
+        }
+    }
+
+    @keyframes num {
+        @for $i from 0 through $time {
+            #{math.div($i * 100%, $time)} {
+                counter-reset: s $time - $i;
+            }
+        }
+    }
+
+    @keyframes arc {
+        0% {
+            stroke-dashoffset: 0px
+        }
+    }
+
+    @keyframes col {
+        @for $i from 0 to $colorCount {
+            #{$i*$fader} {
+                stroke: nth($colors, $i + 1)
+            }
+        }
+    }
+}
+
+
+// Utility generator
+// Used to generate utilities & print utilities
+@mixin generate-utility-desktop-force($utility, $infix, $is-rfs-media-query: false) {
+  $values: map-get($utility, values);
+
+  // If the values are a list or string, convert it into a map
+  @if type-of($values) == "string" or type-of(nth($values, 1)) != "list" {
+    $values: zip($values, $values);
+  }
+
+  @each $key, $value in $values {
+    $properties: map-get($utility, property);
+
+    // Multiple properties are possible, for example with vertical or horizontal margins or paddings
+    @if type-of($properties) == "string" {
+      $properties: append((), $properties);
+    }
+
+    // Use custom class if present
+    $property-class: if(map-has-key($utility, class), map-get($utility, class), nth($properties, 1));
+    $property-class: if($property-class == null, "", $property-class);
+
+    // State params to generate pseudo-classes
+    $state: if(map-has-key($utility, state), map-get($utility, state), ());
+
+    $infix: if($property-class == "" and str-slice($infix, 1, 1) == "-", str-slice($infix, 2), $infix);
+
+    // Don't prefix if value key is null (eg. with shadow class)
+    $property-class-modifier: if($key, if($property-class == "" and $infix == "", "", "-") + $key, "");
+
+    @if map-get($utility, rfs) {
+      // Inside the media query
+      @if $is-rfs-media-query {
+        $val: rfs-value($value);
+
+        // Do not render anything if fluid and non fluid values are the same
+        $value: if($val == rfs-fluid-value($value), null, $val);
+      }
+      @else {
+        $value: rfs-fluid-value($value);
+      }
+    }
+
+    $is-css-var: map-get($utility, css-var);
+    $is-local-vars: map-get($utility, local-vars);
+    $is-rtl: map-get($utility, rtl);
+
+    @if $value != null {
+      @if $is-rtl == false {
+        /* rtl:begin:remove */
+      }
+
+      @if $is-css-var {
+        .#{$property-class + $infix + $property-class-modifier} {
+          --#{$variable-prefix}#{$property-class}: #{$value};
+        }
+
+        @each $pseudo in $state {
+          .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
+            --#{$variable-prefix}#{$property-class}: #{$value};
+          }
+        }
+      } @else {
+        .#{$property-class + $infix + $property-class-modifier} {
+          @each $property in $properties {
+            @if $is-local-vars {
+              @each $local-var, $value in $is-local-vars {
+                --#{$variable-prefix}#{$local-var}: #{$value};
+              }
+            }
+            #{$property}: $value if($enable-important-utilities, !important, null);
+          }
+        }
+
+        @each $pseudo in $state {
+          .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
+            @each $property in $properties {
+              #{$property}: $value if($enable-important-utilities, !important, null);
+            }
+          }
+        }
+      }
+
+      @if $is-rtl == false {
+        /* rtl:end:remove */
+      }
+    }
+  }
+}

@@ -1,0 +1,183 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+#account-contact-details {
+    > .grid {
+        --bs-columns: 2;
+    }
+
+    .validation-message.text-success {
+        justify-content: flex-end;
+        gap: $l-gutter;
+        margin: $m-gutter $vsm-gutter;
+        transition: opacity 300ms ease-in-out;
+
+        .material-icons {
+            padding: 0 $m-gutter;
+        }
+    }
+
+    .pca-search-result {
+        background-color: $gray-200;
+    }
+
+    #address-management-title {
+        padding-bottom: $l-gutter;
+        margin-bottom: $xl-gutter;
+        border-bottom: 1px solid $gray-400;
+    }
+}
+
+#address-change-modal {
+    .pca-search-results-list.grid {
+        --bs-columns: 2;
+    }
+
+    .address-select-button {
+        width: 100%;
+    }
+
+    .pca-search-result:hover {
+        background-color: $white;
+        color: $gray-dg-body;
+
+        a {
+            color: $gray-dg-body;
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:focus {
+            text-decoration: underline;
+        }
+    }
+}
+.pca-search-results-list {
+    --bs-columns: 4;
+
+    .pca-search-result {
+        border: 1px solid $gray-300;
+        will-change: background-color, color;
+        transition: background-color 100ms ease-in-out, color 100ms ease-in-out;
+        padding: var(--l-gutter);
+        background-color: $white;
+        color: $gray-dg-body;
+
+        a {
+            will-change: background-color, color;
+            transition: background-color 100ms ease-in-out, color 100ms ease-in-out;
+            color: $gray-dg-body;
+        }
+
+        .address-controls {
+            display: grid;
+            --bs-columns: 2;
+        }
+    }
+
+    .pca-search-result:hover,
+    .pca-search-result:focus,
+    .pca-search-result:focus-within {
+        border-color: $gray-500;
+    }
+}
+
+.display-block {
+    display: block;
+}
+
+.address-block {
+    label {
+        display: block;
+        font-weight: bold;
+
+        span {
+            display: inline;
+        }
+    }
+
+    span {
+        display: block;
+    }
+    
+    span:not(:last-of-type)::after {
+        content: ','
+    }
+}
+
+.address-block {
+    label.delivery-reference-display {
+        display: none;
+    }
+}
+
+#address-change-modal {
+    .mdc-address-searcher {
+        > .form-group {
+            max-width: 100%;
+        }
+    }
+}
+
+.address-search-wrapper {
+    position: relative;
+    z-index: 2;
+
+    > div:first-of-type {
+        flex-grow: 1;
+
+        > div.mdc-validating-field {
+            > div.mdc-select {
+                width: 100%;
+            }
+        }
+    }
+
+    > div:last-of-type {
+        width: 65%;
+    }
+}
+
+.address-autocomplete {
+    z-index: 50;
+    cursor: pointer;
+    display: inline-block;
+    padding: 0;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: $border-radius !important;
+    box-shadow: 0 4px 16px 4px rgb(0 0 0 / 45%);
+    max-height: 640px;
+    overflow-y: auto;
+    min-width: 320px;
+
+    li.ui-menu-item {
+        cursor: pointer;
+
+        div.ui-menu-item-wrapper {
+            font-weight: $font-weight-base;
+            color: $gray-dg-body;
+            padding: $input-padding-y $input-padding-x;
+        }
+
+        div.ui-menu-item-wrapper.ui-state-active {
+            border: none;
+        }
+
+        div.ui-menu-item-wrapper.ui-state-active,
+        div.ui-menu-item-wrapper:hover,
+        div.ui-menu-item-wrapper:focus,
+        div.ui-menu-item-wrapper:focus-within {
+            background: $blue-100;
+        }
+    }
+
+    li:first-of-type {
+        border-top-right-radius: 0 !important;
+    }
+}
+
+#no-addresses {
+    margin-top: -290px;
+}

@@ -1,0 +1,188 @@
+/*$blue:  #0d6efd !default;*/
+/*$secondary:     $gray-600 !default;*/
+/*$link-color:                            $primary !default;*/
+/*$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#094fb6'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;*/
+:root {
+  --vsm-gutter: 0.25rem;
+  --sm-gutter: 0.5rem;
+  --m-gutter: 0.75rem;
+  --l-gutter: 1rem;
+  --mxl-gutter: 1.5rem;
+  --xl-gutter: 2rem;
+  --xxl-gutter: 3rem;
+  --disco-color: #e51f7c;
+  --letter-spacing-slight: 0.05rem;
+}
+
+.member-wrapper {
+  position: relative;
+  min-height: 320px;
+  margin-bottom: 3rem;
+}
+
+#login-details-grid,
+#password-resetter,
+#unsubscribe-wrapper,
+#resubscribe-wrapper {
+  --bs-columns: 2;
+  gap: 4rem;
+}
+#login-details-grid > div > h4,
+#password-resetter > div > h4,
+#unsubscribe-wrapper > div > h4,
+#resubscribe-wrapper > div > h4 {
+  margin-bottom: 2rem;
+}
+#login-details-grid .member-account-row + .member-account-row,
+#password-resetter .member-account-row + .member-account-row,
+#unsubscribe-wrapper .member-account-row + .member-account-row,
+#resubscribe-wrapper .member-account-row + .member-account-row {
+  margin-top: 2rem;
+}
+#login-details-grid .field-label,
+#password-resetter .field-label,
+#unsubscribe-wrapper .field-label,
+#resubscribe-wrapper .field-label {
+  margin-bottom: 0.25rem;
+}
+#login-details-grid .form-group + .form-group,
+#login-details-grid .form-group + .member-account-row,
+#password-resetter .form-group + .form-group,
+#password-resetter .form-group + .member-account-row,
+#unsubscribe-wrapper .form-group + .form-group,
+#unsubscribe-wrapper .form-group + .member-account-row,
+#resubscribe-wrapper .form-group + .form-group,
+#resubscribe-wrapper .form-group + .member-account-row {
+  margin-top: 1rem;
+}
+#login-details-grid .validation-message,
+#password-resetter .validation-message,
+#unsubscribe-wrapper .validation-message,
+#resubscribe-wrapper .validation-message {
+  margin-top: 0.25rem;
+  display: block;
+}
+#login-details-grid .member-account-row.save-successful::after,
+#password-resetter .member-account-row.save-successful::after,
+#unsubscribe-wrapper .member-account-row.save-successful::after,
+#resubscribe-wrapper .member-account-row.save-successful::after {
+  content: "check";
+  font-family: "Material Icons";
+  color: #419345;
+  position: absolute;
+  font-size: 24px;
+  right: -38px;
+  top: 24px;
+}
+
+#unsubscribe-wrapper .form-control {
+  min-width: 420px;
+}
+
+#resubscribe-wrapper {
+  display: flex;
+  justify-content: center;
+}
+#resubscribe-wrapper .alert {
+  max-width: 640px;
+}
+
+.marketing-permission .form-check-input,
+.marketing-permission .form-check-label {
+  cursor: pointer;
+}
+
+#marketing-country .mdc-notched-outline__notch {
+  padding: 0 !important;
+}
+
+.member-account-row {
+  position: relative;
+}
+
+#login-details-grid {
+  --bs-columns: 2;
+}
+#login-details-grid .member-account-row + .member-account-row {
+  margin-top: 2rem;
+}
+#login-details-grid .field-label {
+  margin-bottom: 0.25rem;
+}
+#login-details-grid .form-group + .form-group,
+#login-details-grid .form-group + .member-account-row {
+  margin-top: 1rem;
+}
+#login-details-grid .validation-message {
+  margin-top: 0.25rem;
+  display: block;
+}
+#login-details-grid .member-account-row.save-successful::after {
+  content: "check";
+  font-family: "Material Icons";
+  color: #419345;
+  position: absolute;
+  font-size: 24px;
+  right: -38px;
+  top: 24px;
+}
+#login-details-grid .member-account-row.relative .member-account-row.save-successful::after {
+  top: 0;
+}
+#login-details-grid .form-check {
+  padding-left: 2rem;
+}
+#login-details-grid .form-check .form-check-input {
+  width: 16px;
+  height: 16px;
+  margin-left: -2rem;
+}
+
+#marketing-permissions .member-account-row {
+  margin-right: 48px;
+}
+#marketing-permissions .member-account-row.relative {
+  padding: 1rem;
+}
+
+.member-account-row.save-successful::after {
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+}
+
+.member-account-row.save-successful.hide::after {
+  opacity: 0;
+}
+
+#password-resetter > div {
+  min-width: 420px;
+}
+
+.section > h1,
+.section > h2,
+.section > h3,
+.section > h4,
+.section > h5,
+.section > h6 {
+  padding: var(--l-gutter);
+  margin-bottom: 0;
+}
+.section .section-body {
+  padding: var(--l-gutter);
+}
+.section .section-body p:last-of-type {
+  margin-bottom: 0;
+}
+
+.section.dark-grey-section {
+  border: 1px solid #ced4da;
+}
+.section.dark-grey-section > h1,
+.section.dark-grey-section > h2,
+.section.dark-grey-section > h3,
+.section.dark-grey-section > h4,
+.section.dark-grey-section > h5,
+.section.dark-grey-section > h6 {
+  background-color: #e9ecef;
+}
+/*# sourceMappingURL=member-login-details.css.map */

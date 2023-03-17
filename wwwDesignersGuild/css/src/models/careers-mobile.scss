@@ -1,0 +1,16 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+#careers-wrapper {
+    .grid {
+        > div:first-of-type {
+            order: 2;
+        }
+
+        > div:nth-of-type(2) {
+            order: 1;
+        }
+    }
+}

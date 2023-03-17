@@ -1,0 +1,48 @@
+﻿@model FixedPageViewModel_MemberResubscribe
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+}
+@Render.StylesPreload("~/bundles/css/member-login-details")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/member-login-details-mobile")
+}
+@if (Model.Member != null && Model.Member.Unsubscribed)
+{
+    <div data-bind="stopBinding">
+        <div class="member-wrapper relative p-3 mt-4">
+            <div id="resubscribe-wrapper">
+                <div class="alert alert-success d-flex align-items-center mb-0">
+                    <i class="material-icons">
+                        check
+                    </i>
+                    <p class="mb-0 ms-3">
+                        @HtmlHelperExtra.Resource("ResubscribeThankYou", l, c, d)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div data-bind="stopBinding">
+        <div class="member-wrapper relative p-3 mt-4">
+            <div id="resubscribe-wrapper">
+                <div class="alert alert-danger d-flex align-items-center mb-0">
+                    <i class="material-icons">
+                        error
+                    </i>
+                    <p class="mb-0 ms-3">
+                        @HtmlHelperExtra.Resource("ResubscribeNotFound", l, c, d)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}

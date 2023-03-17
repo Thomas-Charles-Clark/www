@@ -1,0 +1,412 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeAccountReserveOrdersModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+
+@if (!Model.Permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureOrderStatus", l, c, d)
+            @(Model.TradeAccountModel.AccountDetails.Code) - @(Model.TradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.TradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+    <script id="search-controls-template" type="text/html">
+        <div>
+            <div class="input-group">
+                <input type="text" class="form-control" data-bind="enterKey: search, textInput: searchTerm,
+                        attr: { placeholder: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("SearchByOrderProductReference", l, c, d))' }" />
+                <button class="btn btn-outline-secondary" data-bind="click: search">
+                    <span class="visually-hidden">
+                        @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                    </span>
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+    </script>
+    <script id="address-display-template" type="text/html">
+        <!-- ko if: deliveryAddress -->
+        <div class="address-block" data-bind="with: deliveryAddress">
+            <!-- ko if: DeliveryReference -->
+            <span class="address-block-span" data-bind="text: DeliveryReference"></span>
+            <!-- /ko -->
+            <!-- ko if: DeliveryName -->
+            <span class="address-block-span" data-bind="text: DeliveryName"></span>
+            <!-- /ko -->
+            <!-- ko if: AddressLine1 -->
+            <span class="address-block-span" data-bind="text: AddressLine1"></span>
+            <!-- /ko -->
+            <!-- ko if: AddressLine2 -->
+            <span class="address-block-span" data-bind="text: AddressLine2"></span>
+            <!-- /ko -->
+            <!-- ko if: Town -->
+            <span class="address-block-span" data-bind="text: Town"></span>
+            <!-- /ko -->
+            <!-- ko if: County -->
+            <span class="address-block-span" data-bind="text: County"></span>
+            <!-- /ko -->
+            <!-- ko if: Postcode -->
+            <span class="address-block-span" data-bind="text: Postcode"></span>
+            <!-- /ko -->
+            <!-- ko if: Country -->
+            <span class="address-block-span" data-bind="text: Country"></span>
+            <!-- /ko -->
+            <!-- ko if: Phone -->
+            <span class="address-block-span" data-bind="text: Phone"></span>
+            <!-- /ko -->
+            <!-- ko if: HaulierDescription -->
+            <span class="address-block-span address-block-country" data-bind="text: HaulierDescription"></span>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <!-- ko if: invoiceAddress -->
+        <div class="address-block" data-bind="with: invoiceAddress">
+            <!-- ko if: CustomerName -->
+            <span class="address-block-span" data-bind="text: CustomerName"></span>
+            <!-- /ko -->
+            <!-- ko if: AddressLine1 -->
+            <span class="address-block-span" data-bind="text: AddressLine1"></span>
+            <!-- /ko -->
+            <!-- ko if: AddressLine2 -->
+            <span class="address-block-span" data-bind="text: AddressLine2"></span>
+            <!-- /ko -->
+            <!-- ko if: Town -->
+            <span class="address-block-span" data-bind="text: Town"></span>
+            <!-- /ko -->
+            <!-- ko if: County -->
+            <span class="address-block-span" data-bind="text: County"></span>
+            <!-- /ko -->
+            <!-- ko if: Postcode -->
+            <span class="address-block-span" data-bind="text: Postcode"></span>
+            <!-- /ko -->
+            <!-- ko if: Country -->
+            <span class="address-block-span address-block-country" data-bind="text: Country"></span>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </script>
+
+    <script id="reserve-row-template" type="text/html">
+        <tr>
+            <td>
+                <span data-bind="text: OrderNumber"></span>
+            </td>
+            <td>
+                <!-- ko if: OrderDate -->
+                <span data-bind="text: kendo.toString(kendo.parseDate(OrderDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy')"></span>
+                <!-- /ko -->
+            </td>
+            <td>
+                <!-- ko ifnot: DeliveryReference == "C" -->
+                <span data-bind="text: DeliveryReference"></span>
+                <!-- /ko -->
+            </td>
+            <td>
+                <span data-bind="text: CustomerOrderReference"></span>
+            </td>
+            <td class="actions-cell">
+                <a href="javascript:;" data-bind="click: function () { $parent.fetchReserveLines($data, function() { window.setTimeout(function () { $parent.changeAddress(); }, 300); }) }">
+                    @HtmlHelperExtra.Resource("ChangeDeliveryAddress", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: $parent.fetchReserveLines">
+                    @HtmlHelperExtra.Resource("ModifyLines", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: $parent.releaseOrder, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ReleaseReservation", l, c, d)) ' + OrderNumber"></a>
+            </td>
+        </tr>
+    </script>
+    <script id="order-details-grid-template" type="text/html">
+        <tr>
+            <td class="actions-cell">
+                <span class="display-block" data-bind="text: Product"></span>
+                <a href="javascript:;" class="display-block" data-bind="click: (data) => { $parent.stockInfoModel.showStockInfo(data, 0) }">
+                    @HtmlHelperExtra.Resource("CheckStock", l, c, d)
+                </a>
+                <!-- ko if: ImageID -->
+                <img class="thumb pointer" data-bind="click: function (data, event) { $root.largeImage($data, event); }, attr: { alt: Product, title: Product, src: '/image@(Framework.WebPFallback)/156/' + ImageID }" />
+                <!-- /ko -->
+            </td>
+            <td>
+                <span data-bind="text: Description"></span>
+            </td>
+            <td class="text-right">
+                <span data-bind="text: Quantity"></span>
+            </td>
+            <td>
+                <span class="display-block" data-bind="text: BatchNumber"></span>
+                <!-- ko if: BatchNumber && ReserveFlag == 'C' -->
+                <a class="display-block" href="javascript:;" data-bind="click: function() { $parent.resendBatchCutting($data); }">
+                    @HtmlHelperExtra.Resource("RequestReplacementBatchCutting", l, c, d)
+                </a>
+                <!-- /ko -->
+            </td>
+            <td>
+                <span data-bind="text: CustomerOrderReference"></span>
+            </td>
+            <td>
+                <span data-bind="text: DespatchStatus"></span>
+            </td>
+            <td class="actions-cell">
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.releaseLine(data); }">
+                    @HtmlHelperExtra.Resource("ReleaseReservation", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.changeQuantity($(event.target).closest('tr')); }">
+                    @HtmlHelperExtra.Resource("ChangeQuantity", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.changeLineReference($(event.target).closest('tr')) }">
+                    @HtmlHelperExtra.Resource("ChangeLineReference", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.modifyMemo($(event.target).closest('tr')) }">
+                    @HtmlHelperExtra.Resource("ModifyMemo", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.requestExtension($(event.target).closest('tr')) }">
+                    @HtmlHelperExtra.Resource("RequestExtension", l, c, d)
+                </a>
+                <a href="javascript:;" data-bind="click: function (data, event) { $parent.cancelLine(data) }">
+                    @HtmlHelperExtra.Resource("CancelReservation", l, c, d)
+                </a>
+            </td>
+            <td>
+                <span data-bind='html: Memo.replace(/\u00FD/g, "<br/>")'></span>
+            </td>
+        </tr>
+    </script>
+
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div id="accounts-menu" style="display: none" data-bind="visible: ready">
+                <div id="reserve-orders" class="outstanding-pane tab-pane" data-refresh="reserveOrders">
+                    <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: reserveOrdersBusy, toggleOpacity: reserveOrdersBusy">
+                        <div class="spinner-border"></div>
+                        <h4>
+                            @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                        </h4>
+                    </div>
+                    <div class="invoice-search-controls my-3">
+                        <!-- ko template: { name: 'search-controls-template' } --><!-- /ko -->
+                    </div>
+                    <h4 class="accounts-title mt-5">
+                        @HtmlHelperExtra.Resource("ReserveOrderDetails", l, c, d)
+                        <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
+                            click: function () { reserveOrdersGrid.widget().saveAsExcel(); }"></a>
+                    </h4>
+                    <div data-bind="kendoGrid: reserveOrdersGrid"></div>
+                </div>
+            </div>
+            <div id="order-detail-modal" class="modal fade">
+                <div class="modal-dialog modal-lg modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header grey-blue">
+                            <h4 class="modal-title">
+                                @HtmlHelperExtra.Resource("ReserveOrderDetails", l, c, d):
+                                <span data-bind="text: orderDetailsOrderNumber"></span>
+                                <span class="margin-left-15">
+                                    @HtmlHelperExtra.Resource("OrderDate", l, c, d):
+                                </span>
+                                <span data-bind="with: orderDetailsOrderDate">
+                                    <span data-bind="text: kendo.toString(new Date($data), 'D')"></span>
+                                </span>
+                            </h4>
+                            <button type="button" class="btn-close" aria-label="Close" data-bind="click: hideOrderDetailModal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="page-blocker" data-bind="flexVisible: reserveOrdersBusy, toggleOpacity: reserveOrdersBusy">
+                                <div class="spinner-border"></div>
+                                <h4>
+                                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                </h4>
+                            </div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("TradeAccountDeliveryAddress", l, c, d)
+                            </h4>
+                            <!-- ko template: { name: 'address-display-template' } --><!-- /ko -->
+                            <button class="btn btn-secondary my-3" data-bind="click: changeAddress">
+                                @HtmlHelperExtra.Resource("ChangeDeliveryAddress", l, c, d)
+                            </button>
+                            <div data-bind="kendoGrid: ordersDetailsGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="address-change-modal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header grey-blue">
+                            <h4 class="modal-title">
+                                @HtmlHelperExtra.Resource("ChangeDeliveryAddress", l, c, d)
+                            </h4>
+                            <button type="button" class="btn-close" data-bind="click: cancelAddressChange"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <div class="header check margin-bottom-15" style="border-top: 0">
+                                    <h3>
+                                        @HtmlHelperExtra.Resource("ExistingDeliveryAddress", l, c, d)
+                                    </h3>
+                                </div>
+                                <!-- ko template: { name: 'address-display-template' } --><!-- /ko -->
+                            </div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("SelectAlternativeDeliveryAddress", l, c, d)
+                            </h4>
+                            <div id="address-wrapper" data-bind="with: addressManagementModel">
+                                <!-- ko template: { name: 'trade-address-template' } --><!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="line-inspect-modal" class="modal fade" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header grey-blue">
+                            <h4 class="modal-title">
+                                @HtmlHelperExtra.Resource("OrderNumber", l, c, d)
+                                <span data-bind="text: orderDetailsOrderNumber"></span>
+                                <span class="margin-left-15">
+                                    @HtmlHelperExtra.Resource("LineNumber", l, c, d):
+                                    <span data-bind="with: inspectingLine">
+                                        <span data-bind="text: LineNumber"></span>
+                                    </span>
+                                </span>
+                            </h4>
+                            <button type="button" class="btn-close" aria-label="Close" data-bind="click: hideLineInspectModal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="page-blocker" data-bind="flexVisible: lineBusy, toggleOpacity: lineBusy">
+                                <div class="spinner-border"></div>
+                                <h4>
+                                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                </h4>
+                            </div>
+                            <div class="d-flex" data-bind="with: inspectingLine">
+                                <div>
+                                    <!-- ko if: ImageID -->
+                                    <a href="javascript" data-bind="click: function (data, event) { $parent.largeImage($data); event.stopPropagation(); }">
+                                        <img class="thumb margin-right-15 margin-bottom-15" data-bind="attr: { src: '/image@(Framework.WebPFallback)/156/' + ImageID }" />
+                                    </a>
+                                    <!-- /ko -->
+                                </div>
+                                <div>
+                                    <h5>
+                                        @HtmlHelperExtra.Resource("Name", l, c, d): <span data-bind="text: Description"></span>
+                                    </h5>
+                                    <h5>
+                                        @HtmlHelperExtra.Resource("ProductPartNumber", l, c, d): <span data-bind="text: Product"></span>
+                                    </h5>
+                                    <a href="javascript:;" class="check-stock display-block margin-bottom-20" data-bind="click: (data) => { $parent.stockInfoModel.showStockInfo(data, 0) }">
+                                        @HtmlHelperExtra.Resource("CheckStock", l, c, d)
+                                    </a>
+                                </div>
+                            </div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("ChangeQuantity", l, c, d)
+                            </h4>
+                            <div class="d-flex">
+                                <div id="line-quantity" data-bind="css: { 'increase': isLineQuantityIncrease, 'update-error': lineUpdateErrored }, component: { name: 'mdc-text-field-numeric-component', params: lineQuantityParams }"></div>
+                                <!-- ko if: isLineQuantityIncrease -->
+                                <span class="text-warning">
+                                    @HtmlHelperExtra.Resource("QuantityIncreaseWarning", l, c, d)
+                                </span>
+                                <!-- /ko -->
+                                <!-- ko if: lineUpdateErrored -->
+                                <span class="text-danger" data-bind="text: lineUpdateErrorMessage"></span>
+                                <!-- /ko -->
+                            </div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("RequestExtension", l, c, d)
+                            </h4>
+                            <div class="d-flex">
+                                <div id="reserve-date" data-bind="css: { 'increase': isDateExtension }, component: { name: 'mdc-datepicker-component', params: reserveDatePicker }"></div>
+                                <!-- ko if: isDateExtension -->
+                                <span class="text-warning">
+                                    @HtmlHelperExtra.Resource("ExtensionWarning", l, c, d)
+                                </span>
+                                <!-- /ko -->
+                            </div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("ChangeLineReference", l, c, d)
+                            </h4>
+                            <div id="line-reference" class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: lineReferenceParams }"></div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("ModifyMemo", l, c, d)
+                            </h4>
+                            <div id="line-memo" data-bind="component: { name: 'mdc-text-area-component', params: lineMemoParams }"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <span class="save-message text-success" data-bind="inlineFlexVisible: lineSaved, toggleOpacity: lineSaved">
+                                <span>
+                                    @HtmlHelperExtra.Resource("ManageAccountSaved", l, c, d)
+                                </span>
+                                <span class="material-icons">
+                                    check
+                                </span>
+                            </span>
+                            <span class="save-message text-danger">
+                                @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                            </span>
+                            <button class="btn btn-secondary" data-bind="click: hideLineInspectModal">
+                                @HtmlHelperExtra.Resource("CloseProperCase", l, c, d)
+                            </button>
+                            <button class="btn btn-success" data-bind="click: saveLineInspect">
+                                @HtmlHelperExtra.Resource("MoodboardSave", l, c, d)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        function getReserveOrders() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.ReserveOrders.Results));
+        }
+
+        function getInvoiceAddress() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
+        }
+
+        function getDefaultDeliveryReference() {
+            return '@(Model.DefaultDeliveryReference)'
+        }
+
+    </script>
+
+    @Render.Script("~/bundles/js/trade-reserve-orders")
+}

@@ -1,0 +1,680 @@
+﻿@model FixedPageViewModel_Stockists
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@Render.StylesPreload("~/bundles/css/stockists")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/stockists-mobile")
+}
+@Scripts.Render("~/bundles/js/stockists")
+<script type="text/html" id="ko-featured-stockist-template">
+    <div class="stockist featured-stockist">
+        <!-- ko if: Image -->
+        <img width="200"
+             height="200"
+             data-bind="attr: { src: `/Content/images/stockist/featured/${Image}`, alt: Name }" />
+        <!-- /ko -->
+        <div class="stockist-detail"
+             data-bind="click: $parent.loadStockistDetail">
+            <strong class="d-block mb-3" data-bind="text: Name"></strong>
+            <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
+            <!-- ko if: Telephone -->
+            <span class="d-block">
+                T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+            </span>
+            <!-- /ko -->
+            <!-- ko if: Email -->
+            <span class="d-block">
+                T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+            </span>
+            <!-- /ko -->
+        </div>
+    </div>
+</script>
+<script type="text/javascript">
+    window.getSelectedBrands = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.SelectedBrands))
+    }
+    window.getSelectedProductTypes = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.SelectedProductTypes))
+    }
+</script>
+<script type="text/html" id="ko-stockist-template">
+    <div class="stockist">
+        <div class="stockist-inner">
+            <div class="stockist-detail" data-bind="click: $parent.loadStockistDetail">
+                <strong class="d-block mb-3">
+                    <span class="me-3" data-bind="text: Name"></span>
+                    <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
+                </strong>
+                <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
+                <!-- ko if: Telephone -->
+                <span class="d-block">
+                    T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+                </span>
+                <!-- /ko -->
+                <!-- ko if: Email -->
+                <span class="d-block">
+                    T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+                </span>
+                <!-- /ko -->
+            </div>
+            <div class="stockist-brands">
+                <!-- ko if: DG -->
+                <img width="425"
+                     height="170"
+                     alt="Designers Guild"
+                     src="/Content/images/logo/small/designers-guild@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: CL -->
+                <img width="425"
+                     height="170"
+                     alt="Christian Lacroix"
+                     src="/Content/images/logo/small/christian-lacroix@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: RC -->
+                <img width="425"
+                     height="170"
+                     alt="Royal Collection"
+                     src="/Content/images/logo/small/the-royal-collection@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: RL -->
+                <img width="425"
+                     height="170"
+                     alt="Ralph Lauren"
+                     src="/Content/images/logo/small/ralph-lauren@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: WY -->
+                <img width="425"
+                     height="170"
+                     alt="William Yeoward"
+                     src="/Content/images/logo/small/william-yeoward@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: JD -->
+                <img width="240"
+                     height="178"
+                     alt="John Derian"
+                     src="/Content/images/logo/small/john-derian@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+                <!-- ko if: EH -->
+                <img width="366"
+                     height="219"
+                     alt="English Heritage"
+                     src="/Content/images/logo/small/english-heritage@(Framework.WebpOrPngExtension)" />
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/javascript">
+    window.googleMapsReady = () => {
+
+    }
+</script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@(System.Web.Configuration.WebConfigurationManager.AppSettings["googleMapsAPIKey"])&callback=googleMapsReady"></script>
+<form id="stockist-search-form"
+      class="pt-3"
+      data-bind="with: stockistsModel"
+      onsubmit="return false;">
+    <div id="stockist-filters-offcanvas"
+         class="offcanvas offcanvas-start"
+         tabindex="-1"
+         aria-labelledby="offcanvas-label">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvas-label">
+                @HtmlHelperExtra.Resource("Filters", l, c, d)
+            </h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="stockist-options">
+                <h5>
+                    @HtmlHelperExtra.Resource("StockistBrand", l, c, d)
+                </h5>
+                <div id="brands">
+                    <div class="form-check">
+                        <input id="brand-dg"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="dg"
+                               data-bind="checked: selectedBrands, checkedValue: 'dg'">
+                        <label for="brand-dg"
+                               class="form-check-label">
+                            Designers Guild
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-wy"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="wy"
+                               data-bind="checked: selectedBrands, checkedValue: 'wy'">
+                        <label for="brand-wy"
+                               class="form-check-label">
+                            William Yeoward
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-rc"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="rc"
+                               data-bind="checked: selectedBrands, checkedValue: 'rc'">
+                        <label for="brand-rc"
+                               class="form-check-label">
+                            Royal Collection
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-cl"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="cl"
+                               data-bind="checked: selectedBrands, checkedValue: 'cl'">
+                        <label for="brand-cl"
+                               class="form-check-label">
+                            Christian Lacroix
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-rl"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="rl"
+                               data-bind="checked: selectedBrands, checkedValue: 'rl'">
+                        <label for="brand-rl"
+                               class="form-check-label">
+                            Ralph Lauren
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-jd"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="jd"
+                               data-bind="checked: selectedBrands, checkedValue: 'jd'">
+                        <label for="brand-jd"
+                               class="form-check-label">
+                            John Derian
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="brand-eh"
+                               class="form-check-input"
+                               name="brand"
+                               type="checkbox"
+                               value="eh"
+                               data-bind="checked: selectedBrands, checkedValue: 'eh'">
+                        <label for="brand-eh"
+                               class="form-check-label">
+                            English Heritage
+                        </label>
+                    </div>
+                </div>
+                <h5 class="mt-5">
+                    @HtmlHelperExtra.Resource("StockistProducts", l, c, d)
+                </h5>
+                <div id="product-types">
+                    <div class="form-check">
+                        <input id="product-type-fabric"
+                               class="form-check-input"
+                               name="product-type"
+                               type="checkbox"
+                               value="fabric"
+                               data-bind="checked: selectedProductTypes, checkedValue: 'fabric'">
+                        <label for="product-type-fabric"
+                               class="form-check-label">
+                            @HtmlHelperExtra.Resource("StockistProductsFabricAndTrimmings", l, c, d)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="product-type-wallpaper"
+                               class="form-check-input"
+                               name="product-type"
+                               type="checkbox"
+                               value="wallpaper"
+                               data-bind="checked: selectedProductTypes, checkedValue: 'wallpaper'">
+                        <label for="product-type-wallpaper"
+                               class="form-check-label">
+                            @HtmlHelperExtra.Resource("StockistProductsWallpaper", l, c, d)
+                        </label>
+                    </div>
+                    @if (c != 238)
+                    {
+                        <div class="form-check">
+                            <input id="product-type-paint"
+                                   class="form-check-input"
+                                   name="product-type"
+                                   type="checkbox"
+                                   value="paint"
+                                   data-bind="checked: selectedProductTypes, checkedValue: 'paint'">
+                            <label for="product-type-paint"
+                                   class="form-check-label">
+                                @HtmlHelperExtra.Resource("StockistProductsPaint", l, c, d)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input id="product-type-furniture"
+                                   class="form-check-input"
+                                   name="product-type"
+                                   type="checkbox"
+                                   value="furniture"
+                                   data-bind="checked: selectedProductTypes, checkedValue: 'furniture'">
+                            <label for="product-type-furniture"
+                                   class="form-check-label">
+                                @HtmlHelperExtra.Resource("StockistProductsFurniture", l, c, d)
+                            </label>
+                        </div>
+                    }
+                    <div class="form-check">
+                        <input id="product-type-rugs"
+                               class="form-check-input"
+                               name="product-type"
+                               type="checkbox"
+                               value="rugs"
+                               data-bind="checked: selectedProductTypes, checkedValue: 'rugs'">
+                        <label for="product-type-rugs"
+                               class="form-check-label">
+                            @HtmlHelperExtra.Resource("StockistProductsRugs", l, c, d)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="product-type-accessories"
+                               class="form-check-input"
+                               name="product-type"
+                               type="checkbox"
+                               value="accessories"
+                               data-bind="checked: selectedProductTypes, checkedValue: 'accessories'">
+                        <label for="product-type-accessories"
+                               class="form-check-label">
+                            @HtmlHelperExtra.Resource("StockistProductsAccessories", l, c, d)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="product-type-bed-and-bath"
+                               class="form-check-input"
+                               name="product-type"
+                               type="checkbox"
+                               value="bed-and-bath"
+                               data-bind="checked: selectedProductTypes, checkedValue: 'bed-and-bath'">
+                        <label for="product-type-bed-and-bath"
+                               class="form-check-label">
+                            @HtmlHelperExtra.Resource("StockistProductsBedAndBath", l, c, d)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+        <div class="spinner-border"></div>
+        <h4 data-bind="text: busyMessage"></h4>
+    </div>
+    <div class="d-none">
+        @if (Model.Longitude.HasValue)
+        {
+            <span data-bind="init: { convert: parseFloat }, text: longitude, remove">
+                @Model.Longitude
+            </span>
+        }
+        @if (Model.Latitude.HasValue)
+        {
+            <span data-bind="init: { convert: parseFloat }, text: latitude, remove">
+                @Model.Latitude
+            </span>
+        }
+        @if (!String.IsNullOrEmpty(Model.SearchTerm))
+        {
+            <span data-bind="init: { convert: parseString }, text: searchTerm, remove">
+                @Model.SearchTerm
+            </span>
+        }
+        <span data-bind="init: { convert: parseBool }, text: ready, remove">
+            true
+        </span>
+    </div>
+    <input id="lat"
+           type="hidden"
+           name="lat"
+           value="@Model.Latitude"
+           data-bind="value: latitude" />
+    <input id="lng"
+           type="hidden"
+           name="lng"
+           value="@Model.Longitude"
+           data-bind="value: longitude" />
+    <div id="featured-stockists"
+         class="grid"
+         style="--bs-columns: @(MathExtensions.Clamp(Model.StockistSearchSelect.featuredStockists.Count, 3, 4))"
+         data-bind="foreachInit: { name: 'ko-featured-stockist-template', data: featuredStockists, createElement: createStockistViewModel }">
+        @foreach (var stockist in Model.StockistSearchSelect.featuredStockists)
+        {
+            <div class="stockist featured-stockist"
+                 data-bind="click: $parent.loadStockistDetail">
+                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                    @Html.Raw(JsonConvert.SerializeObject(stockist))
+                </span>
+                @if (!Request.IsLocal && !String.IsNullOrEmpty(stockist.Image))
+                {
+                    <img src="/Content/images/stockist/featured/@(stockist.Image)"
+                         width="200"
+                         height="200" />
+                }
+                <div class="stockist-detail">
+                    <strong class="d-block mb-3">
+                        @stockist.Name
+                    </strong>
+                    <span class="d-block mb-3">
+                        @stockist.AddressDisplay
+                    </span>
+                    @if (!String.IsNullOrEmpty(stockist.Telephone))
+                    {
+                        <span class="d-block">
+                            T. <a href="tel:@(stockist.Telephone)">@stockist.Telephone</a>
+                        </span>
+                    }
+                    @if (!String.IsNullOrEmpty(stockist.Email))
+                    {
+                        <span class="d-block">
+                            <a href="mailto:@(stockist.Email)">@stockist.Email</a>
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div id="stockists-toolbar">
+        <h5 class="text-center pt-2 pb-3 text-uppercase">
+            @HtmlHelperExtra.Resource("LifestyleGalleryFindLocalStockist", l, c, d)
+        </h5>
+        <div class="flex">
+            <select id="country"
+                    class="form-select"
+                    name="country"
+                    data-bind="keepElement: countryCode, value: countryCode">
+                @foreach (var objCountry in Model.Definition.stockistCountries.OrderBy(p => p.Name))
+                {
+                    <option value="@objCountry.Code" @(Model.CountryCode == objCountry.Code ? "selected" : "")>
+                        @objCountry.Name
+                    </option>
+                }
+            </select>
+            <input id="search-term"
+                   class="form-control"
+                   name="search-term"
+                   placeholder="@HtmlHelperExtra.Resource("StockistPlaceHolder", l, c, d)"
+                   maxlength="50"
+                   data-bind="keepElement: searchTerm, value: searchTerm, enterKey: search" />
+
+            <button type="button"
+                    class="btn btn-secondary"
+                    data-bind="click: search">
+                @HtmlHelperExtra.Resource("StockistSearch", l, c, d)
+            </button>
+            <button id="location"
+                    class="btn btn-link"
+                    type="button"
+                    data-bind="click: locationPrompt">
+                <i class="material-icons"></i>
+                <span>
+                    @HtmlHelperExtra.Resource("StockistUseCurrentLocation", l, c, d)
+                </span>
+            </button>
+        </div>
+    </div>
+    <div id="stockists-panel"
+         class="grid">
+        <div id="stockist-filters"
+             style="display: none"
+             data-bind="visible: haveSearched">
+            <button class="btn btn-secondary"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    href="#stockist-filters-offcanvas"
+                    role="button"
+                    aria-controls="stockist-filters-offcanvas">
+                @HtmlHelperExtra.Resource("Filters", l, c, d)
+            </button>
+        </div>
+        <div id="stockist-results">
+            <h5 class="mb-5">
+                <span style="display: none" class="btn" data-bind="visible: haveSearched">
+                    @HtmlHelperExtra.Resource("SelectedRetailersDecorators", l, c, d)
+                    <span data-bind="text: searchResultsDisplay"></span>
+                </span>
+            </h5>
+            <div data-bind="template: { name: 'ko-stockist-template', foreach: searchResults }"></div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="stockist-detail-modal">
+        <div class="modal-dialog modal-lg modal-xl">
+            <div class="page-blocker" data-bind="flexVisible: detailBusy, toggleOpacity: detailBusy">
+                <div class="spinner-border"></div>
+                <h5 data-bind="text: detailBusyMessage"></h5>
+            </div>
+            <div class="modal-content">
+                <div class="modal-header" data-bind="with: inspectingStockist">
+                    <h5 class="modal-title" data-bind="text: Name"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" data-bind="with: inspectingStockist">
+                    <div class="d-flex">
+                        <div>
+                            <div class="d-flex">
+                                <div>
+                                    <p>
+                                        <!-- ko if: Name -->
+                                        <strong class="d-block mb-3">
+                                            <span data-bind="text: Name" class="d-block"></span>
+                                            <!-- ko if: typeof Distance != 'undefined' -->
+                                            <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
+                                            <!-- /ko -->
+                                        </strong>
+                                        <!-- /ko -->
+                                        <!-- ko if: Address -->
+                                        <span data-bind="text: Address"></span><br />
+                                        <!-- /ko -->
+                                        <!-- ko if: City -->
+                                        <span data-bind="text: City"></span><br />
+                                        <!-- /ko -->
+                                        <!-- ko if: County -->
+                                        <span data-bind="text: County"></span><br />
+                                        <!-- /ko -->
+                                        <!-- ko if: Postcode -->
+                                        <span data-bind="text: Postcode"></span><br /><br />
+                                        <!-- /ko -->
+                                    </p>
+                                    <!-- ko if: Telephone -->
+                                    <p>
+                                        @HtmlHelperExtra.Resource("Tel", l, c, d). <strong data-bind="text: Telephone"></strong>
+                                    </p>
+                                    <!-- /ko -->
+                                    <!-- ko if: Fax -->
+                                    <p>
+                                        @HtmlHelperExtra.Resource("Fax", l, c, d). <strong data-bind="text: Fax"></strong>
+                                    </p>
+                                    <!-- /ko -->
+                                    <!-- ko if: Email -->
+                                    <p>
+                                        @HtmlHelperExtra.Resource("email", l, c, d). <a data-bind="attr: { href: 'mailto:' + Email }, text: Email"></a>
+                                    </p>
+                                    <!-- /ko -->
+                                    <!-- ko if: Website -->
+                                    <p>
+                                        @HtmlHelperExtra.Resource("Website", l, c, d). <a data-bind="attr: { href: 'https://' + Website?.replace(/https?:\/\//, '') }, text: Website" href="#" target="_blank"></a>
+                                    </p>
+                                    <!-- /ko -->
+                                    <ul class="list-unstyled" data-bind="with: detail">
+                                        <!-- ko if: Facebook -->
+                                        <li>
+                                            <a data-bind="attr: { href: Facebook }" href="#" target="_blank">
+                                                <img src="/Content/images/icon/icon-facebook.png" alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
+                                            </a>
+                                        </li>
+                                        <!-- /ko -->
+                                        <!-- ko if: Twitter -->
+                                        <li>
+                                            <a data-bind="attr: { href: Twitter }" href="#" target="_blank">
+                                                <img src="/Content/images/icon/icon-twitter.png" alt="@HtmlHelperExtra.Resource("Twitter", l, c, d)" />
+                                            </a>
+                                        </li>
+                                        <!-- /ko -->
+                                    </ul>
+                                    <div class="opening-times" data-bind="with: detail">
+                                        <!-- ko if: ShowOpeningTimes === true -->
+                                        <div>
+                                            <p><strong>@HtmlHelperExtra.Resource("OpeningTimes", l, c, d)</strong></p>
+                                            <ul>
+                                                <!-- ko if: OpenMonday || ClosedMonday -->
+                                                <li>
+                                                    <span class="day">
+                                                        @HtmlHelperExtra.Resource("Monday", l, c, d)
+                                                    </span>
+                                                    <span class="time" data-bind="text: OpenMonday ? OpenMonday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedMonday ? ClosedMonday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenMonday || ClosedMonday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Monday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenTuesday || ClosedTuesday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenTuesday ? OpenTuesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedTuesday ? ClosedTuesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenTuesday || ClosedTuesday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenWednesday || ClosedWednesday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenWednesday ? OpenWednesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedWednesday ? ClosedWednesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenWednesday || ClosedWednesday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenThursday || ClosedThursday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenThursday ? OpenThursday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedThursday ? ClosedThursday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenThursday || ClosedThursday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenFriday || ClosedFriday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenFriday ? OpenFriday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedFriday ? ClosedFriday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenFriday || ClosedFriday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenSaturday || ClosedSaturday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenSaturday ? OpenSaturday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedSaturday ? ClosedSaturday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenSaturday || ClosedSaturday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko if: OpenSunday || ClosedSunday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
+                                                    <span class="time" data-bind="text: OpenSunday ? OpenSunday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                    <span class="time" data-bind="text: ClosedSunday ? ClosedSunday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: OpenSunday || ClosedSunday -->
+                                                <li>
+                                                    <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
+                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                                </li>
+                                                <!-- /ko -->
+                                            </ul>
+                                        </div>
+                                        <!-- /ko -->
+                                        <div class="service-offering">
+                                            <!-- ko if: ServiceOffer && Info -->
+                                            <div class="stockLeft">
+                                                <p><strong>@HtmlHelperExtra.Resource("ServiceOffer", l, c, d)</strong></p>
+
+                                                <p data-bind="html: ServiceOffer"></p>
+                                            </div>
+                                            <div class="stockRight">
+                                                <p><strong>@HtmlHelperExtra.Resource("Info", l, c, d)</strong></p>
+
+                                                <p data-bind="html: Info"></p>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: ServiceOffer && Info -->
+                                            <!-- ko if: ServiceOffer -->
+                                            <div class="stockLeft" style="width:98%;">
+                                                <p><strong>@HtmlHelperExtra.Resource("ServiceOffer", l, c, d)</strong></p>
+
+                                                <p data-bind="html: ServiceOffer"></p>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko if: Info -->
+                                            <div class="stockRight" style="width:98%; margin-left:0;">
+                                                <p><strong>@HtmlHelperExtra.Resource("Info", l, c, d)</strong></p>
+
+                                                <p data-bind="html: Info"></p>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ko if: Image -->
+                                <img class="stockist-img" data-bind="attr: { src: '/Content/images/stockist/featured/' + Image }" alt="" />
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <div id="map-canvas"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

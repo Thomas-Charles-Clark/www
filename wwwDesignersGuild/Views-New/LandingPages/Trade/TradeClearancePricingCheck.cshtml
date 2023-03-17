@@ -1,0 +1,29 @@
+﻿@model wwwDesignersGuild.Controllers.tradeClearancePricingCheckViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    
+    @* Checked 13/07/2022 *@
+}
+
+@if (Convert.ToBoolean(Session["memberDisplayTradePrice"]))
+{
+    // Great: we can allow the display of the page!
+}
+else
+{
+    // Hmm.
+    <div class="alert alert-danger">
+        <p>
+            @HtmlHelperExtra.Resource("tradeClearancePricingState", l, c, d)
+        </p>
+        <p style="margin-bottom: 0">
+            <a href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, null, dgContentType.landingPage, 107, null, null, null)">
+                @HtmlHelperExtra.Resource("tradeClearancePricingState2", l, c, d)
+            </a>
+        </p>
+    </div>
+}

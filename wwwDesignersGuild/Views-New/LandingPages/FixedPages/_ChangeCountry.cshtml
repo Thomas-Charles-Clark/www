@@ -1,0 +1,55 @@
+﻿@model FixedPageViewModel<cmsCountryDefinition>
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@Render.StylesPreload("~/bundles/css/change-country")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/change-country-mobile")
+}
+<h4 class="text-uppercase py-4">
+    @HtmlHelperExtra.Resource("ChangeCountry", l, c, d)
+</h4>
+@{ 
+    foreach (var regionId in Model.Definition.countryRegions
+        .OrderBy(p => p.SortOrder)
+        .GroupBy(p => p.RegionID)
+        .Select(grp => grp.Key))
+    {
+        var objRegion = Model.Definition.countryRegions.Where(p => p.RegionID == regionId).First();
+
+        <div class="grid region-grid">
+            <div class="region-header">   
+                <h5 class="text-uppercase">
+                    @objRegion.Name
+                </h5>
+            </div>
+           @foreach (countryItem objCountry in Model.Definition.countryItems.Where(p => p.RegionID == regionId).OrderBy(p => p.SortOrder))
+            {
+                <div class="country">
+                    <a href="@(dgFramework.buildUrl(dgContentType.landingPage, 0, objCountry))">
+                        <img src="~/Content/images/country/@(objCountry.CountryID.ToString())@(Framework.WebpOrPngExtension)?v=1"
+                             width="62"
+                             height="46"
+                             alt="@(objCountry.Name)"
+                             title="@(objCountry.Name)" />
+                        <div>
+                            <span>
+                                @(objCountry.Name)
+                            </span>
+                            <span>
+                                @(objCountry.LanguageCode.ToUpper())
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+}

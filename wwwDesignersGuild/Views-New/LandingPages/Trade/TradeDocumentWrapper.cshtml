@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+    
+    @* Checked 13/07/2022 *@
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>
+        @ViewBag.Title
+    </title>
+    @Styles.Render("~/bundles/css/trade-document-wrapper")
+    @Render.StylesPreload("~/bundles/css/bootstrap")
+    @Render.ScriptDefer("~/bundles/js/bootstrap")
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Material+Icons" rel="stylesheet" />
+
+    <script type="text/javascript">
+        window.init = (frame) => {
+            document.getElementById('busy').classList.add('hide');
+        }
+        window.print = () => {
+            window.frames[0].focus();
+            window.frames[0].print();
+        }
+        window.email = () => {
+            fetch('@ViewBag.EmailLink', {
+                method: 'GET'
+            }).then(data => {
+                bootstrap.Modal.getOrCreateInstance(document.querySelector('#success-modal')).show();
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="header">
+        <div class="hstack gap-3">
+            <button class="btn btn-secondary" onclick="email();">
+                @ViewBag.Email
+            </button>
+            <button class="btn btn-secondary" onclick="print();">
+                @ViewBag.Print
+            </button>
+        </div>
+    </div>
+    <div id="content">
+        <div id="busy"
+             class="page-blocker">
+            <div class="spinner-border"></div>
+            <h4>
+                @ViewBag.PleaseWait
+            </h4>
+        </div>
+        <iframe id="document-frame" src="@(Html.Raw(ViewBag.Contents))" onload="init(this);"></iframe>
+    </div>
+    <div id="success-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">
+                        @ViewBag.EmailSentTo
+                        <a href="mailto:@ViewBag.UserEmail">@ViewBag.UserEmail</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

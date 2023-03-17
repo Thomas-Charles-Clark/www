@@ -1,0 +1,57 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeDownloadsViewModel
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+@if (!Model.Permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureDownload", l, c, d)
+            @(Model.TradeAccountModel.AccountDetails.Code) - @(Model.TradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.TradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.Script("~/bundles/js/jquery")
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.DevExpress().GetStyleSheets(
+                new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+                new StyleSheet { ExtensionSuite = ExtensionSuite.Editors }
+    )
+    @Html.DevExpress().GetScripts(
+                new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+                new Script { ExtensionSuite = ExtensionSuite.Editors }
+    )
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            @using (Html.BeginForm())
+            {
+                @Html.Partial("~/Views-New/LandingPages/Trade/TradeDownloadFileManagerPartial.cshtml", Model)
+                @Html.Hidden("objMaster", JsonConvert.SerializeObject(Model.MasterDefinition))
+                @Html.Hidden("countryId", c)
+                @Html.Hidden("languageId", l)
+            }
+        </div>
+    </div>
+    @Render.Script("~/bundles/js/trade-downloads")
+}

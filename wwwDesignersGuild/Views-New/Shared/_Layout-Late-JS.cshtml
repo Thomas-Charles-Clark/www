@@ -1,0 +1,61 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var contentId = objMaster.UrlBreakdown.ContentId;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+
+}<script type="text/javascript" defer>
+    document.querySelectorAll('.carousel').forEach(c => {
+        c.addEventListener('slide.bs.carousel', (event) => {
+            document.querySelectorAll(`[data-bs-target="#${event.target.id}"]`).forEach(b => {
+                b.classList.remove('active');
+            });
+            let active = document.querySelector(`[data-bs-target="#${event.target.id}"][data-bs-slide-to="${event.to}"]`);
+            if (active)
+                active.classList.add('active');
+        });
+    });
+    //document.addEventListener('show.bs.modal', (e) => {
+    //    // e.target
+    //    let otherModalElements = [...document.querySelectorAll('.modal.show')];
+        
+    //    if (otherModalElements.length) {
+    //        otherModalElements = otherModalElements.flatMap(m => {
+    //            return m == e.target ? [] : [m];
+    //        });
+            
+    //        let z = 1050;
+
+    //        if (otherModalElements.length > 1) {
+    //            for (i = 0; i < otherModalElements.length; i++) {
+    //                if (+otherModalElements[i].style.zIndex > z)
+    //                    z = +otherModalElements[i].style.zIndex
+    //            }
+    //        }
+
+    //        let modal = bootstrap.Modal.getOrCreateInstance(e.target);
+
+    //        function setZIndexing () {
+                
+    //            modal._backdrop._element.style.zIndex = z + 5;
+
+    //            modal._element.style.zIndex = z + 10;
+
+    //            modal._element.removeEventListener('shown.bs.modal', setZIndexing);
+    //        }
+
+    //        e.target.addEventListener('shown.bs.modal', setZIndexing)
+    //    }
+    //});
+</script>

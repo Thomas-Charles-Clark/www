@@ -1,0 +1,411 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeAccountRequestViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+}
+<script src='https://www.google.com/recaptcha/api.js?hl=@(objMaster.UrlBreakdown.countryDetails.LanguageCode)' async="async" defer="defer"></script>
+
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+
+<div class="row">
+    <div class="col-full header">
+        <h1>@(Model.heading)</h1>
+        <span>@(Model.subHeading)</span>
+    </div>
+</div>
+
+<div data-bind="stopBinding">
+    <div id="trade-wrapper">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="trade-account-request" style="display: none" data-bind="visible: true">
+            <div class="address-form">
+                <div class="page-blocker" data-bind="flexVisible: submitBusy, toggleOpacity: submitBusy">
+                    <div class="spinner-border"></div>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h4>
+                </div>
+                <div style="display: none;"
+                     class="alert alert-success"
+                     data-bind="visible: success()">
+                    <h3 class="alert-heading">
+                        @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                    </h3>
+                    <p>
+                        @HtmlHelperExtra.Resource("TradeAccountRequestSuccess2", l, c, d)
+                    </p>
+                    @if (Model.immediateOrderRequested) { }
+                    else
+                    {
+                        <p style="display: none" data-bind="visible: !immediateOrderRequested()">
+                            @HtmlHelperExtra.Resource("TradeAccountRequestSuccess3a", l, c, d)
+                            <a href="javascript:;" data-bind="click: function() { setImmediateOrderRequest() }">
+                                @HtmlHelperExtra.Resource("checkoutTradeAccountRegistrationMessage2", l, c, d)
+                            </a>
+                        </p>
+                        <p style="display: none" data-bind="visible: immediateOrderRequested()">
+                            @HtmlHelperExtra.Resource("TradeAccountRequestSuccess3b", l, c, d)
+                        </p>
+                    }
+                    <p class="mb-0">
+                        @HtmlHelperExtra.Resource("TradeAccountRequestSuccess4", l, c, d)
+                    </p>
+                </div>
+                <div data-bind="visible: !success()">
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyNameParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: businessTypeDropDownList }"></div>
+                    <div class="mb-3" data-bind="visible: channelId() === 0, component: { name: 'mdc-text-field-component', params: businessTypeOtherParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyRegistrationParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
+                    <div class="mb-3" data-bind="visible: vatRegistered, component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
+                    <div class="mb-3" data-bind="visible: eoriRegistered, component: { name: 'mdc-text-field-component', params: eoriNumberParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: companyTypeDropDownList }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouSellOnlineParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: websiteParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: tradingForDropDownList }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: contactTypeDropDownList }"></div>
+                    <div class="mb-3" data-bind="visible: contactTypeId() == 0, component: { name: 'mdc-text-field-component', params: positionOtherParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: titleDropDownList }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: fullNameParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: phoneNumberParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
+                    <p>
+                        @HtmlHelperExtra.Resource("TradeAccountRequestEmailGather", l, c, d)
+                    </p>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: orderConfirmationSameAsPrimaryParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: orderConfirmationEmailParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: invoicesStatementsSameAsPrimaryParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: invoicesStatementsEmailParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: productNewsEventsSameAsPrimaryParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: productNewsEventsEmailParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: pricelistsSameAsPrimaryParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: pricelistsEmailParams }"></div>
+                    <div class="form-group">
+                        <h5 class="field-label mt-5 mb-4">
+                            @HtmlHelperExtra.Resource("TradeAccountInvoiceAddress", l, c, d)
+                            <sup>*</sup>
+                        </h5>
+                        <div data-bind="with: invoiceAddressSearch">
+                            <div data-bind="with: addressObject">
+                                <div class="hstack gap-0 address-search-wrapper mb-3">
+                                    <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
+                                    <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                                </div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex-heading my-4">
+                            <h5 class="field-label">
+                                @HtmlHelperExtra.Resource("TradeAccountDeliveryAddress", l, c, d)
+                                <sup>*</sup>
+                            </h5>
+                            <div data-bind="component: { name: 'mdc-checkbox-component', params: deliverySameAsInvoiceParams }"></div>
+                        </div>
+                        <div data-bind="visible: !deliverySameAsInvoice(), with: deliveryAddressSearch">
+                            <div data-bind="with: addressObject">
+                                <div class="hstack gap-0 address-search-wrapper mb-3">
+                                    <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
+                                    <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                                </div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex-heading my-4">
+                            <h5 class="field-label">
+                                @HtmlHelperExtra.Resource("TradeAccountVisitAddress", l, c, d)
+                                <sup>*</sup>
+                            </h5>
+                            <div data-bind="component: { name: 'mdc-checkbox-component', params: visitSameAsInvoiceParams }"></div>
+                        </div>
+                        <div data-bind="visible: !visitSameAsInvoice(), with: visitAddressSearch">
+                            <div data-bind="with: addressObject">
+                                <div class="hstack gap-0 address-search-wrapper mb-3">
+                                    <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
+                                    <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                                </div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-area-component', params: brandsCurrentlyWorkedWithParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-area-component', params: whyWorkWithDGParams }"></div>
+                    <!-- ko if: availableProductTypeGroups().length -->
+                    <h5 class="field-label mt-5 mb-4">
+                        @HtmlHelperExtra.Resource("WhichBrandsInterestedIn", l, c, d)
+                        <sup>*</sup>
+                    </h5>
+                    <div id="interest-wrapper" class="form-group">
+                        <table id="lead-interest-table"
+                               data-bind="validationElement: leadInterests">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <!-- ko foreach: availableBrandGroups -->
+                                    <th data-bind="html: Key().Name"></th>
+                                    <!-- /ko -->
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ko foreach: availableProductTypeGroups -->
+                                <tr>
+                                    <th>
+                                        <span data-bind="text: Key().Name"></span>
+                                    </th>
+                                    <!-- ko foreach: Enumerable.From($data.source).OrderBy('$.BrandSortOrder').ToArray() -->
+                                    <!-- ko if: Available -->
+                                    <td>
+                                        <label class="col-form-label pointer" data-bind="validationOptions: { insertMessages: false }">
+                                            <input type="checkbox" class="interest pointer" data-bind="checked: $parentContext.$parent.leadInterests, checkedValue: $parentContext.$parent.getBrandProductTypeGroupObject($data.BrandID, $data.ProductTypeGroupID)" />
+                                        </label>
+                                    </td>
+                                    <!-- /ko -->
+                                    <!-- ko ifnot: Available -->
+                                    <td></td>
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+                                    <td>
+                                        <span class="text-left" data-bind="visible: !((($data.ProductTypeGroupID == 11) || ($data.ProductTypeGroupID == 12)) && ($parentContext.$parent.countryId() == 238))">
+                                            <a data-bind="attr: { href: 'javascript:;' }, click: function() { $parent.interestedInAllBrandsForProductType($data.Key().ProductTypeGroupID) }">
+                                                @HtmlHelperExtra.Resource("All", l, c, d)
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+                                <tr>
+                                    <td>
+                                        &nbsp;
+                                    </td>
+                                    <!-- ko foreach: availableBrandGroups -->
+                                    <td>
+                                        <a data-bind="attr: { href: 'javascript:;' }, click: function() { $parent.interestedInAllProductTypesForBrand($data.Key().BrandID) }">
+                                            @HtmlHelperExtra.Resource("All", l, c, d)
+                                        </a>
+                                    </td>
+                                    <!-- /ko -->
+                                    <td>
+                                        <span class="text-left">
+                                            <a data-bind="attr: { href: 'javascript:;' }, click: function() { interestedInEverything() }">
+                                                @HtmlHelperExtra.Resource("All", l, c, d)
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-3" style="display: none;" data-bind="visible: interestErrors.isAnyMessageShown()">
+                            <span class="text-danger" data-bind="validationMessage: leadInterests">
+                            </span>
+                        </div>
+                        <div class="text-center" data-bind="visible: mustOptIn">
+                            <div data-bind="component: { name: 'mdc-checkbox-component', params: potentiallyMandatoryOptInParams }"></div>
+                            <span class="validation-message" data-bind="validationMessage: potentiallyMandatoryOptIn"></span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <div class="form-group">
+                        <div class="g-recaptcha" data-sitekey="6LcweykUAAAAABVCfluv_8tvgXVviBywnK5L_3tj"></div>
+                        <div id="g-recaptcha-tip" class="error-message error-message-bordered text-center">
+                            <span class="text-danger text-large">
+                                @HtmlHelperExtra.Resource("FormsErrorCaptchaCompare", l, c, d)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: none;" data-bind="visible: formErrors.isAnyMessageShown()">
+                        <div class="mb-5 text-center">
+                            <span class="text-danger">
+                                @HtmlHelperExtra.Resource("TradeAccountFormCorrectErrors", l, c, d)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group text-center">
+                        <button id="tarf-submit" class="btn btn-secondary" data-bind="click: submit">
+                            @HtmlHelperExtra.Resource("RequestAccount", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="thank-you-modal"
+             class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                        </h4>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            @HtmlHelperExtra.Resource("TradeAccountRequestSuccess3b", l, c, d)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="warning-modal"
+             class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("Warning", l, c, d)
+                        </h4>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            @HtmlHelperExtra.Resource("TradeAccountFormWeNoticed1", l, c, d)
+                        </p>
+                        <!-- ko ifnot: companyRegistration -->
+                        <p class="absent-field">
+                            @HtmlHelperExtra.Resource("CompanyRegistrationNumber", l, c, d)
+                        </p>
+                        <!-- /ko -->
+                        <!-- ko ifnot: companyVATNumber -->
+                        <p class="absent-field">
+                            @HtmlHelperExtra.Resource("VATNumber", l, c, d)
+                        </p>
+                        <!-- /ko -->
+                        <!-- ko ifnot: companyEORINumber -->
+                        <p class="absent-field">
+                            @HtmlHelperExtra.Resource("EORINumber", l, c, d)
+                        </p>
+                        <!-- /ko -->
+                        <!-- ko ifnot: website -->
+                        <p class="absent-field">
+                            @HtmlHelperExtra.Resource("Website", l, c, d)
+                        </p>
+                        <!-- /ko -->
+                        <p>
+                            @HtmlHelperExtra.Resource("TradeAccountFormWeNoticed2", l, c, d)
+                        </p>
+                        <div class="vstack gap-3">
+                            <button class="btn btn-secondary" data-bind="click: ignoreWarningModal">
+                                @HtmlHelperExtra.Resource("TradeAccountFormWontProvide", l, c, d)
+                                <br />
+                                (@HtmlHelperExtra.Resource("TradeAccountFormSubmitWithout", l, c, d))
+                            </button>
+                            <button class="btn btn-dark" data-bind="click: closeWarningModal">
+                                @HtmlHelperExtra.Resource("TradeAccountFormWillProvide", l, c, d)
+                                <br />
+                                (@HtmlHelperExtra.Resource("ReturnToForm", l, c, d))
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function getAvailableCountries() {
+        return @(Html.Raw(Json.Encode(Model.availableCountries.OrderBy(p => p.Name))));
+    }
+
+    function getAvailableCounties(value) {
+        var initial = @Html.Raw(Json.Encode(Model.availableCounties));
+        var r = Enumerable.From(initial).Where(function (x) { return x.CountryCode === value }).ToArray();
+        return r;
+    }
+
+    function getAvailableTitles() {
+        return @Html.Raw(Json.Encode(Model.availableTitles));
+    }
+
+    function getAvailableCompanyTypes() {
+        return @Html.Raw(Json.Encode(Model.companyTypes));
+    }
+
+    function getAvailableBusinessTypes() {
+        return [
+            { BusinessTypeID: 1, Name: getResource('businessTypeInteriorDesigner') },
+            { BusinessTypeID: 2, Name: getResource('businessTypeRetailStore') },
+            { BusinessTypeID: 3, Name: getResource('businessTypeOther') }
+        ];
+    }
+
+    function getAvailableTradingForOptions() {
+        return @Html.Raw(Json.Encode(Model.tradingForOptions));
+    }
+
+    function getAvailableProductTypeGroupBrands() {
+        return @Html.Raw(Json.Encode(Model.productTypeGroups));
+    }
+
+    function getContactTypes() {
+        return @Html.Raw(Json.Encode(Model.contactTypes));
+    }
+
+    function getChannels() {
+        return @Html.Raw(Json.Encode(Model.channels));
+    }
+
+    function getImmediateOrderState() {
+        return @(Model.immediateOrderRequested ? 1 : 0);
+    }
+
+    function getLeadId() {
+        return @Model.leadId
+    }
+
+    ko.validation.rules['minArrayLength'] = {
+        validator: function (obj, params) {
+            return obj.length >= params.minLength;
+        },
+        message: "Must have at least {0} {1}"
+    };
+
+    ko.validation.registerExtenders();
+</script>
+
+@Render.Script("~/bundles/js/trade-account-request")

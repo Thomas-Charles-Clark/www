@@ -1,0 +1,464 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeUserManagementViewModel
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeAdmin = Model.Permission;
+}
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+<div data-bind="stopBinding">
+    <div id="trade-wrapper">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="accounts-menu" style="display: none;" data-bind="visible: true">
+            <ul class="nav nav-pills"
+                role="tablist">
+                <li class="nav-item"
+                    role="presentation">
+                    <button type="button"
+                            class="nav-link active"
+                            data-bs-toggle="tab"
+                            data-bs-target="#trade-user-admin"
+                            role="tab">
+                        @HtmlHelperExtra.Resource("ManageTradeAccount_Administrators", l, c, d)
+                    </button>
+                </li>
+                <li class="nav-item"
+                    role="presentation">
+                    <button type="button"
+                            class="nav-link"
+                            data-bs-toggle="tab"
+                            data-bs-target="#trade-users">
+                        @HtmlHelperExtra.Resource("ManageTradeAccount_Users", l, c, d)
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="trade-user-admin" class="tab-pane fade show active">
+                    @if (tradeAdmin)
+                    {
+                        <a href="javascript:;" class="btn btn-secondary mb-3" data-bind="click: addAdmin">
+                            @HtmlHelperExtra.Resource("ManageTradeAccount_AddAdmin", l, c, d)
+                        </a>
+                    }
+                    <div class="grid mb-5" data-bind="foreach: tradeAdmins">
+                        <div class="user-wrapper">
+                            <div class="user-wrapper-inner">
+                                @if (tradeAdmin)
+                                {
+                                    <a href="javascript:;" class="delete-user" data-bind="click: $root.deleteAdmin, visible: ($root.tradeAdmins().length > 1) && ($data.memberId != '@Model.MemberDetail.MemberID')">
+                                        @HtmlHelperExtra.Resource("Delete", l, c, d)
+                                    </a>
+                                }
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("ManageAccountDetailsName", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <span class="name" data-bind="text: fullName"></span>
+                                    </dd>
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("email", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <a class="email" data-bind="attr: { href: `mailto:${email}` }, text: email"></a>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("RegistrationStatus", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <!-- ko if: tradeAuthenticationComplete -->
+                                        <span class="text-success">
+                                            @HtmlHelperExtra.Resource("TradeAuthComplete", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: tradeAuthenticationComplete -->
+                                        <!-- ko if: daysRemaining() < 0 -->
+                                        <span class="text-danger">
+                                            @HtmlHelperExtra.Resource("TradeAuthExpired", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- ko if: daysRemaining() >= 0 -->
+                                        <span class="text-warning">
+                                            <span data-bind="text: daysRemaining"></span>
+                                            @HtmlHelperExtra.Resource("TradeAuthDaysRemaining", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+                                        @if (tradeAdmin)
+                                        {
+                                            <!-- ko ifnot: tradeAuthenticationComplete -->
+                                            <a style="display: block;" href="javascript:;" data-bind="click: $root.resendAdminInvite">
+                                                @HtmlHelperExtra.Resource("TradeAuthenticationResendInvite", l, c, d)
+                                            </a>
+                                            <!-- /ko -->
+                                        }
+                                    </dd>
+                                </dl>
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("PricingDisplay", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <!-- ko if: tradePricingDisplay -->
+                                        @HtmlHelperExtra.Resource("TradePrices", l, c, d)
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: tradePricingDisplay -->
+                                        @HtmlHelperExtra.Resource("RetailPrices", l, c, d)
+                                        <!-- /ko -->
+                                    </dd>
+                                </dl>
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("ManageTradeAccount_Permissions", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <ul class="permissions">
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ManageAccountTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: manageAccount" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_ManageAccount", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ManageContactDetailsTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: manageAccount" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_ManageContactDetails", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: placeOrders" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: placeSamples" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccountsTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: viewAccounts" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccounts", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochuresTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: downloadPricelistsBrochures" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochures", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeedsTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: downloadProductFeeds" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeeds", l, c, d)
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="trade-users" class="tab-pane fade">
+                    @if (tradeAdmin)
+                    {
+                        <a href="javascript:;" class="btn btn-secondary" data-bind="click: addUser, css: { 'mb-3': tradeUsers().length }">
+                            @HtmlHelperExtra.Resource("ManageTradeAccount_AddUser", l, c, d)
+                        </a>
+                    }
+                    <div class="grid" data-bind="foreach: tradeUsers">
+                        <div class="user-wrapper">
+                            <div class="user-wrapper-inner">
+                                @if (tradeAdmin)
+                                {
+                                    <a href="javascript:;" class="delete-user" data-bind="click: $root.deleteUser">
+                                        @HtmlHelperExtra.Resource("ManageTradeAccount_DeleteUser", l, c, d)
+                                    </a>
+                                }
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("ManageAccountDetailsName", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <span class="name" data-bind="text: fullName"></span>
+                                    </dd>
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("email", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <a class="email" data-bind="attr: { href: `mailto:${email}` }, text: email"></a>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("RegistrationStatus", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <!-- ko if: tradeAuthenticationComplete -->
+                                        <span class="text-success">
+                                            @HtmlHelperExtra.Resource("TradeAuthComplete", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: tradeAuthenticationComplete -->
+                                        <!-- ko if: daysRemaining() < 0 -->
+                                        <span class="text-danger">
+                                            @HtmlHelperExtra.Resource("TradeAuthExpired", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- ko if: daysRemaining() >= 0 -->
+                                        <span class="text-warning">
+                                            <span data-bind="text: daysRemaining"></span>
+                                            @HtmlHelperExtra.Resource("TradeAuthDaysRemaining", l, c, d)
+                                        </span>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+                                        @if (tradeAdmin)
+                                        {
+                                            <!-- ko ifnot: tradeAuthenticationComplete -->
+                                            <a style="display: block;" href="javascript:;" data-bind="click: $root.resendInvite">
+                                                @HtmlHelperExtra.Resource("TradeAuthenticationResendInvite", l, c, d)
+                                            </a>
+                                            <!-- /ko -->
+                                        }
+                                    </dd>
+                                </dl>
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("PricingDisplay", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <!-- ko if: tradePricingDisplay -->
+                                        @HtmlHelperExtra.Resource("TradePrices", l, c, d)
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: tradePricingDisplay -->
+                                        @HtmlHelperExtra.Resource("RetailPrices", l, c, d)
+                                        <!-- /ko -->
+                                    </dd>
+                                </dl>
+                                @if (tradeAdmin)
+                                {
+                                    <a href="javascript:;" class="edit-user" data-bind="click: $root.editUser">
+                                        @HtmlHelperExtra.Resource("ManageTradeAccount_Edit", l, c, d)
+                                    </a>
+                                }
+                                <dl class="dl-horizontal grid">
+                                    <dt>
+                                        @HtmlHelperExtra.Resource("ManageTradeAccount_Permissions", l, c, d)
+                                    </dt>
+                                    <dd>
+                                        <ul class="permissions">
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: placeOrders" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: placeSamples" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccountsTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: viewAccounts" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccounts", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochuresTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: downloadPricelistsBrochures" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochures", l, c, d)
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeedsTitle", l, c, d)">
+                                                    <input type="checkbox" data-bind="checked: downloadProductFeeds" disabled="disabled" />
+                                                    @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeeds", l, c, d)
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="user-edit-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog" data-bind="with: editingUser">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!-- ko if: editEmail -->
+                        <h4 class="modal-title" data-bind="text: admin ? resources.ManageTradeAccount_AddAdmin : resources.ManageTradeAccount_AddUser"></h4>
+                        <!-- /ko -->
+                        <!-- ko ifnot: editEmail -->
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("ManageTradeAccount_EditUser", l, c, d)
+                        </h4>
+                        <!-- /ko -->
+                        <button type="button" class="btn-close" aria-label="Close" data-bind="click: $parent.closeUserEditModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
+                        <span class="validation-message text-danger" data-bind="visible: permissionsAlreadyExist">
+                            @String.Format(HtmlHelperExtra.Resource("ManageTradeAccount_EmailExists", l, c, d).ToString(), Model.TradeAccountModel.AccountDetails.Code)
+                        </span>
+                        <h4 class="permissions-label">
+                            @HtmlHelperExtra.Resource("ManageTradeAccount_Permissions", l, c, d)
+                        </h4>
+                        <div class="flex-container">
+                            <div>
+                                <ul class="permissions">
+                                    <!-- ko if: admin -->
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ManageAccountTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: manageAccount" disabled="disabled" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_ManageAccount", l, c, d)
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ManageContactDetailsTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: manageAccount" disabled="disabled" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_ManageContactDetails", l, c, d)
+                                        </label>
+                                    </li>
+                                    <!-- /ko -->
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: placeOrders, disable: admin" />
+                                            @HtmlHelperExtra.Resource("TradeUserManagementPlaceOrders", l, c, d)
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: placeSamples, disable: admin" />
+                                            @HtmlHelperExtra.Resource("TradeUserManagementOrderSamples", l, c, d)
+                                        </label>
+                                    </li>
+                                    <!-- ko ifnot: admin -->
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccountsTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: viewAccounts, disable: admin" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccounts", l, c, d)
+                                        </label>
+                                    </li>
+                                    <!-- /ko -->
+                                    <!-- ko if: admin -->
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccountsTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: viewAccounts, disable: admin" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_ViewAccounts", l, c, d)
+                                        </label>
+                                    </li>
+                                    <!-- /ko -->
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochuresTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: downloadPricelistsBrochures, disable: admin" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadPricelistsBrochures", l, c, d)
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label title="@HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeedsTitle", l, c, d)">
+                                            <input type="checkbox" data-bind="checked: downloadProductFeeds, disable: admin" />
+                                            @HtmlHelperExtra.Resource("ManageTradeAccount_DownloadFeeds", l, c, d)
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="validation-message text-danger" data-bind="validationMessage: permissionsValid"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-flat pull-left" data-bind="click: $parent.closeUserEditModal">
+                            @HtmlHelperExtra.Resource("EditNegative", l, c, d)
+                        </button>
+                        <button class="btn btn-success" data-bind="enable: !$parent.busy(), click: $parent.save">
+                            @HtmlHelperExtra.Resource("EditPositive", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resent-confirm-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="margin-bottom-0">
+                            @HtmlHelperExtra.Resource("TradeAuthenticationEmailResent", l, c, d)
+                            <span data-bind="text: resendRecipient()"></span>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" data-bs-dismiss="modal" aria-label="Close">
+                            @HtmlHelperExtra.Resource("Ok", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="remove-confirm-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @HtmlHelperExtra.Resource("AreYouSure", l, c, d)
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p data-bind="with: userToRemove" class="margin-bottom-0">
+                            @HtmlHelperExtra.Resource("TradePermissionsRemove", l, c, d)
+                            <span data-bind="text: fullName"></span>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-flat pull-left" data-bind="click: deleteCancelled" data-bs-dismiss="modal" aria-label="Close">
+                            @HtmlHelperExtra.Resource("No", l, c, d)
+                        </button>
+                        <button class="btn btn-success" data-bind="click: deleteConfirmed" data-bs-dismiss="modal" aria-label="Close">
+                            @HtmlHelperExtra.Resource("Yes", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function getTradeInfo() {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.TradeAccountModel));
+    }
+</script>
+
+@Render.Script("~/bundles/js/trade-user-management")

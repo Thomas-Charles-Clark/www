@@ -1,0 +1,120 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+.basket-title {
+    display: block;
+
+    h1 {
+        margin-bottom: var(--l-gutter);
+    }
+
+    a.btn-secondary {
+        display: block;
+        width: 100%;
+        padding-left: $btn-padding-x;
+        padding-right: $btn-padding-y;
+    }
+}
+
+.basket-empty {
+    flex-direction: column;
+    p.mb-0 {
+        width: 100%;
+        text-align: left;
+        margin-top: calc(var(--l-gutter) * -1);
+        margin-bottom: var(--l-gutter) !important;
+    }
+    .btn-dark {
+        width: 100%;
+
+        padding-left: $btn-padding-x;
+        padding-right: $btn-padding-x;
+    }
+}
+
+.basket-contents {
+    .basket-item {
+        flex-direction: column;
+
+        .basket-item-inner {
+            width: 100%;
+            align-items: flex-start;
+
+            a {
+                img {
+                    max-width: 156px;
+                }
+            }
+        }
+        .basket-item-delivery-options {
+            .delivery-option + .delivery-option {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .basket-flex {
+        position: relative;
+
+        .basket-item-price {
+            flex: 1 1 auto;
+            width: 100%;
+            text-align: right;
+            margin-inline-start: 0;
+            font-size: $font-size-lg;
+        }
+
+        .basket-item-delivery-options {
+            align-self: flex-start;
+        }
+    }
+}
+
+.promotion-code-entry-wrapper {
+    flex-direction: column;
+    label {
+        width: 100%;
+        text-align: left;
+        margin-inline-end: 0;
+        margin-bottom: var(--l-gutter);
+    }
+}
+
+.subtotal-wrapper {
+    font-size: $font-size-lg;
+
+    > div {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    div.basket-title {
+        img {
+            order: 3;
+        }
+        a:first-of-type {
+            order: 2;
+            margin: $l-gutter auto;
+        }
+        a:nth-of-type(2) {
+            order: 1;
+        }
+    }
+
+    label {
+        margin-inline-end: 0;
+    }
+
+    .payment-options {
+        margin: 0 auto var(--l-gutter) auto;
+        width: 100%;
+        max-width: 346px;
+    }
+
+    .btn-dark {
+        width: 100%;
+    }
+}
+

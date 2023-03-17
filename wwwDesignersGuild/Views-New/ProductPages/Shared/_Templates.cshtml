@@ -1,0 +1,132 @@
+﻿@model ProductPageViewModel
+@{ 
+    var priceRegex = new System.Text.RegularExpressions.Regex(@"([^\d?*.,\d?*])(\(.*\))?(inc\.)?");
+}
+@if (Model.IsShop)
+{
+    <nav class="breadcrumb-social-wrapper"
+         aria-label="breadcrumb">
+        @Model.Breadcrumbs()
+        @Html.Partial("~/Views-New/Shared/_SocialMediaDrop.cshtml", Model.SocialMediaViewModel)
+    </nav>
+}
+else
+{
+    <div class="mb-5"></div>
+}
+<script type="text/html" id="stock-message-template">
+    <h6 class="order-form-stock-message" data-bind="css: cssClasses, html: stockMessage"></h6>
+</script>
+@Html.JsonLD("PrimaryProducts",
+    Model,
+    JObject.FromObject(Model.Definition.json).SelectToken("description").Value<string>(),
+    Model.MasterDefinition.UrlBreakdown.countryDetails.CurrencyCode)
+<script type="text/javascript" defer>
+    @{
+        var runningPriceTotal = 0m;
+        var runningDiscountTotal = 0m;
+        var overallValue = 0m;
+    }
+    window.addLoadFunction(() => {
+        if (typeof (window.gtag === 'function'))
+        {
+            let data = {
+                'currency': getCurrencyCode(),
+                'items': [
+             @for (var i = 0; i < Model.AllProducts.Count(); i++)
+             {
+                 var product = Model.AllProducts.OrderBy(p => p.SortOrder).ToList()[i];
+
+                 var price = "";
+
+                 var discount = "";
+
+                 if (product.Product.ContainsKey("displayPrice") && product.Product["displayPrice"].Type != JTokenType.Null)
+                 {
+                     if (product.Product.ContainsKey("displaySalePrice") && product.Product["displaySalePrice"].Type != JTokenType.Null)
+                     {
+                         price = $@"{product.Product["displaySalePrice"].Value<decimal>():F}";
+
+                         discount = $"{product.Product["displayPrice"].Value<decimal>() - product.Product["displaySalePrice"].Value<decimal>()}";
+                     }
+                     else
+                     {
+                         price = $@"{product.Product["displayPrice"]?.Value<decimal>():F}";
+                     }
+                 }
+                 else if (product.Product.ContainsKey("rRPMessage") && product.Product["rRPMessage"].Type != JTokenType.Null)
+                 {
+                     price = $@"{product.Product["rRPMessage"].Value<string>()}";
+                 }
+
+                 if (String.IsNullOrEmpty(price))
+                 {
+                     if (product.Product["sample"].Type != JTokenType.Null && product.Product["sample"]["priceMessage"].Type != JTokenType.Null)
+                     {
+                         price = $"{product.Product["sample"]["priceMessage"].Value<string>()}";
+                     }
+                     if (product.Product["largeSample"].Type != JTokenType.Null && product.Product["largeSample"]["priceMessage"].Type != JTokenType.Null)
+                     {
+                         price = $"{product.Product["largeSample"]["priceMessage"].Value<string>()}";
+                     }
+                 }
+
+                 price = priceRegex.Replace(price, "");
+
+                 var numberFormat = new System.Globalization.CultureInfo(Model.MasterDefinition.UrlBreakdown.countryDetails.DotNetCulture).NumberFormat;
+
+                 if (numberFormat.CurrencyDecimalSeparator == ",")
+                 {
+                     price = price.Replace(".", "");
+                     price = price.Replace(",", ".");
+                 }
+
+                 if (numberFormat.CurrencyDecimalSeparator == ".")
+                 {
+                     price = price.Replace(",", "");
+                 }
+
+                 //price = price.Replace(numberFormat.CurrencyDecimalSeparator, $"{(char)253}");
+                 //price = price.Replace(numberFormat.CurrencyGroupSeparator, $"{(char)252}");
+
+                 if (Decimal.TryParse(price, out decimal parsedPrice))
+                 {
+                     runningPriceTotal += parsedPrice;
+                 }
+
+                 if (Decimal.TryParse(discount, out decimal parsedDiscount))
+                 {
+                     runningDiscountTotal += parsedDiscount;
+                 }
+
+                 if (!String.IsNullOrEmpty(price))
+                 {
+                     <text>
+                     {
+                        'item_id': '@(product.ProductCode)',
+                        'item_name': '@(product.BasketName)',
+                        'item_category': '@(product.ProductTypeID)',
+                        'quantity': '1',
+                        'price': @(price),
+                        @if (!String.IsNullOrEmpty(discount))
+                        {
+                        @:'discount': @(discount),
+                        }
+                        'index': '@(i)',
+                        'item_brand': '@(product.Brand)'
+                    },
+                    </text>
+                 }
+
+                }],
+                'value': @($"{(runningPriceTotal - runningDiscountTotal):F}"),
+            };
+            if (data.items.length) {
+                console.log('gtag is pushing view_item with', data);
+                gtag('event', 'view_item', data);
+            } else {
+                console.log('gtag did not push view_item, nothing was priced');
+            }
+        }
+    })
+</script>

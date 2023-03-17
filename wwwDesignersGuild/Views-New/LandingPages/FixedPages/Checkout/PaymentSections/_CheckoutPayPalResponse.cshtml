@@ -1,0 +1,24 @@
+﻿@model wwwDesignersGuild.Models.Classes.passPayPalResponse
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+}
+
+<body>
+    <script>
+        @if (Model.isExpired)
+        {
+            @:window.opener.jumpToSessionExpired();
+        } else if (!Model.checkoutValid)
+        {
+            @:window.opener.paypalSignInError();
+        }
+        else
+        {
+            @:window.opener.proceedToCheckout(@Html.Raw(Convert.ToInt32(dgCheckoutType.Paypal)));
+        }
+
+        close();
+    </script>
+</body>

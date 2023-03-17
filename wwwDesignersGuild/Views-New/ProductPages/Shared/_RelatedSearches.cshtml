@@ -1,0 +1,21 @@
+﻿@model ProductPageViewModel 
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+<h5 class="my-3 text-uppercase">
+    @HtmlHelperExtra.Resource("RelatedSearches", l, c, d)
+</h5>
+<div id="related-searches" class="hstack gap-3 mb-5 flex-wrap">
+   @foreach (var rs in Model.RelatedSearches)
+    {
+       <a class="btn btn-link" href="@rs.target" target="_self">
+           @rs.text
+       </a>
+    }
+</div>

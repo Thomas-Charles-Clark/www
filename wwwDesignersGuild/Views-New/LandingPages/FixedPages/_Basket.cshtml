@@ -1,0 +1,725 @@
+﻿@model FixedPageViewModel_Basket
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var productTypes = objMaster.ProductTypeDropDown.ProductTypes;
+
+    var cultureInfo = new System.Globalization.CultureInfo(Model.MasterDefinition.UrlBreakdown.countryDetails.LanguageDotNetCulture);
+}
+@Render.StylesPreload("~/bundles/css/basket-page")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/basket-page-mobile")
+}
+<script type="text/html" id="ko-basket-item-template">
+    <div class="basket-item basket-flex">
+        <div class="basket-item-inner">
+            <a data-bind="attr: { href: ProductPageURL }">
+                <img width="239"
+                     height="239"
+                     data-bind="attr: {
+                        src: `/image@(Framework.WebPFallback)/239/${ImageID}`,
+                        alt: BasketName,
+                        title: BasketName,
+                        srcset: window.imageAttributeSourceSet(ImageID, imageSizeSmall),
+                        sizes: window.imageAttributeSizes(ImageID, imageSizeSmall)
+                     }" />
+            </a>
+            <div class="basket-item-details">
+                <h5>
+                    <span data-bind="html: DisplayLine"></span>
+                    <!-- ko if: New -->
+                    <sup class="heading-new">
+                        @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                    </sup>
+                    <!-- /ko -->
+                </h5>
+                <span class="d-block">
+                    @HtmlHelperExtra.Resource("BasketProductCode", l, c, d):
+                    <span class="product-code" data-bind="text: Code"></span>
+                </span>
+                <!-- ko foreach: (StockMessaging ? StockMessaging.BasketQuantityThresholds : []) -->
+                <!-- ko foreach: StockMessages -->
+                <span class="d-block stock-messaging" data-bind="class: Class, html: StockMessage"></span>
+                <!-- /ko -->
+                <!-- /ko -->
+                <div class="basket-item-quantity">
+                    <div class="input-group" data-bind="validationOptions: { insertMessages: false }">
+                        <button class="btn btn-secondary progress-btn"
+                                data-bind="
+                                    enable: canDecreaseQuantity,
+                                    css: {
+                                        'disabled': !canDecreaseQuantity(),
+                                        'validation-element': !quantity.isValid()
+                                    },
+                                    click: decreaseQuantity">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <input type="number"
+                               class="form-control progress-btn"
+                               aria-invalid="false"
+                               autocomplete="off"
+                               data-bind="selectOnFocus,
+                                           keepElement: quantity,
+                                           validationOptions: { insertMessages: false },
+                                           validationElement: quantity,
+                                           numeric: quantity,
+                                           value: quantity,
+                                           attr: {
+                                                'aria-invalid': !quantity.isValid(),
+                                                'aria-errormessage': `quantity-${ProductID}-error`,
+                                                'min': StockMessaging.QuantityMinimum,
+                                                'max': StockMessaging.QuantityMaximum,
+                                                'step': StockMessaging.QuantityIncrement
+                                            }" />
+                        <button class="btn btn-secondary progress-btn"
+                                data-bind="
+                                    enable: canIncreaseQuantity,
+                                    css: {
+                                        'disabled': !canIncreaseQuantity(),
+                                        'validation-element': !quantity.isValid() 
+                                    },
+                                    click: increaseQuantity">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <span class="validation-message" data-bind="attr: {
+                              id: `quantity-${ProductID}-quantity-error`
+                          },
+                          validationMessage: quantity"></span>
+                </div>
+                <div class="basket-item-controls">
+                    <button class="btn btn-link btn-sm progress-btn" data-bind="click: deleteItem">
+                        @HtmlHelperExtra.Resource("Delete", l, c, d)
+                    </button>
+                    <button class="btn btn-link btn-sm progress-btn" data-bind="click: saveItem">
+                        @HtmlHelperExtra.Resource("SaveForLater", l, c, d)
+                    </button>
+                    <!-- ko if: (StockMessaging ? StockMessaging.AllowBackInStockReminder : []) -->
+                    <button class="btn btn-link btn-sm progress-btn" data-bind="click: () => { window.basketModel.backInStockReminder($data) }">
+                        @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+                    </button>
+                    <!-- /ko -->
+                </div>
+                <div style="display: none"
+                     data-bind="visible: basketItemErrors().length">
+                    <div class="alert alert-danger">
+                        <!-- ko foreach: basketItemErrors -->
+                        <div class="basket-item-error">
+                            <!-- ko foreach: errors -->
+                            <p class="display-block validation-message text-danger" data-bind="text: $data.message"></p>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="basket-item-price" data-bind="html: PriceMessage"></div>
+        <div class="basket-item-delivery-options">
+            <!-- ko foreach: deliveryOptions -->
+            <span class="delivery-option" data-bind="text: resourceValue"></span>
+            <!-- /ko -->
+            <!-- ko if: GiftWrappable -->
+            <span class="delivery-option">
+                @HtmlHelperExtra.Resource("GiftWrapAvailable", l, c, d)
+            </span>
+            <!-- /ko -->
+            @if (tradeUser)
+            {
+                <!-- ko if: Treatable -->
+                <span class="delivery-option">
+                    @HtmlHelperExtra.Resource("TreatmentOptionsAvailable", l, c, d)
+                </span>
+                <!-- /ko -->
+            }
+        </div>
+    </div>
+</script>
+<script id="ko-basket-item-saved-template" type="text/html">
+    <div>
+        <div class="pod-card">
+            <div class="card">
+                <img class="card-img-top"
+                     width="239"
+                     height="239"
+                     data-bind="attr: {
+                        src: `/image@(Framework.WebPFallback)/239/${ImageID}`,
+                        alt: BasketName,
+                        title: BasketName,
+                        srcset: window.imageAttributeSourceSet(ImageID, imageSizeSmall),
+                        sizes: window.imageAttributeSizes(ImageID, imageSizeSmall)
+                    }" />
+            </div>
+            <div class="card-body">
+                <!-- ko if: New -->
+                <h6 class="card-new">
+                    @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                </h6>
+                <!-- /ko -->
+                <p class="card-text" data-bind="html: DisplayLine"></p>
+                <!-- ko if: PriceMessage -->
+                <p class="card-text">
+                    <span class="d-block" data-bind="html: PriceMessage"></span>
+                </p>
+                <!-- /ko -->
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary mt-2 w-100" data-bind="click: restoreItem">
+            @HtmlHelperExtra.Resource("MoveToBasket", l, c, d)
+        </button>
+    </div>
+</script>
+<script id="ko-applied-promotion-template" type="text/html">
+    <div data-bind="with: promotion" class="promotion-code-display-wrapper">
+        <div class="alert alert-dark bg-light mb-0" data-bind="css: { 'alert-success': displayValue(), 'alert-danger': !displayValue() }">
+            <h5 class="alert-title">
+                <span class="me-4"
+                      data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PromotionCode", l, c, d)): &quot;' + promotionCode + '&quot;'">
+                    @HtmlHelperExtra.Resource("PromotionCode", l, c, d): @Model.Definition.PromotionCodeDetails.Code
+                </span>
+                <span data-bind="visible: displayValue">
+                    <span data-bind="text: '-' + formatCurrency(totalDiscount(), 2, getCulture(), getCurrencyCode())">
+                        -@String.Format(cultureInfo, "{0:C}", Model.Definition.PromotionCodeDetails.EffectiveDiscount)
+                    </span>
+                </span>
+            </h5>
+            <!-- ko if: validMessage() -->
+            <p data-bind="text: validMessage"></p>
+            <!-- /ko -->
+            <!-- ko if: displayValue() -->
+            <!-- ko if: description -->
+            <p data-bind="text: description">
+                @Model.Definition.PromotionCodeDetails.Description
+            </p>
+            <!-- /ko -->
+            <!-- /ko -->
+            <div class="promo-btns">
+                <button type="button"
+                        id="promo-delete-btn"
+                        class="btn btn-link progress-btn"
+                        data-bind="click: $parent.deletePromoCode">
+                    @HtmlHelperExtra.Resource("Delete", l, c, d)
+                </button>
+                <button type="button"
+                        id="promo-login-btn"
+                        class="btn btn-link progress-btn"
+                        style="display: none"
+                        data-bind="visible: $parent.showPromoCodeLogin(), attr: { href: $parent.promoCodeLoginUrl() }">
+                    @HtmlHelperExtra.Resource("PromoCodeLoginClick", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+<div data-bind="stopBinding">
+    <div id="basket-wrapper">
+        <div class="page-blocker"
+             style="display: none"
+             data-bind="flexVisible: busy, toggleOpacity: busy">
+            <div class="spinner-border" role="status"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+            @JsonConvert.SerializeObject(Model.Definition)
+        </span>
+        <div class="basket-title py-4">
+            <h1 class="text-uppercase">
+                @HtmlHelperExtra.Resource("yourBasket", l, c, d)
+            </h1>
+            <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutLogin, ci)"
+               class="btn btn-secondary progress-btn"
+               style="@(Model.IsEmpty ? "display: none" : "display: block")"
+               data-bind="visible: !isBasketEmpty(), css: { 'disabled': basketItemErrors().length }, attr: { 'disabled': basketItemErrors().length }"
+               onclick="document.querySelectorAll('.progress-btn').forEach(pb => { pb.setAttribute('disabled', true); pb.classList.add('disabled') })">
+                @HtmlHelperExtra.Resource("BasketProceedCheckout", l, c, d)
+            </a>
+        </div>
+        <!-- ko if: notices() -->
+        <div class="mb-4">
+            @Html.Raw(Model.Definition.Notices)
+        </div>
+        <!-- /ko -->
+        <div class="basket-empty mb-3"
+             style="@(Model.IsEmpty ? "display: flex" : "display: none")"
+             data-bind="flexVisible: isBasketEmpty(), css: { 'mb-3': isBasketEmpty(), 'mb-6': (isBasketEmpty() && savedForLaterItems().length == 0) }">
+            <p class="mb-0">
+                @HtmlHelperExtra.Resource("EmptyBasket", l, c, d)
+            </p>
+            <a class="btn btn-dark btn-continue-shopping" href="@dgFramework.buildUrl(dgContentType.landingPage, 1142, ci)">
+                @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
+            </a>
+        </div>
+        <div class="basket-contents"
+             data-bind="foreachInit: { name: 'ko-basket-item-template', data: basketItems, createElement: createBasketItemViewModel, afterQueueFlush: basketReady }">
+            @foreach (var bi in Model.Definition.BasketItems.Where(bi => bi.SaveForLater == false).OrderBy(bi => bi.SortOrder))
+            {
+                <div class="basket-item basket-flex">
+                    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                        @JsonConvert.SerializeObject(bi)
+                    </span>
+                    <div class="basket-item-inner">
+                        <a href="@bi.ProductPageURL">
+                            <img src="/image@(Framework.WebPFallback)/239/@bi.ImageID"
+                                 width="239"
+                                 height="239"
+                                 alt="@bi.BasketName"
+                                 title="@bi.BasketName" />
+                        </a>
+                        <div class="basket-item-details">
+                            <h5>
+                                @Html.Raw(bi.DisplayLine)
+                                @if (bi.New)
+                                {
+                                    <sup class="heading-new">@HtmlHelperExtra.Resource("PodNew", l, c, d)</sup>
+                                }
+                            </h5>
+                            <span class="d-block">
+                                @HtmlHelperExtra.Resource("BasketProductCode", l, c, d):
+                                <span class="product-code">
+                                    @bi.Code
+                                </span>
+                            </span>
+                            @if (tradeUser)
+                            {
+                                <span class="d-block">
+                                    @bi.BasketLineType
+                                </span>
+                            }
+                            @foreach (var bqt in bi.StockMessaging?.BasketQuantityThresholds)
+                            {
+                                if (bqt.StockMessages != null)
+                                {
+                                    foreach (var sm in bqt.StockMessages)
+                                    {
+                                        if (tradeUser)
+                                        {
+                                            <a class="d-block stock-messaging pointer @sm.Class" data-bind="click: () => { $parent.stockInfoModel.showStockInfo($data, 0) }">
+                                                @sm.StockMessage
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="d-block stock-messaging @sm.Class">
+                                                @sm.StockMessage
+                                            </span>
+                                        }
+                                    }
+                                }
+                            }
+                            <div class="basket-item-quantity">
+                                <div class="input-group" data-bind="validationOptions: { insertMessages: false }">
+                                    <button class="btn btn-secondary progress-btn"
+                                            data-bind="enable: canDecreaseQuantity,
+                                                       css: {
+                                                           'disabled': !canDecreaseQuantity(),
+                                                           'validation-element': !quantity.isValid()
+                                                       },
+                                                       click: decreaseQuantity">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+                                    <input type="number"
+                                           class="form-control progress-btn"
+                                           value="@(String.Format(cultureInfo, "{0:#.##}", bi.Quantity))"
+                                           min="@(String.Format(cultureInfo, "{0:#.##}", bi.StockMessaging?.QuantityMinimum))"
+                                           max="@(String.Format(cultureInfo, "{0:#.##}", bi.StockMessaging?.QuantityMaximum))"
+                                           step="@(String.Format(cultureInfo, "{0:#.##}", bi.StockMessaging?.QuantityIncrement))"
+                                           aria-invalid="false"
+                                           aria-errormessage="quantity-@(bi.ProductID)-error"
+                                           autocomplete="off"
+                                           data-bind="init: { convert: parseFloat },
+                                                    selectOnFocus,
+                                                    keepElement: quantity,
+                                                    validationOptions: { insertMessages: false },
+                                                    validationElement: quantity,
+                                                    numeric: quantity,
+                                                    value: quantity,
+                                                    attr: {
+                                                        'aria-invalid': !quantity.isValid()
+                                                    }" />
+                                    <button class="btn btn-secondary progress-btn"
+                                            data-bind="enable: canIncreaseQuantity,
+                                                        css: {
+                                                            'disabled': !canIncreaseQuantity(),
+                                                            'validation-element': !quantity.isValid() 
+                                                        },
+                                                        click: increaseQuantity">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <span id="quantity-@(bi.ProductID)-quantity-error" class="validation-message" data-bind="validationMessage: quantity"></span>
+                            </div>
+                            <div class="basket-item-controls">
+                                <button class="btn btn-link btn-sm progress-btn" data-bind="click: deleteItem">
+                                    @HtmlHelperExtra.Resource("Delete", l, c, d)
+                                </button>
+                                <button class="btn btn-link btn-sm progress-btn" data-bind="click: saveItem">
+                                    @HtmlHelperExtra.Resource("SaveForLater", l, c, d)
+                                </button>
+                                @if (bi.StockMessaging.AllowBackInStockReminder)
+                                {
+                                    <button class="btn btn-link btn-sm progress-btn" data-bind="click: () => { window.basketModel.backInStockReminder($data) }">
+                                        @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+                                    </button>
+                                }
+                            </div>
+                            <div style="display: none"
+                                 data-bind="visible: basketItemErrors().length">
+                                <div class="alert alert-danger">
+                                    <!-- ko foreach: basketItemErrors -->
+                                    <div class="basket-item-error">
+                                        <!-- ko foreach: errors -->
+                                        <p class="display-block validation-message text-danger" data-bind="text: $data.message"></p>
+                                        <!-- /ko -->
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="basket-item-price">
+                        @Html.Raw(bi.PriceMessage)
+                    </div>
+                    <div class="basket-item-delivery-options">
+                        @foreach (var deliveryOption in bi.DeliveryOptions.GroupBy(del => new { del.DeliveryOptionID, del.Name, del.ResourceName }))
+                        {
+                            <span class="delivery-option">
+                                @HtmlHelperExtra.Resource(deliveryOption.Key.ResourceName, l, c, d)
+                            </span>
+                        }
+                        @if (bi.GiftWrappable)
+                        {
+                            <span class="delivery-option">
+                                @HtmlHelperExtra.Resource("GiftWrapAvailable", l, c, d)
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        @if (!tradeUser)
+        {
+            <div class="promotion-code-entry-wrapper py-4"
+                 style="display: @(Model.IsEmpty ? "none" : Model.Definition.HasPromotionCode ? "none" : "flex")"
+                 data-bind="visible: basketItems().length && promotion() == null">
+                <label for="promotion-code-entry">
+                    @HtmlHelperExtra.Resource("BasketShoppingCode", l, c, d)
+                </label>
+                <div class="input-group input-group-sm">
+                    <input class="form-control text-uppercase progress-btn"
+                           data-bind="enterKey: addPromoCode, textInput: promoCode" />
+                    <button class="btn btn-secondary progress-btn"
+                            data-bind="click: addPromoCode">
+                        @HtmlHelperExtra.Resource("BasketApplyCode", l, c, d)
+                    </button>
+                </div>
+            </div>
+            <div class="promotion-code-display-wrapper mt-4"
+                 style="display: @(Model.IsEmpty ? "none" : Model.Definition.HasPromotionCode ? "flex" : "none")"
+                 data-bind="flexVisible: basketItems().length">
+                <div id="promotion-code" data-bind="visible: promotion(), template: { name: 'ko-applied-promotion-template' }">
+                    <div data-bind="with: promotion" class="promotion-code-display-wrapper">
+                        <div class="alert alert-dark bg-light mb-0" data-bind="css: { 'alert-success': displayValue(), 'alert-danger': !displayValue() }">
+                            <h5 class="alert-title">
+                                <span class="me-4"
+                                      data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PromotionCode", l, c, d)): &quot;' + promotionCode + '&quot;'">
+                                    @HtmlHelperExtra.Resource("PromotionCode", l, c, d): @Model.Definition.PromotionCodeDetails.Code
+                                </span>
+                                <span data-bind="visible: displayValue">
+                                    <span data-bind="text: '-' + formatCurrency(totalDiscount(), 2, getCulture(), getCurrencyCode())">
+                                        -@String.Format(cultureInfo, "{0:C}", Model.Definition.PromotionCodeDetails.EffectiveDiscount)
+                                    </span>
+                                </span>
+                            </h5>
+                            <!-- ko if: validMessage() -->
+                            <p data-bind="text: validMessage"></p>
+                            <!-- /ko -->
+                            <!-- ko if: displayValue() -->
+                            <!-- ko if: description -->
+                            <p data-bind="text: description">
+                                @Model.Definition.PromotionCodeDetails.Description
+                            </p>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <div class="promo-btns">
+                                <button type="button"
+                                        id="promo-delete-btn"
+                                        class="btn btn-link progress-btn"
+                                        data-bind="click: $parent.deletePromoCode">
+                                    @HtmlHelperExtra.Resource("Delete", l, c, d)
+                                </button>
+                                <button type="button"
+                                        id="promo-login-btn"
+                                        class="btn btn-link progress-btn"
+                                        style="display: none"
+                                        data-bind="visible: $parent.showPromoCodeLogin(), attr: { href: $parent.promoCodeLoginUrl() }">
+                                    @HtmlHelperExtra.Resource("PromoCodeLoginClick", l, c, d)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="subtotal-wrapper py-3"
+             style="display: @(Model.IsEmpty ? "none" : "block")"
+             data-bind="visible: basketItems().length">
+            <div class="py-3">
+                <label>
+                    @HtmlHelperExtra.Resource("TotalExcludingDelivery", l, c, d)
+                </label>
+                <span id="basket-subtotal" data-bind="html: totalPriceDisplay">
+                    @(String.Format(cultureInfo, "{0:C}", Model.Definition.Total.TotalPrice))
+                </span>
+            </div>
+            <div class="basket-title py-3">
+                @if (!tradeUser)
+                {
+                    if (Model.MasterDefinition.UrlBreakdown.countryDetails.AcceptAmazonPay)
+                    {
+                        <img src="~/Content/images/basket/credit@(Framework.WebpOrJpgExtension)"
+                             class="payment-options"
+                             width="346"
+                             height="22"
+                             alt="@HtmlHelperExtra.Resource("AcceptedPaymentMethods", l, c, d)" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/images/basket/credit-no-amazon@(Framework.WebpOrJpgExtension)"
+                             class="payment-options"
+                             width="245"
+                             height="22" alt="@HtmlHelperExtra.Resource("AcceptedPaymentMethods", l, c, d)" />
+                    }
+                }
+                <a class="btn btn-link" href="@dgFramework.buildUrl(dgContentType.landingPage, 1142, ci)">
+                    @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
+                </a>
+                <a class="btn btn-secondary progress-btn"
+                   href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutLogin, ci)"
+                   data-bind="css: { 'disabled': basketItemErrors().length }, attr: { 'disabled': basketItemErrors().length }"
+                   onclick="document.querySelectorAll('.progress-btn').forEach(pb => { pb.setAttribute('disabled', true); pb.classList.add('disabled') })">
+                    @HtmlHelperExtra.Resource("BasketProceedCheckout", l, c, d)
+                </a>
+            </div>
+        </div>
+        <div class="saved-for-later-wrapper" style="display: @(Model.Definition.BasketItems.Where(bi => bi.SaveForLater == true).Any() ? "block" : "none")"
+             data-bind="visible: savedForLaterItems().length > 0">
+            <h5 class="my-4">
+                @HtmlHelperExtra.Resource("SavedForLater", l, c, d)
+            </h5>
+            <p style="display: @(!Model.Definition.BasketItems.Where(bi => bi.SaveForLater == true).Any() ? "block" : "none")"
+               data-bind="visible: savedForLaterItems().length == 0">
+                @HtmlHelperExtra.Resource("SavedForLaterNoItems", l, c, d)
+            </p>
+            <p style="display: @(Model.Definition.BasketItems.Where(bi => bi.SaveForLater == true).Any() ? "block" : "none")"
+               data-bind="visible: savedForLaterItems().length > 0">
+                @HtmlHelperExtra.Resource("BasketToBuyItemClickMoveToBasket", l, c, d)
+            </p>
+            <div class="saved-for-later mb-5" data-bind="foreachInit: { name: 'ko-basket-item-saved-template', data: savedForLaterItems, createElement: createBasketItemViewModel }">
+                @foreach (var bi in Model.Definition.BasketItems.Where(bi => bi.SaveForLater == true).OrderBy(bi => bi.SortOrder))
+                {
+                    <div>
+                        <div class="pod-card">
+                            <span class="d-none" data-bind="init: { convert: JSON.parse, field: data }, remove">
+                                @JsonConvert.SerializeObject(bi)
+                            </span>
+                            <div class="card">
+                                <img class="card-img-top"
+                                     width="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Two)"
+                                     height="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Two)"
+                                     alt="@(bi.BasketName)"
+                                     title="@(bi.BasketName)"
+                                     src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Two)/@(bi.ImageID)"
+                                     @HtmlHelperExtra.ImageSourceSetSizes(bi.ImageID, ImageSize.Two) />
+                            </div>
+                            <div class="card-body">
+                                @if (bi.New)
+                                {
+                                    <h6 class="card-new">
+                                        @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                                    </h6>
+                                }
+                                <p class="card-text">
+                                    @Html.Raw(bi.DisplayLine)
+                                </p>
+                                @if (!String.IsNullOrEmpty(bi.PriceMessage))
+                                {
+                                    <p class="card-text">
+                                        <span class="d-block">
+                                            @Html.Raw(bi.PriceMessage)
+                                        </span>
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary mt-2 w-100" data-bind="click: restoreItem">
+                            @HtmlHelperExtra.Resource("MoveToBasket", l, c, d)
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+        @*@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml", Model.BaseViewModel)*@
+        <div id="basket-errors-modal"
+             class="modal fade"
+             data-bs-keyboard="false"
+             data-bs-backdrop="static"
+             data-bs-dismiss="false">
+            <div class="modal-dialog modal-lg">
+                <div class="page-blocker" data-bind="toggleOpacity: resolveBusy">
+                    <div class="spinner-border" role="status"></div>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h4>
+                </div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("Warning", l, c, d)
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <p class="display-block text-center validation-message text-danger">
+                                @HtmlHelperExtra.Resource("OneOrMoreBasketErrors", l, c, d)
+                            </p>
+                        </div>
+                        <!-- ko foreach: erroneousBasketItems() -->
+                        <div class="flex-container">
+                            <div>
+                                <img data-bind="attr: { src: '/image@(Framework.WebPFallback)/90/' + ImageID, alt: BasketName }" />
+                            </div>
+                            <div class="basket-item-text">
+                                <span class="display-block" data-bind="text: BasketName"></span>
+                                <span>
+                                    <span data-bind="text: $parent.resources.BasketProductCode + ': ' + Code"></span>
+                                    &times;
+                                    <span data-bind="text: Quantity"></span>
+                                </span>
+                                <!-- ko foreach: basketItemErrors -->
+                                <div class="basket-item-errors">
+                                    <div class="alert alert-danger">
+                                        <!-- ko foreach: errors -->
+                                        <p class="display-block validation-message text-danger" data-bind="text: $data.message"></p>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko foreach: promoCodeErrorDisplay -->
+                        <div class="alert alert-danger mb-0">
+                            <p class="display-block text-center validation-message text-danger" data-bind="html: message"></p>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: basketErrorDisplay() -->
+                        <div class="alert alert-danger mb-0">
+                            <p class="text-danger" data-bind="html: basketErrorDisplay"></p>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                    <div class="modal-footer">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-light" data-bs-dismiss="modal">
+                                @HtmlHelperExtra.Resource("CloseProperCase", l, c, d)
+                            </button>
+                            <span>
+                                @HtmlHelperExtra.Resource("AndManuallyCorrectYourBasket", l, c, d)
+                            </span>
+                        </div>
+                        <!-- ko if: (terminalBasketItems().length || promoCodeErrorDisplay().length) -->
+                        <span>
+                            @HtmlHelperExtra.Resource("Or", l, c, d)
+                        </span>
+                        <div class="d-flex gap-2">
+                            <span>
+                                @HtmlHelperExtra.Resource("ClickThisButtonToAutoCorrect", l, c, d)
+                            </span>
+                            <button class="btn btn-dark" data-bind="disable: resolveBusy(), text: resources.RemoveAll, click: resolveAllBasketItemErrors"></button>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: (basketItemErrors().length == 0 && promoCodeErrorDisplay().length == 0) -->
+                        <span>
+                            &nbsp;
+                        </span>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="failed-promotion-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @HtmlHelperExtra.Resource("UnableToApplyPromotionCode", l, c, d)
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" data-bind="with: failedPromotion">
+                        <div class="alert alert-danger mb-0">
+                            <h4 class="alert-title">
+                                <span data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PromotionCode", l, c, d))' + ': &quot;' + promotionCode + '&quot;'"></span>
+                            </h4>
+                            <!-- ko if: validMessage() -->
+                            <p class="text-bold mb-0" data-bind="text: validMessage"></p>
+                            <!-- /ko -->
+                            @*<p data-bind="text: description"></p>*@
+                            <!-- ko if: $parent.showPromoCodeLogin() -->
+                            <a class="promo-valid" data-bind="attr: { href: $parent.promoCodeLoginUrl }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PromoCodeLoginClick", l, c, d))'"></a>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" defer>
+    window.addLoadFunction(() => {
+        if (typeof (window.gtag === 'function'))
+        {
+            let data = {
+                'currency': getCurrencyCode(),
+                'items': [
+                    @for (var i = 0; i < Model.Definition.BasketItems.Count(); i++)
+                    {
+                        var product = Model.Definition.BasketItems.OrderBy(p => p.SortOrder).ToList()[i];
+
+                        var price = $"{product.Price}";
+
+                        <text>
+                        {
+                            'item_id': '@(product.Code)',
+                            'item_name': '@(product.BasketName)',
+                            'item_category': '@(product.ProductTypeID)',
+                            'quantity': @(product.Quantity),
+                            'price': @($"{product.Price:F}"),
+                            'index': '@(i)',
+                            'item_brand': '@(product.Brand)'
+                        },
+                        </text>
+                    }
+                ],
+                'value': @($"{Model.Definition.BasketItems.Select(bi => bi.Price * bi.Quantity).Sum():F}")
+            };
+
+            console.log('gtag is pushing view_cart with', data);
+
+            gtag('event', 'view_cart', data);
+        }
+    })
+</script>
+@Render.Script("~/js/dist/models/common/stock-info.min.js")
+@Render.Script("~/bundles/js/basket-page")

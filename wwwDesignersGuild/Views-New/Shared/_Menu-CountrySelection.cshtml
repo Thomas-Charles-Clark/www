@@ -1,0 +1,41 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCountryDropDownPicker
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    foreach (byte regionId in Model.cmsCountryDropDownDefinitions.countryDropDownItems.OrderBy(p => p.SortOrder).GroupBy(p => p.RegionID).Select(grp => grp.Key).ToList<byte>())
+    {
+        foreach (countryDropDownItem objCountry in Model.cmsCountryDropDownDefinitions.countryDropDownItems.Where(p => p.RegionID == regionId).OrderBy(p => p.SortOrder))
+        {
+            <li class="country">
+                <a href="/@(objCountry.URL)/l0@(Request.QueryString["dateOverride"] == null ? "" : "?dateOverride=" + Request.QueryString["dateOverride"])@(Request.QueryString["countryOverride"] == null ? "" : Request.QueryString["dateOverride"] == null ? "?countryOverride=" + Request.QueryString["countryOverride"] : "&countryOverride=" + Request.QueryString["countryOverride"])" target="_self">
+                    <img style="width: auto; height: 14px; margin: 5px 0 5px 0" src="~/Content/images/country/@(objCountry.CountryID.ToString())@(Framework.WebpOrPngExtension)?v=1" alt="@(objCountry.Country)" title="@(objCountry.Country)" />
+                    <span style="position:relative;bottom:6px;left:5px;">@(objCountry.Country) @((objCountry.CountryID == 81 || objCountry.CountryID == 238) ? "" : "| " + objCountry.LanguageCode.ToUpper())</span>
+                </a>
+            </li>
+        }
+    }
+}
+
+<div style="clear: both;"></div>
+
+<script>
+
+    function doNavigate(country) {
+
+        @{
+            String dateOverride = ";";
+            if (Request.QueryString["dateOverride"] == null){ }
+            else
+            {
+                dateOverride = " + '?dateOverride=" + Request.QueryString["dateOverride"] + "';";
+            }
+        }
+
+        var url = '/' + country@(Html.Raw(dateOverride))
+
+        window.location.href = url;
+        return false;
+    }
+
+</script>

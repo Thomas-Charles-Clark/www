@@ -1,0 +1,22 @@
+﻿@model BaseViewModel
+@{
+    Layout = null;
+
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var ci = objMaster.UrlBreakdown.countryDetails;
+}
+<h4>
+    @HtmlHelperExtra.Resource("Sorry", l, c, d)
+</h4>
+<p class="mb-5">
+    @HtmlHelperExtra.Resource("CheckoutProblemReviewErrors1", l, c, d)
+</p>
+<a class="btn btn-lg btn-dark"
+   href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, ci)">
+    @HtmlHelperExtra.Resource("ReturnToBasket", l, c, d)
+</a>

@@ -1,0 +1,124 @@
+﻿@model TradeAddressBookManagementViewModel
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+
+}
+@if (!Model.Permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureAccounts", l, c, d)
+            @(Model.Users.AccountDetails.Code) - @(Model.Users.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.Users.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+    @Render.Script("~/bundles/js/trade-address-management")
+    <div class="mb-8"
+         data-bind="stopBinding">
+        <div id="trade-account-contact-details">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: ready() === false, toggleOpacity: ready() === false">
+                <div class="spinner-border"></div>
+                <h3>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h3>
+            </div>
+            <h1 id="address-management-title">
+                @HtmlHelperExtra.Resource("Addresses", l, c, d)
+            </h1>
+            <!-- ko if: displayInvoice -->
+            <div class="mb-5">
+                <div class="d-flex align-items-center mb-3">
+                    <h3 class="mb-0 me-3">
+                        @HtmlHelperExtra.Resource("ManageAccountTradeInvoiceAddress", l, c, d)
+                    </h3>
+                    <button type="button" class="btn btn-outline-secondary" data-bind="click: requestInvoiceAddressChange">
+                        @HtmlHelperExtra.Resource("ManageAccountTradeInvoiceAddressRequestChange", l, c, d)
+                    </button>
+                </div>
+                <div class="address-block" style="display: none" data-bind="visible: invoiceAddress, with: invoiceAddress">
+                    <div data-bind="html: displayBlock"></div>
+                    <!-- ko if: typeof $parent.selectFunction === 'function' -->
+                    <!-- ko if: $parent.selectPermitted($data) -->
+                    <button class="btn btn-flat address-select-button" data-bind="click: $parent.selectFunction">
+                        @HtmlHelperExtra.Resource("FindAddressSelectAddress", l, c, d)
+                    </button>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+                <div id="invoice-address-change-requested" style="display: none" class="alert alert-success my-3">
+                    <span class="material-icons me-3">
+                        check
+                    </span>
+                    <div>
+                        <h4 class="alert-title">
+                            @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                        </h4>
+                        <p class="mb-0">
+                            @HtmlHelperExtra.Resource("YourRequestHasBeenRecorded", l, c, d)
+                        </p>
+                    </div>
+                </div>
+                <div data-bind="component: { name: 'mdc-address-search-component', params: invoiceAddressSearch }"></div>
+            </div>
+            <!-- /ko -->
+            <div>
+                <div class="d-flex align-items-center mb-3">
+                    <h3 class="mb-0 me-3">
+                        @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
+                    </h3>
+                    <button type="button" class="btn btn-outline-secondary" data-bind="click: function () { addressSearch.showEditModal(true); }">
+                        @HtmlHelperExtra.Resource("ManageAccountTradeAddDeliveryAddress", l, c, d)
+                    </button>
+                </div>
+                <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        function getResource(resourceKey) {
+            var resourceText = '';
+
+            switch (resourceKey) {
+                case 'majorError':
+                    resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("MajorError", l, c, d))';
+                    break;
+            }
+
+            return resourceText;
+        }
+
+        function getInvoiceAddress() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
+        }
+
+        function getDefaultDeliveryReference() {
+            return '@(Model.DefaultDeliveryReference)'
+        }
+
+    </script>
+}

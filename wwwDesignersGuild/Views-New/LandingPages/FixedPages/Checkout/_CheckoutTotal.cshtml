@@ -1,0 +1,330 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutTotals
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    var objMaster = Model.masterDefinition;
+    var objSummary = Model.checkoutSummarys;
+    
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+
+    var nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+    nfi.NumberDecimalSeparator = ".";
+    nfi.CurrencyDecimalSeparator = ".";
+
+    var displayItemTotal = "0.00";
+    var displayGiftTotal = "0.00";
+    var displayPPTotal = "0.00";
+    var displayPromotionDiscount = "0.00";
+    var displayVATExemption = "0.00";
+    var displayUSSalesTax = "0.00";
+    var displayGrandTotal = "0.00";
+    var displayBalance = string.Empty;
+    var displayVouchers = string.Empty;
+    decimal voucherTotal = 0.00M;
+    decimal balance = 0.00M;
+    decimal grandTotal = 0.00M;
+    bool hasVouchers = false;
+    decimal toPay = 0.00M;
+
+    if (objSummary.checkoutTotals.Count == 0) { }
+    else
+    {
+        if (objSummary.checkoutTotals[0].TotalItems == null)
+        {
+            objSummary.checkoutTotals[0].TotalItems = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalGiftBox == null)
+        {
+            objSummary.checkoutTotals[0].TotalGiftBox = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalPandP == null)
+        {
+            objSummary.checkoutTotals[0].TotalPandP = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalPayable == null)
+        {
+            objSummary.checkoutTotals[0].TotalPayable = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalPromotionDiscount == null)
+        {
+            objSummary.checkoutTotals[0].TotalPromotionDiscount = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalVATExemption == null)
+        {
+            objSummary.checkoutTotals[0].TotalVATExemption = 0;
+        }
+
+        if (objSummary.checkoutTotals[0].TotalUSSalesTax == null)
+        {
+            objSummary.checkoutTotals[0].TotalUSSalesTax = 0;
+        }
+
+        displayItemTotal = ((decimal)objSummary.checkoutTotals[0].TotalItems).ToString("###,##0.00");
+        displayGiftTotal = ((decimal)objSummary.checkoutTotals[0].TotalGiftBox).ToString("###,##0.00");
+        displayPPTotal = ((decimal)objSummary.checkoutTotals[0].TotalPandP).ToString("###,##0.00");
+        displayPromotionDiscount = ((decimal)objSummary.checkoutTotals[0].TotalPromotionDiscount).ToString("###,##0.00");
+        displayVATExemption = ((decimal)objSummary.checkoutTotals[0].TotalVATExemption).ToString("###,##0.00");
+        displayUSSalesTax = ((decimal)objSummary.checkoutTotals[0].TotalUSSalesTax).ToString("###,##0.00");
+        displayGrandTotal = ((decimal)objSummary.checkoutTotals[0].TotalPayable).ToString("###,##0.00");
+        grandTotal = (decimal)objSummary.checkoutTotals[0].TotalPayable;
+    }
+
+    var currencySymbol = HtmlHelperExtra.Resource("currencySymbol", l, c, d);
+
+    displayItemTotal = String.Format("{0}{1}", currencySymbol, displayItemTotal);
+    displayGiftTotal = String.Format("{0}{1}", currencySymbol, displayGiftTotal);
+    displayPPTotal = String.Format("{0}{1}", currencySymbol, displayPPTotal);
+    displayPromotionDiscount = ((decimal)objSummary.checkoutTotals[0].TotalPromotionDiscount).ToString("C", new System.Globalization.CultureInfo(objMaster.UrlBreakdown.countryDetails.DotNetCulture));// String.Format("{0}{1}", currencySymbol, displayPromotionDiscount);
+    displayVATExemption = String.Format("{0}{1}", currencySymbol, displayVATExemption);
+    displayUSSalesTax = String.Format("{0}{1}", currencySymbol, displayUSSalesTax);
+    displayGrandTotal = String.Format("{0}{1}", currencySymbol, displayGrandTotal);
+
+    Int32 wrapperHeight = 160;
+
+    if ((bool)Session["checkoutDisplayGiftTab"] == true) { }
+    else
+    {
+        wrapperHeight = 135;
+    }
+
+    Int32 rowHeight = 25;
+
+    if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
+    else
+    {
+        wrapperHeight += rowHeight;
+    }
+
+    if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
+    else
+    {
+        wrapperHeight += rowHeight;
+    }
+
+    if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
+    else
+    {
+        wrapperHeight += rowHeight;
+    }
+
+    Boolean tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+    {
+        wrapperHeight -= rowHeight;
+    }
+
+    if (objSummary.checkoutGiftVouchers.giftVoucherDetails.Count > 0)
+    {
+        wrapperHeight += (2 * rowHeight);
+        hasVouchers = true;
+        voucherTotal = objSummary.checkoutGiftVouchers.giftVoucherDetails.Sum(v => v.ValueInc);
+        balance = grandTotal - voucherTotal;
+
+        displayVouchers = String.Format("-{0}{1}", currencySymbol, voucherTotal.ToString("###,##0.00"));
+        displayBalance = String.Format("{0}{1}", currencySymbol, balance.ToString("###,##0.00"));
+        toPay = balance;
+    }
+    else
+    {
+        toPay = grandTotal;
+    }
+}
+<div>
+    <h5 class="mb-3">
+        <strong>
+            @if (Model.checkoutType == dgCheckoutType.Trade)
+            {
+                @HtmlHelperExtra.Resource("CheckoutSinglePageCompleteTitleTrade", l, c, d)
+            }
+            else
+            {
+                @HtmlHelperExtra.Resource("CheckoutSinglePageCompleteTitle", l, c, d)
+            }
+        </strong>
+    </h5>
+    <form class="p-3">
+        <div class="page-blocker" data-bind="flexVisible: summaryBusy(), toggleOpacity: summaryBusy()">
+            <div class="spinner-border"></div>
+            <h5>
+                @HtmlHelperExtra.Resource("CheckoutSinglePageCalculatingTotals", l, c, d)
+            </h5>
+        </div>
+        <div id="checkout-totals">
+            <div class="total-detail">
+                <label>
+                    @HtmlHelperExtra.Resource("CheckoutPayItems", l, c, d)
+                </label>
+                <span>
+                    @displayItemTotal
+                </span>
+            </div>
+           @if ((bool)Session["checkoutDisplayGiftTab"] == true)
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayGift", l, c, d)
+                    </label>
+                    <span>
+                        @displayGiftTotal
+                    </span>
+                </div>
+            }
+           @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+            {
+                
+            }
+            else
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayPostage", l, c, d)
+                    </label>
+                    <span>
+                        @displayPPTotal
+                    </span>
+                </div>
+            }
+           @if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
+            else
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayPromotionDiscount", l, c, d)
+                    </label>
+                    <span>
+                        @displayPromotionDiscount
+                    </span>
+                </div>
+            }
+           @if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
+            else
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayVAT", l, c, d)
+                    </label>
+                    <span>
+                        @displayVATExemption
+                    </span>
+                </div>
+            }
+           @if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
+            else
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPaySalesTax", l, c, d)
+                    </label>
+                    <span>
+                        @displayUSSalesTax
+                    </span>
+                </div>
+            }
+            @{ 
+                var grandTotalClass = "total";
+
+                if (hasVouchers)
+                {
+                    grandTotalClass = null;
+                }
+            }
+            <div class="total-separator"></div>
+            <div class="total-detail">
+                <label class="@grandTotalClass">
+                    @HtmlHelperExtra.Resource("CheckoutPayOrderTotal", l, c, d)
+                </label>
+                <span class="@grandTotalClass">
+                    @displayGrandTotal
+                </span>
+            </div>
+           @if (hasVouchers)
+            {
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayGiftTotal", l, c, d)
+                    </label>
+                    <span>
+                        @displayVouchers
+                    </span>
+                </div>
+                <div class="total-separator"></div>
+                <div class="total-detail">
+                    <label>
+                        @HtmlHelperExtra.Resource("CheckoutPayGiftBalance", l, c, d)
+                    </label>
+                    <span>
+                        @displayBalance
+                    </span>
+                </div>
+            }
+           @if (Model.checkoutType == dgCheckoutType.Trade)
+            {
+                <div class="trade-detail">
+                    <span>
+                        @HtmlHelperExtra.Resource("CheckoutPayTradeDelivery", l, c, d)
+                        <br /><br />
+                        @HtmlHelperExtra.Resource("CheckoutPayTradeTax", l, c, d)
+                    </span>
+                </div>
+            }
+        </div>
+    </form>
+    <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
+        @if (Model.checkoutType == dgCheckoutType.Trade)
+        {
+            @HtmlHelperExtra.Resource("CheckoutTradeSubmitOrder", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+        }
+        else
+        {
+            @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+        }
+    </a>
+    @if (Model.checkoutType != dgCheckoutType.Trade)
+    {
+        <div id="checkout-marketing-permissions" style="display: none;" data-bind="visible: marketingPermissions().length > 0">
+            <!-- ko foreach: marketingPermissions -->
+            <!-- ko ifnot: Hidden -->
+            <div class="form-check permissions">
+                <input type="checkbox"
+                       class="form-check-input"
+                       data-bind="attr: {
+                            id: `marketing-permission-${$index()}`
+                       },
+                       checked: Checked" />
+                <label class="form-check-label"
+                       data-bind="attr: {
+                            for: `marketing-permission-${$index()}`
+                       },
+                       html: Label">
+                </label>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <div id="privacy-policy mt-3">
+                <span>
+                    @HtmlHelperExtra.Resource("CheckoutMarketingPrivacy", l, c, d)
+                </span>
+            </div>
+        </div>
+    }
+</div>
+
+@* Bronto Cart Phase Marker *@
+<div id="order-review-phase" style="display: none;"></div>
+
+<script type="text/javascript">
+    if (typeof viewModel != 'undefined') {
+        viewModel.balanceNumber(@(toPay.ToString("F", nfi)));
+    }
+</script>

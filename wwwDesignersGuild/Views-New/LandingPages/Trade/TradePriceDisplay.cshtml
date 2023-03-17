@@ -1,0 +1,82 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradePriceDisplayViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+    var countryId = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var languageId = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+@Render.Script("~/bundles/js/trade-price-display")
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+<div data-bind="stopBinding">
+    <div id="trade-wrapper">
+        <div class="form-check">
+            <input id="ack-check" type="checkbox" class="form-check-input" data-bind="checked: acknowledged" />
+            <label class="pointer form-check-label" for="ack-check">
+                @HtmlHelperExtra.Resource("TradePricingUnderstand", languageId, countryId, contentDate)
+            </label>
+        </div>
+        <hr />
+        <div class="member-account-row disabled" data-bind="css: { 'disabled': !acknowledged() }">
+            <div id="pricing-option-wrapper">
+                <div class="form-check mb-2">
+                    <input type="radio"
+                           id="trade-price"
+                           name="trade-pricing-display"
+                           class="form-check-input"
+                           data-bind="enable: acknowledged(), checked: choice, checkedValue: false" disabled />
+                    <label class="pointer price-display-label form-check-label"
+                           for="trade-price"
+                           data-bind="css: { 'save-successful': choice() === false }">
+                        <span>
+                            @HtmlHelperExtra.Resource("RetailPrices", languageId, countryId, contentDate)
+                            <span class="trade-pricing-save retail-pricing">
+                                <span>
+                                    @HtmlHelperExtra.Resource("ManageAccountSaved", languageId, countryId, contentDate)
+                                </span>
+                                <span class="material-icons">
+                                    check
+                                </span>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input type="radio"
+                           id="retail-price"
+                           name="trade-pricing-display"
+                           class="form-check-input"
+                           data-bind="enable: acknowledged(), checked: choice, checkedValue: true" disabled />
+                    <label class="pointer price-display-label form-check-label"
+                           for="retail-price"
+                           data-bind="css: { 'save-successful': choice() === true }">
+                        <span>
+                            @HtmlHelperExtra.Resource("TradePrices", languageId, countryId, contentDate)
+                            <span class="trade-pricing-save trade-pricing">
+                                <span>
+                                    @HtmlHelperExtra.Resource("ManageAccountSaved", languageId, countryId, contentDate)
+                                </span>
+                                <span class="material-icons">
+                                    check
+                                </span>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.getTradePriceDisplay = () => {
+        return @(Model.MemberDetail.DisplayTradePrice.ToString().ToLower());
+    }
+</script>

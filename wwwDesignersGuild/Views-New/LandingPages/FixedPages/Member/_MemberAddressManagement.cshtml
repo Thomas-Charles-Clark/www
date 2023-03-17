@@ -1,0 +1,48 @@
+﻿@model FixedPageViewModel_MemberAddress
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@Render.Script("~/bundles/js/address-management")
+@Render.StylesPreload("~/bundles/css/member-address-management")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/member-address-management-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+<div class="page-blocker" style="display: flex; opacity: 1" data-bind="flexVisible: false, toggleOpacity: false">
+    <div class="loading-spinner"></div>
+    <h4>
+        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+    </h4>
+</div>
+<div class="relative" data-bind="with: memberAddressModel, fadeVisible: true" style="display: none;">
+    <div id="account-contact-details" class="mt-5">
+        <div class="d-flex align-items-center mb-3">
+            <h3 class="mb-0 me-3">
+                @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
+            </h3>
+            <button type="button" class="btn btn-outline-secondary" data-bind="click: function () { addressSearch.showEditModal(true); }">
+                @HtmlHelperExtra.Resource("ManageAccountTradeAddDeliveryAddress", l, c, d)
+            </button>
+        </div>
+        <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
+        <h4 id="no-addresses" style="display: none;" data-bind="visible: addressSearch.addressLookup.searchResultsList().length === 0">
+            @HtmlHelperExtra.Resource("NoAddressesFound", l, c, d)
+        </h4>
+    </div>
+</div>
+<script type="text/javascript">
+    window.getDefaultDeliveryAddress = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.DefaultMemberAddress));
+    }
+    window.getDefaultMemberAddressId = () => {
+        return @(Model.DefaultMemberAddress?.MemberAddressID);
+    }
+</script>

@@ -1,0 +1,50 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var grid = (ProductPageGridPageSection)Model.Definition;
+}
+@Render.Script("~/bundles/js/trade-clearance")
+<div id="trade-clearance-card" class="card" data-bind="tradeClearanceAddition: productPageGrid, with: productPageGrid">
+    <button disabled type="button" class="card-img-top btn btn-primary filters-button collapsed" data-bs-target="#trade-clearance-control-panel" data-bs-toggle="collapse" data-bind="class: 'loaded', enable: true, click: () => { selectMode(!selectMode()) }">
+        @HtmlHelperExtra.Resource("DownloadClearanceList", l, c, d)
+        <span class="material-icons">
+            download
+        </span>
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <div id="trade-clearance-control-panel" class="collapse">
+        <div class="card-body p-0">
+            <p class="my-3">
+                @HtmlHelperExtra.Resource("ClearanceListHint", l, c, d)
+            </p>
+            <div class="d-flex">
+                <button type="button" id="trade-selection-toggle" class="btn btn-primary" data-bind="click: toggleSelectAll, text: allSelected() ? '@HtmlHelperExtra.Resource("DeselectAll", l, c, d)' : '@HtmlHelperExtra.Resource("SelectAll", l, c, d)'">
+                    @HtmlHelperExtra.Resource("SelectAll", l, c, d)
+                </button>
+                <button type="button" class="btn btn-secondary download" data-bind="click: fetchClearanceSpreadsheet">
+                    @HtmlHelperExtra.Resource("ClearanceSpreadsheet", l, c, d)
+                    <span class="material-icons">
+                        download
+                    </span>
+                </button>
+                <button type="button" class="btn btn-secondary download" data-bind="click: fetchClearancePDF">
+                    @HtmlHelperExtra.Resource("ClearancePDF", l, c, d)
+                    <span class="material-icons">
+                        download
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

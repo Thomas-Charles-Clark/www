@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Flock" Class="databaseDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=rs-db.designersguild.com;Initial Catalog=Flock;Persist Security Info=True;User ID=dg" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="FlockConnectionString" Provider="System.Data.SqlClient" />
+  <Function Name="pub.Page_Generate" Method="Page_Generate">
+    <Parameter Name="PageID" Parameter="pageID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="LanguageID" Parameter="languageID" Type="System.Byte" DbType="TinyInt" />
+    <Parameter Name="CountryID" Parameter="countryID" Type="System.Int16" DbType="SmallInt" />
+    <Parameter Name="Date" Parameter="date" Type="System.DateTime" DbType="Date" />
+    <ElementType Name="Page_GenerateResult">
+      <Column Name="Heading" Type="System.String" DbType="NVarChar(70)" CanBeNull="true" />
+      <Column Name="SubHeading" Type="System.String" DbType="NVarChar(70)" CanBeNull="true" />
+      <Column Name="TitleTag" Type="System.String" DbType="NVarChar(70)" CanBeNull="true" />
+      <Column Name="MetaDescription" Type="System.String" DbType="NVarChar(155)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+</Database>

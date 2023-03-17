@@ -1,0 +1,92 @@
+﻿@model FixedPageViewModel<cmsCareersPageDefinition>
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@Render.StylesPreload("~/bundles/css/careers")
+@if(dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/careers-mobile")
+} 
+<div id="careers-wrapper"
+     class="mb-5">
+    <div class="grid">
+        <div class="g-col-12 g-col-lg-12">
+            <h5 class="my-3 text-uppercase">
+                @HtmlHelperExtra.Resource("CareersCurrentVacancies", l, c, d)
+            </h5>
+            <div id="careers-accordion"
+                 class="accordion accordion-plain accordion-flush">
+               @foreach (var career in Model.Definition.CareerListings.OrderBy(cl => cl.SortOrder))
+                {
+                    <div class="accordion-item">
+                        <h5 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#career-@(career.CareerListingID)-collapse"
+                                    aria-expanded="false"
+                                    aria-controls="career-@(career.CareerListingID)-collapse">
+                                @career.Title
+                            </button>
+                        </h5>
+                        <div id="career-@(career.CareerListingID)-collapse"
+                             class="accordion-collapse collapse"
+                             data-bs-parent="#careers-accordion">
+                            <p>
+                                @(HtmlHelperExtra.Resource("CareersLocation", l, c, d)): @(career.Location)
+                            </p>
+                           @if (career.ApplyBeforeDT.HasValue)
+                            {
+                                <p>
+                                    @(HtmlHelperExtra.Resource("CareersApplyBefore", l, c, d)):
+                                    @Html.Raw(dgFramework.convertIntToSuperscriptOrdinal(career.ApplyBeforeDT.Value.Day))
+                                    @(career.ApplyBeforeDT.Value.ToString("MMMM yyyy"))
+                                </p>
+                            }
+                            <p>
+                                @Html.Raw(career.Contents)
+                            </p>
+                            <p>
+                                @if (career.Salaried)
+                                {
+                                    @HtmlHelperExtra.Resource("CareersApply1", l, c, d)
+                                }
+                                else
+                                {
+                                    @HtmlHelperExtra.Resource("CareersApply2", l, c, d)
+                                }
+
+                                @if (career.ContactPostal != null)
+                                {
+                                    @Html.Raw(career.ContactPostal)
+                                }
+
+                                @if (career.ContactEmail != null)
+                                {
+                                    if (career.ContactPostal != null)
+                                    {
+                                        @HtmlHelperExtra.Resource("CareersOrVia", l, c, d)
+                                    }
+                                    <a href="mailto:@(career.ContactEmail)">
+                                        @(career.ContactEmail)
+                                    </a>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        @*<div class="g-col-12 g-col-lg-5">
+            <p>
+                @Html.Raw(Model.Definition.Blurb.Blurb)
+            </p>
+        </div>*@
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutGiftCard
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var countryId = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var languageId = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+@if (Model.displayGiftCards)
+{
+    var objMaster = Model.masterDefinition;
+    var objGifts = Model.checkoutGiftVouchers.checkoutGiftVoucherBaskets;
+
+    <div id="gift-card-modal" class="modal fade" data-bind="with: $parent.giftCardFactory">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("CheckoutGiftVoucherPrompt", languageId, countryId, contentDate)
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="gift-cards-container">
+                        <!-- ko foreach: giftCards -->
+                        <div class="gift-card">
+                            <strong class="d-block mb-3">
+                                <span data-bind="text: BasketName"></span>
+                                -
+                                <span data-bind="text: Code"></span>
+                            </strong>
+                            <div data-bind="component: { name: 'mdc-text-area-component', params: messageParams }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success pull-right" data-bind="click: save">
+                        @HtmlHelperExtra.Resource("MoodboardSave", languageId, countryId, contentDate)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        window.getGiftCardModel = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.checkoutGiftVouchers.checkoutGiftVoucherBaskets));
+        }
+
+        viewModel.giftCardFactory.serverModel(getGiftCardModel());
+
+    </script>
+}

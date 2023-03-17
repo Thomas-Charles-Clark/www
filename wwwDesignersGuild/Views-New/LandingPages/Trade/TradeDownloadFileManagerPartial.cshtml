@@ -1,0 +1,5 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeDownloadsViewModel
+@* Checked 13/07/2022 *@
+@Html.DevExpress().FileManager(
+    wwwDesignersGuild.Models.Trade.TradeDownloadFileManagerSettings.CreateFileManagerDownloadSettings()
+).BindToFileSystemProvider(Model.FileSystemProvider).GetHtml()

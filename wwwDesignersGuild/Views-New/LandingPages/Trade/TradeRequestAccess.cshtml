@@ -1,0 +1,53 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeRequestAccessViewModel
+@{
+    var l = Model.BaseViewModel.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.BaseViewModel.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.BaseViewModel.MasterDefinition.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+@Render.StylesPreload("~/bundles/css/trade")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/trade-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+
+<div data-bind="stopBinding">
+    <div id="trade-wrapper">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="trade-request-access" style="display: none" data-bind="visible: true">
+            <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNumberParams }"></div>
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNameParams }"></div>
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: userNameParams }"></div>
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
+            <div class="mb-3" data-bind="component: { name: 'mdc-phone-field-component', params: phoneParams }"></div>
+            <ul class="mb-3 list-group" data-bind="foreach: [...new Set(errors())]">
+                <li class="list-group-item text-danger" data-bind="text: $data"></li>
+            </ul>
+            <button class="btn btn-secondary" type="button" data-bind="enable: !showSuccess(), click: submit">
+                @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+            </button>
+            <div id="trade-access-request-success" class="text-success save-message mt-3" data-bind="flexVisible: showSuccess, toggleOpacity: showSuccess">
+                <span>
+                    @HtmlHelperExtra.Resource("TradeAccessRequestSubmittedSuccessfully", l, c, d)
+                </span>
+                <span class="material-icons">
+                    check
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+@Render.Script("~/bundles/js/trade-request-access")

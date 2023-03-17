@@ -1,0 +1,559 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var lc = objMaster.UrlBreakdown.countryDetails.LanguageCode;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var section = ((FormPageSection)Model.Definition);
+
+    var form = section.Form;
+}
+@if (form.CaptchaRequired)
+{
+    <script src='https://www.google.com/recaptcha/api.js?hl=@(lc)' defer></script>
+}
+@if (form.SourceID == 0)
+{
+    <script type="text/javascript">
+        window.getMailingListEmail = () => {
+            return '@(Request.QueryString["mailing-email"] ?? "")';
+        }
+    </script>
+}
+@if (form.SourceGroupID == (int)FormSourceGroup.Brochure ||
+    form.SourceGroupID == (int)FormSourceGroup.JoinMailingListWeb ||
+    form.SourceGroupID == (int)FormSourceGroup.JoinMailingListRetail ||
+    form.SourceGroupID == (int)FormSourceGroup.Competition ||
+    form.SourceGroupID == (int)FormSourceGroup.Other)
+{
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.Base)
+}
+<div id="form-wrapper"
+     class="d-flex justify-content-center px-2 py-5 position-relative"
+    data-bind="with: form">
+    <div class="page-blocker d-none" data-bind="toggleOpacity: busy">
+        <div class="spinner-border" role="status"></div>
+        <h4>
+            @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+        </h4>
+    </div>
+    <form action="/api/form/SavePageSectionForm"
+          method="POST"
+          class="page-form"
+          data-bind="visible: success() == false">
+        <span class="d-none" data-bind="init: { convert: parseInt, field: sourceId }, remove">
+            @(form.SourceID)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseInt, field: sourceGroupId }, remove">
+            @(form.SourceGroupID)
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseInt, field: thirdPartyId }, remove">
+            @(form.ThirdPartyID)
+        </span>
+        @if (!String.IsNullOrEmpty(form.Heading))
+        {
+            <h2 class="trixie">
+                @Html.Raw(form.Heading)
+            </h2>
+        }
+        @if (!String.IsNullOrEmpty(form.SubHeading))
+        {
+            <h5>
+                @Html.Raw(form.SubHeading)
+            </h5>
+        }
+        @if (!String.IsNullOrEmpty(form.HeaderText))
+        {
+            <p>
+                @Html.Raw(form.HeaderText)
+            </p>
+        }
+        @if (!String.IsNullOrEmpty(form.Heading) ||
+           !String.IsNullOrEmpty(form.SubHeading) ||
+           !String.IsNullOrEmpty(form.HeaderText))
+        {
+            <hr />
+        }
+        <span class="d-none" data-bind="init: { convert: JSON.parse, field: data }, remove">
+            @Html.Raw(JsonConvert.SerializeObject(section, new JsonSerializerSettings() { StringEscapeHandling = StringEscapeHandling.EscapeHtml }).Replace(System.Environment.NewLine, ""))
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseInt, field: thirdPartyId }, remove">
+            @form.ThirdPartyID
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseBool, field: addressRequired }, remove">
+            @form.AddressRequired
+        </span>
+        <span class="d-none" data-bind="init: { convert: parseBool, field: captchaRequired }, remove">
+            @form.CaptchaRequired
+        </span>
+        <div class="form-thanks-text" data-bind="visible: success">
+            @Html.Raw(form.ThanksText)
+            @if (!String.IsNullOrEmpty(form.PromotionDescription))
+            {
+                <hr />
+                @Html.Raw(form.PromotionDescription)
+                if (!String.IsNullOrEmpty(form.PromotionCode))
+                {
+                    <span class="bold">
+                        @form.PromotionCode
+                    </span>
+                }
+            }
+        </div>
+        @if (form.Source == FormSource.RetailAppointmentRequest)
+        {
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-agenda" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsAppointmentTopic", l, c, d)
+                </label>
+                <select id="appointment-agenda"
+                        name="appointment-agenda"
+                        class="form-select"
+                        aria-errormessage="appointment-agenda-error"
+                        data-bind="keepElement: appointmentAgendaId,
+                                   value: appointmentAgendaId,
+                                   attr: {
+                                    'aria-invalid': !appointmentAgendaId.isValid()
+                                   }">
+                    @if (section.RetailAppointmentAgendas.Count == 1)
+                    {
+                        <option value="@(section.RetailAppointmentAgendas[0].RetailAppointmentAgendaID)" selected>
+                            @(section.RetailAppointmentAgendas[0].Name)
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="" selected>
+                            @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                        </option>
+                        foreach (var raa in section.RetailAppointmentAgendas.OrderBy(p => p.SortOrder))
+                        {
+                            <option value="@raa.RetailAppointmentAgendaID">
+                                @raa.Name
+                            </option>
+                        }
+                    }
+                </select>
+                <span id="appointment-agenda-error" class="validation-message" data-bind="validationMessage: appointmentAgendaId"></span>
+            </div>
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-type" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsAppointmentType", l, c, d)
+                </label>
+                <select id="appointment-type"
+                        name="appointment-type"
+                        class="form-select"
+                        aria-errormessage="appointment-type-error"
+                        data-bind="keepElement: appointmentTypeId,
+                                   value: appointmentTypeId,
+                                   attr: {
+                                    'aria-invalid': !appointmentTypeId.isValid()
+                                   }">
+                    @if (section.RetailAppointmentTypes.Count == 1)
+                    {
+                        <option value="@(section.RetailAppointmentTypes[0].RetailAppointmentTypeID)" selected>
+                            @(section.RetailAppointmentTypes[0].Name)
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="" selected>
+                            @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                        </option>
+                        foreach (var rat in section.RetailAppointmentTypes.OrderBy(p => p.SortOrder))
+                        {
+                            <option value="@rat.RetailAppointmentTypeID">
+                                @rat.Name
+                            </option>
+                        }
+                    }
+                </select>
+                <span id="appointment-type-error" class="validation-message" data-bind="validationMessage: appointmentTypeId"></span>
+            </div>
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-time" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsPreferredTime", l, c, d)
+                </label>
+                <select id="appointment-time"
+                        name="appointment-time"
+                        class="form-select"
+                        aria-errormessage="appointment-time-error"
+                        data-bind="keepElement: appointmentTime,
+                                   value: appointmentTime,
+                                   attr: {
+                                    'aria-invalid': !appointmentTime.isValid()
+                                   }">
+                    <option value="" selected>
+                        @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                    </option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    }
+                </select>
+                <span id="appointment-time-error" class="validation-message" data-bind="validationMessage: appointmentTime"></span>
+            </div>
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-date" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsNotes", l, c, d) @* Actually reads Preferred Date *@
+                </label>
+                <div>
+                    <input id="appointment-date"
+                           name="appointment-date"
+                           class="date-picker form-control"
+                           aria-errormessage="appointment-date-error"
+                           data-bind="keepElement: appointmentDate,
+                                      hasFocus: appointmentDateFocus,
+                                      kendoDatePicker: appointmentDatePicker,
+                                      attr: {
+                                         'aria-invalid': !appointmentDate.isValid()
+                                      }"
+                           placeholder="DD/MM/YYYY" />
+                    <label class="date-clear" data-bind="click: function () { appointmentDatePicker.clear(); }">
+                        &times;
+                    </label>
+                </div>
+                <span id="store-event-date-error" class="validation-message" data-bind="validationMessage: appointmentDate"></span>
+            </div>
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-location" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsPreferredShop", l, c, d)
+                </label>
+                <select id="appointment-location"
+                        name="appointment-location"
+                        class="form-select"
+                        aria-errormessage="appointment-location-error"
+                        data-bind="keepElement: appointmentLocation,
+                                   value: appointmentLocation,
+                                   attr: {
+                                    'aria-invalid': !appointmentLocation.isValid()
+                                   }">
+                    <option value="" selected>
+                        @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                    </option>
+                    <option value="Kings Road">
+                        King's Road
+                    </option>
+                    <option value="Marylebone">
+                        Marylebone High Street
+                    </option>
+                </select>
+                <span id="appointment-location-error" class="validation-message" data-bind="validationMessage: appointmentLocation"></span>
+            </div>
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="appointment-comments" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsAppointmentComments", l, c, d)
+                </label>
+                <textarea id="appointment-comments"
+                          name="appointment-comments"
+                          class="form-control"
+                          aria-errormessage="appointment-comments-error"
+                          data-bind="keepElement: appointmentComments,
+                                     textInput: appointmentComments"
+                          rows="4"
+                          maxlength="1000"></textarea>
+            </div>
+        }
+        @if (form.Source == FormSource.StoreEvent)
+        {
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="store-event" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsEventLocation", l, c, d)
+                </label>
+                <select id="store-event-location"
+                        name="store-event-location"
+                        class="form-select"
+                        aria-errormessage="store-event-location-error"
+                        data-bind="keepElement: storeEventLocation,
+                                   options: StoreEventsByLocation,
+                                   optionsText: 'StoreEventLocation',
+                                   optionsValue: $data,
+                                   optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                                   value: storeEventLocation,
+                                   attr: {
+                                      'aria-invalid': !storeEventLocation.isValid()
+                                   }">
+                    @if (section.StoreEventsByLocation.Count == 1)
+                    {
+                        <option value="@(section.StoreEventsByLocation[0].StoreEventLocationID)" selected>
+                            @(section.StoreEventsByLocation[0].StoreEventLocation)
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="" selected>
+                            @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                        </option>
+                        foreach (var se in section.StoreEventsByLocation.OrderBy(p => p.StoreEventLocationID))
+                        {
+                            <option value="@se.StoreEventLocationID">
+                                @se.StoreEventLocation
+                            </option>
+                        }
+                    }
+                </select>
+                <span id="store-event-location-error" class="validation-message" data-bind="validationMessage: storeEventLocation"></span>
+            </div>
+            <div class="date-wrapper mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="store-event-date" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsEventDate", l, c, d)
+                </label>
+                <span class="placeholder-hint" data-bind="visible: !storeEventLocation()">
+                    @HtmlHelperExtra.Resource("FormsErrorSelectLocation", l, c, d)
+                </span>
+                <div style="display: none;" data-bind="visible: storeEventLocation">
+                    <input id="store-event-date"
+                           name="store-event-date"
+                           class="date-picker form-control"
+                           aria-errormessage="store-event-date-error"
+                           data-bind="keepElement: storeEventDate,
+                                      hasFocus: storeEventDateFocus,
+                                      kendoDatePicker: storeEventDatePicker,
+                                      attr: {
+                                         'aria-invalid': !storeEventDate.isValid()
+                                      }"
+                           placeholder="DD/MM/YYYY" />
+                    <label class="date-clear" data-bind="click: function () { storeEventDatePicker.clear(); }">
+                        &times;
+                    </label>
+                </div>
+                <span id="store-event-date-error" class="validation-message" data-bind="validationMessage: storeEventDate"></span>
+            </div>
+            <div class="date-wrapper mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="store-event-time" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsEventTime", l, c, d)
+                </label>
+                <span class="placeholder-hint" data-bind="visible: !storeEventDate()">
+                    @HtmlHelperExtra.Resource("FormsErrorSelectDate", l, c, d)
+                </span>
+                <div style="display: none;" data-bind="visible: storeEventDate">
+                    <select id="store-event-time"
+                            name="store-event-time"
+                            class="form-select"
+                            data-bind="options: storeEvents,
+                                       optionsText: 'StoreEventTimeSlot',
+                                       optionsValue: $data,
+                                       optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                                       value: storeEvent" placeholder="DD/MM/YYYY">
+                    </select>
+                </div>
+                <span class="validation-message" data-bind="validationMessage: storeEvent"></span>
+            </div>
+        }
+        @if (form.SourceGroupID != (int)FormSourceGroup.Brochure)
+        {
+            <div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="full-name" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsFullName", l, c, d)
+                </label>
+                <input id="full-name"
+                       name="full-name"
+                       class="form-control"
+                       type="text"
+                       aria-errormessage="full-name-error"
+                       data-bind="keepElement: fullName,
+                                  textInput: fullName,
+                                  attr:{
+                                    'aria-invalid': !fullName.isValid()
+                                  }" />
+                <span id="full-name-error" class="validation-message" data-bind="validationMessage: fullName"></span>
+            </div>
+        }
+        @if (form.SourceGroupID == (int)FormSourceGroup.Brochure)
+        {
+            <span class="d-none" data-bind="init: { convert: parseInt, field: brochureId }, remove">
+                @(form.BrochureID)
+            </span>
+            <div class="mb-4">
+                <div class="flex-heading my-4">
+                    <h5 class="field-label">
+                        @HtmlHelperExtra.Resource("TradeAccountDeliveryAddress", l, c, d)
+                    </h5>
+                </div>
+                <div data-bind="with: deliveryAddressSearch">
+                    <div data-bind="with: addressObject">
+                        <div class="hstack gap-0 address-search-wrapper mb-3">
+                            <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
+                            <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                        </div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: phone }"></div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mb-4" />
+        }
+        <div class="mb-3"
+             data-bind="validationOptions: { insertMessages: false }">
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
+            <span id="email-error" class="validation-message mt-0 mb-3" data-bind="validationMessage: email"></span>
+            @*<label for="email" class="form-label">
+                @HtmlHelperExtra.Resource("FormsEmail", l, c, d)
+            </label>
+            <input id="email"
+                   name="email"
+                   class="form-control"
+                   type="text"
+                   value="@(form.SourceID == 0 ? Request.QueryString["mailing-email"] : null)"
+                   aria-errormessage="email-error"
+                   data-bind="keepElement: email,
+                              textInput: email,
+                              attr:{
+                                'aria-invalid': !email.isValid()
+                              }"
+                   />
+            <span id="email-error" class="validation-message" data-bind="validationMessage: email"></span>*@
+        </div>
+        @if (form.ConfirmEmail)
+        {
+            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailConfirmationParams }"></div>
+            <span id="confirm-email-error" class="validation-message mt-0 mb-3" data-bind="validationMessage: emailConfirmation"></span>
+            @*<div class="mb-3"
+                 data-bind="validationOptions: { insertMessages: false }">
+                <label for="confirm-email" class="form-label">
+                    @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
+                </label>
+                <input id="confirm-email"
+                       name="confirm-email"
+                       class="form-control"
+                       aria-errormessage="confirm-email-error"
+                       type="text"
+                       data-bind="keepElement: emailConfirmation,
+                                  textInput: emailConfirmation"
+                       />
+                <span id="confirm-email-error" class="validation-message" data-bind="validationMessage: emailConfirmation"></span>
+            </div>*@
+        }
+        <div class="mb-3"
+             data-bind="validationOptions: { insertMessages: false }">
+            <label for="country" class="form-label">
+                @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
+            </label>
+            <span class="d-none" data-bind="init: { convert: parseInt, field: marketingCountryId }, remove">
+                @(section.DefaultCountryID)
+            </span>
+            <span class="d-none" data-bind="init: { convert: JSON.parse, field: availableCountries }, remove">
+                @Html.Raw(JsonConvert.SerializeObject(section.Countries))
+            </span>
+            <select id="country"
+                    name="country"
+                    class="form-select"
+                    data-bind="keepElement: marketingCountryId,
+                               options: availableCountries,
+                               optionsText: 'Name',
+                               optionsValue: 'CountryID',
+                               optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                               value: marketingCountryId,
+                               attr: {
+                                  'aria-invalid': !marketingCountryId.isValid()
+                               }">
+                @foreach (var country in section.Countries.OrderBy(p => p.Name))
+                {
+                    <option value="@country.CountryID" @(country.CountryID == section.DefaultCountryID ? "selected" : "")>
+                        @country.Name
+                    </option>
+                }
+            </select>
+            <span id="country-error" class="validation-message" data-bind="validationMessage: marketingCountryId"></span>
+        </div>
+        <div style="display: none"
+             class="mb-3"
+             data-bind="visible: availableLanguages().length > 1, validationOptions: { insertMessages: false }">
+            <label for="country" class="form-label">
+                @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
+            </label>
+            <span class="d-none" data-bind="init: { convert: parseInt, field: marketingLanguageId }, remove">
+                @(l)
+            </span>
+            <span class="d-none" data-bind="init: { convert: JSON.parse, field: availableLanguages }, remove">
+                @Html.Raw(JsonConvert.SerializeObject(section.Languages))
+            </span>
+            <select id="language"
+                    name="language"
+                    class="form-select"
+                    data-bind="keepElement: marketingLanguageId,
+                               options: availableLanguages,
+                               optionsText: 'Name',
+                               optionsValue: 'LanguageID',
+                               optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                               value: marketingLanguageId,
+                               attr: {
+                                  'aria-invalid': !marketingLanguageId.isValid()
+                               }">
+                @foreach (var language in section.Languages.OrderBy(p => p.Name))
+                {
+                    <option value="@language.LanguageID" @(language.LanguageID == l ? "selected" : "")>
+                        @language.Name
+                    </option>
+                }
+            </select>
+            <span id="language-error" class="validation-message" data-bind="validationMessage: marketingLanguageId"></span>
+        </div>
+        <div class="mt-5 d-flex flex-column justify-content-center align-items-center">
+            @if (form.CaptchaRequired)
+            {
+                <div class="g-recaptcha mb-5" data-sitekey="6LcweykUAAAAABVCfluv_8tvgXVviBywnK5L_3tj"></div>
+            }
+            <!-- ko foreach: marketingPermissions -->
+            <!-- ko ifnot: Hidden -->
+            <div class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
+                <input class="form-check-input" type="checkbox" data-bind="checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
+                <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
+                    <span data-bind="html: Label"></span>
+                </label>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <button type="submit" class="btn btn-secondary" disabled data-bind="enable: true, init: { field: submitButtonText }, click: submit">
+                @((form.SubmitButtonText ?? HtmlHelperExtra.Resource("FormsSubmit", l, c, d).ToString()).ToLowerInvariant())
+            </button>
+            <span class="validation-message" style="display: none;" data-bind="visible: errorGroup().isAnyMessageShown()">
+                @HtmlHelperExtra.Resource("PleaseCorrectAll", l, c, d)
+            </span>
+        </div>
+    </form>
+    <div class="alert alert-success form-alert align-items-center mb-0"
+         role="alert"
+         style="display: none"
+         data-bind="visible: success">
+        <i class="material-icons text-success">
+            check
+        </i>
+        <div>
+            @Html.Raw(form.ThanksText)
+        </div>
+    </div>
+</div>

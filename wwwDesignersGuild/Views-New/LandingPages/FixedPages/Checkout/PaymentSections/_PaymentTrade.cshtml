@@ -1,0 +1,18 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutPayment
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{ 
+    Layout = null;
+}
+
+<div class="alert alert-dark bg-light d-inline-block">
+    <h5 id="trade-charge-method" class="alert-heading">
+        @HtmlHelperExtra.Resource("CheckoutTradePaymentDescription", Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID, Model.masterDefinition.UrlBreakdown.countryDetails.CountryID, Model.masterDefinition.UrlBreakdown.ContentDate) @Session["memberTradeAccountNumber"]
+    </h5>
+</div>
+
+<script>
+    function initialisePaymentPartial() {
+        singlePageCheckout.paymentMethodSelected(true);
+    }
+</script>

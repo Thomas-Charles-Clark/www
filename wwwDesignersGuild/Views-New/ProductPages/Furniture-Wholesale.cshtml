@@ -1,0 +1,128 @@
+﻿@model ProductPageViewModel_Furniture_Wholesale
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+}
+@section LateTemplateScripts {
+    @Render.Script("~/bundles/js/product-page")
+}
+@Render.StylesPreload("~/bundles/css/furniture-wholesale")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/furniture-wholesale-mobile")
+}
+@Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
+<div id="ko-wrapper">
+    <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+        @JsonConvert.SerializeObject(Model)
+    </div>
+    <div id="product-page-carousel-wrapper">
+        <div class="mb-3">
+            @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+        </div>
+    </div>
+    <div id="product-page-main" class="grid mb-5">
+        <div class="mb-3">
+            @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.SecondaryCarousel)
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-top">
+                <div>
+                    <h4 class="text-uppercase">
+                        @Model.Definition.heading
+                        @if (Model.Definition.isNew)
+                        {
+                            <sup class="heading-new">
+                                @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                            </sup>
+                        }
+                    </h4>
+                    <h6 class="text-uppercase">
+                        @Model.Definition.brand
+                    </h6>
+                    @if (!Model.AllProductsUnavailable)
+                    {
+                        if (JObject.FromObject(Model.ProductPagePrice)["priceMessage"] != null)
+                        {
+                            <h5 class="text-uppercase mb-3">
+                                @JObject.FromObject(Model.ProductPagePrice).SelectToken("priceMessage")
+                            </h5>
+                        }
+                        if (JObject.FromObject(Model.ProductPagePrice)["rRPMessage"] != null)
+                        {
+                            <h5 class="text-uppercase mb-3">
+                                @JObject.FromObject(Model.ProductPagePrice).SelectToken("rRPMessage")
+                            </h5>
+                        }
+                    }
+                </div>
+                <div>
+                    @if (!Model.AllProductsUnavailable)
+                    {
+                        if (JObject.FromObject(Model.ProductPagePrice)["discountMessage"] != null)
+                        {
+                            <h5 class="text-uppercase discount mb-3">
+                                @JObject.FromObject(Model.ProductPagePrice).SelectToken("discountMessage")
+                            </h5>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="my-4">
+                <hr />
+            </div>
+            <div class="py-2">
+                @Html.Raw(JObject.FromObject(Model.Definition.json).SelectToken("description"))
+            </div>
+            <div class="vstack mt-5 gap-4">
+                @if (!tradeUser)
+                {
+                    <a class="btn btn-secondary"
+                       href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, objMaster.UrlBreakdown.countryDetails)"
+                       target="_self">
+                        @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
+                    </a>
+                }
+                @if (!String.IsNullOrEmpty(Model.InteractiveBrochureURL))
+                {
+                    <a class="btn btn-secondary"
+                       href="@Model.InteractiveBrochureURL"
+                       target="_blank">
+                        @HtmlHelperExtra.Resource("ViewOurLatestFurnitureBrochure", l, c, d)
+                    </a>
+                }
+                @if (!String.IsNullOrEmpty(Model.FurniturePDFURL))
+                {
+                    <a class="btn btn-dark"
+                       href="~/pdf/furniture/@Model.FurniturePDFURL"
+                       target="_blank">
+                        @HtmlHelperExtra.Resource("DimensionsAndTechnicalSpecs", l, c, d)
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.RelatedProductPages.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
+}
+@if (Model.ShowRecentlyViewed)
+{
+    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+}
+@if (Model.RelatedSearches.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml", Model)
+}

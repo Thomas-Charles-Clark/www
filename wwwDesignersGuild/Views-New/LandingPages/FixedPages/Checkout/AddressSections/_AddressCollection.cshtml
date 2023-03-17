@@ -1,0 +1,150 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutAddress
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+@{
+    //  Has a UPS Access Point address been selected
+    String upsName = "";
+    String upsStreet = "";
+    String upsCity = "";
+    String upsPostCode = "";
+    String upsID = "";
+    String upsCountry = "";
+    Boolean loadWithUPS = false;
+
+    List<String> openTimes = new List<String>();
+
+    if (Request.QueryString["appuId"] == null) { }
+    else
+    {
+        upsName = Request.QueryString["name"].ToString();
+        upsStreet = Request.QueryString["addLine1"].ToString();
+        upsCity = Request.QueryString["city"].ToString();
+        upsPostCode = Request.QueryString["postal"].ToString();
+        upsID = Request.QueryString["appuId"].ToString();
+        upsCountry = Request.QueryString["country"].ToString();
+        openTimes = Request.QueryString["hours"].ToString().Replace('.', ' ').Split('-').ToList();
+        loadWithUPS = true;
+    }
+
+    var objMaster = Model.masterDefinition;
+    List<Country> countryItems = Model.countryItems;
+    List<MemberAddress> objMemberAddresses = Model.memberAddressSelect.Addresses;
+    var listCountries = new SelectList(countryItems.OrderBy(p => p.Name), "Code", "Name", objMaster.UrlBreakdown.countryDetails.CountryCode);
+    checkoutAddressGenerateResult objDeliveryOptions = Model.deliveryOptions;
+
+    String autoOpenPanel = string.Empty;
+
+    if (objDeliveryOptions.deliveryItems.Count < 3)
+    {
+        if (objDeliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 2).Count() != 0)
+        {
+            autoOpenPanel = "collect";
+        }
+        else if (objDeliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 3).Count() != 0)
+        {
+            autoOpenPanel = "ups";
+        }
+
+        if (Request.QueryString["id"] != null)
+        { 
+            //  Dont open if UPS address selected as this the UPS tab will already be opened in the UPS view
+            autoOpenPanel = "";
+        }
+    }
+}
+
+<div id="collection-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @HtmlHelperExtra.Resource("CollectionOptions", l, c, d)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="collection-accordion" class="accordion">
+                    @if (Model.checkoutMethod != dgCheckoutType.Trade && 
+                         objDeliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 2).Any())
+                    {
+                        <div class="accordion-item">
+                            <h5 id="click-collect-heading"
+                                class="accordion-title"
+                                data-toggle="collapse"
+                                data-parent="#collection-accordion" href="#store-collapse">
+                                <button class="accordion-button collapsed"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#store-collapse"
+                                        aria-controls="store-collapse">
+                                    <img class="icon" src="~/Content/images/checkout/click-collect.png" />
+                                    <span>
+                                        @HtmlHelperExtra.Resource("CheckoutAddressCollectTitle", l, c, d)
+                                    </span>
+                                    <span class="d-block small">
+                                        @HtmlHelperExtra.Resource("CheckoutAddressCollectHeading", l, c, d)
+                                    </span>
+                                </button>
+                            </h5>
+                            <div id="store-collapse"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="click-collect-heading" data-bs-parent="#collection-accordion">
+                                @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_CheckoutAddressClickCollect.cshtml", Model)
+                            </div>
+                        </div>
+                    }
+                    @if (objDeliveryOptions.deliveryItems.Where(p => p.DeliveryOptionID == 3).Any())
+                    {
+                        <div class="accordion-item">
+                            <h5 id="ups-ap-heading"
+                                class="accordion-title"
+                                data-toggle="collapse"
+                                data-parent="#collection-accordion" href="#ups-collapse">
+                                <button class="accordion-button collapsed"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#ups-collapse"
+                                        aria-controls="ups-collapse">
+                                    <img class="icon" src="~/Content/images/checkout/ups-ap.png" />
+                                    <span>
+                                        @HtmlHelperExtra.Resource("CheckoutAddressUps", l, c, d)
+                                    </span>
+                                    <span class="d-block small">
+                                        @HtmlHelperExtra.Resource("CheckoutAddressUpsInfo", l, c, d)
+                                    </span>
+                                </button>
+                            </h5>
+                            <div id="ups-collapse"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="ups-ap-heading"
+                                 data-bs-parent="#collection-accordion">
+                                @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_CheckoutAddressUpsAccessPoint.cshtml", Model)
+                            </div>
+                        </div>
+                        <!-- ko if: selectedUpsAp() -->
+                        <div id="ups-confirm" class="accordion-item">
+                            <div id="selected-access-point">
+                                <!-- ko template: { name: 'ups-ap-detail-template', data: selectedUpsAp } --><!-- /ko -->
+                                <div class="control-buttons">
+                                    <button class="btn btn-default btn-secondary btn-cancel" data-bind="click: cancelSelectedUpsAp">
+                                        @HtmlHelperExtra.Resource("Cancel", l, c, d)
+                                    </button>
+                                    <button class="btn btn-success" data-bind="click: confirmSelectedUpsAp">
+                                        @HtmlHelperExtra.Resource("CheckoutConfrmGiftVoucherMessage", l, c, d)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

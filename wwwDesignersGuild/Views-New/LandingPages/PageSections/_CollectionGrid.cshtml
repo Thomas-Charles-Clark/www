@@ -1,0 +1,42 @@
+﻿@model PageSectionViewModel
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var grid = (CollectionGridPageSection)Model.Definition;
+}<div class="my-4">
+    <div class="collection-grid grid" data-bind="foreachInit: { name: 'ko-blank-template', data: collectionGrid.visibleCollections, createElement: collectionGrid.createCollectionPod }">
+       @foreach(var co in grid.Collections)
+        {
+        <div>
+            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
+            </span>
+            <a class="pod-card" href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, co.URLKeywords, (dgContentType)dgContentType.collectionPage, co.CollectionID)">
+                <div class="card">
+                    @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", co.CarouselViewModel)
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase">
+                            @Html.Raw(co.Heading)
+                            @if (co.New)
+                            {
+                                <sup class="heading-new">
+                                    @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                                </sup>
+                            }
+                        </h6>
+                        <p>
+                            @Html.Raw(co.SubHeading)
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        }
+    </div>
+</div>

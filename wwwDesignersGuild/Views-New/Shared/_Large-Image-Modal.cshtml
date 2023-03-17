@@ -1,0 +1,104 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+}<div class="modal" tabindex="-1" id="large-image-modal">
+    <div class="modal-dialog modal-xl modal-fullscreen-xl-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-bind="html: title">
+                    @HtmlHelperExtra.Resource("clickZoom", l, c, d)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="large-image-carousel-wrapper">
+                   @if (!dgFramework.IsMobileDevice())
+                    { 
+                        <!-- ko if: images().length > 1 -->
+                        <div class="carousel-thumbnails">
+                            <!-- ko foreach: images -->
+                            <div class="g-col-1">
+                                <button class="btn btn-link"
+                                        data-bind="
+                                        attr: { 
+                                            'data-bs-target': `#${$parent.carouselId}`,
+                                            'data-bs-slide-to': $index(),
+                                            'aria-current': $index() == 0 ? 'true' : '',
+                                            'aria-label': '@HtmlHelperExtra.Resource("ImageSlide", l, c, d) ' + ($index() + 1) 
+                                        },
+                                        class: $index() == 0 ? 'active' : ''">
+                                    <img width="156"
+                                            height="156"
+                                            data-bind="
+                                            attr: { 
+                                                src: `/image@(Framework.WebPFallback)/156/${ImageID}`,
+                                                alt: AltText, 
+                                                srcset: window.imageAttributeSourceSet(ImageID, imageSizeXS),
+                                                sizes: window.imageAttributeSizes(ImageID, imageSizeXS)
+                                            }"
+                                            loading="lazy"
+                                        /> 
+                                </button>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                    }
+                    <div class="carousel slide carousel-fade carousel-dark" data-bs-ride="carousel" data-bs-interval="false" data-bind="attr: { id: carouselId }">
+                        <div class="carousel-inner" data-bind="foreachInit: { data: images }">
+                            <div data-template
+                                 class="carousel-item"
+                                 data-bind="css: { 'active': $index() == 0 }">
+                                <!-- ko if: typeof htmlSectionImage !== 'undefined' -->
+                                <div data-bind="html: htmlSectionImage"></div>
+                                <!-- /ko -->
+                                <!-- ko if: typeof htmlSectionImage === 'undefined' -->
+                                <img class="d-block w-100"
+                                     width="1024"
+                                     height="1024"
+                                     data-bind="attr: { src: `/image@(Framework.WebPFallback)/${MaxWidth}/${ImageID}`,
+                                                        alt: AltText, 
+                                                        srcset: window.imageAttributeSourceSet(ImageID, determineImageSizeFromMaxWidth(MaxWidth)),
+                                                        sizes: window.imageAttributeSizes(ImageID, determineImageSizeFromMaxWidth(MaxWidth))
+                                     }"
+                                     loading="lazy">
+                                <!-- ko if: orderFormGroups().length -->
+                                <div data-bind="foreach: orderFormGroups">
+                                    <div data-bind="html: markup"></div>
+                                </div>
+                                <!-- /ko -->
+                                <button class="btn btn-link btn-scrapbook position-absolute"
+                                        aria-label="@HtmlHelperExtra.Resource("AddToScrapbook", l, c, d)"
+                                        data-bind="click: basketModel.toggleScrapbook">
+                                    <i class="bi"
+                                       data-bind="class: window.isImageInScrapbook(ImageID) ? 'bi-bookmark-heart' : 'bi-bookmark-plus'"></i>
+                                </button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                       @if (dgFramework.IsMobileDevice())
+                        {
+                            <!-- ko if: images().length > 1 -->
+                            <div class="carousel-indicators" data-bind="foreach: images">
+                                <button type="button"
+                                        data-bind="attr: { 
+                                                        'data-bs-target': `#${$parent.carouselId}`,
+                                                        'data-bs-slide-to': $index(),
+                                                        'aria-current': $index() == 0 ? 'true' : '',
+                                                        'aria-label': '@HtmlHelperExtra.Resource("ImageSlide", l, c, d) ' + ($index() + 1) 
+                                                    },
+                                                   class: $index() == 0 ? 'active' : ''">
+                                </button>
+                            </div>
+                            <!-- /ko -->
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

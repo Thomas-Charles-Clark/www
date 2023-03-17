@@ -1,0 +1,341 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutAddress
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    var objMaster = Model.masterDefinition;
+    List<Country> countryItems = Model.countryItems;
+    MemberAddressSelect memberAddressSelects = Model.memberAddressSelect;
+    var listCountries = new SelectList(countryItems.OrderBy(p => p.Name), "Code", "Name", objMaster.UrlBreakdown.countryDetails.CountryCode);
+
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+
+    //  Has a UPS Access Point address been selected
+    String upsName = "";
+    String upsStreet = "";
+    String upsCity = "";
+    String upsPostCode = "";
+    String upsID = "";
+    String upsCountry = "";
+
+    List<String> openTimes = new List<String>();
+
+    if (Request.QueryString["appuId"] == null) { }
+    else
+    {
+        upsName = Request.QueryString["name"].ToString();
+        upsStreet = Request.QueryString["addLine1"].ToString();
+        upsCity = Request.QueryString["city"].ToString();
+        upsPostCode = Request.QueryString["postal"].ToString();
+        upsID = Request.QueryString["appuId"].ToString();
+        upsCountry = Request.QueryString["country"].ToString();
+        openTimes = Request.QueryString["hours"].ToString().Replace('.', ' ').Split('-').ToList();
+
+    }
+
+    String urlClickAndCollectCallBack = dgFramework.buildUrl(Model.masterDefinition.UrlBreakdown.countryDetails, null,
+                                                                dgContentType.landingPage,
+                                                                (int)dgFixedPage.checkoutSinglePage,
+                                                                Request.QueryString["dateOverride"], Request.QueryString["countryOverride"], "method=" + Request.QueryString["method"]);
+
+    urlClickAndCollectCallBack = String.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, urlClickAndCollectCallBack);
+
+    urlClickAndCollectCallBack = String.Format("{0}&", urlClickAndCollectCallBack);
+
+    String urlMain = String.Format("https://locator.kiala.com/search?accountid=E30A67&country=GB&bckurl={0}&target=_parent", Uri.EscapeUriString(urlClickAndCollectCallBack));
+
+    urlMain = String.Format("https://www.ups.com/lsw/invoke?uac=E30A67&cburl={0}&country={1}&loc={2}&css={3}&oId=123456789&edit=false",  //&loc={2}
+        HttpUtility.UrlEncode(urlClickAndCollectCallBack),
+        Model.masterDefinition.UrlBreakdown.countryDetails.CountryCode,
+        Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture.Replace("-", "_"),
+        HttpUtility.UrlEncode("https://www.designersguild.com/content/css/addendum/ups.css")
+        );
+
+    Boolean tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+
+    Boolean isMemberCheckout = dgFramework.isUserLoggedIn(Session["loginStatus"]);
+}
+
+@if (Request.QueryString["appuId"] == null)
+{
+    <text>
+    <h6 class="mb-3">
+        @HtmlHelperExtra.Resource("CheckoutAddressUpsFind", l, c, d)
+    </h6>
+    <div class="ups-postcode-wrapper">
+        <div class="page-blocker" data-bind="flexVisible: upsBusy, toggleOpacity: upsBusy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div class="btn-toolbar mb-3">
+            <div class="btn-group">
+                <div class="input-group">
+                    <input type="text" id="ups-ap-postcode-entry" class="form-control" placeholder="@(HtmlHelperExtra.Resource("FormsPostCode", l, c, d))" maxlength="8" data-bind="textInput: upsSearchTerm, enterKey: upsLocatorSearch" />
+                    <button type="button" class="btn btn-secondary" data-bind="enterKey: upsLocatorSearch, click: upsLocatorSearch">
+                        @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                    </button>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#snippet-id-240">
+                    @HtmlHelperExtra.Resource("UpsAbout", l, c, d)
+                </button>
+            </div>
+        </div>
+        <div id="ups-ap-range"
+             class="mb-3">
+            <label>
+                @HtmlHelperExtra.Resource("UPSAPSearchRadiusMiles", l, c, d)
+            </label>
+            <input type="range" min="1" max="100" step="1" data-bind="textInput: upsApRange" />
+            <span id="ups-ap-range-display" data-bind="text: upsApRange() + 'm'"></span>
+        </div>
+    </div>
+    <!-- ko if: upsLocatorNoResults() -->
+    <span class="validation-message text-danger">
+        @HtmlHelperExtra.Resource("UPSAPPleaseCheckYourPostcode", l, c, d)
+    </span>
+    <!-- /ko -->
+    <div id="ups-ap-map-wrapper">
+        <div id="ups-ap-list-wrapper">
+            <!-- ko if: upsLocatorResults().length -->
+            <h6 class="search-result-count">
+                <span data-bind="text: upsLocatorResults().length"></span>
+                <!-- ko if: upsLocatorResults().length == 1 -->
+                <span>
+                    @HtmlHelperExtra.Resource("SearchResult", l, c, d)
+                </span>
+                <!-- /ko -->
+                <!-- ko if: upsLocatorResults().length > 1 -->
+                <span>
+                    @HtmlHelperExtra.Resource("SearchResults", l, c, d)
+                </span>
+                <!-- /ko -->
+            </h6>
+            <!-- /ko -->
+            <div id="ups-ap-list">
+                <!-- ko if: upsLocatorResults().length -->
+                <!-- ko foreach: upsLocatorResults -->
+                <!-- ko template: { name: 'ups-ap-template' } --><!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko ifnot: upsLocatorResults().length -->
+                <h6 class="no-results">
+                    @HtmlHelperExtra.Resource("UPSAPNoSearchResultsToDisplay", l, c, d)
+                </h6>
+                <!-- /ko -->
+            </div>
+        </div>
+        <div id="ups-ap-map"></div>
+    </div>
+    <!-- ko if: upsLocatorResults().length -->
+    <small class="ups-comments">
+        @HtmlHelperExtra.Resource("UPSAPClickThumbForLargerImage", l, c, d)
+    </small>
+    <!-- /ko -->
+    <script id="ups-ap-template" type="text/html">
+        <div class="ups-ap" data-bind="click: function () { $parent.closeApInfoWindows($data.openInfoWindow) }">
+            <!-- ko template: { name: 'ups-ap-detail-template' } --><!-- /ko -->
+        </div>
+    </script>
+    <script id="ups-ap-detail-template" type="text/html">
+        <div class="ap-detail" data-bind="keepElement: infoDomHolder">
+            <!-- ko if: accessPointInformationField.imageURLField -->
+            <img class="ap-thumb" data-bind="click: showLargeImage, attr: { src: accessPointInformationField.imageURLField }" />
+            <!-- /ko -->
+            <h6 data-bind="text: addressKeyFormatField.consigneeNameField"></h6>
+            <div class="ap-address" data-bind="with: addressKeyFormatField">
+                <!-- ko if: addressLineField -->
+                <span data-bind="text: addressLineField"></span>
+                <!-- /ko -->
+                <!-- ko if: addressLine2Field -->
+                <span data-bind="text: addressLine2Field"></span>
+                <!-- /ko -->
+                <!-- ko if: addressLine3Field -->
+                <span data-bind="text: addressLine3Field"></span>
+                <!-- /ko -->
+                <!-- ko if: politicalDivision1Field -->
+                <span data-bind="text: politicalDivision1Field"></span>
+                <!-- /ko -->
+                <!-- ko if: politicalDivision2Field -->
+                <span data-bind="text: politicalDivision2Field"></span>
+                <!-- /ko -->
+                <!-- ko if: politicalDivision3Field -->
+                <span data-bind="text: politicalDivision3Field"></span>
+                <!-- /ko -->
+                <!-- ko if: postcodePrimaryLowField -->
+                <span>
+                    <span data-bind="text: postcodePrimaryLowField"></span>
+                    <!-- ko if: postcodeExtendedLowField -->
+                    <span data-bind="text: postcodeExtendedLowField"></span>
+                    <!-- /ko -->
+                </span>
+                <!-- /ko -->
+                <!-- ko if: postcodePrimaryLowField -->
+                <span data-bind="text: countryCodeField"></span>
+                <!-- /ko -->
+            </div>
+            <!-- ko if: commentsField -->
+            <i class="ups-comments display-block" data-bind="text: commentsField"></i>
+            <!-- /ko -->
+            <!-- ko if: standardHoursOfOperationField -->
+            <span class="ups-open-hrs display-block" data-bind="html: standardHoursOfOperationField.replace(/; /g, '<br/>')"></span>
+            <!-- /ko -->
+            <button class="btn btn-secondary btn-sm btn-ups-select" data-bind="click: function () { parent.selectUpsAp($data) }">
+                @HtmlHelperExtra.Resource("ModularSelect", l, c, d)
+            </button>
+        </div>
+    </script>
+    <script type="text/javascript">
+        function mapCallback() {
+            viewModel.deliveryAddressFactory.upsMoogleGapReady();
+        }
+    </script>
+    <script type="text/javascript"
+        data-bind="attr: { src: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAbqquOSKwerwZOIBsWOozoLCynawcb7us&callback=mapCallback&libraries=&v=weekly' }"
+        async></script>
+    </text>
+}
+else
+{
+    <text>
+    <h6 class="mb-3">
+        @HtmlHelperExtra.Resource("CheckoutAddressUpsSelected", l, c, d)
+    </h6>
+    <div class="row">
+        <div class="three-col">
+            <div class="address" style="overflow: visible; margin-top: 0;">
+                <p>
+                    <strong>
+                        @upsName
+                    </strong>
+                </p>
+                <p style="float: left; margin-right: 15px;">
+                    @upsStreet<br />
+                    @upsCity<br />
+                    @upsPostCode
+                </p>
+                <div class="clearfix" style="border: none"></div>
+
+                @if (openTimes.Select(p => p.Length).Sum() > 0)
+                {
+                    var days = new List<string>();
+                    var openings = new List<string>();
+                    var closings = new List<string>();
+
+                    foreach (string s in openTimes)
+                    {
+                        var t = s.Split(' ');
+                        if (t.Length == 3)
+                        {
+                            days.Add(t[0]);
+                            openings.Add(t[1]);
+                            closings.Add(t[2]);
+                        }
+                    }
+
+                    <p>
+                        <strong>
+                            @(HtmlHelperExtra.Resource("OpeningTimes", l, c, d))
+                        </strong>
+                    </p>
+
+                    <table style="float: left;" class="ups-hours-table">
+                        <tr>
+                            @foreach (string s in days)
+                            {
+                                if (s.Length > 0)
+                                {
+                                    <th>@s</th>
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @foreach (string s in openings)
+                            {
+                                if (s.Length > 0)
+                                {
+                                    <td>@s</td>
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @foreach (string s in closings)
+                            {
+                                if (s.Length > 0)
+                                {
+                                    <td>@s</td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                }
+
+                <div class="clearfix" style="margin-top: 20px;"></div>
+
+                <button type="button" class="btn btn-success" data-bind="click: deliverToUPSAccessPoint">
+                    @HtmlHelperExtra.Resource("CheckoutAddressUpsDeliver", l, c, d)
+                </button>
+                <button type="button" class="btn btn-secondary" style="margin-top: 1em;" onclick="$('#anotherUPS').toggle(); $('.ups-postcode-wrapper').show(); loadUpsAPiFrame(); return false;">
+                    @HtmlHelperExtra.Resource("CheckoutAddressUpsSelect", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="ups-postcode-wrapper" style="width: 100%; margin: 1em auto; display: none;">
+        <h6 class="mb-3">
+            @HtmlHelperExtra.Resource("CheckoutAddressUpsFind", l, c, d)
+        </h6>
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <div class="input-group">
+                    <input type="text" id="ups-ap-postcode-entry" class="form-control" style="text-transform: uppercase;" value="@(upsPostCode)" maxlength="8" data-bind="textInput: upsSearchTerm, enterKey: upsLocatorSearch" />
+                    <button type="button" class="btn btn-secondary" data-bind="click: function () { upsLocatorSearch(); }">
+                        @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                    </button>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#snippet-id-240">
+                    @HtmlHelperExtra.Resource("UpsAbout", l, c, d)
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="ups-module" id="showUps"></div>
+    </text>
+}
+
+<script type="text/javascript">
+@{
+    if (Request.QueryString["appuId"] == null) { }
+    else
+    {
+        <text>
+    $(document).ready(function () {
+        $('#collection-modal').modal('show');
+        $('#ups-collapse').collapse('show');
+    });
+    </text>
+    }
+}
+
+    function getUpsAccessPointAddress() {
+        return {
+            FullName: '',
+            CompanyName: '@HttpUtility.JavaScriptStringEncode(upsName)',
+            AddressLine1: '@HttpUtility.JavaScriptStringEncode(upsStreet)',
+            Town: '@HttpUtility.JavaScriptStringEncode(upsCity)',
+            PostCode: '@HttpUtility.JavaScriptStringEncode(upsPostCode)',
+            UPSAPID: '@HttpUtility.JavaScriptStringEncode(upsID)',
+            CountryCode: '@HttpUtility.JavaScriptStringEncode(upsCountry)'
+        }
+    }
+
+</script>

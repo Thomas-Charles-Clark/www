@@ -1,0 +1,29 @@
+﻿
+$xs-gutter: 0.1rem;
+$vsm-gutter: 0.25rem;
+$sm-gutter: 0.5rem;
+$m-gutter: 0.75rem;
+$l-gutter: 1.0rem;
+$mxl-gutter: 1.5rem;
+$xl-gutter: 2.0rem;
+$xxl-gutter: 3.0rem;
+$disco-color: #e51f7c;
+$letter-spacing-slight: 0.05rem;
+
+$variable-prefix: bs- !default;
+
+:root {
+    --vsm-gutter: #{$vsm-gutter};
+    --sm-gutter: #{$sm-gutter};
+    --m-gutter: #{$m-gutter};
+    --l-gutter: #{$l-gutter};
+    --mxl-gutter: #{$mxl-gutter};
+    --xl-gutter: #{$xl-gutter};
+    --xxl-gutter: #{$xxl-gutter};
+    --disco-color: #{$disco-color};
+    --letter-spacing-slight: #{$letter-spacing-slight};
+}
+
+$font-size-md: 18px;
+
+$bespoke-breakpoints: ( navbar-0-btn: 340px, navbar-1-btn: 359px, navbar-2-btn: 374px) !default;

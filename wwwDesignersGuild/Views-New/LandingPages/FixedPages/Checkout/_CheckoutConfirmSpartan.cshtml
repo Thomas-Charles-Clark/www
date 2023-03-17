@@ -1,0 +1,92 @@
+﻿@model BaseViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var c = Model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var l = Model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var d = Model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = Model.MasterDefinition.UrlBreakdown.countryDetails;
+
+    bool DisplayTCSEmail = Session["DisplayTCSEmail"] == null ? false : Convert.ToBoolean(Session["DisplayTCSEmail"]);
+    string TradeCustomerServiceEmail = Session["TradeCustomerServiceEmail"] == null ? null : (string)Session["TradeCustomerServiceEmail"];
+    bool DisplayTCSPhone  = Session["DisplayTCSPhone"] == null ? false : Convert.ToBoolean(Session["DisplayTCSPhone"]);
+    string TradeCustomerServicePhone = Session["TradeCustomerServicePhone"] == null ? null : (string)Session["TradeCustomerServicePhone"];
+    string CustomerServiceHours = Session["CustomerServiceHours"] == null ? null : (string)Session["CustomerServiceHours"];
+}
+
+@if (Session["tradeOrderReference"] == null)
+{
+    <div class="mb-5">
+        <h4 class="mb-3">
+            @HtmlHelperExtra.Resource("CheckoutReceiptThankyouSingle", l, c, d)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("CheckoutConfirmSpartanMessage", l, c, d)
+        </p>
+    </div>
+}
+else
+{
+    <div class="mb-5">
+        <div>
+            <h4 class="mb-3 text-uppercase">
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmTitle", l, c, d)
+            </h4>
+            <p>
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmYourOrderWithRef", l, c, d)
+                <strong>
+                    "@Session["tradeOrderReference"]"
+                </strong>
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmHasBeenSent", l, c, d)
+            </p>
+            <p>
+                <a href="mailto:@Session["memberEmail"]">
+                    @Session["memberEmail"]
+                </a>
+            </p>
+            <p>
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmProvidingTheItems", l, c, d)
+                <strong>
+                    @HtmlHelperExtra.Resource("TradeCheckoutConfirmStockAlreadyAllocated", l, c, d)
+                </strong>
+            <p>
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmShouldTheItems", l, c, d)
+            </p>
+            <p class="mb-0">
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmInTheMeantime", l, c, d)
+                <strong>
+                    "@Session["tradeOrderReference"]"
+                </strong>
+                @HtmlHelperExtra.Resource("TradeCheckoutConfirmOneOfOur", l, c, d)
+            </p>
+        </div>
+    </div>
+    
+    <div id="help-container" class="mb-5 p-0">
+        <div class="summary-help d-inline-block">
+            <p class="summary-help-title">
+                @HtmlHelperExtra.Resource("CheckoutCustomerServicesTitle", l, c, d)
+            </p>
+            <p class="summary-help-body">
+                @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d)
+            </p>
+           @if (DisplayTCSPhone)
+            {
+                <p>
+                    <a class="summary-help-phone" href="tel:@(TradeCustomerServicePhone)">@(TradeCustomerServicePhone)</a>&nbsp;@(CustomerServiceHours)
+                </p>
+            }
+           @if (DisplayTCSEmail)
+            {
+                <p>
+                    <a class="summary-help-email" href="mailto:@(TradeCustomerServiceEmail)">@(TradeCustomerServiceEmail)</a>
+                </p>
+            }
+        </div>
+    </div>
+}
+
+<a class="btn btn-lg btn-dark" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.home, ci)">
+    @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
+</a>

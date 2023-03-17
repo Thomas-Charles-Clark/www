@@ -1,0 +1,21 @@
+﻿@model wwwDesignersGuild.Models.Classes.NewMasterDefinition
+@using wwwDesignersGuild.Models.Classes;  
+@using wwwDesignersGuild.Models.Helper;  
+
+@{
+    Layout = null;
+
+    var objMaster = Model;
+    String urlContent = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                            null,
+                                            dgContentType.landingPage,
+                                            (int)dgFixedPage.maintainBasket,
+                                            Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+}
+
+
+<script>
+
+    window.location.href = '@Html.Raw(urlContent)';
+
+</script>

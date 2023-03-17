@@ -1,0 +1,422 @@
+﻿@model OrderFormItemViewModel
+@{
+    var l = Model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.MasterDefinition.UrlBreakdown.ContentDate;
+    var cd = Model.MasterDefinition.UrlBreakdown.countryDetails;
+
+    var tradeUser = Model.MasterDefinition.TradeAllowed;
+
+    var imageSize = ImageSize.Two;
+}
+<div id="@(Model.OrderFormID.Replace("#", ""))"
+     class="order-form-product">
+    <span class="d-none" data-bind="init: { convert: JSON.parse, field: image }, remove">
+        @Html.Raw(JsonConvert.SerializeObject(Model.Image))
+    </span>
+    <span class="d-none product-code">
+        @Html.Raw(JsonConvert.SerializeObject(Model.ProductCode))
+    </span>
+    <div class="my-3">
+        <div class="order-form-details">
+           @if (!Model.Solitary)
+           {
+               if (Model.ImageLinkToProductPage)
+               {
+                   <a href="@dgFramework.buildUrl(dgContentType.productPage, (int)Model.ProductPageID, cd, null, null, null, Model.URLKeywords)">
+                        <img class="order-form-image"
+                             src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(imageSize)/@Model.Image.imageId"
+                             width="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
+                             height="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
+                             alt="@Model.Image.altText"
+                             title="@Model.Image.titleText"
+                             @HtmlHelperExtra.ImageSourceSetSizes(Model.Image.imageId, imageSize)
+                             loading="lazy"
+                             />
+                   </a>
+               }
+               else
+               {
+                    <img class="order-form-image"
+                         src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(imageSize)/@Model.Image.imageId"
+                         width="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
+                         height="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
+                         alt="@Model.Image.altText"
+                         title="@Model.Image.titleText"
+                         data-bind="click: (data, event) => { showLargeImage(data, event); }"
+                         @HtmlHelperExtra.ImageSourceSetSizes(Model.Image.imageId, imageSize)
+                         loading="lazy"
+                         />
+               }
+           }
+            <div class="order-form-item-properties">
+              @foreach (var kvp in Model.OrderFormProperties)
+              {
+                   <span>
+                       @(kvp.Key)
+                   </span>
+                   <span>
+                       @(kvp.Value)
+                   </span>
+              }
+            </div>
+            <div class="flex-grow-0 text-end product-price">
+                @Html.Raw(JObject.FromObject(Model.Product).SelectToken("priceMessage"))
+               @if (JObject.FromObject(Model.Product).SelectToken("priceMessage")?.Value<string>() != null && 
+                     JObject.FromObject(Model.Product).SelectToken("rRPMessage")?.Value<string>() != null)
+                {
+                    <br/>
+                }
+                @Html.Raw(JObject.FromObject(Model.Product).SelectToken("rRPMessage"))
+            </div>
+        </div>
+        <div class="d-none" data-bind="init: { field: products, value: [@(Model.ClientProductViewModels)] }, remove"></div>
+        <div class="d-none" data-bind="remove">
+           @{
+               if (Model.AllowSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["sample"])
+                    </span>
+                    <!-- /ko -->
+                }
+                if (Model.AllowLargeSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["largeSample"])
+                    </span>
+                    <!-- /ko -->
+                }
+                if (Model.AllowOrder)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product)
+                    </span> 
+                    <!-- /ko -->
+                }
+                if (Model.AllowReserve)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Reserve.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product)
+                    </span>
+                    <!-- /ko -->
+                }
+                if (Model.AllowReserveWithBatchCutting)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product)
+                    </span>
+                    <!-- /ko -->
+                }
+            }
+        </div>
+       @if (!Model.IsLifestyle)
+        {
+            if (Model.AllowSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["sample"],
+                                     OrderFormItemType.Sample,
+                                     OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowLargeSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["largeSample"],
+                                     OrderFormItemType.LargeSample,
+                                     OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowOrder)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product,
+                                     OrderFormItemType.Order,
+                                     OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowReserve)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Reserve.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product,
+                                     OrderFormItemType.Reserve,
+                                     OrderFormItemType.Reserve.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowReserveWithBatchCutting)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product,
+                                     OrderFormItemType.ReserveWithBatchCutting,
+                                     OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
+                <!-- /ko -->
+            }
+            if (Model.ProductTypeID == 18 && c == 81 && l == 1)
+            {
+                <div class="order-form-item mt-3">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <button type="button" class="btn btn-light"
+                           data-bs-target="#coverage-calculator-modal"
+                           data-bs-toggle="modal">
+                            @HtmlHelperExtra.Resource("CoverageCalculator", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            }
+            if (!Model.AllowOrder && !tradeUser)
+            {
+                <div class="order-form-item mt-3">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)" class="btn btn-light where-to-buy">
+                            @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            if (Model.ProductTypeID == 18 && c == 81 && l == 1)
+            {
+                <div class="order-form-item mt-3">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <button type="button" class="btn btn-light"
+                           data-bs-target="#coverage-calculator-modal"
+                           data-bs-toggle="modal">
+                            @HtmlHelperExtra.Resource("CoverageCalculator", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            }
+            if (!tradeUser)
+            {
+                <div class="order-form-item mt-3">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <button type="button"
+                                class="btn btn-light where-to-buy"
+                                onclick="window.parent.postMessage({
+                                    hide: 'quick-look-modal',
+                                    navigateTo: '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)'
+                                })">
+                            @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            }
+            if (Model.AllowOrder)
+            {
+                <div class="order-form-item mt-3">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <button type="button"
+                                class="btn btn-light where-to-buy"
+                                onclick="window.parent.postMessage({
+                                    hide: 'quick-look-modal',
+                                    navigateTo: '@dgFramework.buildUrl(dgContentType.productPage, Model.ProductPageID, cd, null, null, null, Model.URLKeywords, null)'
+                                })">
+                            @HtmlHelperExtra.Resource("LifestyleGalleryBuyOnline", l, c, d)
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div class="order-form-item-underline mt-4 pb-4">
+        <hr class="m-0"/>
+    </div>
+</div>
+@helper OrderFormItemHelper( 
+    NewMasterDefinition objMaster,
+    object product,
+    OrderFormItemType orderFormItemType,
+    byte basketLineTypeId,
+    bool disabled)
+{ 
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    
+    var tradeUser = Model.MasterDefinition.TradeAllowed;
+
+    var objProduct = JObject.FromObject(product);
+
+    var backInStockReminder = objProduct.SelectToken("controls")?.SelectToken("allowBackInStockReminder").Value<bool>() == true;
+
+    var quantityMinimum = objProduct.SelectToken("stockMessage").SelectToken("quantityMinimum").Value<decimal>();
+    var quantityMaximum = objProduct.SelectToken("stockMessage").SelectToken("quantityMaximum").Value<decimal>();
+    var quantityIncrement = objProduct.SelectToken("stockMessage").SelectToken("quantityIncrement").Value<decimal>();
+    var enabled = (quantityMaximum > 0);
+
+    if (disabled) 
+    {
+        enabled = false;
+    }
+
+    var initialQuantity = quantityMinimum;
+
+    if (quantityMaximum == 0)
+    {
+        initialQuantity = 0;
+    }
+
+    var orderFormTypePrefix = orderFormItemType.ToString().ToLowerInvariant();
+
+    var extantInBasket = Model.Basket.basketDetails.SingleOrDefault(p => 
+        p.ProductID == objProduct.SelectToken("productId").Value<int>() &&
+        p.BasketLineTypeID == basketLineTypeId);
+
+    <div class="order-form-item">
+        <span class="d-none" data-bind="init: { convert: parseBool }, text: enabled, remove">
+            @enabled
+        </span>
+       @if (orderFormItemType != OrderFormItemType.Reserve &&
+  orderFormItemType != OrderFormItemType.ReserveWithBatchCutting)
+       {
+            <div class="stock-messages">
+           @foreach (var stockMessage in objProduct.SelectToken("stockMessage")?
+                                      .SelectToken("basketQuantityThresholds")?
+                                      .Children()
+                                      .SelectMany(p =>
+                                      {
+                                          if (p["stockMessages"] != null)
+                                              return p.SelectToken("stockMessages").Children();
+                                          else
+                                              return new JEnumerable<JToken>();
+                                      })
+                                      .ToArray())
+            {
+                <span class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))" data-bind="@((orderFormItemType >= OrderFormItemType.Order ? tradeUser ? "click: () => { $root.stockInfo.showStockInfo($data, 0) }" : "" : null)),
+                    css: { 'pointer': stockMessage.allowStockCheck }">
+                    @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
+                </span>
+            }
+            </div>
+        }
+        <div class="order-form-controls">
+            <label for="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity">
+                @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
+            </label>
+            <input type="number" id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity" class="form-control"
+                                                value="@(initialQuantity)"
+                                                min="@(quantityMinimum)"
+                                                max="@(quantityMaximum)"
+                                                step="@(quantityIncrement)"
+                                                aria-invalid="false"
+                                                aria-errormessage="quantity-@(objProduct.SelectToken("productId"))-error"
+                                                autocomplete="off"
+                                                data-bind="init: { convert: parseFloat },
+                                                            keepElement: quantity, 
+                                                            validationOptions: { insertMessages: false },
+                                                            validationElement: quantity,
+                                                            numeric: quantity, 
+                                                            textInput: quantity,
+                                                            attr: {
+                                                                'aria-invalid': !quantity.isValid(),
+                                                                'disabled': !enabled()
+                                                            }"
+                                               @if (!enabled)
+                                                {
+                                                    @:disabled
+                                                }
+                                                />
+            <span class="d-none" data-bind="init: { field: enabled, value: @(enabled ? "true" : "false") }"></span>
+            <button id="product-@(objProduct["productId"])-@(orderFormItemType.ToString().ToLowerInvariant())-btn"
+                    type="button"
+                    class="btn btn-secondary" disabled data-bind="class: 'loaded', enable: enabled, click: basketModel.addToBasket" @(enabled ? "" : "disabled")>
+               @switch (orderFormItemType)
+               {
+                   case OrderFormItemType.Order:
+                            <text>
+                                @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                            </text>
+                       break;
+                   case OrderFormItemType.Sample:
+                            <text>
+                                <span class="me-2">
+                                    @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                                </span>
+                                <span>
+                                    @Html.Raw(objProduct.SelectToken("priceMessage"))
+                                </span>
+                            </text>
+                       break;
+                   case OrderFormItemType.LargeSample:
+                            <text>
+                                <span class="me-2">
+                                    @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                                </span>
+                                <span>
+                                    @Html.Raw(objProduct.SelectToken("priceMessage"))
+                                </span>
+                            </text>
+                       break;
+                   case OrderFormItemType.Reserve:
+                            <text>
+                                @Html.Raw(objProduct.SelectToken("reserveButtonText"))
+                            </text>
+                       break;
+                   case OrderFormItemType.ReserveWithBatchCutting:
+                            <text>
+                                @Html.Raw(objProduct.SelectToken("reserveWithBatchSampleButtonText"))
+                            </text>
+                       break;
+                   default:
+                            <text>
+                                @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                            </text>
+                       break;
+               }
+                <div class="dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+        </div>
+        <span id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity-error" style="display: none;" class="validation-message" data-bind="validationMessage: quantity"></span>
+       @if (extantInBasket != null)
+        {
+            <span class="basket-message">
+                @Html.Raw(Model.AlreadyInBasketString(extantInBasket, orderFormItemType))
+            </span>
+        } 
+       @if (backInStockReminder)
+       {
+            <div class="back-in-stock-wrapper mt-2 text-right">
+                <a href="javascript:;"data-bind="click: window.basketModel.backInStockReminder">
+                    @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+                </a>
+            </div>
+       }
+    </div>
+}

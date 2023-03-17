@@ -1,0 +1,288 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutPayment
+@{
+    Layout = null;
+
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<script id="payment-template" type="text/html">
+    <div id="paymentByCard">
+        <div id="divSavedCards">
+            @if (Model.checkoutMethod == dgCheckoutType.Paypal)
+            {
+                <label class="d-none">
+                    <input type="radio" name="selectedCard" value="paypal" data-bind="checked: selectedCard" checked>
+                    <span>PayPal</span>
+                </label>
+                <div id="paypal-button-wrapper" class="text-center">
+                    <div class="d-flex">
+                        <div id="paypal-button"></div>
+                        <i class="material-icons text-success">
+                            check
+                        </i>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @* This double check of saved cards existing prevents the CVV confirmation bit showing up if you're a member having no cards who has just hit buy now with card details in there *@
+                if (Model.savedCards.Count > 0 && Model.checkoutMethod == dgCheckoutType.Member)
+                {
+                    <div id="saved-cards-wrapper" style="display: none" data-bind="visible: true">
+                        <!-- ko foreach: cards -->
+                        <div class="saved-card pointer" data-bind="click: function() { $parent.selectedCard(token); }, css: { 'selected-card': $parent.selectedCard() == token }">
+                            <span class="saved-card-type" data-bind="text: cardType"></span>
+                            <p>**** **** **** <span data-bind="text: endDigits"></span></p>
+                            <!-- ko if: isExpired -->
+                            <p class="validation-message">
+                                @HtmlHelperExtra.Resource("CheckoutCardExpired", l, c, d)
+                            </p>
+                            <!-- /ko -->
+                            <!-- ko ifnot: isExpired -->
+                            <!-- ko if: typeof expiry != 'undefined' -->
+                            <p>
+                                @(HtmlHelperExtra.Resource("CheckoutCardExpires", l, c, d)): <span data-bind="text: expiry"></span>
+                            </p>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <p class="saved-card-footer">
+                                <span data-bind="visible: !(isExpired || defaultCard() || vaultToken() === '')">
+                                    <a href="javascript:void(0);" data-bind="click: $parent.makeDefaultCard">
+                                        @HtmlHelperExtra.Resource("CheckoutMakeCardDefault", l, c, d)
+                                    </a>
+                                </span>
+                                <a href="javascript:;" data-bind="click: function(data, event) { event.stopPropagation(); $parent.removeCard(data); }">
+                                    @HtmlHelperExtra.Resource("Delete", l, c, d)
+                                </a>
+                            </p>
+                        </div>
+                        <!-- /ko -->
+                        <div class="add-card saved-card" data-bs-toggle="modal" data-bs-target="#card-modal">
+                            <span class="saved-card-type">
+                                @HtmlHelperExtra.Resource("CheckoutPayUseAnotherCard", l, c, d)
+                            </span>
+                            <p>
+                                &nbsp;
+                            </p>
+                            <p>
+                                &nbsp;
+                            </p>
+                            <p class="saved-card-footer">
+                                <a href="#">
+                                    @HtmlHelperExtra.Resource("CheckoutAddPaymentDetails", l, c, d)
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    @*<!-- ko foreach: cards -->
+                        <div>
+                            <label class="margin-bottom-8">
+                                <input type="radio" name="selectedCard" data-bind="value: token, checked: $parent.selectedCard, enable: !isExpired" />
+                                <span data-bind="text: $parent.getDisplayCard($data)" />
+                            </label>
+                            @if (Model.isMemberCheckout)
+                            {
+                                <span class="pay-remove-card">
+                                    <a href="javascript:void(0);" data-bind="click: $parent.removeCard">@HtmlHelperExtra.Resource("CheckoutRemoveCard", languageId, countryId, contentDate)</a>
+                                </span>
+                                    <span data-bind="visible: defaultCard()">
+                                        @HtmlHelperExtra.Resource("CheckoutCardIsDefault", languageId, countryId, contentDate)
+                                    </span>
+                                    <span data-bind="visible: !(isExpired || defaultCard() || vaultToken() === '')">
+                                        <a href="javascript:void(0);" data-bind="click: $parent.makeDefaultCard">@HtmlHelperExtra.Resource("CheckoutMakeCardDefault", languageId, countryId, contentDate)</a>
+                                    </span>
+                            }
+                        </div>
+                    <!-- /ko -->*@
+
+                    if (Model.isMemberCheckout)
+                    {
+                        @*data-bind="visible: selectedCard() !== null && getSelectedCardDetails().vaultToken() !== ''"*@
+                        <div data-bind="with: selectedCard">
+                            <div id="cvv-validation-container" data-bind="visible: $parent.getSelectedCardDetails().vaultToken() !== ''">
+                                <div id="cvv-validation-loading-wrapper" class="page-blocker">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                                <div>
+                                    <strong>
+                                        @HtmlHelperExtra.Resource("CheckoutPayPleaseConfirmSecurity", l, c, d)
+                                        <span data-bind="text: $parent.getSelectedCardDetails().cardType"></span>
+                                        @HtmlHelperExtra.Resource("CheckoutPayPleaseConfirmSecurityEnding", l, c, d)
+                                        <span data-bind="text: $parent.getSelectedCardDetails().endDigits"></span>
+                                    </strong>
+                                </div>
+                                <div id="cvv-desc-text">
+                                    <!-- ko ifnot: $parent.getSelectedCardDetails().cardType == 'American Express' -->
+                                    <small>@HtmlHelperExtra.Resource("CheckoutConfirmSecrityInfo", l, c, d)</small>
+                                    <!-- /ko -->
+                                    <!-- ko if: $parent.getSelectedCardDetails().cardType == 'American Express' -->
+                                    <small>@HtmlHelperExtra.Resource("CheckoutConfirmSecrityInfoAmex", l, c, d)</small>
+                                    <!-- /ko -->
+                                </div>
+                                <div id="cvv-validation-wrapper"
+                                     class="d-flex">
+                                    <div id="cvv-validation" class="form-control"></div>
+                                    <!-- ko ifnot: $parent.getSelectedCardDetails().cardType == 'American Express' -->
+                                    <img id="img-cvv" src="/Content/images/checkout/cvvdemo.png" alt="cvv card location">
+                                    <!-- /ko -->
+                                    <!-- ko if: $parent.getSelectedCardDetails().cardType == 'American Express' -->
+                                    <img id="img-cvv" src="/Content/images/checkout/cvvdemo-amex.png" alt="cvv card location">
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+
+        @if (Model.checkoutMethod == dgCheckoutType.Member && Model.savedCards.Count > 0)
+        {
+            <div id="card-modal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="page-blocker" data-bind="flexVisible: addCardBusy, toggleOpacity: addCardBusy">
+                            <div class="spinner-border"></div>
+                            <h4>
+                                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                            </h4>
+                        </div>
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                @HtmlHelperExtra.Resource("CheckoutAddPaymentDetails", l, c, d)
+                            </h4>
+                            <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="payment-wrapper">
+                                <div id="braintree-container"></div>
+                                <div class="page-blocker payment-loading-wrapper" style="display: flex; opacity: 1.0">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="braintree-add-card" class="btn btn-success">
+                                @HtmlHelperExtra.Resource("CheckoutBrainTreeAddCard", l, c, d)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.checkoutMethod == dgCheckoutType.Guest || (Model.checkoutMethod == dgCheckoutType.Member && Model.savedCards.Count == 0))
+        {
+            <div id="payment-wrapper">
+                <div id="braintree-container">
+
+                </div>
+                <div class="page-blocker payment-loading-wrapper" style="opacity: 1.0">
+                    <div class="spinner-border"></div>
+                    <h5>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h5>
+                </div>
+            </div>
+        }
+
+        @*<div id="addPaymentCardPopup" class="overlay-bg" onclick="hideAddCardPopup();">
+                <div class="popupCenteringWrapper">
+                    <div class="pay-overlay" id="divAddPaymentCardDetails" style="width:600px;">
+                        <a id="closePaymentCardPopup" class="close-btn" onclick="hideAddCardPopup();"></a>
+
+                        <div style="text-align: center;">
+
+                            <div id="billingAddressMessage" class="paymentLoadingMessage">
+                                <p>@HtmlHelperExtra.Resource("CheckoutPayBillingAddressMessage", languageId, countryId, contentDate)</p>
+                            </div>
+
+                            <div id="paymentLoadingMessage" class="paymentLoadingMessage" style="display:none;">
+                                <p>@HtmlHelperExtra.Resource("CheckoutPayLoading", languageId, countryId, contentDate)</p>
+                                <p id="reloadPage" style="display:none;">
+                                    @HtmlHelperExtra.Resource("CheckoutPayReloadPageText", languageId, countryId, contentDate)
+                                    <a href="javascript:;" onclick="reloadPage();">@HtmlHelperExtra.Resource("CheckoutPayReloadPageLink", languageId, countryId, contentDate)</a>
+                                </p>
+                            </div>
+
+                            <div id="creditCardPayment-iframeContainer" style="display: none;">
+                                <iframe name="hss_iframe" width="570" height="700" align="middle"></iframe>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+    </div>
+
+    @*<div id="payment-processing-failure" class="overlay-bg" data-bind="click: $parent.closeError">
+        <div class="overlay-content checkout-error-box" style="width:400px;height:160px;">
+            <a data-bind="click: $parent.closeError" class="close-btn"></a>
+            <div style="margin-top:20px;">
+                <span class="checkout-error-symbol">!</span>
+                <p id="payment-processing-failure-text">@Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreeLoadError", languageId, countryId, contentDate).ToString())</p>
+            </div>
+        </div>
+    </div>*@
+
+    <div id="payment-processing-failure" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content alert alert-danger">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                    </h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="payment-processing-failure-text" class="validation-message">
+                        @Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreeLoadError", l, c, d).ToString())
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*<div id="card-vaulting-failure" class="overlay-bg" data-bind="click: $parent.closeError">
+        <div class="overlay-content checkout-error-box" style="width: 300px; height: 160px;">
+            <a data-bind="click: $parent.closeError" class="close-btn"></a>
+            <div style="margin-top: 20px;">
+                <span class="checkout-error-symbol">!</span>
+                <p id="card-vaulting-failure-text">@Html.Raw(HtmlHelperExtra.Resource("PleaseCheckCardDetails", languageId, countryId, contentDate))</p>
+            </div>
+        </div>
+    </div>*@
+
+    <div id="card-vaulting-failure" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                    </h4>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="card-vaulting-failure-text" class="mb-0">
+                        @Html.Raw(HtmlHelperExtra.Resource("PleaseCheckCardDetails", l, c, d))
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ko if: initialisePaymentPartial() --><!-- /ko -->
+</script>
+
+<div data-bind="template: { name: 'payment-template', data: paymentMethodFactory }"></div>

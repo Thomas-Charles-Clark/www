@@ -1,0 +1,604 @@
+﻿@model BaseViewModel
+@{
+    var l = Model.LanguageID;
+    var c = Model.CountryID;
+    var d = Model.Date;
+}
+@Render.StylesPreload("~/bundles/css/kendo")
+@Render.StylesPreload("~/bundles/css/address-components")
+@Render.Script("~/bundles/js/jquery")
+@Render.Script("~/bundles/js/kendo")
+@Render.Script("~/bundles/js/address-components")
+
+<script id="mdc-text-field-component" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation, disabled: typeof disabled === 'undefined' ? null : disabled },
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : ko.unwrap(readOnly) },
+             enterKey: typeof enterKey === 'undefined' ? null : enterKey">
+            <input type="text" class="mdc-text-field__input" data-bind="keepElement: observable, forceNullOnEmpty: observable, textInput: observable, charsRemaining: charsRemainingOptions, enable: typeof readOnly == 'undefined' ? true : !ko.unwrap(readOnly), hasFocus: (typeof focusObservable === 'undefined' ? ko.observable() : focusObservable), css: { 'ui-autocomplete-loading': typeof busy === 'undefined' ? false : busy }" />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof permitRevert != 'undefined' && permitRevert && typeof revertFunction === 'function' && typeof originalValue != 'undefined' -->
+        <div class="close revert" data-bind="click: revertFunction">
+            <i class="material-icons">
+                replay
+            </i>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-password-field-component" type="text/html">
+    <div class="mdc-validating-field mdc-password-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation, disabled: typeof disabled === 'undefined' ? null : disabled },
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : ko.unwrap(readOnly) },
+             enterKey: typeof enterKey === 'undefined' ? null : enterKey">
+            
+                <input type="password" class="mdc-text-field__input" autocomplete="new-password" data-bind="keepElement: observable,
+                       forceNullOnEmpty: observable,
+                       textInput: observable,
+                       charsRemaining: charsRemainingOptions,
+                       enable: typeof readOnly == 'undefined' ? true : !ko.unwrap(readOnly),
+                       hasFocus: (typeof focusObservable === 'undefined' ? ko.observable() : focusObservable),
+                       css: { 'ui-autocomplete-loading': typeof busy === 'undefined' ? false : busy },
+                       attr: { 'type': showPassword() ? 'text' : 'password' }" />
+                <div class="show-password-lbl btn btn-light">
+                    <input type="checkbox" id="show-password-check" class="pointer" data-bind="checked: showPassword, checkedValue: true" />
+                    <label for="show-password-check" class="pointer">
+                        @HtmlHelperExtra.Resource("Show", l, c, d)
+                    </label>
+                </div>                
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof permitRevert != 'undefined' && permitRevert && typeof revertFunction === 'function' && typeof originalValue != 'undefined' -->
+        <div class="close revert" data-bind="click: revertFunction">
+            <i class="material-icons">
+                replay
+            </i>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-phone-field-component" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined ps-0" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                , css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : ko.unwrap(readOnly) }">
+            <input type="text" class="mdc-text-field__input" data-bind="intlMobile: { phone: observable, country: countryObservable, preferredCountries: preferredCountries }, keepElement: observable, enable: typeof readOnly == 'undefined' ? true : !ko.unwrap(readOnly), textInput: observable, charsRemaining: charsRemainingOptions" />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading" style="width: 48px;"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-text-field-pca-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement }">
+            <input type="text" class="mdc-text-field__input" data-bind="keepElement: observable, textInput: observable, pcaPredict: $data" />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label" data-bind="text: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("SearchForAddress", l, c, d)))'"></label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-text-field-pca-list-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement }">
+            <input type="text" class="mdc-text-field__input" data-bind="keepElement: observable, textInput: observable, pcaPredictList: $data, hasFocus: focusObservable, enterKey: function() { $(observable.DOMElement).autocomplete('search'); }" />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label" data-bind="text: label"></label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-kendo-dropdown-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-select mdc-select--outlined" data-bind="mdcSelectComponent: { 
+                    boundTo: observable, 
+                    useNativeValidation: useNativeValidation, 
+                    optionsValue: dropDownListSettings.dataValueField, 
+                    disabled: typeof disabled === 'undefined' ? false : disabled,
+                    css: {
+                        'mdc-select--focused': observable()
+                    }
+                }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement }, 
+                css: { 'clearable': (typeof showClear === 'undefined' ? false : showClear ), 'revertable': typeof revertFunction === 'function' }">
+            <select class="mdc-select__native-control" style="display: none;"></select>
+            <div data-bind="kendoDropDownList: dropDownListSettings, css: controlClass"></div>
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label" data-bind="text: label, css: { 'mdc-floating-label--float-above' : observable() }"></label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof permitRevert != 'undefined' && permitRevert && typeof revertFunction === 'function' && typeof originalValue != 'undefined' -->
+        <div class="close revert" data-bind="click: revertFunction">
+            <i class="material-icons">
+                replay
+            </i>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-address-search-component" type="text/html">
+    <div class="mdc-address-searcher" style="display: none" data-bind="visible: !isInvoiceSearch">
+        <!-- ko if: pcaLookup.countryRequired -->
+        <div class="input-group form-group" data-bind="keepElement: pcaLookup.inputGroup">
+            <div class="input-group-btn">
+                <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }, style: { width: countryDropDownList.width }"></div>
+            </div>
+            <div data-bind="component: { name: 'mdc-text-field-pca-list-component', params: addressLookup, descendantsComplete: descendantsComplete }"></div>
+        </div>
+        <!-- /ko -->
+        <!-- ko ifnot: pcaLookup.countryRequired -->
+        <div class="form-group mb-3" data-bind="component: { name: 'mdc-text-field-pca-list-component', params: addressLookup, descendantsComplete: descendantsComplete }"></div>
+        <!-- /ko -->
+        <div class="relative" style="min-height: 300px;">
+            <div class="page-blocker" style="display: none" data-bind="flexVisible: busy, toggleOpacity: busy">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <!-- ko if: addressLookup.searchResultsList().length == 50 -->
+            <p class="mb-3" style="text-align: center; font-style: italic;">
+                @(HtmlHelperExtra.Resource("TradeAddressBookFirstFifty", l, c, d))
+            </p>
+            <!-- /ko -->
+            <div class="pca-search-results-list grid" data-bind="keepElement: addressLookup.searchResultsList, foreach: addressLookup.searchResultsList">
+                <!-- ko if: $data.hasOwnProperty('displayBlock') -->
+                <div class="pca-search-result">
+                    <div class="display-block address-block">
+                        <!-- ko if: deliveryReference() -->
+                        <label class="delivery-reference-display mb-3">
+                            @HtmlHelperExtra.Resource("DeliveryReference", l, c, d):
+                            <span data-bind="text: deliveryReference"></span>
+                        </label>
+                        <!-- /ko -->
+                        <!-- ko if: companyName.observable() -->
+                        <label class="mb-3" data-bind="text: companyName.observable()"></label>
+                        <!-- /ko -->
+                        <!-- ko if: $data.hasOwnProperty('endCustomerTradeAccountName') -->
+                        <!-- ko if: $data.endCustomerTradeAccountName != null -->
+                        <span data-bind="text: endCustomerTradeAccountName"></span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: name.observable() -->
+                        <span data-bind="text: name.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: addressLine1.observable() -->
+                        <span data-bind="text: addressLine1.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: addressLine2.observable() -->
+                        <span data-bind="text: addressLine2.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: town.observable() -->
+                        <span data-bind="text: town.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: county.observable() -->
+                        <span data-bind="text: county.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: postcode.observable() -->
+                        <span data-bind="text: postcode.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: country() -->
+                        <!-- ko if: country().hasOwnProperty('Code') -->
+                        <span class="address-block-country" data-bind="text: country().Code"></span>
+                        <!-- /ko -->
+                        <!-- ko ifnot: country().hasOwnProperty('Name') -->
+                        <span class="address-block-country" data-bind="text: country"></span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: phone.observable() -->
+                        <span class="address-block-phone" data-bind="text: phone.observable"></span>
+                        <!-- /ko -->
+                        <!-- ko if: email.observable() -->
+                        <a href="#" class="address-block-email" data-bind="text: email.observable, attr: { href: 'mailto:' + email.observable() }"></a>
+                        <!-- /ko -->
+                    </div>
+                    <div class="address-controls">
+                        <!-- ko if: typeof $parentContext.$parent.selectFunction === 'function' -->
+                        <!-- ko if: $parentContext.$parent.selectPermitted($data) -->
+                        <div>
+                            <button class="btn btn-secondary address-select-button my-2" data-bind="click: $parentContext.$parent.selectFunction" style="align-self: flex-end;">
+                                @HtmlHelperExtra.Resource("FindAddressSelectAddress", l, c, d)
+                            </button>
+                        </div>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <div class="vstack gap-1 align-items-end mt-3">
+                            <!-- ko if: deliveryReference() != $parentContext.$parent.defaultDeliveryReference() -->
+                            <a href="javascript:;" data-bind="click: $parentContext.$parent.makeDefault">
+                                @HtmlHelperExtra.Resource("ManageAccountTradeMakeDeliveryAddressDefault", l, c, d)
+                            </a>
+                            <!-- /ko -->
+                            <!-- ko if: deliveryReference() == $parentContext.$parent.defaultDeliveryReference() -->
+                            <span class="default">
+                                [@HtmlHelperExtra.Resource("ManageAccountTradeDefaultDeliveryAddresses", l, c, d)]
+                            </span>
+                            <!-- /ko -->
+                            <a href="javascript:;" data-bind="click: function () { $component.pcaLookup.itemSelect($data.item); }">
+                                @HtmlHelperExtra.Resource("ManageTradeAccount_Edit", l, c, d)
+                            </a>
+                            <a href="javascript:;" data-bind="click: $parentContext.$parent.delete">
+                                @HtmlHelperExtra.Resource("Delete", l, c, d)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.hasOwnProperty('displayBlock') -->
+                <a class="list-group-item" data-bind="click: $component.pcaLookup.itemSelect, attr: { href: 'javascript:;' }, class: type">
+                    <span data-bind="text: label"></span>
+                </a>
+                <!-- /ko -->
+            </div>
+        </div>
+        @*<a data-bind="text: 'Enter Address Manually', attr: { href: 'javascript:;' }, click: function () { reset(true); addressObject.manual(true); showEditModal(); }"></a>*@
+        @*<span class="d-none" data-bind="css: { 'ready': ready(true) }, remove"></span>*@
+    </div>
+    <div class="modal fade" data-bind="keepElement: editModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="page-blocker" style="display: none" data-bind="flexVisible: busy, toggleOpacity: busy">
+                    <div class="spinner-border"></div>
+                    <h3>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h3>
+                </div>
+                <div class="modal-header grey-blue">
+                    <h4 class="modal-title">
+                        <!-- ko if: addressObject.deliveryReference() -->
+                        @HtmlHelperExtra.Resource("EditAddress", l, c, d)
+                        <span class="text-transparent" data-bind="text: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DeliveryReference", l, c, d))): ' + addressObject.deliveryReference()"></span>
+                        <!-- /ko -->
+                        <!-- ko if: addressObject.invoiceAddress -->
+                        @HtmlHelperExtra.Resource("RequestInvoiceChange", l, c, d)
+                        <!-- /ko -->
+                        <!-- ko ifnot: addressObject.deliveryReference() -->
+                        @HtmlHelperExtra.Resource("TradeAccountAddress", l, c, d)
+                        <!-- /ko -->
+                    </h4>
+                </div>
+                <div class="modal-body" data-bind="keepElement: [editModalBody, addressObject.editModalBody], with: addressObject">
+                    <div class="flex-container">
+                        <div class="address-edit-modal-main">
+                            <h4 class="mb-4">
+                                @HtmlHelperExtra.Resource("ContactDetails", l, c, d)
+                            </h4>
+                            <div class="mb-3" data-bind="component: { name: 'mdc-phone-field-component', params: phone }"></div> 
+                            <div data-bind="component: { name: 'mdc-text-field-component', params: email }"></div>
+                        </div>
+                    </div>
+                    <hr class="my-4" />
+                    <h4 class="mb-4">
+                        <span data-bind="text: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("TradeAccountAddress", l, c, d)))'"></span>
+                        <!-- ko if: deliveryReference() && deliveryReference() != 'C'-->
+                        <span data-bind="text: '- ' + deliveryReference()"></span>
+                        <!-- /ko -->
+                    </h4>
+                    <!-- ko if: domReady -->
+                    <div class="hstack gap-0 address-search-wrapper mb-3">
+                        <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
+                        <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                    </div>
+                    <!-- /ko -->
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                    <!-- ko if: domReady -->
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
+                    <!-- /ko -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-flat pull-left" data-bind="click: closeEditModal">
+                        @HtmlHelperExtra.Resource("Cancel", l, c, d)
+                    </button>
+                    <button class="btn btn-success" data-bind="click: validateAddress">
+                        <span data-bind="text: verb() + ' @(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ThisAddress", l, c, d)))'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <span class="d-none" data-bind="css: { 'ready': addressObject.domReady(true) }, remove"></span>
+</script>
+
+<script id="mdc-kendo-combobox-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-select mdc-select--outlined" data-bind="mdcSelectComponent: { 
+                boundTo: observable, 
+                useNativeValidation: useNativeValidation, 
+                optionsValue: comboBoxSettings.dataValueField, 
+                disabled: typeof disabled === 'undefined' ? false : disabled 
+             }, 
+            validationOptions: { 
+                insertMessages: insertValidationMessages, 
+                decorateInputElement: decorateInputElement 
+             }, 
+             css: { 'clearable': (typeof showClear === 'undefined' ? false : showClear ), 'revertable': typeof revertFunction === 'function' }">
+            <select class="mdc-select__native-control" style="display: none;"></select>
+            <div data-bind="kendoComboBox: comboBoxSettings, mdcKendoComboBox: comboBoxSettings, charsRemaining: charsRemainingOptions"></div>
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="mdc-text-field-numeric-component" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : readOnly }">
+            <input type="text" class="mdc-text-field__input text-right mdc-text-field__numeric" data-bind="numeric: observable, 
+                    keepElement: observable, 
+                    value: observable.formatted, 
+                    enable: typeof readOnly == 'undefined' ? true : !readOnly(),
+                    hasFocus: (typeof focusObservable === 'undefined' ? ko.observable() : focusObservable),
+                    css: { clearable: showClear, revertable: typeof revertFunction === 'function' }
+                    " />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof permitRevert != 'undefined' && permitRevert && typeof revertFunction === 'function' && typeof originalValue != 'undefined' -->
+        <div class="close revert" data-bind="click: revertFunction">
+            <i class="material-icons">
+                replay
+            </i>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+
+<script id="mdc-datepicker-component" type="text/html">
+    <div class="mdc-validating-field mdc-datepicker" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined" data-bind="
+                mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof disabled == 'undefined' ? false : disabled }">
+            <input id="custom-from-date" class="mdc-text-field__input" data-bind="kendoDatePicker: $data, click: function () { widget().open(); }" />
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
+    </div>
+</script>
+    
+<script id="mdc-checkbox-component" type="text/html">
+    <div class="mdc-form-field">
+        <div class="mdc-checkbox" data-bind="mdcCheckboxComponent: $data, validationOptions: { insertMessages: false }">
+            <input type="checkbox" class="mdc-checkbox__native-control" data-bind="checked: $data.observable, checkedValue: typeof checkedValue === 'undefined' ? true : checkedValue, attr: { id: checkboxId, 'disabled': typeof disabled === 'undefined' ? false : disabled }" />
+            <div class="mdc-checkbox__background">
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                </svg>
+            <div class="mdc-checkbox__mixedmark"></div>
+        </div>
+        <div class="mdc-checkbox__ripple"></div></div>
+        <label data-bind="html: label, attr: { for: checkboxId }, css: { 'checkbox-label-disabled': (typeof disabled === 'undefined' ? false : disabled) }"></label>
+    </div>
+</script>
+
+@*<div id="address-edit-modal" class="modal" data-bind="keepElement: editModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="page-blocker" style="display: none" data-bind="flexVisible: busy, toggleOpacity: busy">
+                <div class="spinner-border"></div>
+                <h3>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h3>
+            </div>
+            <div class="modal-header grey-blue">
+                <h4 class="modal-title">
+                    <!-- ko if: addressObject.deliveryReference() -->
+                    @HtmlHelperExtra.Resource("EditAddress", l, c, d)
+                    <span class="text-transparent" data-bind="text: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DeliveryReference", l, c, d))): ' + addressObject.deliveryReference()"></span>
+                    <!-- /ko -->
+                    <!-- ko if: addressObject.invoiceAddress -->
+                    @HtmlHelperExtra.Resource("RequestInvoiceChange", l, c, d)
+                    <!-- /ko -->
+                    <!-- ko ifnot: addressObject.deliveryReference() -->
+                    @HtmlHelperExtra.Resource("TradeAccountAddress", l, c, d)
+                    <!-- /ko -->
+                </h4>
+            </div>
+            <div class="modal-body" data-bind="with: addressObject">
+                <div class="flex-container">
+                    <div class="address-edit-modal-main">
+                        <h4>
+                            @HtmlHelperExtra.Resource("ContactDetails", l, c, d)
+                        </h4>
+                        <div class="mb-3" data-bind="component: { name: 'mdc-phone-field-component', params: phone }"></div> 
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: email }"></div>
+                    </div>
+                </div>
+                <hr class="my-4" />
+                <h4>
+                    <span data-bind="text: '@(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("TradeAccountAddress", l, c, d)))'"></span>
+                    <!-- ko if: deliveryReference() && deliveryReference() != 'C'-->
+                    <span data-bind="text: '- ' + deliveryReference()"></span>
+                    <!-- /ko -->
+                </h4>
+                <div class="hstack gap-0 address-search-wrapper mb-3">
+                    <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList }"></div>
+                    <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
+                </div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine2 }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: town }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: county }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: postcode }"></div>
+                <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList }"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-flat pull-left" data-bind="click: closeEditModal">
+                    @HtmlHelperExtra.Resource("Cancel", l, c, d)
+                </button>
+                <button class="btn btn-success" data-bind="click: validateAddress">
+                    <span data-bind="text: verb() + ' @(HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ThisAddress", l, c, d)))'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+<script id="trade-address-template" type="text/html">
+    <!-- ko if: displayHeading -->
+    <h4>
+        @HtmlHelperExtra.Resource("Addresses", l, c, d)
+    </h4>
+    <!-- /ko -->
+    <!-- ko if: displayInvoice -->
+    <div class="form-group">
+        <label class="field-label">
+            @HtmlHelperExtra.Resource("ManageAccountTradeInvoiceAddress", l, c, d)
+            <a href="javascript:;" class="pull-right" data-bind="click: requestInvoiceAddressChange">
+                @HtmlHelperExtra.Resource("ManageAccountTradeInvoiceAddressRequestChange", l, c, d)
+            </a>
+        </label>
+        <div data-bind="with: invoiceAddress">
+            <div data-bind="html: displayBlock"></div>
+            <!-- ko if: typeof $parent.selectFunction === 'function' -->
+            <!-- ko if: $parent.selectPermitted($data) -->
+            <button class="btn btn-secondary address-select-button" data-bind="click: $parent.selectFunction">
+                @HtmlHelperExtra.Resource("FindAddressSelectAddress", l, c, d)
+            </button>
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <div id="invoice-address-change-requested" style="display: none" class="alert alert-success">
+            <h4 class="alert-title">
+                @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+            </h4>
+            <p class="mb-0">
+                @HtmlHelperExtra.Resource("YourRequestHasBeenRecorded", l, c, d)
+            </p>
+        </div>
+        <div style="display: none;" data-bind="component: { name: 'mdc-address-search-component', params: invoiceAddressSearch }"></div>
+    </div>
+    <!-- /ko -->
+    <div class="form-group">
+        <button class="btn btn-secondary d-block w-100 mb-3" data-bind="click: function () { addressSearch.showEditModal(true); }">
+            @HtmlHelperExtra.Resource("ManageAccountTradeAddDeliveryAddress", l, c, d)
+        </button>
+        @*<label class="d-block my-3">
+            @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
+        </label>*@
+        <div class="relative">
+            <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
+        </div>
+    </div>
+</script>
+
+<script id="mdc-text-area-component" type="text/html">
+    <div class="mdc-validating-field">
+        <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" data-bind="mdcTextFieldComponent: { boundTo: observable, useNativeValidation: useNativeValidation }, 
+                validationOptions: { insertMessages: insertValidationMessages, decorateInputElement: decorateInputElement },
+                css: { 'mdc-text-field--disabled': typeof readOnly == 'undefined' ? false : readOnly }">
+            <textarea class="mdc-text-field__input" data-bind="maxNewLines: typeof maxNewLines === 'undefined' ? null : maxNewLines, keepElement: observable, textInput: observable, charsRemaining: charsRemainingOptions, attr: { rows: rows, readonly: typeof readOnly == 'undefined' ? false : readOnly }" rows="6" maxlength="500"></textarea>
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+            <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+            <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+            <!-- /ko -->
+        </div>
+    </div>
+</script>
+
+@Render.Script("~/bundles/js/ko-components")

@@ -1,0 +1,47 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+.region-grid {
+    --bs-columns: 6;
+    gap: $xl-gutter;
+    margin-bottom: var(--xxl-gutter);
+
+    .region-header {
+        grid-column: auto/span 6;
+        h4 { 
+            margin-bottom: 0;
+        }
+    }   
+
+    .country {
+        a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+
+            img {
+                margin-inline-end: var(--sm-gutter);
+            }
+
+            span {
+                display: block;
+                font-size: $small-font-size;
+                color: $gray-dg-body;
+            }
+        }
+
+        a:hover {
+            span {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.region-grid + .region-grid {
+    margin-top: var(--xxl-gutter);
+    padding-top: var(--xl-gutter);
+    border-top: 1px solid $gray-300;
+}

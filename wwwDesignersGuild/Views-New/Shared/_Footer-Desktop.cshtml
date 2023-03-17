@@ -1,0 +1,261 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+
+    var tradeUser = objMaster.TradeAllowed;
+
+    var menu = Model.MasterDefinition.Menu.menuGroups.Where(p => p.MenuID == 0).SingleOrDefault();
+
+    var menuItems = Model.MasterDefinition.Menu.menuItems.Where(p => p.MenuID == 0).ToList();
+}
+<div class="container d-flex justify-content-between">
+   @if (menu != null && menuItems.Any())
+    {
+        <nav id="footer-menu" class="navbar menu-navbar" role="navigation">
+            @{ 
+                var columns = menuItems.GroupBy(ch => ch.Column).ToList();
+                columns.ForEach(col =>
+                {
+                    col.OrderBy(mi => mi.SortOrder).First().FirstInColumn = true;
+                });
+            }
+            <div class="grid px-0" style="--bs-columns: @(columns.Count());">
+               @foreach(var column in columns)
+                {
+                    @BuildMenuColumn(Model, column)
+                }
+            </div>
+        </nav>
+    }
+    <div>
+    @if(!tradeUser)
+    {
+        <form method="get" 
+                action="/uk/join-our-mailing-list/l100"
+                target="_self"
+              class="py-2 container">
+            <h5 class="text-uppercase mt-1">
+                @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
+            </h5>
+            <div class="input-group">
+                <input name="mailing-email"
+                       class="form-control"
+                       type="text"
+                       aria-label="@HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)"
+                       placeholder="@HtmlHelperExtra.Resource("EnterEmailAddress", l, c, d)" />
+                <button type="submit"
+                        class="btn btn-secondary">
+                    @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+                </button>
+            </div>
+        </form>
+    }
+    <ul class="d-flex flex-row justify-content-center align-items-center">
+        <li>
+            <a href="https://www.facebook.com/designersguildgroup/" target="_blank">
+                <img src="~/Content/images/social/icon-facebook@(Framework.WebpOrPngExtension)"
+                     width="24"
+                     height="24"
+                     alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)"
+                     title="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
+            </a>
+        </li>
+        <li>
+            <a href="https://www.pinterest.co.uk/designersguild/" target="_blank">
+                <img src="~/Content/images/social/icon-pinterest@(Framework.WebpOrPngExtension)"
+                     width="24"
+                     height="24"
+                     alt="@HtmlHelperExtra.Resource("Pinterest", l, c, d)"
+                     title="@HtmlHelperExtra.Resource("Pinterest", l, c, d)" />
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/designersguild" target="_blank">
+                <img src="~/Content/images/social/icon-twitter@(Framework.WebpOrPngExtension)"
+                     width="24"
+                     height="24"
+                     alt="@HtmlHelperExtra.Resource("Twitter", l, c, d)"
+                     title="@HtmlHelperExtra.Resource("Twitter", l, c, d)" />
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/c/designersguild" target="_blank">
+                <img src="~/Content/images/social/icon-youtube@(Framework.WebpOrPngExtension)"
+                     width="24"
+                     height="24"
+                     alt="@HtmlHelperExtra.Resource("YouTube", l, c, d)"
+                     title="@HtmlHelperExtra.Resource("YouTube", l, c, d)" />
+            </a>
+        </li>
+        <li>
+            <a href="https://www.instagram.com/designersguild/?hl=en" target="_blank">
+                <img src="~/Content/images/social/icon-instagram@(Framework.WebpOrPngExtension)"
+                     width="24"
+                     height="24"
+                     alt="@HtmlHelperExtra.Resource("Instagram", l, c, d)"
+                     title="@HtmlHelperExtra.Resource("Instagram", l, c, d)" />
+            </a>
+        </li>
+    </ul>
+    <div class="footer-copy">
+        <a id="change-country"
+            href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.countryPicker, cd)"
+            target="_self">
+            <img class="country-img country-list" src="~/Content/images/country/@(c)@(Framework.WebpOrPngExtension)?v=1" alt="@cd.Name" title="@HtmlHelperExtra.Resource("ChangeCountry", l, c, d)" />
+            <span>
+                @(cd.Name) @((c == 81 || c == 238) ? "" : "| " + cd.LanguageCode.ToUpper())
+            </span>
+        </a>
+    </div>
+    <div class="footer-copy">
+        &copy; @HtmlHelperExtra.Resource("FooterDGTitle", l, c, d) @DateTime.Now.Year.ToString()
+    </div>
+    @if (!tradeUser && c != 118)
+    {
+        var feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-uk?displayFeedbackType=BOTH&timeFrame=ALL";
+        var feefoImgUrl = "/content/images/logo/feefo.jpg";
+        if (c == 238)
+        {
+            feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-us?displayFeedbackType=BOTH&timeFrame=ALL";
+            feefoImgUrl = "/content/images/logo/feefo-us.jpg";
+        }
+        <a href="@(feefoUrl)" target="_blank" rel="noreferrer" title="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)">
+            <img id="feefo"
+                 class="mb-3"
+                 width="264"
+                 height="83"
+                 title="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)"
+                 alt="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)"
+                 src="@(feefoImgUrl)"
+                 loading="lazy" />
+        </a>
+    }
+    </div>
+</div>
+
+@helper BuildMenuColumn(BaseViewModel model, IGrouping<byte, menuItem> column)
+{
+    <ul class="g-col-1" id="column-@(column.Key)">
+        @foreach (var menuItem in column.OrderBy(c => c.SortOrder)) 
+        {
+            @BuildMenuItem(model, menuItem)
+        }
+    </ul>
+}
+
+@helper BuildMenuItem(BaseViewModel model, menuItem item)
+{
+    var objMenu = model.MasterDefinition.Menu;
+
+    var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = model.MasterDefinition.UrlBreakdown.countryDetails;
+
+    if (item.BannerLocationID == null)
+    {
+        var url = item.FinalURL(ci.URL);
+        <li>
+       @if (url == "javascript:;")
+        {
+            <a  id="menu-item-@(item.MenuItemID)"
+                class="nav-link @item.FontClass @(item.FontClass?.Contains("header") == true && !item.FirstInColumn ? "mt-3" : "")"
+                aria-label="@(item.FontClass == "menu-spacer" ? HtmlHelperExtra.Resource("MenuSpacer", l, c, d).ToString() : item.Name)"
+                target="@(item.NewWindow ? "_blank" : "_self")"
+                onclick="@(item.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                rel="@(item.NoFollow ? "nofollow noopener" : "")">
+               @if (item.Header || item.FontClass.Contains("bold"))
+                {
+                    <span class="text-uppercase">
+                        @(item.Name.ToUpperInvariant())
+                    </span>
+                }
+                else
+                {
+                    @(item.Name)
+                }
+            </a>
+        }
+        else 
+        { 
+            <a  id="menu-item-@(item.MenuItemID)"
+                class="nav-link @item.FontClass @(item.FontClass?.Contains("header") == true && !item.FirstInColumn ? "mt-3" : "")"
+                aria-label="@(item.FontClass == "menu-spacer" ? HtmlHelperExtra.Resource("MenuSpacer", l, c, d).ToString() : item.Name)"
+                href="@Framework.URLFixup(url)"
+                target="@(item.NewWindow ? "_blank" : "_self")"
+                onclick="@(item.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                rel="@(item.NoFollow ? "nofollow noopener" : "")">
+               @if (item.Header || item.FontClass.Contains("bold"))
+                {
+                    <span class="text-uppercase">
+                        @(item.Name.ToUpperInvariant())
+                    </span>
+                }
+                else
+                {
+                    @(item.Name)
+                }
+            </a>
+        }
+        </li>
+    }
+    else
+{
+    var banners = model
+        .Banners
+        .Where(bl => bl.id == item.BannerLocationID).SelectMany(bl => bl.banners)
+        .Where(b => b.restrictions.menuIds == null || b.restrictions.menuIds.Contains(item.MenuID))
+        .ToList();
+
+    if (@*(!Request.IsLocal) &&*@ banners.Any())
+        {
+            <li>
+               @if (banners.Count() == 1)
+                {
+                    var banner = banners.First();
+
+                    <a  id="menu-item-@(item.MenuItemID)"
+                        class="nav-link @item.FontClass"
+                        aria-label="@(item.FontClass == "menu-spacer" ? HtmlHelperExtra.Resource("MenuSpacer", l, c, d).ToString() : item.FontClass)"
+                        href="@((item.FontClass == "menu-spacer" ? "javascript:;" : 
+                                $"{banner.linkURL}{item.QueryStringParameters}" +
+                                $"{(String.IsNullOrEmpty(item.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}" )}"))"
+                        target="@(banner.newWindow ? "_blank" : "_self")"
+                        onclick="@(item.TrackExternalURL ? "return trackOutbound(this);" : "")"
+                        rel="@(item.NoFollow ? "nofollow noopener" : "")">
+                        <img src="/imagebanner@(Framework.WebPFallback)/256/@(banner.bannerId)"
+                             alt="@(banner.altText ?? banner.overlayText ?? item.Name)" 
+                             title="@(banner.titleText ?? banner.overlayText ?? item.Name)"  />
+                    </a>
+                }
+                else
+                {
+                    <div class="carousel slide carousel-fade carousel-dark"
+                         data-bs-ride="carousel"
+                         data-bs-interval="3000">
+                        <div class="carosuel-inner">
+                           @foreach (var b in banners.Select((value, index) => new { value, index }))
+                            {
+                                var banner = b.value;
+                                var index = b.index;
+                                <div class="carousel-item @(index == 0 ? "active" : "")">
+                                    <img src="/imagebanner@(Framework.WebPFallback)/156/@banner.bannerId?v=@banner.version"
+                                            class="d-block w-100 pointer"
+                                            alt="@(banner.altText ?? item.Name)"
+                                            width="156"
+                                            height="156">
+                                    @banner.overlayText
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </li>
+        }
+    }
+}

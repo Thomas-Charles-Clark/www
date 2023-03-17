@@ -1,0 +1,142 @@
+﻿@model ProductPageViewModel_FabricWallpaper
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+@section LateTemplateScripts {
+    @Render.Script("~/bundles/js/product-page")
+}
+@Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
+<div id="ko-wrapper">
+    @if (Model.AllProductsUnavailable)
+    {
+        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+            @JsonConvert.SerializeObject(new ProductPageViewModel_Empty())
+        </div>
+    }
+    else
+    {
+        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+            @JsonConvert.SerializeObject(Model)
+        </div>
+    }
+    <div id="product-page-main" class="grid">
+        <div id="product-page-carousel-wrapper">
+            <div class="mb-3">
+                @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+            </div>
+        </div>
+        <div id="product-page-order-form-wrapper">
+            <div class="d-flex justify-content-between align-items-top">
+                <div>
+                    <h4 class="text-uppercase">
+                        @Model.Definition.heading
+                    </h4>
+                    <h6 class="text-uppercase">
+                        @Model.Definition.brand
+                    </h6>
+                    <h6 class="text-uppercase">
+                        @Model.Definition.subHeading
+                    </h6>
+                </div>
+                @if (!Model.AllProductsUnavailable && JObject.FromObject(Model.ProductPagePrice)["discountMessage"] != null)
+                {
+                    <div class="text-end">
+                        <h4 class="discount">
+                            @JObject.FromObject(Model.ProductPagePrice).SelectToken("discountMessage")
+                        </h4>
+                    </div>
+                }
+            </div>
+            <div class="my-4">
+                <hr />
+            </div>
+            @Html.Partial("~/Views-New/ProductPages/Shared/_AlternateColourways.cshtml")
+            @if (Model.AllProductsUnavailable)
+            {
+                <h3>
+                    @HtmlHelperExtra.Resource("AllProductsUnavailable", l, c, d)
+                </h3>
+            }
+            else
+            {
+                <!-- ko foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup } -->
+                <div data-init
+                     class="order-form-group">
+                    @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", Model.MainProduct)
+                </div>
+                <!-- /ko -->
+            }
+            <div id="product-page-accordion" class="my-3 accordion accordion-flush">
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="description-panel-heading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description-panel" aria-expanded="true" aria-controls="description-panel">
+                            @HtmlHelperExtra.Resource("Description", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="description-panel" class="accordion-collapse collapse show" aria-labelledby="description-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            @Html.Raw(JObject.FromObject(Model.Definition.json).SelectToken("description"))
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="information-panel-heading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#information-panel" aria-expanded="false" aria-controls="information-panel">
+                            @HtmlHelperExtra.Resource("Information", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="information-panel" class="accordion-collapse collapse" aria-labelledby="information-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            <dl class="grid">
+                                @Html.Raw(Model.TechInfoDisplay)
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                @* Sarah asked for Reviews to be removed from F&W 03/08/2022 *@
+                @*<div class="accordion-item">
+                        <h6 class="accordion-header" id="reviews-panel-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviews-panel" aria-expanded="false" aria-controls="reviews-panel">
+                                @HtmlHelperExtra.Resource("Reviews", l, c, d)
+                            </button>
+                         </h6>
+                        <div id="reviews-panel" class="accordion-collapse collapse" aria-labelledby="reviews-panel" data-bs-parent="#product-page-accordion">
+                            <div class="accordion-body">
+                                @if (JObject.FromObject(Model.Definition.json).SelectToken("reviews").Type == JTokenType.Null)
+                                {
+                                    @HtmlHelperExtra.Resource("NoReviewsYet", l, c, d)
+                                }
+                                else
+                                {
+                                    @(JObject.FromObject(Model.Definition.json).SelectToken("reviews"))
+                                }
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+    @if (Model.MainProduct?.ProductTypeID == 18)
+    {
+        @* Wallpaper *@
+        @Html.Partial("~/Views-New/ProductPages/Shared/_CoverageCalculatorModal.cshtml", Model)
+    }
+</div>
+@if (Model.RelatedProductPages.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml", Model)
+}
+@if (Model.ShowRecentlyViewed)
+{
+    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+}
+@if (Model.RelatedSearches.Any())
+{
+    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml", Model)
+}

@@ -1,0 +1,146 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutPayment
+@using wwwDesignersGuild.Models.Helper;
+@{
+    Layout = null;
+
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<div data-bind="with: giftVoucherFactory">
+    <div id="gift-voucher-modal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @HtmlHelperExtra.Resource("CheckoutPayGiftEnterVoucherText", l, c, d)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="pay-giftcode" data-bind="validationOptions: { insertMessages: false }">
+                        <input id="voucherCodeOne" class="voucher-code-part form-control" type="text" maxlength="4" name="giftcode-one" data-bind="keepElement: voucherCodeOne, textInput: voucherCodeOne, event: { paste: voucherPaste }" onfocus="$(this).select()" />
+                        -
+                        <input id="voucherCodeTwo" class="voucher-code-part form-control" type="text" maxlength="4" name="giftcode-two" data-bind="keepElement: voucherCodeTwo, textInput: voucherCodeTwo, event: { paste: voucherPaste }" onfocus="$(this).select()" />
+                        -
+                        <input id="voucherCodeThree" class="voucher-code-part form-control" type="text" maxlength="4" name="giftcode-three" data-bind="keepElement: voucherCodeThree, textInput: voucherCodeThree, event: { paste: voucherPaste }" onfocus="$(this).select()" />
+                        -
+                        <input id="voucherCodeFour" class="voucher-code-part form-control" type="text" maxlength="4" name="giftcode-four" data-bind="keepElement: voucherCodeFour, textInput: voucherCodeFour, event: { paste: voucherPaste }" onfocus="$(this).select()" />
+                        &nbsp;
+                        <button id="apply-gift-voucher" type="button" class="btn btn-dark mt-3 d-block" data-bind="click: applyVoucherCode">
+                            @HtmlHelperExtra.Resource("CheckoutPayGiftApply", l, c, d)
+                        </button>
+                        <span class="validation-message text-danger" data-bind="validationMessage: voucherTotalLength"></span>
+                        <span id="gift-voucher-failure-message" class="validation-message text-danger"></span>
+                    </div>
+                    <div class="pay-gift-container" data-bind="if: vouchers().length > 0">
+                        <table class="pay-gift-header table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @HtmlHelperExtra.Resource("CheckoutPayGiftVoucherCode", l, c, d)
+                                    </th>
+                                    <th>
+                                        @HtmlHelperExtra.Resource("CheckoutPayGiftExpiry", l, c, d)
+                                    </th>
+                                    <th class="amount">
+                                        @HtmlHelperExtra.Resource("CheckoutPayGiftAmount", l, c, d)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ko foreach: vouchers() -->
+                                <tr>
+                                    <td data-bind="text: Code"></td>
+                                    <td class="expiry" data-bind="text: displayExpiryDate"></td>
+                                    <td class="amount" data-bind="text: resources.currencySymbol + ValueInc.formatCurrencyForDisplay()"></td>
+                                    <td>
+                                        <a href="javascript:;" class="remove" data-bind="click: function () { $parent.voucherToRemove($data); }">
+                                            @HtmlHelperExtra.Resource("CheckoutPayGiftRemove", l, c, d)
+                                        </a>
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2">
+                                        @HtmlHelperExtra.Resource("CheckoutPayGiftTotal", l, c, d)
+                                    </th>
+                                    <td data-bind="text: resources.currencySymbol + vouchersTotal().formatCurrencyForDisplay()"></td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2">
+                                        @HtmlHelperExtra.Resource("CheckoutPayGiftBalance", l, c, d)
+                                    </th>
+                                    <td>
+                                        <span data-bind="text: resources.currencySymbol + balance().formatCurrencyForDisplay()"></span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="voucher-remove-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("CheckoutPayRemoveGiftVoucher", l, c, d)
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div style="height:100px; margin-top:20px;" data-bind="with: voucherToRemove()">
+                        <p></p>
+                        <br />
+                        <p data-bind="text: Code" style="font-weight:bold; text-align: center;"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-flat pull-left" data-bs-dismiss="modal">
+                        @HtmlHelperExtra.Resource("DeleteConfirmNegative", l, c, d)
+                    </button>
+                    <button type="button" class="btn btn-success pull-right" data-bind="click: removeVoucher">
+                        @HtmlHelperExtra.Resource("DeleteConfirmPositive", l, c, d)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div id="delete-confirm" class="overlay-bg" data-bind="style: { display: voucherToRemove() ? 'block' : 'none' }, click: closeRemoveVoucher">
+        <div class="overlay-content" style="width:400px;height:160px;">
+            <a data-bind="click: closeRemoveVoucher" class="close-btn"></a>
+            <div style="height:100px; margin-top:20px;" data-bind="with: voucherToRemove()">
+                <p>@HtmlHelperExtra.Resource("CheckoutPayRemoveGiftVoucher", languageId, countryId, contentDate)</p>
+                <br />
+                <p data-bind="text: Code" style="font-weight:bold;"></p>
+            </div>
+            <ul class="thatSide">
+                <li>
+                    <a data-bind="click: closeRemoveVoucher" style="cursor: pointer;">
+                        @HtmlHelperExtra.Resource("DeleteConfirmNegative", languageId, countryId, contentDate)
+                    </a>
+                </li>
+                <li class="de">
+                    <a style="cursor: pointer; background-color:#000; color:#FFF;" data-bind="click: removeVoucher">
+                        @HtmlHelperExtra.Resource("DeleteConfirmPositive", languageId, countryId, contentDate)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>*@
+</div>
+<script>
+    window.addLoadFunction(() => {
+        // must we do this from here?
+        if (typeof window.viewModel != 'undefined') {
+            viewModel.giftVoucherFactory.reloadGiftVoucherDetails();
+        }
+    });
+</script>

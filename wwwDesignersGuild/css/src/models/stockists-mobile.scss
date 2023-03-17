@@ -1,0 +1,160 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "../common/variables";
+
+#stockist-search-form {
+    display: grid;
+    --bs-columns: 1;
+    padding: 0;
+
+    #stockists-toolbar {
+        order: 1;
+        --bs-columns: 1;
+        flex-direction: column;
+        gap: $l-gutter;
+        margin: 0 auto $l-gutter auto;
+        padding: 0;
+        width: 100%;
+        padding: $l-gutter 0;
+
+        > div {
+            width: 100%;
+        }
+
+        > .flex {
+            display: grid;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+        }
+
+        #location {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: $gray-dg-body;
+            line-height: 1em;
+            gap: $l-gutter;
+            width: 100%;
+
+            .material-icons::after {
+                content: 'location_searching'
+            }
+        }
+
+        #location:hover,
+        #location:focus,
+        #location:focus-within {
+            span {
+                text-decoration: underline;
+            }
+
+            .material-icons::after {
+                content: 'my_location'
+            }
+        }
+    }
+
+    #stockist-filters {
+        padding-bottom: $l-gutter;
+        margin-bottom: $l-gutter;
+        border-bottom: 1px solid $gray-300;
+
+        button {
+            width: 100%;
+        }
+    }
+
+    #featured-stockists {
+        order: 2;
+        gap: $l-gutter;
+        flex-direction: column;
+        --bs-columns: 1 !important;
+        display: none;
+    }
+
+    #stockists-panel {
+        order: 3;
+        --bs-columns: 1;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 0;
+
+        #stockist-options {
+            grid-column: auto/span 1;
+            margin-bottom: var(--xl-gutter);
+
+            #brands,
+            #product-types {
+                grid-column: auto/span 1;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+
+                .form-check {
+                    margin-left: var(--l-gutter);
+                }
+
+                .form-check + .form-check {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        #stockist-results {
+            .stockist {
+                .stockist-inner {
+                    .stockist-brands {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+
+    #stockist-detail-modal {
+        .modal-dialog {
+            .modal-body {
+                > div.d-flex {
+                    flex-direction: column;
+
+                    > div#map-canvcas {
+                        flex: unset;
+                    }
+
+                    p {
+                        word-break: break-word;
+                        white-space: normal;
+                    }
+
+                    img.stockist-img {
+                        width: 100%;
+                        max-width: unset;
+                        height: auto;
+                    }
+                }
+
+                #map-canvas {
+                    height: 350px;
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+#stockist-search-form {
+    #stockist-detail-modal {
+        .modal-dialog {
+            .modal-body {
+                > div.d-flex {
+                    > div {
+                        flex: unset;
+                    }
+                }
+            }
+        }
+    }
+}

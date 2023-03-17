@@ -1,0 +1,269 @@
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeRegistrationViewModel
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var displayEmailAddress = Model.BaseViewModel.Visitor.Email;
+
+    var displayAdmin = Model.Data?.FormType == "PrimaryAdmin";
+}
+
+<script type="text/javascript">
+    var basketCountry = "@objMaster.UrlBreakdown.countryDetails.URL";
+    var siteMTXCurrency = '@(objMaster.UrlBreakdown.countryDetails.MertexCurrencyCode)';
+    var countryId = "@objMaster.UrlBreakdown.countryDetails.CountryID";
+    var languageId = "@objMaster.UrlBreakdown.countryDetails.LanguageID";
+</script>
+
+@if (!Model.BaseViewModel.TradeOrderingAllowed)
+{
+    <div class="alert alert-danger">
+        <h4 class="alert-heading mb-0">
+            @HtmlHelperExtra.Resource("TradeOrderingNotInYourMarket", l, c, d)
+        </h4>
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper" class="mt-3">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div id="trade-registration" style="display: none" data-bind="visible: true">
+                <div id="registration-preamble" data-bind="visible: tradeCheckResultText() == null">
+                    <h4>
+                        @HtmlHelperExtra.Resource("TradeRegistrationTitle", l, c, d)
+                    </h4>
+                    <span>
+                        @HtmlHelperExtra.Resource("TradeRegistrationSubTitle", l, c, d)
+                    </span>
+                    <div id="next-step" class="customer" style="display: none;">
+                        <form class="customer-form">
+                            <div>
+                                @HtmlHelperExtra.Resource("RegistrationCompleteMessage", l, c, d)
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <p class="trade-check-result-text" data-bind="html: resources.TradeLoginHeadingText"></p>
+                        <div class="summary-help" data-bind="visible: !tradeComplete()">
+                            @if (Model.Data?.CustomerServicesPhoneNumber != null)
+                            {
+                                <p class="summary-help-title">
+                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesTitle", l, c, d)
+                                </p>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d):
+                                            </th>
+                                            <td>
+                                                <a class="summary-help-phone" href="tel:@(Model.Data?.CustomerServicesPhoneNumber)">@(Model.Data?.CustomerServicesPhoneNumber)</a>
+                                            </td>
+                                        </tr>
+                                        @if (Model.Data?.SalesRepresentativeEmail != null)
+                                        {
+                                            <tr>
+                                                <th>
+                                                    @HtmlHelperExtra.Resource("MemberEditYourSalesRep", l, c, d):
+                                                </th>
+                                                <td>
+                                                    <span>
+                                                        @(Model.Data?.SalesRepresentativeName)
+                                                    </span>
+                                                    <a class="summary-help-email" href="mailto:@(Model.Data?.SalesRepresentativeEmail)">@(Model.Data?.SalesRepresentativeEmail)</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div id="registration-complete" style="display: none" data-bind="visible: tradeCheckResultText()">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">
+                            @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                        </h4>
+                        <p class="mb-0" data-bind="html: tradeCheckResultText"></p>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-4" style="display: none;" data-bind="visible: tradeCheckResultErrorText() != null">
+                    <h4 class="alert-heading mb-0" data-bind="html: tradeCheckResultErrorText"></h4>
+                </div>
+                @if (Model.Data?.Result == true)
+                {
+                    <div id="trade-registration-inner" style="display: none" data-bind="visible: tradeCheckResultText() == null">
+                        <div class="address-form">
+                            <div class="page-blocker" data-bind="flexVisible: tradeSubmitBusy, toggleOpacity: tradeSubmitBusy">
+                                <div class="spinner-border"></div>
+                                <h4>
+                                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                </h4>
+                            </div>
+                            <div data-bind="visible: !tradeComplete()">
+                                @if (displayAdmin)
+                                {
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNumberParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountInvoicePostcodeParams }"></div>
+                                    <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountPhoneParams }"></div>
+                                }
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeEmailParams }"></div>
+                                <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNameParams }"></div>
+
+                                <div class="form-group">
+                                    <div data-bind="validationOptions: { insertMessages: false }">
+                                        <div class="mb-3" data-bind="component: { name: 'mdc-password-field-component', params: tradeAccountPasswordParams }"></div>
+                                        <!-- ko if: tradePassword() -->
+                                        <div class="meter-wrapper" data-bind="with: tradePassword.zxcvbn">
+                                            <meter value="0" min="0" low="2" high="3" max="4" optimum="4" data-bind="value: score">
+                                                <span class="meter-gauge">
+                                                    <span class="meter-display" data-bind="visible: score == 1"></span>
+                                                    <span class="meter-display" data-bind="visible: score == 2"></span>
+                                                    <span class="meter-display" data-bind="visible: score == 3"></span>
+                                                    <span class="meter-display" data-bind="visible: score == 4"></span>
+                                                </span>
+                                            </meter>
+                                            <span class="hint" data-bind="text: $parent.resources['ManageAccountPasswordStrength' + score]"></span>
+                                            <i class="fas fa-question-circle password-tips pointer" data-toggle="modal" data-target="#password-hint-modal"></i>
+                                        </div>
+                                        <a class="pointer mt-2" data-bs-toggle="modal" data-bs-target="#password-hint-modal" style="display: inline-block; text-decoration: none;">
+                                            @HtmlHelperExtra.Resource("ManageAccountPasswordHint", l, c, d)
+                                        </a>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display: none;">
+                                    @* This is intentionally hidden, Sarah wanted it to not be presented *@
+                                    <label class="field-label">
+                                        @HtmlHelperExtra.Resource("PricingDisplay", l, c, d)
+                                    </label>
+                                    <div>
+                                        <label class="pointer pricing-display-lbl">
+                                            <input id="retail-price" type="radio" name="pricing-display" data-bind="checked: displayTradePrice, checkedValue: false" />
+                                            @HtmlHelperExtra.Resource("RetailPrices", l, c, d).ToString().ToUpperInvariant()
+                                        </label>
+                                        <label class="pointer pricing-display-lbl">
+                                            <input id="trade-price" type="radio" name="pricing-display" data-bind="checked: displayTradePrice, checkedValue: true" />
+                                            @HtmlHelperExtra.Resource("TradePrices", l, c, d).ToString().ToUpperInvariant()
+                                        </label>
+                                    </div>
+                                    <span class="trade-pricing-note">
+                                        @Html.Raw(HtmlHelperExtra.Resource("ManageTradeAccount_PricingNote", l, c, d))
+                                    </span>
+                                    <span class="trade-pricing-note">
+                                        @HtmlHelperExtra.Resource("TradeRegistrationPricingHint", l, c, d)
+                                    </span>
+                                </div>
+
+                                <label id="login-error" class="field-label" style="display: none;" data-bind="text: resources.LoginInvalid"></label>
+
+                                <button id="trade-submit" type="button" class="btn btn-secondary" data-bind="click: function() { tradeRegistrationSubmit() }">
+                                    @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger mt-3">
+                        <h4 class="alert-heading mb-0">
+                            @HtmlHelperExtra.Resource("ManageAccountErrorTradeAccountNumberConfiguration", l, c, d)
+                        </h4>
+                    </div>
+                }
+                <h4>
+                    @HtmlHelperExtra.Resource("TradeRegistrationPricingInfo", l, c, d)
+                </h4>
+            </div>
+        </div>
+    </div>
+
+    <div id="password-hint-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("PasswordAdvice", l, c, d)
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip1", l, c, d)
+                    </h4>
+                    <ul>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li1", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li2", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li3", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip1_li4", l, c, d)
+                        </li>
+                    </ul>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip2", l, c, d)
+                    </h4>
+                    <ol>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li1", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li2", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li3", l, c, d)
+                        </li>
+                        <li>
+                            @HtmlHelperExtra.Resource("PasswordAdviceTip2_li4", l, c, d)
+                        </li>
+                    </ol>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3", l, c, d)
+                    </h4>
+                    <p>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3_p1", l, c, d)
+                    </p>
+                    <p>
+                        @HtmlHelperExtra.Resource("PasswordAdviceTip3_p2", l, c, d)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function getTradeEmail() {
+            return '@(Model.Data?.Email)'
+        }
+        function getAuthGuid() {
+            return '@(Model?.GUID)'
+        }
+        function getDisplayAdmin() {
+            return @displayAdmin.ToString().ToLowerInvariant();
+        }
+    </script>
+    @Render.Script("~/bundles/js/trade-registration")
+}

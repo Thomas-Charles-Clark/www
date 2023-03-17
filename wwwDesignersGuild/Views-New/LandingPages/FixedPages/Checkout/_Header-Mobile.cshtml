@@ -1,0 +1,34 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+    
+    var tradeUser = objMaster.TradeAllowed;
+}
+<div id="logo-search-container"
+     class="container mt-4">
+    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, cd)">
+        @if (tradeUser) 
+        {
+        <img id="navbar-logo" width="512" height="37" title="@HtmlHelperExtra.Resource("DesignersGuild", l, c, d)" alt="@HtmlHelperExtra.Resource("DesignersGuildLogo", l, c, d)" 
+                src="/Content/images/logo/dg-logo-b2b-670-37@(Framework.WebpOrPngExtension)"
+                srcset="/Content/images/logo/dg-logo-b2b-670-37@(Framework.WebpOrPngExtension) 1x,
+                        /Content/images/logo/dg-logo-b2b-1340-73@(Framework.WebpOrPngExtension) 2x,
+                        /Content/images/logo/dg-logo-b2b-2680-145@(Framework.WebpOrPngExtension) 4x"
+                sizes="(max-width: 992px) 512px, (max-width: 1200px) 1024px, 2048px"/>
+        }
+        else
+        {
+        <img id="navbar-logo" width="512" height="37" title="@HtmlHelperExtra.Resource("DesignersGuild", l, c, d)" alt="@HtmlHelperExtra.Resource("DesignersGuildLogo", l, c, d)" 
+                src="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension)"
+                srcset="/Content/images/logo/dg-logo-512-37@(Framework.WebpOrPngExtension) 1x,
+                        /Content/images/logo/dg-logo-1024-73@(Framework.WebpOrPngExtension) 2x,
+                        /Content/images/logo/dg-logo-2048-145@(Framework.WebpOrPngExtension) 4x"
+                sizes="(max-width: 992px) 512px, (max-width: 1200px) 1024px, 2048px"/>
+        }
+    </a>
+</div>

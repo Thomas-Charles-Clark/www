@@ -1,0 +1,200 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeAccountContactDetailsViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseDefinition.MasterDefinition;
+
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+
+@if (!String.IsNullOrEmpty(Model.heading))
+{
+    <div class="row">
+        <div class="col-full header check">
+            <h2>@(Model.heading)</h2>
+        </div>
+    </div>
+}
+
+@if (!Model.tradePermissionAccountAdmin)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailureContact", l, c, d)
+            @(Model.tradeAccountModel.AccountDetails.Code) - @(Model.tradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.tradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseDefinition)
+
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h3>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h3>
+            </div>
+            <div id="trade-account-contact-details" style="display: none" data-bind="visible: true">
+                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: memberList, remove">
+                    @(Html.Raw(JsonConvert.SerializeObject(Model.tradeAccountModel.Administrators.Concat(Model.tradeAccountModel.Users))))
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: orderConfirmationsOriginal, remove">
+                    @Model.emails.OrderConfirmations
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: orderConfirmations, remove">
+                    @Model.emails.OrderConfirmations
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: invoicesStatementsOriginal, remove">
+                    @Model.emails.InvoicesStatements
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: invoicesStatements, remove">
+                    @Model.emails.InvoicesStatements
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: productNewsEventsOriginal, remove">
+                    @Model.emails.ProductNewsEvents
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: productNewsEvents, remove">
+                    @Model.emails.ProductNewsEvents
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: pricelistsOriginal, remove">
+                    @Model.emails.Pricelists
+                </span>
+                <span class="d-none" data-bind="init: { convert: parseString }, text: pricelists, remove">
+                    @Model.emails.Pricelists
+                </span>
+                <h3 class="mb-5">
+                    @HtmlHelperExtra.Resource("EmailAddresses", l, c, d)
+                </h3>
+                <div class="grid">
+                    <div class="mb-5">
+                        <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                            <div class="input-group" data-bind="with: orderConfirmationsParams">
+                                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                                <div data-bind="component: { name: 'mdc-kendo-combobox-component', params: $data }"></div>
+                                <!-- ko if: observable() == originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $(observable.DOMElement).select(); }, text: $parent.resources.ManageAccountDetailsEdit"></button>
+                                <!-- /ko -->
+                                <!-- ko if: observable() != originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $parent.saveOrderConfirmation() }, text: $parent.resources.Save"></button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <span class="validation-message text-success" style="display: none" data-bind="flexVisible: orderConfirmationsParams.updated, toggleOpacity: orderConfirmationsParams.updated">
+                            <span data-bind="text: resources.ManageAccountChangedEmail"></span>
+                            <i class="material-icons">
+                                check
+                            </i>
+                        </span>
+                        <span class="validation-message text-danger" data-bind="validationMessage: orderConfirmations"></span>
+                    </div>
+                    <div class="mb-5">
+                        <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                            <div class="input-group" data-bind="with: invoicesStatementsParams">
+                                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                                <div data-bind="component: { name: 'mdc-kendo-combobox-component', params: $data }"></div>
+                                <!-- ko if: observable() == originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $(observable.DOMElement).select(); }, text: $parent.resources.ManageAccountDetailsEdit"></button>
+                                <!-- /ko -->
+                                <!-- ko if: observable() != originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $parent.saveInvoicesStatements() }, text: $parent.resources.Save"></button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <span class="validation-message text-success" style="display: none" data-bind="flexVisible: invoicesStatementsParams.updated, toggleOpacity: invoicesStatementsParams.updated">
+                            <span data-bind="text: resources.ManageAccountChangedEmail"></span>
+                            <i class="material-icons">
+                                check
+                            </i>
+                        </span>
+                        <span class="validation-message text-danger" data-bind="validationMessage: invoicesStatements"></span>
+                    </div>
+                    <div class="mb-5">
+                        <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                            <div class="input-group" data-bind="with: productNewsEventsParams">
+                                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                                <div data-bind="component: { name: 'mdc-kendo-combobox-component', params: $data }"></div>
+                                <!-- ko if: observable() == originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $(observable.DOMElement).select(); }, text: $parent.resources.ManageAccountDetailsEdit"></button>
+                                <!-- /ko -->
+                                <!-- ko if: observable() != originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $parent.saveProductNewsEvents() }, text: $parent.resources.Save"></button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <span class="validation-message text-success" style="display: none" data-bind="flexVisible: productNewsEventsParams.updated, toggleOpacity: productNewsEventsParams.updated">
+                            <span data-bind="text: resources.ManageAccountChangedEmail"></span>
+                            <i class="material-icons">
+                                check
+                            </i>
+                        </span>
+                        <span class="validation-message text-danger" data-bind="validationMessage: productNewsEvents"></span>
+                    </div>
+                    <div class="mb-5">
+                        <div class="form-group" data-bind="validationOptions: { insertMessages: false }">
+                            <div class="input-group" data-bind="with: pricelistsParams">
+                                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                                    <div class="spinner-border"></div>
+                                    <h4>
+                                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                                    </h4>
+                                </div>
+                                <div data-bind="component: { name: 'mdc-kendo-combobox-component', params: $data }"></div>
+                                <!-- ko if: observable() == originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $(observable.DOMElement).select(); }, text: $parent.resources.ManageAccountDetailsEdit"></button>
+                                <!-- /ko -->
+                                <!-- ko if: observable() != originalValue() -->
+                                <button class="btn btn-secondary" data-bind="click: function() { $parent.savePricelists() }, text: $parent.resources.Save"></button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <span class="validation-message text-success" style="display: none" data-bind="flexVisible: pricelistsParams.updated, toggleOpacity: pricelistsParams.updated">
+                            <span data-bind="text: resources.ManageAccountChangedEmail"></span>
+                            <i class="material-icons">
+                                check
+                            </i>
+                        </span>
+                        <span class="validation-message text-danger" data-bind="validationMessage: pricelists"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Render.Script("~/bundles/js/trade-contact-details")
+}

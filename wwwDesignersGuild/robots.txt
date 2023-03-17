@@ -1,0 +1,41 @@
+User-agent: *
+crawl-delay: 1
+Sitemap: https://www.designersguild.com/sitemap-index.xml
+Disallow: */l75$	# Search
+Disallow: */l76$ # ServerSearch
+Allow: *.js
+Allow: *.css
+Disallow: */l100$ # newsletter
+Disallow: */l101$ # memberRegistration
+Disallow: */l102$ # memberLogin
+Disallow: */l150$ # memberMenu
+Disallow: */l151$ # memberAddress
+Disallow: */l152$ # memberEdit
+Disallow: */l153$ # memberOrderHistory
+Disallow: */l181$ # resetPassword
+Disallow: */l201$ # maintainBasket
+Disallow: */l211$ # checkoutLogin
+Disallow: */l299$ # checkoutSinglePage
+Disallow: */l212$ # checkoutNewMember
+Disallow: */l221$ # checkoutAddress
+Disallow: */l231$ # checkoutDispatch
+Disallow: */l236$ # checkoutGiftVoucher
+Disallow: */l241$ # checkoutGift
+Disallow: */l251$ # checkoutSummary
+Disallow: */l261$ # checkoutPay
+Disallow: */l271$ # checkoutConfirmation
+Disallow: */l291$ # checkoutPayPalExpress
+Disallow: */l300$ # checkoutSessionExpired
+Disallow: */l1038$ # contractStockistSearch
+Disallow: */h212$ # checkoutNewMember
+Disallow: */h213$ # checkoutSinglePage
+Disallow: */h221$ # checkoutAddress
+Disallow: */h231$ # checkoutDispatch
+Disallow: */h236$ # checkoutGiftVoucher
+Disallow: */h241$ # checkoutGift
+Disallow: */h251$ # checkoutSummary
+Disallow: */h261$ # checkoutPay
+Disallow: */h271$ # checkoutConfirm
+Disallow: */h291$ # checkoutPayPalExpress
+Disallow: */h300$ # checkoutSessionExpired
+Disallow: */api/* # do not crawl our bloody API endpoints

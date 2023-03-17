@@ -1,0 +1,25 @@
+﻿@model ProductPageViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+}
+<h5 class="my-3 text-uppercase">
+    @HtmlHelperExtra.Resource("productCompleteTheLook", l, c, d)
+</h5>
+<div class="related-product-pages mb-5">
+   @foreach(var rp in Model.RelatedProductPages)
+   {
+       @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", rp)
+   }
+</div>

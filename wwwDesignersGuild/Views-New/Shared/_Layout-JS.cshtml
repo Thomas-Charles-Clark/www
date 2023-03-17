@@ -1,0 +1,296 @@
+﻿@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var contentId = objMaster.UrlBreakdown.ContentId;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+
+}<script type="text/javascript" defer>
+@{
+    @* Leave console.log and console.trace alone for status@designersguild.com *@
+    if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]) &&
+        Model.Visitor?.memberId != 1547882)
+    {
+        @:console.trace = function () { };
+        @:console.log = function () { };
+    }
+}
+
+    @* Annoyingly, Safari on older iOS versions (and newer ones? don't know) doesn't retain basic auth headers *@
+    window.fetchHeaders = {
+        'accept': 'application/json',
+        'content-type': 'application/json'
+    }
+    @if (!Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]))
+    {
+    @:window.fetchHeaders.authorization = 'Basic Q0FkbWluOlRhcGVzdHJ5Rmxvd2VyMjI=';
+    @:window.fetchHeaders.dateOverride = '@($"{d:ddMMyyyy}")';
+    @:window.fetchHeaders.countryOverride = '@(Request.QueryString["countryOverride"])';
+    }
+
+    const imageSizeIcon = Symbol('imageSizeIcon'); // Max width of 90px
+    const imageSizeXS = Symbol('imageSizeExtraSmall'); // Max width of 156px
+    const imageSizeSmall = Symbol('imageSizeSmall'); // Max width of 322px
+    const imageSizeMedium = Symbol('imageSizeMedium'); // Max width of 480px
+    const imageSizeLarge = Symbol('imageSizeLarge'); // Max width of 654px
+    const imageSizeVeryLarge = Symbol('imageSizeVeryLarge'); // Max width of 1024px
+    const imageSizeExtraLarge = Symbol('imageSizeExtraLarge'); // Max width of 1546px
+    const imageSizeExtraExtraLarge = Symbol('imageSizeExtraExtraLarge'); // No max width (3092px)
+
+    window.determineImageSizeFromMaxWidth = (maxWidth = 1024) => {
+        switch (maxWidth) {
+            case 90:
+                return imageSizeIcon;
+            case 156:
+                return imageSizeXS;
+            case 322:
+                return imageSizeSmall;
+            case 480:
+                return imageSizeMedium;
+            case 654:
+                return imageSizeLarge;
+            case 1024:
+                return imageSizeVeryLarge;
+            case 1546:
+                return imageSizeExtraLarge;
+            case 3092:
+                return imageSizeExtraExtraLarge;
+            default:
+                return imageSizeVeryLarge;
+        }
+    }
+
+    window.imageAttributeSourceSet = (imageId, imageSize = null, maxWidth = null) => {
+       @if (dgFramework.IsMobileDevice())
+        {
+            @:imageSize = null; // force the default to hit
+        }
+
+        switch (maxWidth) {
+            case 1024:
+                imageSize = imageSizeVeryLarge;
+                break;
+            case 1546:
+                imageSize = imageSizeExtraLarge;
+                break;
+            case 3092:
+                imageSize = imageSizeExtraExtraLarge;
+                break;
+            default:
+                break;
+        }
+
+        switch (imageSize)
+        {
+            case imageSizeIcon:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w`;
+            case imageSizeXS:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w`;
+            case imageSizeSmall:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w`;
+            case imageSizeMedium:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w`;
+            case imageSizeLarge:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w,/image@(Framework.WebPFallback)/600/${imageId} 600w,/image@(Framework.WebPFallback)/654/${imageId} 654w`;
+            case imageSizeVeryLarge:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w,/image@(Framework.WebPFallback)/600/${imageId} 600w,/image@(Framework.WebPFallback)/654/${imageId} 654w,/image@(Framework.WebPFallback)/1024/${imageId} 1024w`;
+            case imageSizeExtraLarge:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w,/image@(Framework.WebPFallback)/600/${imageId} 600w,/image@(Framework.WebPFallback)/654/${imageId} 654w,/image@(Framework.WebPFallback)/1024/${imageId} 1024w,/image@(Framework.WebPFallback)/1546/${imageId} 1546w`;
+            case imageSizeExtraExtraLarge:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w,/image@(Framework.WebPFallback)/600/${imageId} 600w,/image@(Framework.WebPFallback)/654/${imageId} 654w,/image@(Framework.WebPFallback)/1024/${imageId} 1024w,/image@(Framework.WebPFallback)/1546/${imageId} 1546w,/image@(Framework.WebPFallback)/3092/${imageId} 3092w`;
+            default:
+                return `/image@(Framework.WebPFallback)/32/${imageId} 32w,/image@(Framework.WebPFallback)/90/${imageId} 90w,/image@(Framework.WebPFallback)/156/${imageId} 156w,/image@(Framework.WebPFallback)/195/${imageId} 195w,/image@(Framework.WebPFallback)/239/${imageId} 239w,/image@(Framework.WebPFallback)/322/${imageId} 322w,/image@(Framework.WebPFallback)/380/${imageId} 380w,/image@(Framework.WebPFallback)/428/${imageId} 428w,/image@(Framework.WebPFallback)/488/${imageId} 488w,/image@(Framework.WebPFallback)/600/${imageId} 600w,/image@(Framework.WebPFallback)/654/${imageId} 654w,/image@(Framework.WebPFallback)/986/${imageId} 986w,/image@(Framework.WebPFallback)/1024/${imageId} 1024w`;
+        }
+    }
+
+    window.imageAttributeSizes = (imageId, imageSize = null, maxWidth = null) => {
+
+       @if (dgFramework.IsMobileDevice())
+        {
+            @:imageSize = null; // force the default to hit
+        }
+
+        // Re-enable this when images are available
+        //switch (maxWidth) {
+        //    case 1024:
+        //        imageSize = imageSizeVeryLarge;
+        //        break;
+        //    case 1546:
+        //        imageSize = imageSizeExtraLarge;
+        //        break;
+        //    case 3092:
+        //        imageSize = imageSizeExtraExtraLarge;
+        //        break;
+        //    default:
+        //        break;
+        //}
+
+        switch (imageSize)
+        {
+            case imageSizeIcon:
+                return `(max-width: 32px) 32px, 90px`;
+            case imageSizeXS:
+                return `(max-width: 90px) 90px, 156px`;
+            case imageSizeSmall:
+                return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,322px`;
+            case imageSizeMedium:
+                return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,488px`;
+            case imageSizeLarge:
+                return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,654px`;
+            case imageSizeVeryLarge:
+            case imageSizeExtraLarge:
+            case imageSizeExtraExtraLarge:
+                return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,1024px`;
+            //case imageSizeExtraLarge:
+            //    return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,(max-width: 1024px) 1024px,1546px`;
+            //case imageSizeExtraExtraLarge:
+            //    return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,(max-width: 1024px) 1024px,(max-width: 1546px) 1546px,3092px`;
+            default:
+                return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,(max-width: 986px) 986px,1024px`;
+        }
+    }
+
+    if (window.navigator.userAgent.match(/MSIE|Trident/) !== null) {
+        alert('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("IE11Warning", l, c, d))');
+    }
+
+    if (typeof window.operamini != 'undefined') {
+        alert('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("OperaMiniWarning", l, c, d))');
+    }
+
+    window.getMasterDefinition = () => {
+        return {
+            urlBreakdown: @Html.Raw(JsonConvert.SerializeObject(objMaster.UrlBreakdown)),
+        }
+    }
+
+    window.getContentId = () => {
+        return @contentId;
+    }
+
+    window.getLanguageId = () => {
+        return @l;
+    }
+
+    window.getCountryId = () => {
+        return @c;
+    }
+
+    window.getLanguageId = () => {
+        return @l;
+    }
+
+    window.getPriceListId = () => {
+        return @cd.PriceListID;
+    }
+
+    window.getSiteCountry = () => {
+        return '@cd.URL';
+    }
+
+    window.getCulture = () => {
+        return '@cd.LanguageDotNetCulture';
+    }
+
+    window.getCurrencyCode = () => {
+        return '@cd.CurrencyCode';
+    }
+
+    window.getCountryCode = () => {
+        return '@cd.CountryCode';
+    }
+
+    window.getDate = () => {
+        return '@d'
+    }
+
+    window.getWebPFallback = () => {
+        return '@(Framework.WebPFallback ?? "")';
+    }
+
+    window.isImageInScrapbook = (imageId) => {
+        return @(JsonConvert.SerializeObject(Model.Scrapbook?.Images.Select(sb => sb.ImageID))).indexOf(imageId) > -1;
+    }
+</script>
+@if (tradeUser)
+{
+<script type="text/javascript" defer>
+    window.busyChangingTradePricing = false;
+    window.tradePriceChange = (value) => {
+        if (busyChangingTradePricing == true) {
+            return;
+        }
+        busyChangingTradePricing = true;
+        fetch('/api/member/memberDisplayTradePriceUpdate', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                displayTradePrice: document.getElementById('display-trade-price').value
+            })
+        })
+        .then(window.handleFetchResponse)
+        .then(data => {
+            if (data) {
+                window.location.reload(false);
+            }
+        })
+        .catch(window.catchFetchErrors);
+    }
+</script>
+}
+@if (objMaster.BackInStockReminder != null && objMaster.UrlBreakdown.ContentId != (int)dgFixedPage.memberLogin)
+{
+    <script type="text/javascript">
+        window.addBasketLoadFunction(() => {
+            window.basketModel.backInStockReminder({
+                productId: @(objMaster.BackInStockReminder)
+            })
+        });
+    </script>
+}
+<script id="add-to-scrapbook-content" type="text/html">
+    <div class="vstack gap-2">
+        <span>
+            @HtmlHelperExtra.Resource("ScrapbookAddImageSuccess", l, c, d)
+        </span>
+        <span>
+            <a class="d-inline" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.moodboard, cd)"
+                target="_self">
+                @HtmlHelperExtra.Resource("ViewScrapbook", l, c, d)
+            </a>
+        </span>
+        <span>
+            <a class="d-inline" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.moodboard, cd)"
+               target="_self">
+                @HtmlHelperExtra.Resource("MoodboardCreateEdit", l, c, d)
+            </a>
+        </span>
+    </div>
+</script>
+<script id="removed-from-scrapbook-content" type="text/html">
+    <div class="vstack gap-2">
+        <span>
+            @HtmlHelperExtra.Resource("ScrapbookRemoveImageSuccess", l, c, d)
+        </span>
+    </div>
+</script>
+<script id="toggle-scrapbook-template" type="text/html">
+    <div class="popover scrapbook-popover" role="tooltip">
+        <div class="popover-arrow"></div>
+        <h3 class="popover-header"></h3>
+        <div class="popover-body"></div>
+    </div>
+</script>
+<script id="ko-blank-template" type="text/html"></script>

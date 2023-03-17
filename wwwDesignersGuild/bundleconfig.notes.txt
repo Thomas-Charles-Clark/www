@@ -1,0 +1,9 @@
+﻿
+/*
+  //{
+  //  "outputFileName": "css/lib/kendo/dist-datepicker/datepicker.css",
+  //  "inputFiles": [
+  //    "css/lib/kendo/dist-datepicker/datepicker.scss"
+  //  ]
+  //}, // only if you want to edit the datepicker, otherwise sass will flood with warnings about not using math.div
+*/

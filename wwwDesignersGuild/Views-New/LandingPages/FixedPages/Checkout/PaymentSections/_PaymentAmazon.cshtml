@@ -1,0 +1,15 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutPayment
+
+@{
+    Layout = null;
+
+    var countryId = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var languageId = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<div id="walletWidgetDiv"></div>
+
+<button id="amazon-wallet-edit" class="btn btn-flat pull-right" style="display: none; margin-top: 1em;" data-bind="click: paymentMethodFactory.amazonReturnToEdit">
+    @HtmlHelperExtra.Resource("ManageAddressBookEdit", languageId, countryId, contentDate)
+</button>

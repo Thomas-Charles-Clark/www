@@ -1,0 +1,65 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutAddress
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    Layout = null;
+
+    var countryId = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var languageId = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var contentDate = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+
+<div>
+    <h5 class="mb-3">
+        <strong>@HtmlHelperExtra.Resource("CheckoutSinglePageDeliveryTitle", languageId, countryId, contentDate)</strong>
+    </h5>
+    <div class="g-col-12 g-col-lg-8">
+        @if (Model.checkoutMethod != dgCheckoutType.Amazon)
+        {
+            <div style="display: none" data-bind="visible: deliveryAddress, with: deliveryAddress">
+                <div class="margin-bottom-8">
+                    <span data-bind="text: fullName"></span>
+                </div>
+                <div data-bind="foreach: displayLines">
+                    <div class="margin-bottom-8" data-bind="text: value"></div>
+                </div>
+                <p style="float: left;">
+                    <span data-bind="text: phone"></span>
+                </p>
+                @if (Model.checkoutMethod == dgCheckoutType.Member)
+                {
+                    <a href="#" style="float: right;" data-bind="visible: isDefault(), click: $parent.makeSelectedAddressDefault">Make default</a>
+                }
+            </div>
+        }
+
+        @switch (Model.checkoutMethod)
+        {
+            case dgCheckoutType.Member:
+            case dgCheckoutType.Guest:
+            case dgCheckoutType.Paypal:
+            case dgCheckoutType.Trade:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressMemberComponent.cshtml", Model)
+                break;
+            case dgCheckoutType.Amazon:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressAmazon.cshtml", Model)
+                break;
+        }
+    </div>
+</div>
+
+<div id="payment-address-error" style="display: none;">
+    <div class="checkout-error-box">
+        <span class="checkout-error-symbol">!</span>
+        <p id="payment-address-error-text" class="checkout-error-content">
+        </p>
+    </div>
+</div>
+
+@if(Model.checkoutMethod == dgCheckoutType.Amazon)
+{
+    <div class="checkout-error-box" style="display:none;">
+        <span class="checkout-error-symbol">!</span>
+        <p class="error-message checkout-error-content"></p>
+    </div>
+}

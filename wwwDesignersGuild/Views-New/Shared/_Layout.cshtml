@@ -1,0 +1,481 @@
+﻿@using StackExchange.Profiling
+@model BaseViewModel
+@{ 
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+}
+<!DOCTYPE html>
+<html lang="@objMaster.UrlBreakdown.countryDetails.LanguageDotNetCulture">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        @(objMaster.TitleTag)
+    </title>
+    <meta name="description" content="@(objMaster.MetaDescription ?? objMaster.TitleTag)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    @if (Model.CustomCanonical == null)
+    {
+        foreach (var href in objMaster.GoogleHrefs)
+        {
+            <link rel="alternate" hreflang="@Html.Raw(href.hreflang)" href="@Html.Raw(href.href)" />
+        }
+    }
+
+    <link rel="canonical" href="@(Model.CustomCanonical ?? Request.Url.GetLeftPart(UriPartial.Path))" />
+
+    @if (Model.NoIndex)
+    {
+        if (Model.NoFollow)
+        {
+            <meta name="robots" content="noindex, nofollow" />
+        }
+        else
+        {
+            <meta name="robots" content="noindex, follow" />
+        }
+    }
+    else
+    {
+        if (Model.NoFollow)
+        {
+            <meta name="robots" content="index, nofollow" />
+        }
+        else
+        {
+            <meta name="robots" content="index, follow" />
+        }
+    }
+
+    <!-- #region CSS Libraries -->
+    @if (!dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/bootstrap")
+    }
+    else
+    {
+        @Render.StylesPreload("~/bundles/css/bootstrap-mobile")
+    }
+    <!-- #endregion -->
+    <!-- #region CSS Fonts -->
+    @* Fonts tracking JS *@
+    <link type="text/css" rel="stylesheet" media="print" href="https://fast.fonts.net/lt/1.css?apiType=css&c=0a2175c5-d572-423b-af9a-ca60070ed6ca&fontids=5353122,5355143,5355145,5359239,5361968,5765071">
+    @Render.StylesPreload("~/bundles/css/fonts")
+    @Render.StylesPreload("~/bundles/css/font-awesome")
+    @Render.StylesPreload("~/bundles/css/bootstrap-icons")
+    @if (c == 118@* Japanese *@)
+{
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:normal|bold&display=swap">
+<style type="text/css">
+    html * {
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+</style>
+}
+    <!-- #endregion -->
+    <!-- #region Global CSS -->
+    @Render.StylesPreload("~/bundles/css/common")
+
+    @if (!dgFramework.IsMobileDevice())
+    {
+        @Render.Styles("~/bundles/css/desktop")
+    }
+    else
+    {
+        @Render.Styles("~/bundles/css/mobile")
+    }
+
+    @if (dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
+    {
+        @Render.StylesPreload("~/bundles/css/checkout")
+        if (dgFramework.IsMobileDevice())
+        {
+            @Render.StylesPreload("~/bundles/css/checkout-mobile")
+        }
+    }
+
+    <!-- #endregion -->
+    <!-- #region JS (Up front) -->
+    <script>
+        window.isES6 = false;
+    </script>
+    <script>
+        // Arrow functions support
+        () => { };
+
+        // Class support
+        class __ES6FeatureDetectionTest { };
+
+        // Object initializer property and method shorthands
+        let a = true;
+        let b = {
+            a,
+            c() { return true; },
+            d: [1, 2, 3],
+        };
+
+        // Object destructuring
+        let { c, d } = b;
+
+        // Spread operator
+        let e = [...d, 4];
+
+        let cssSupport = CSS.supports('(display: grid)');
+
+        window.isES6 = true;
+    </script>
+    <script>
+            if (!window.isES6) {
+                window.stop();
+                alert('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("BrowserSupportWarning", l, c, d))')
+            }
+    </script>
+
+    <script type="text/javascript">
+
+        window.addLoadFunction = (fnc) => {
+            let prevFn = window.onload;
+            if (typeof prevFn != 'function') {
+                window.onload = fnc;
+            } else {
+                window.onload = function () {
+                    if (prevFn) {
+                        prevFn();
+                    }
+                    fnc();
+                }
+            }
+        }
+
+        window.addBasketLoadFunction = (fnc) => {
+            let prevFn = window.onBasketLoad;
+            if (typeof prevFn != 'function') {
+                window.onBasketLoad = fnc;
+            } else {
+                window.onBasketLoad = function () {
+                    if (prevFn) {
+                        prevFn();
+                    }
+                    fnc();
+                }
+            }
+        }
+
+        window.addFixedPageLoadFunction = (fnc) => {
+            let prevFn = window.onFixedPageLoad;
+            if (typeof prevFn != 'function') {
+                window.onFixedPageLoad = fnc;
+            } else {
+                window.onFixedPageLoad = function () {
+                    if (prevFn) {
+                        prevFn();
+                    }
+                    fnc();
+                }
+            }
+        }
+
+        window.addBootstrapLoadFunction = (fnc) => {
+            let prevFn = window.onBootstrapLoad;
+            if (typeof prevFn != 'function') {
+                window.onBootstrapLoad = fnc;
+            } else {
+                window.onBootstrapLoad = function () {
+                    if (prevFn) {
+                        prevFn();
+                    }
+                    fnc();
+                }
+            }
+        }
+    </script>
+
+    <!-- #endregion -->
+    <!-- #region JS Libraries (Deferred) -->
+
+    @if (dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, (int)Model.ContentID) ||
+        (Model.ContentID == (int)dgFixedPage.moodboard && Model.ContentType == dgContentType.landingPage))
+    {
+        @Render.Script("~/bundles/js/bootstrap", skipDefer: true)
+        @Render.Script("~/bundles/js/jquery", skipDefer: true)
+    }
+    else
+    {
+        @Render.ScriptDefer("~/bundles/js/bootstrap")
+    }
+
+    <script type="text/javascript">
+        window.getPrefetchedResources = () => handleResourcesArray(@Html.Raw(JsonConvert.SerializeObject(Model.PrefetchedResources)));
+    </script>
+
+    <script type="text/javascript">
+        window.getSearchTerm = () => {
+            return '@(Model.SearchTerm)';
+        }
+        window.getProductType = () => {
+            return '@(Model.ProductType)';
+        }
+    </script>
+
+
+    @if (!Framework.ProductionVersion)
+    {
+        <script type="text/javascript" @(dgFramework.IsMobileDevice() ? "defer" : "")>
+            window.onKnockoutAvailable = () => {
+                ko.bindingHandlers['attr'] = {
+                    'update': function(element, valueAccessor, allBindings) {
+                        var value = ko.utils.unwrapObservable(valueAccessor()) || {};
+                        ko.utils.objectForEach(value, function(attrName, attrValue) {
+                            attrValue = ko.utils.unwrapObservable(attrValue);
+                            if (attrValue == null)
+                                attrValue = '';
+                            @if (Request.QueryString["dateOverride"] != null)
+                            {
+                                <text>
+                                if (attrName === 'href') {
+                                    if (attrValue.indexOf('?') == -1) {
+                                        attrValue += '?dateOverride=@(Request.QueryString["dateOverride"])'
+                                    } else {
+                                        attrValue += '&dateOverride=@(Request.QueryString["dateOverride"])'
+                                    }
+                                }
+                                </text>
+                            }
+                            @if (Request.QueryString["countryOverride"] != null)
+                            {
+                                <text>
+                                if ((attrName === 'href' && attrValue != 'javascript:;') || (attrName == 'src' && element.nodeName == 'IFRAME')) {
+                                    if (attrValue.indexOf('?') == -1) {
+                                        attrValue += '?countryOverride=@(Request.QueryString["countryOverride"])'
+                                    } else {
+                                        attrValue += '&countryOverride=@(Request.QueryString["countryOverride"])'
+                                    }
+                                }
+                                </text>
+                            }
+
+                            var prefixLen = attrName.indexOf(':');
+                            var namespace = "lookupNamespaceURI" in element && prefixLen > 0 && element.lookupNamespaceURI(attrName.substr(0, prefixLen));
+
+                            var toRemove = (attrValue === false) || (attrValue === null) || (attrValue === undefined);
+                            if (toRemove) {
+                                namespace ? element.removeAttributeNS(namespace, attrName) : element.removeAttribute(attrName);
+                            } else {
+                                attrValue = attrValue.toString();
+                            }
+
+                            if (ko.utils.ieVersion <= 8 && attrName in attrHtmlToJavaScriptMap) {
+                                attrName = attrHtmlToJavaScriptMap[attrName];
+                                if (toRemove)
+                                    element.removeAttribute(attrName);
+                                else
+                                    element[attrName] = attrValue;
+                            } else if (!toRemove) {
+                                namespace ? element.setAttributeNS(namespace, attrName, attrValue) : element.setAttribute(attrName, attrValue);
+                            }
+
+                            if (attrName === "name") {
+                                element.name = toRemove ? "" : attrValue;
+                            }
+                        });
+                    }
+                };
+            }
+        </script>
+    }
+
+   @if (HtmlHelperExtra.Debug)
+    {
+        @Render.Script("~/bundles/js/ko")
+        @Render.Script("~/bundles/js/common")
+    }
+    else
+    {
+        if (Model.ContentType == dgContentType.landingPage &&
+           Model.ContentID == (int)dgFixedPage.serverSearch)
+        {
+            @Render.Script("~/bundles/js/ko")
+            @Render.Script("~/bundles/js/common")
+        }
+        else
+        {
+            @Render.Script("~/bundles/js/ko")
+            @*@Render.ScriptDefer("~/bundles/js/common")*@
+            @Render.Script("~/bundles/js/common")
+        }
+    }
+
+    <!-- #endregion -->
+    <!-- #region Global JS -->
+    @Html.Partial("~/Views-New/Shared/_Layout-JS.cshtml")
+    @Html.Partial("~/Views-New/Shared/_Layout-Tracking-JS.cshtml")
+    @Html.Partial("~/Views-New/Shared/_Layout-Third-Party-JS.cshtml")
+    <!-- #endregion -->
+
+    @Render.ScriptDefer("~/bundles/js/large-image-modal")
+    @RenderSection("EarlyTemplateScripts", required: false)
+    @RenderSection("TemplateScripts", required: false)
+    @RenderSection("TemplateStyles", required: false)
+
+    @RenderSection("KendoScripts", required: false)
+    @RenderSection("KendoStyles", required: false)
+
+    @RenderSection("DownloaderScripts", required: false)
+    @RenderSection("DownloaderStyles", required: false)
+
+    @Html.JsonLD("Base", null, null)
+
+    @* This is for Pingdom *@
+    <!-- stillAlive -->
+    @*
+        This is because Googlebot Smartphone (which Google is using to crawl and index our site with)
+        has a very stingy resource management approach - it will arbitrarily refuse to load resources (images, external resources, our css bundles, our js bundles...)
+        when it decides to skip those resources it can end up rendering the site for itself in a broken looking state, then complain that elements are too close together
+        and that text is too small!
+    *@
+    @if (Request.UserAgent == "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/W.X.Y.Z Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
+    {
+        <style type="text/css">
+            * {
+                font-size: 16px;
+                margin: 1em;
+            }
+        </style>
+    }
+</head>
+    <body>
+        <div id="body-content">
+           @if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
+            {
+                <div id="body-inner">
+                    @if (!ViewBag.Partial)
+                    {
+                        @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+                    }
+                    @if (!ViewBag.Partial && !dgFramework.IsMobileDevice())
+                    {
+                        @Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
+                    }
+                    @if (!dgFramework.IsMobileDevice())
+                    {
+                        if (!ViewBag.Partial)
+                        {
+                            @Html.Partial("~/Views-New/Shared/_Menu-Desktop.cshtml")
+                        }
+                        else
+                        {
+                            @Render.Script("~/bundles/js/menu-scripts")
+                        }
+                        <div id="body-proper" class="py-2 container mb-4">
+                            @RenderBody()
+                            @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
+                            {
+                                @* productPages render this in their own templates because of relatedSearches *@
+                                if (Model.ShowRecentlyViewed)
+                                {
+                                    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+                                }
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        if (!ViewBag.Partial)
+                        {
+                            @Html.Partial("~/Views-New/Shared/_Menu-Mobile.cshtml")
+                        }
+                        else
+                        {
+                            @Render.Script("~/bundles/js/menu-scripts")
+                        }
+                        <div id="body-proper" class="py-2 container mb-4">
+                            <div id="menu-underlay"
+                                 class="page-blocker"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target="#navbar-content"
+                                 onclick="this.classList.remove('show')"></div>
+                            @RenderBody()
+                            @if (!ViewBag.Partial)
+                            {
+                                if (!Request.IsLocal && Model.ShowRecentlyViewed)
+                                {
+                                    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+                if (!ViewBag.Partial)
+                {
+                    <footer>
+                        @if (!dgFramework.IsMobileDevice())
+                        {
+                            @Html.Partial("~/Views-New/Shared/_Footer-Desktop.cshtml")
+                        }
+                        else
+                        {
+                            @Html.Partial("~/Views-New/Shared/_Footer-Mobile.cshtml")
+                        }
+                    </footer>
+                }
+            }
+            else
+            {
+                <div id="body-inner" style="min-height: 101vh">
+                    @Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
+                   @if (Model.ContentID == (int)dgFixedPage.checkoutLogin)
+                    {
+                        @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+                    }
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Common.cshtml")
+                   @if (!dgFramework.IsMobileDevice())
+                    {
+                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Desktop.cshtml")
+                    }
+                    else
+                    {
+                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Mobile.cshtml")
+                    }
+                    <div class="py-2 container mb-4">
+                        @RenderBody()
+                    </div>
+                </div>
+                <footer>
+                    @if (!dgFramework.IsMobileDevice())
+                    {
+                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Desktop.cshtml")
+                    }
+                    else
+                    {
+                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Mobile.cshtml")
+                    }
+                </footer>
+            }
+        </div>
+        @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
+        @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
+        @Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
+       @if (true)
+        {
+            @Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
+        }
+       @if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+        {
+            @(MiniProfiler.Current?.RenderIncludes())
+        }
+       @if (!ViewBag.Partial &&
+            Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
+            Model.HasEcommercePopupBanners)
+        {
+           <script type="text/javascript">
+               window.ecommercePopBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommercePopupBanners));
+           </script>
+           @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
+        }
+        @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
+        @RenderSection("LateTemplateScripts", required: false)
+    </body>
+</html>

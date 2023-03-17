@@ -1,0 +1,126 @@
+﻿@model wwwDesignersGuild.Models.Classes.passCheckoutAddress
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+@{ 
+    Layout = null;
+}
+@{
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+
+    var isMemberCheckout = dgFramework.isUserLoggedIn(Session["loginStatus"]);
+}
+@if (Model.checkoutMethod != dgCheckoutType.Trade)
+{
+    <div class="store">
+       @if (!Model.deliveryOptions.collectFromKingsRoad)
+        {
+            <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.65); display: flex; align-items: center; justify-content: center">
+                <h2 style="font-size: 24px; color: white; font-weight: bold;">
+            @HtmlHelperExtra.Resource("TemporarilyUnavailable", l, c, d)
+                </h2>            
+            </div>
+        } 
+        <div class="map kingsroadmap">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d9937.914451501982!2d-0.172533!3d51.486084!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xca55492f701719fa!2sDesigners+Guild!5e0!3m2!1sen!2suk!4v1544090890208" style="border: none; width:100%; height: 100%;" frameborder="0"></iframe>
+        </div>
+        <div class="grid">
+            <div class="g-col-12 g-col-lg-6">
+                <p>
+                    <span>
+                        @HtmlHelperExtra.Resource("CheckoutAddressCollectKingsRoad", l, c, d)
+                    </span>
+                    <br />
+                    @HtmlHelperExtra.Resource("CheckoutAddressCollectKingsRoadLineOne", l, c, d)
+                    <br />
+                    @HtmlHelperExtra.Resource("CheckoutAddressCollectKingsRoadLineTwo", l, c, d)
+                </p>
+            </div>
+            <div class="g-col-12 g-col-lg-6">
+                <ul class="openingtimes">
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Monday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Friday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursB", l, c, d)</span></li>
+                </ul>
+            </div>
+        </div>
+        <button class="btn btn-secondary mb-3" data-bind="click: function () { collectFromStore('kings') }">
+            @HtmlHelperExtra.Resource("CheckoutAddressCollectDeliver", l, c, d)
+        </button>
+    </div>
+    <div class="store">
+       @if (!Model.deliveryOptions.collectFromMarylebone)
+        {
+            <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.65); display: flex; align-items: center; justify-content: center">
+                <h2 style="font-size: 24px; color: white; font-weight: bold;">
+            @HtmlHelperExtra.Resource("TemporarilyUnavailable", l, c, d)
+                </h2>            
+            </div>
+        }
+        <div class="map marylebonemap">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d9930.204644692736!2d-0.152229!3d51.52145!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xdba0013b41095cab!2sDesigners+Guild!5e0!3m2!1sen!2suk!4v1544090824273" style="border: none; width:100%; height: 100%;" frameborder="0"></iframe>
+        </div>
+        <div class="grid">
+            <div class="g-col-12 g-col-lg-6">
+                <p>
+                    <span class="collectheader">@HtmlHelperExtra.Resource("CheckoutAddressCollectMarylebone", l, c, d)</span><br />
+                    @HtmlHelperExtra.Resource("CheckoutAddressCollectMaryleboneLineOne", l, c, d)<br />
+                    @HtmlHelperExtra.Resource("CheckoutAddressCollectMaryleboneLineTwo", l, c, d)
+                </p>
+            </div>
+            <div class="g-col-12 g-col-lg-6">
+                <ul class="openingtimes">
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Monday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Friday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursA", l, c, d)</span></li>
+                    <li><span class="openday">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursB", l, c, d)</span></li>
+                </ul>
+            </div>
+        </div>
+        <button class="btn btn-secondary mb-3" data-bind="click: function () { collectFromStore('marylebone') }">
+            @HtmlHelperExtra.Resource("CheckoutAddressCollectDeliver", l, c, d)
+        </button>
+    </div>
+}
+<div class="store">
+   @if (!Model.deliveryOptions.collectFromWarehouse)
+    {
+        <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.65); display: flex; align-items: center; justify-content: center">
+            <h2 style="font-size: 24px; color: white; font-weight: bold;">
+            @HtmlHelperExtra.Resource("TemporarilyUnavailable", l, c, d)
+            </h2>            
+        </div>
+    }
+    <div class="map distributionmap">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1241.057523149828!2d-0.2727619355817654!3d51.52944968094328!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487611f1970fe3c9%3A0x23d85e5fd423ed81!2sMatrix+Park%2C+900+Coronation+Rd%2C+London+NW10+7PH!5e0!3m2!1sen!2suk!4v1408101936721" style="border: none; width:100%; height: 100%;" frameborder="0"></iframe>
+    </div>
+    <div class="grid">
+        <div class="g-col-12 g-col-lg-6">
+            <p>
+                <span class="collectheader">@HtmlHelperExtra.Resource("CheckoutAddressCollectDistribution", l, c, d)</span><br />
+                @HtmlHelperExtra.Resource("CheckoutAddressCollectDistributionOne", l, c, d)<br />
+                @HtmlHelperExtra.Resource("CheckoutAddressCollectDistributionTwo", l, c, d)
+            </p>
+        </div>
+        <div class="g-col-12 g-col-lg-6">
+            <ul class="openingtimes">
+                <li><span class="openday">@HtmlHelperExtra.Resource("Monday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursC", l, c, d)</span></li>
+                <li><span class="openday">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursC", l, c, d)</span></li>
+                <li><span class="openday">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursC", l, c, d)</span></li>
+                <li><span class="openday">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursC", l, c, d)</span></li>
+                <li><span class="openday">@HtmlHelperExtra.Resource("Friday", l, c, d)</span> <span class="openhours">@HtmlHelperExtra.Resource("CheckoutAddressCollectOpenHoursC", l, c, d)</span></li>
+            </ul>
+        </div>
+    </div>
+    <button class="btn btn-secondary mb-3" data-bind="click: function () { collectFromStore('distribution') }">
+        @HtmlHelperExtra.Resource("CheckoutAddressCollectDeliverWarehouse", l, c, d)
+    </button>
+</div>

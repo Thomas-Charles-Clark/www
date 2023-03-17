@@ -1,0 +1,119 @@
+﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "variables";
+@import "mixins";
+
+#quick-ordering {
+    --bs-columns: 1;
+}
+
+.mdc-address-searcher {
+    > .form-group {
+        max-width: 100%;
+    }
+}
+
+.pca-search-results-list {
+    --bs-columns: 1;
+}
+
+.address-search-wrapper {
+    > div:first-of-type {
+        max-width: 35%;
+    }
+}
+
+#trade-account-contact-details {
+    > .grid {
+        --bs-columns: 1;
+    }
+}
+
+#account-summary-grid.grid {
+    --bs-columns: 1;
+    gap: $xxl-gutter;
+
+    .undotted-list {
+        padding-left: 0;
+        width: 100%;
+    }
+}
+
+.invoice-search-controls {
+    flex-wrap: wrap;
+    > div {
+        flex-grow: 1;
+    }
+}
+
+#login-details-grid {
+    --bs-columns: 1;
+
+    .member-account-row {
+        padding-right: 40px;
+        .member-account-row {
+            padding-right: 0;
+        }
+    }
+
+    .member-account-row.save-successful::after {
+        content: 'check';
+        font-family: 'Material Icons';
+        color: $green-400;
+        position: absolute;
+        font-size: 24px;
+        right: 4px;
+        top: 28px;
+    }
+}
+
+
+#trade-user-admin,
+#user-edit-modal {
+
+    .grid {
+        --bs-columns: 1;
+        gap: $l-gutter;
+    }
+
+    .dl-horizontal {
+        display: grid;
+        --bs-columns: 12;
+        gap: $l-gutter;
+
+        > dt {
+            grid-column: auto/span 12;
+            text-align: left;
+        }
+
+        > dd {
+            grid-column: auto/span 12;
+        }
+    }
+}
+
+#trade-account-request,
+#trade-registration-inner {
+
+    .address-form {
+        padding: 0;
+    }
+
+    #interest-wrapper {
+        overflow-x: scroll;
+    }
+
+    .flex-heading {
+        flex-wrap: wrap;
+    }
+
+    .page-blocker {
+        position: fixed;
+    }
+}
+
+#trade-contact-us-grid {
+    --bs-columns: 1;
+    gap: $l-gutter;
+}

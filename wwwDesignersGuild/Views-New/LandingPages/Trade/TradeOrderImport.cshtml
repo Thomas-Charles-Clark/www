@@ -1,0 +1,76 @@
+﻿@model wwwDesignersGuild.Models.Trade.TradeOrderImportViewModel
+@using wwwDesignersGuild.Models.Classes;
+@using wwwDesignersGuild.Models.Helper;
+
+@{
+    var objMaster = Model.BaseViewModel.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    @* Checked 13/07/2022 *@
+}
+
+@if (!Model.permission)
+{
+    <div class="alert alert-danger trade-message-warning">
+        <h4>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure1", l, c, d)
+            @(Model.TradeAccountModel.AccountDetails.Code) - @(Model.TradeAccountModel.AccountDetails.Name)
+        </h4>
+        <p>
+            @HtmlHelperExtra.Resource("tradeLoginPermissionFailure2", l, c, d)
+        </p>
+        @foreach (var a in Model.TradeAccountModel.Administrators)
+        {
+            <p>
+                @(a.FullName) <a href="mailto:@a.Email">@a.Email</a>
+            </p>
+        }
+    </div>
+}
+else
+{
+    @Render.StylesPreload("~/bundles/css/trade")
+    if (dgFramework.IsMobileDevice())
+    {
+        @Render.StylesPreload("~/bundles/css/trade-mobile")
+    }
+    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+    <div data-bind="stopBinding">
+        <div id="trade-wrapper">
+            <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="remove">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div id="trade-upload-control" style="display: none;" data-bind="visible: true;">
+                <form method="post" action="/api/tradeapi/uploadOrderFiles">
+                    <input type="hidden" name="countryId" value="@(c)" />
+                    <input type="hidden" name="languageId" value="@(l)" />
+                    <input id="file-uploader" type="file" name="files[]" data-bind="kendoUpload: uploader" accept=".csv" />
+                </form>
+                <div id="trade-upload-buttons">
+                    @if (Model.distributor)
+                    {
+                        <a class="btn btn-secondary" style="white-space: normal" href="/downloads/trade-order-import-distributor-format">
+                            @HtmlHelperExtra.Resource("DownloadDistributorSpecificationPDF", l, c, d)
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-secondary" style="white-space: normal" href="/downloads/trade-order-import-format">
+                            @HtmlHelperExtra.Resource("DownloadStandardSpecificationPDF", l, c, d)
+                        </a>
+                    }
+                    <a class="btn btn-secondary" style="white-space: normal" href="/downloads/trade-order-import-example">
+                        @HtmlHelperExtra.Resource("DownloadExampleCSV", l, c, d)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Render.Script("~/bundles/js/trade-order-uploads")
+}

@@ -1,0 +1,86 @@
+﻿@model SocialMediaShareViewModel 
+@{
+    var objMaster = Model.Base.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
+}
+<div class="@Model.DirectionClass social-media-wrapper">
+   @if (Model.ButtonOnly)
+   {
+        <button type="button"
+                class="btn btn-link btn-sm"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <span class="visually-hidden">
+                @HtmlHelperExtra.Resource("Share", l, c, d)
+            </span>
+            <div class="share"></div>
+        </button>
+    }
+    else
+    {
+        <button type="button"
+                class="btn btn-link btn-sm breadcrumb"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            @HtmlHelperExtra.Resource("Share", l, c, d)
+            <div class="share"></div>
+        </button>
+    }
+    <ul class="dropdown-menu @(Model.ButtonOnly ? "" : "dropdown-menu-end")">
+        <li> 
+            <a class="dropdown-item" href="mailto:?subject=@(Model.Base.MasterDefinition.TitleTag)&body=@(Request.Url.AbsoluteUri)">
+                <span class="email"></span>
+                <span>
+                    @HtmlHelperExtra.Resource("email", l, c, d)
+                </span>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item" href="#" onclick="window.facebookShare('@Request.Url')">
+                <span class="facebook"></span>
+                <span>
+                    @HtmlHelperExtra.Resource("shareOnFacebook", l, c, d)
+                </span>
+            </a>
+        </li>
+        <li>
+            <a id="pinterest-drop" class="dropdown-item" target="_blank" href="https://www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark" data-pin-custom="true">
+                <span class="pinterest"></span>
+                <span>
+                    @HtmlHelperExtra.Resource("shareOnPinterest", l, c, d)
+                </span>
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" target="_blank" href="https://twitter.com/intent/tweet?text=@(Model.Base.MasterDefinition.TitleTag?.Replace("|", "-"))Designers%20Guild&url=@Url.Encode(Request.Url.ToString())&hashtags=designersguild&via=DesignersGuild">
+                <span class="twitter"></span>
+                <span>
+                    @HtmlHelperExtra.Resource("shareOnTwitter", l, c, d)
+                </span>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item" href="#" onclick="event.stopPropagation(); window.copyToClipboard('@Request.Url', this)">
+                <span class="copy"></span>
+                <span>
+                    @HtmlHelperExtra.Resource("CopyLink", l, c, d)
+                </span>
+                <span class="copied material-icons text-success fade">
+                    check
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>
+<script>
+    window.addLoadFunction(() => {
+        document.querySelector('#pinterest-drop').setAttribute('href', 'javascript:;');
+    });
+</script>

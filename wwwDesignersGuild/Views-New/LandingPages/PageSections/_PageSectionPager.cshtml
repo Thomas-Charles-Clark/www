@@ -1,0 +1,120 @@
+﻿@model PagerViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var grid = Model;
+
+    <nav aria-label="@HtmlHelperExtra.Resource("PagerNavigation", l, c, d)" class="product-page-grid-pager my-2">
+        <ul class="pagination">
+            <!-- ko template: { name: 'ko-pager-template' } -->
+            <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
+                <a class="page-section-@(Model.PageSectionID)-submitter">
+                    <label class="page-link @(grid.Page == 1 ? "disabled" : "")" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
+                           data-bind="enable: backEnabled, click: () => previousPage(), css: { 'disabled': !backEnabled() }">
+                        <span class="material-icons">
+                            chevron_left
+                        </span>
+                        <span class="visually-hidden">
+                            <input type="radio" name="page" value="@(grid.Page - 1)"
+                                   data-bind="checked: page, checkedValue: @(grid.Page - 1)" >
+                        </span>
+                    </label>
+                </a>
+            </li>
+            @{
+                var ctr = 0;
+
+                if (grid.DisplayLeftEllipsis)
+                {
+                    <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
+                        <a class="page-link">
+                            <span>
+                                &#8230;
+                            </span>
+                        </a>
+                    </li>
+                }
+                for (var i = grid.Page - grid.PagerBreadthNegative; i < grid.Page && ctr < grid.PagerBreadthNegative; i++)
+                {
+                    <li class="page-item ripple disabled" data-bind="css: { 'disabled': false 'active': page() == $data }">
+                        <a class="page-section-@(Model.PageSectionID)-submitter" aria-labelledby="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) @(i)">
+                            <label class="page-link" data-bind="click: () => { page($data) }">
+                                <span>
+                                    @(i)
+                                </span>
+                                <span class="visually-hidden">
+                                    <input type="radio" name="page" value="@(i)"
+                                           data-bind="checked: page, checkedValue: $data" />
+                                </span>
+                            </label>
+                        </a>
+                    </li>
+                    ctr++;
+                }
+            }
+            <li class="page-item ripple active disabled" data-bind="css: { 'disabled': false, 'active': page() == @(grid.Page) }">
+                <a class="page-section-@(Model.PageSectionID)-submitter" aria-labelledby="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) @(grid.Page)">
+                    <label class="page-link" data-bind="click: () => { page(@(grid.Page)) }">
+                        <span>
+                            @(grid.Page)
+                        </span>
+                        <span class="visually-hidden">
+                            <input type="radio" name="page" checked value="@(grid.Page)"
+                                   data-bind="checked: page, checkedValue: @(grid.Page)" />
+                        </span>
+                    </label>
+                </a>
+            </li>
+            @{
+                ctr = 0;
+
+                for (var i = grid.Page + 1; i < grid.PageCount + 1 && ctr < grid.PagerBreadthPositive; i++)
+                {
+                    <li class="page-item ripple disabled" data-bind="css: { 'disabled': false, 'active': page() == @(i) }">
+                        <a class="page-section-@(Model.PageSectionID)-submitter" aria-labelledby="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) @(i)">
+                            <label class="page-link" data-bind="click: () => { page(@(i)) }">
+                                <span>
+                                    @(i)
+                                </span>
+                                <span class="visually-hidden">
+                                    <input type="radio" name="page" value="@(i)"
+                                           data-bind="checked: page, checkedValue: @(i)" />
+                                </span>
+                            </label>
+                        </a>
+                    </li>
+                    ctr++;
+                }
+                if (grid.DisplayRightEllipsis)
+                {
+                    <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
+                        <a class="page-link">
+                            <span>
+                                &#8230;
+                            </span>
+                        </a>
+                    </li>
+                }
+            }
+            <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
+                <a class="page-section-@(Model.PageSectionID)-submitter">
+                    <label class="page-link @(grid.Page == grid.PageCount ? "disabled" : "")" aria-label="@HtmlHelperExtra.Resource("ArticleNext", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
+                           data-bind="enable: forwardEnabled, click: () => nextPage(), css: { 'disabled': !forwardEnabled() }">
+                        <span class="material-icons">
+                            chevron_right
+                        </span>
+                        <span class="visually-hidden">
+                            <input type="radio" name="page" value="@(grid.Page + 1)" 
+                                   data-bind="checked: page, checkedValue: @(grid.Page + 1)" />
+                        </span>
+                    </label>
+                </a>
+            </li>
+            <!-- /ko -->
+        </ul>
+    </nav>
+}

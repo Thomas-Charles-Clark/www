@@ -1,0 +1,201 @@
+/*$blue:  #0d6efd !default;*/
+/*$secondary:     $gray-600 !default;*/
+/*$link-color:                            $primary !default;*/
+/*$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#094fb6'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;*/
+:root {
+  --vsm-gutter: 0.25rem;
+  --sm-gutter: 0.5rem;
+  --m-gutter: 0.75rem;
+  --l-gutter: 1rem;
+  --mxl-gutter: 1.5rem;
+  --xl-gutter: 2rem;
+  --xxl-gutter: 3rem;
+  --disco-color: #e51f7c;
+  --letter-spacing-slight: 0.05rem;
+}
+
+#stockist-search-form {
+  position: relative;
+  margin-bottom: var(--xxl-gutter);
+  padding: var(--l-gutter) 0;
+  padding-top: 0;
+}
+#stockist-search-form .validation-message {
+  display: block;
+  margin-top: var(--sm-gutter);
+}
+#stockist-search-form #featured-stockists {
+  gap: 2rem;
+  margin-bottom: var(--xl-gutter);
+  cursor: pointer;
+}
+#stockist-search-form #featured-stockists .featured-stockist {
+  display: block;
+  /*border: 1px solid $gray-300;*/
+  background: #f8f9fa;
+  color: #4E4E4E;
+}
+#stockist-search-form #featured-stockists .featured-stockist img {
+  display: block;
+  border: none;
+  width: 100%;
+  height: auto;
+}
+#stockist-search-form #featured-stockists .featured-stockist .stockist-detail {
+  padding: var(--l-gutter);
+}
+#stockist-search-form .stockist .stockist-inner {
+  display: flex;
+  cursor: pointer;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-detail {
+  flex: 1;
+  padding: var(--l-gutter);
+  border-radius: 0;
+  background-color: #f8f9fa;
+  /*border: 1px solid $gray-300;*/
+  transition: color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-detail a {
+  transition: color 150ms ease-in-out;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-detail > span + span {
+  margin-top: var(--vsm-gutter);
+}
+#stockist-search-form .stockist .stockist-inner .stockist-detail:hover,
+#stockist-search-form .stockist .stockist-inner .stockist-detail:focus,
+#stockist-search-form .stockist .stockist-inner .stockist-detail:focus-within {
+  color: #fff;
+  background-color: #343a40;
+  border-color: #adb5bd;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-detail:hover a,
+#stockist-search-form .stockist .stockist-inner .stockist-detail:focus a,
+#stockist-search-form .stockist .stockist-inner .stockist-detail:focus-within a {
+  color: #fff;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-brands {
+  flex: 0 1 calc(var(--xl-gutter) + 140px);
+  display: flex;
+  padding-left: var(--xl-gutter);
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1rem;
+}
+#stockist-search-form .stockist .stockist-inner .stockist-brands img {
+  width: 100%;
+  height: auto;
+}
+#stockist-search-form .stockist:not(.featured-stockist) + .stockist {
+  margin-top: var(--xl-gutter);
+  padding-top: var(--xl-gutter);
+  border-top: 1px solid #dee2e6;
+}
+#stockist-search-form #stockists-toolbar {
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 0;
+  padding: var(--m-gutter) var(--m-gutter);
+  margin-bottom: var(--xxl-gutter);
+}
+#stockist-search-form #stockists-toolbar h5 {
+  margin-bottom: 0;
+}
+#stockist-search-form #stockists-toolbar > .flex {
+  gap: 1rem;
+  display: flex;
+  align-items: center;
+}
+#stockist-search-form #stockists-toolbar > .flex > * {
+  flex: 0 1 25%;
+}
+#stockist-search-form #stockists-toolbar button {
+  display: block;
+  width: 100%;
+}
+#stockist-search-form #stockists-toolbar #location {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: #4E4E4E;
+  line-height: 1em;
+  gap: 1rem;
+  width: auto;
+}
+#stockist-search-form #stockists-toolbar #location .material-icons::after {
+  content: "location_searching";
+}
+#stockist-search-form #stockists-toolbar #location:hover span,
+#stockist-search-form #stockists-toolbar #location:focus span,
+#stockist-search-form #stockists-toolbar #location:focus-within span {
+  text-decoration: underline;
+}
+#stockist-search-form #stockists-toolbar #location:hover .material-icons::after,
+#stockist-search-form #stockists-toolbar #location:focus .material-icons::after,
+#stockist-search-form #stockists-toolbar #location:focus-within .material-icons::after {
+  content: "my_location";
+}
+#stockist-search-form #stockist-filters-offcanvas #stockist-options h5 {
+  margin-bottom: var(--l-gutter);
+}
+#stockist-search-form #stockist-filters-offcanvas #stockist-options .form-check label {
+  margin-right: var(--m-gutter);
+}
+#stockist-search-form #stockist-filters-offcanvas #stockist-options .form-check label,
+#stockist-search-form #stockist-filters-offcanvas #stockist-options .form-check input[type=checkbox] {
+  cursor: pointer;
+}
+#stockist-search-form #stockist-filters-offcanvas #stockist-options .form-check + .form-check {
+  margin-top: var(--sm-gutter);
+}
+#stockist-search-form #stockist-filters {
+  grid-column: auto/span 2;
+}
+#stockist-search-form #stockist-filters button {
+  width: 100%;
+}
+#stockist-search-form #stockist-results {
+  grid-column: auto/span 10;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog {
+  position: relative;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body {
+  min-height: 500px;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body > div.d-flex {
+  gap: 1rem;
+  width: 100%;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body > div.d-flex p {
+  word-break: keep-all;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body > div.d-flex > div {
+  flex: 1 1 50%;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body > div.d-flex > div > div.d-flex {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body .stockist-img {
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  align-self: flex-start;
+}
+#stockist-search-form #stockist-detail-modal .modal-dialog .modal-body #map-canvas {
+  width: 500px;
+  height: 500px;
+}
+
+@media (min-width: 1320px) {
+  #stockist-search-form #stockists-panel #stockist-filters {
+    grid-column: auto/span 3;
+  }
+  #stockist-search-form #stockists-panel #stockist-results {
+    grid-column: auto/span 9;
+  }
+}
+/*# sourceMappingURL=stockists.css.map */

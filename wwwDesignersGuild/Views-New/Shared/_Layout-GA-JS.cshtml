@@ -1,0 +1,268 @@
+﻿@{
+    var tradeOrderingAllowed = Convert.ToBoolean(Session["tradeOrderingAllowed"]);
+    var tradeUser = false;
+
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var contentId = objMaster.UrlBreakdown.ContentId;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+    {
+        tradeUser = true;
+    }
+}
+
+<script type="text/javascript">
+    window.addLoadFunction(() => {
+        let home = window.location.pathname == '/',
+            product = document.querySelector('#product-page-main') != null,
+            cart = window.location.pathname.endsWith('/l201'),
+            category = document.querySelectorAll('.product-page-grid-section').length > 0,
+            id = '',
+            price = '',
+            pagetype = 'other';
+
+        if (home) {
+            pagetype = "home"
+
+        } else if (category) {
+            pagetype = "category"
+
+        } else if (product) {
+            pagetype = "product"
+            if (document.querySelector('#product-page-order-form-wrappper')) {
+                id = [...document.querySelector('#product-page-order-form-wrapper').querySelectorAll('.product-code')].map(e => e.innerHTML.trim());
+
+                price = [...document.querySelector('#product-page-order-form-wrapper').querySelectorAll('.product-price')].map(e => {
+                    let result = Number((e.innerHTML.trim().replace(/\s*[^\s\-0-9.]/g, '') / 100) * 100).toFixed(2);
+
+                    if (result == 0) {
+                        let f = -1;
+                    }
+
+                    return result;
+                });
+            }
+        }
+
+        if (cart) {
+            if (typeof window.basketMaintenanceModel === 'object') {
+                function basketPageVisit () {
+                    pagetype = "cart"
+
+                    id = [...document.querySelectorAll('.product-code')].map(e => e.innerHTML.trim());
+
+                    price = Number((document.querySelector('#basket-subtotal').innerHTML.trim().replace(/\s*[^\s\-0-9.]/g, '') / 100) * 100).toFixed(2);
+
+                    let google_tag_params = {
+                        ecomm_prodid: id,
+                        ecomm_pagetype: pagetype,
+                        ecomm_totalvalue: price
+                    };
+
+                    if (typeof gtag === 'function') {
+                        let data = {
+                            'send_to': 'default',
+                            'event_label': google_tag_params.ecomm_pagetype,
+                            'dimension1': google_tag_params.ecomm_prodid,
+                            'dimension2': google_tag_params.ecomm_pagetype,
+                            'dimension3': google_tag_params.ecomm_totalvalue,
+                            'retail_or_trade': '@(tradeUser ? "trade" : "retail")',
+                            'non_interaction': true
+                        };
+                        console.log('gtag is pushing page_visit with', data);
+                        gtag('event', 'page_visit', data);
+                    }
+                }
+
+                if (window.basketMaintenanceModel.ready()) {
+                    basketPageVisit()
+                } else {
+                    window.basketMaintenanceModel.ready.subscribe(nv => basketPageVisit());
+                }
+            }
+        } else {
+            let google_tag_params = {
+                ecomm_prodid: id,
+                ecomm_pagetype: pagetype,
+                ecomm_totalvalue: price
+            };
+
+            if (typeof gtag === 'function') {
+                let data = {
+                    'send_to': 'default',
+                    'event_label': google_tag_params.ecomm_pagetype,
+                    'dimension1': google_tag_params.ecomm_prodid,
+                    'dimension2': google_tag_params.ecomm_pagetype,
+                    'dimension3': google_tag_params.ecomm_totalvalue,
+                    'retail_or_trade': '@(tradeUser ? "trade" : "retail")',
+                    'non_interaction': true
+                };
+                console.log('gtag is pushing page_visit with', data);
+                gtag('event', 'page_visit', data);
+            }
+        }
+    });
+
+    window.gTagAddToCart = (basketItem, quantity) => {
+        if (typeof gtag === 'function') {
+            let price = ko.unwrap(basketItem.priceOverride);
+
+            if (price == null) {
+                price = ko.unwrap(basketItem.displaySalePrice);
+                if (price == null) {
+                    price = ko.unwrap(basketItem.displayPrice);
+                    if (price == null) {
+                        price = ko.unwrap(basketItem.Price);
+                    }
+                }
+            }
+
+            var data = {
+                "currency": getCurrencyCode(),
+                "value": +(+ko.unwrap(price) * +ko.unwrap(basketItem.quantity)),
+                "items": [{
+                    "item_id": ko.unwrap(basketItem.code) || ko.unwrap(basketItem.Code),
+                    "item_name": ko.unwrap(basketItem.name || basketItem.BasketName),
+                    "quantity": ko.unwrap(quantity),
+                    "price": +ko.unwrap(price)
+                }]
+            };
+            console.log('gtag is pushing add_to_cart with', data);
+            gtag('event', 'add_to_cart', data);
+        }
+    }
+
+    window.gTagRemoveFromCart = (basketItem, quantity, onComplete) => {
+        if (typeof gtag === 'function') {
+
+            let price = ko.unwrap(basketItem.displaySalePrice);
+
+            if (price == null) {
+                price = ko.unwrap(basketItem.displayPrice);
+                if (price == null) {
+                    price = ko.unwrap(basketItem.Price);
+                }
+            }
+
+            var data = {
+                "items": [{
+                    "item_id": ko.unwrap(basketItem.code) || ko.unwrap(basketItem.Code),
+                    "item_name": ko.unwrap(basketItem.name || basketItem.BasketName),
+                    "quantity": ko.unwrap(quantity),
+                    "price": +ko.unwrap(price)
+                }],
+                "value": +(+ko.unwrap(price) * +ko.unwrap(quantity)),
+                'event_callback': onComplete
+            };
+            console.log('gtag is pushing remove_from_cart with', data);
+            gtag('event', 'remove_from_cart', data);
+        }
+    }
+
+    window.gTagViewList = (definition, items, onComplete) => {
+        if (typeof gtag === 'function') {
+            var data = {
+                'item_list_id': `PageSectionID: ${definition.PageSectionID}`,
+                'item_list_name': `${definition.Name}`,
+                'items': items.map((i, index) => {
+                    let item = {
+                        'item_id': `ProductPageID: ${i.ProductPageID}`,
+                        'item_name': i.Heading,
+                        'index': index,
+                        'price': i.ProductPagePrice?.PriceMax,
+                        'quantity': 1
+                    }
+                    if (i.ProductPagePrice?.SalePriceMax) {
+                        item.discount = i.ProductPagePrice.SalePriceMax
+                    }
+                    return item;
+                })
+            }
+
+            console.log('gtag is pushing view_item_list with', data);
+            gtag('event', 'view_item_list', data);
+        }
+    }
+</script>
+
+@if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]) == false)
+{
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53708903-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-53708903-2', {
+            'dimension4': 'retail_or_trade',
+            'allow_enhanced_conversions': true
+        });
+        gtag('config', 'AW-1030129884'), {
+            'groups': 'dg_aw_uk',
+            'allow_enhanced_conversions': true
+        };
+    </script>
+}
+
+@if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]) == true)
+{
+    
+    if ((c == 81 || c == 238))
+    {
+        @* Google Tag Manager UK & USA *@
+        <!-- Google Tag Manager -->
+        <script type="text/javascript" defer>
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window, document, 'script', 'dataLayer', 'GTM-W73JX7G');
+        </script>
+        <!-- End Google Tag Manager -->
+    }
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53708903-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-53708903-1', {
+            'dimension4': 'retail_or_trade',
+            'allow_enhanced_conversions': true
+        });
+        gtag('config', 'AW-1030129884'), {
+            'allow_enhanced_conversions': true
+        };
+
+        @if (Convert.ToInt16(ViewData["countryId"]) == 16)
+        {
+            <text>
+            gtag('config', 'UA-97939801-1', {
+                'groups': 'aus',
+                'allow_enhanced_conversions': true
+            });
+            </text>
+        }
+        @if (Convert.ToInt16(ViewData["countryId"]) == 196)
+        {
+            <text>
+            gtag('config', 'UA-111805626-1', {
+                'groups': 'ru',
+                'allow_enhanced_conversions': true
+            });
+            </text>
+        }
+        @if (Convert.ToInt16(ViewData["countryId"]) == 175)
+        {
+            <text>
+            gtag('config', 'UA-146504682-1', {
+                'groups': 'nz',
+                'allow_enhanced_conversions': true
+            });
+            </text>
+        }
+    </script>
+}
