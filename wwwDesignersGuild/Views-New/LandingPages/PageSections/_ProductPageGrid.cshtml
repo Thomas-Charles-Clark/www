@@ -417,7 +417,7 @@
             var attributeFilterTextCount = HtmlHelperExtra.Resource(grid.Contents.Count > 1 ? "AttributeFilterTextResultsFoundFor" : "AttributeFilterTextResultFoundFor", l, c, d).ToString();
             attributeFilterTextCount = attributeFilterTextCount.Replace("{Count}", $"{grid.FilteredIDs.Count}");
             attributeFilterTextCount = attributeFilterTextCount.Replace("{AttributeFilterText}", $"{Model.Base.AttributeFilterText} {Model.Base.CategoryPageProductType.NamePlural}");
-            <h3 class="filter-indexing-result-count"> @*style="display: @(String.IsNullOrEmpty(Model.Base.AttributeFilterText) ? "none" : "block")"*@
+            <h3 class="filter-indexing-result-count" style="display: @(String.IsNullOrEmpty(Model.Base.AttributeFilterText) ? "none" : "block")">
                 @(attributeFilterTextCount)
             </h3>
         }
