@@ -1346,6 +1346,10 @@ input::-webkit-inner-spin-button {
   margin-left: auto;
 }
 
+.filter-indexing-result-count {
+  padding: 0.25rem 0.75rem;
+}
+
 .trade-clearance-selector.form-check {
   visibility: hidden;
   cursor: pointer;

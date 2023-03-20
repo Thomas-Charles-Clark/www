@@ -559,6 +559,8 @@ namespace wwwDesignersGuild.ViewModels
                 "Sorry",
                 "ThereWereNoResultsForThatCombination",
                 "WeHaveDeselectedTheFollowing",
+                "AttributeFilterTextResultFoundFor",
+                "AttributeFilterTextResultsFoundFor",
                 "MajorError" };
 
             switch (ContentID)
