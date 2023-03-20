@@ -90,6 +90,15 @@
                 }
 
                 if (filterText) {
+                    document.querySelectorAll('.filter-indexing-result-count').forEach(e => {
+                        let r = self.allProductPages().length > 1 ? self.resources.AttributeFilterTextResultsFoundFor : self.resources.AttributeFilterTextResultFoundFor;
+                        r = r.replace('{Count}', self.filteredContent().length);
+                        if (productTypeTextPlural) {
+                            r = r.replace('{AttributeFilterText}', `${filterText} ${productTypeTextPlural}`);
+                            e.innerHTML = r;
+                            e.style.display = 'block';
+                        }
+                    });
                     document.querySelectorAll('.filter-text').forEach(e => {
                         e.innerHTML = `${filterText} `;
                     });
@@ -111,6 +120,9 @@
                         }
                     });
                 } else {
+                    document.querySelectorAll('.filter-indexing-result-count').forEach(e => {
+                        e.style.display = 'none';
+                    });
                     document.querySelectorAll('.filter-text').forEach(e => {
                         e.innerHTML = e.dataset['originalContents'];
                     });

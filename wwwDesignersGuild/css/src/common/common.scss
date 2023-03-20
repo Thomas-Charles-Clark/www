@@ -1549,6 +1549,10 @@ input::-webkit-inner-spin-button {
     }
 }
 
+.filter-indexing-result-count {
+    padding: $vsm-gutter $m-gutter;
+}
+
 .trade-clearance-selector.form-check {
     visibility: hidden;
     cursor: pointer;
