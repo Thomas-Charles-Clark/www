@@ -749,7 +749,10 @@ namespace wwwDesignersGuild.Controllers
                             !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                             Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                        return new RedirectResult(tempUrl, false);
+                        // 20/03/2023 Amine wants us to serve 301's but we don't know that the content is gone FOREVER
+                        Response.Headers["cache-control"] = "no-cache";
+                        // so we're serving a hybrid nonsense result: a "temporary" moved permanently. Ugh.
+                        return new RedirectResult(tempUrl, true);
                     }
                 }
 
