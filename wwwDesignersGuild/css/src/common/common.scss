@@ -1550,7 +1550,8 @@ input::-webkit-inner-spin-button {
 }
 
 .filter-indexing-result-count {
-    padding: $vsm-gutter $m-gutter;
+    padding: 0;
+    margin-bottom: $xl-gutter;
 }
 
 .trade-clearance-selector.form-check {
