@@ -1347,7 +1347,8 @@ input::-webkit-inner-spin-button {
 }
 
 .filter-indexing-result-count {
-  padding: 0.25rem 0.75rem;
+  padding: 0;
+  margin-bottom: 2rem;
 }
 
 .trade-clearance-selector.form-check {
