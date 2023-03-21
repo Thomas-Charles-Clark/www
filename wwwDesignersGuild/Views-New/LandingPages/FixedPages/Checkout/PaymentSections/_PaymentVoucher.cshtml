@@ -55,7 +55,7 @@
                                 <tr>
                                     <td data-bind="text: Code"></td>
                                     <td class="expiry" data-bind="text: displayExpiryDate"></td>
-                                    <td class="amount" data-bind="text: resources.currencySymbol + ValueInc.formatCurrencyForDisplay()"></td>
+                                    <td class="amount" data-bind="text: $parent.resources.currencySymbol + ValueInc.formatCurrencyForDisplay()"></td>
                                     <td>
                                         <a href="javascript:;" class="remove" data-bind="click: function () { $parent.voucherToRemove($data); }">
                                             @HtmlHelperExtra.Resource("CheckoutPayGiftRemove", l, c, d)
