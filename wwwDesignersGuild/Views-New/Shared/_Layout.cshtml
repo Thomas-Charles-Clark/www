@@ -17,12 +17,9 @@
     <meta name="description" content="@(objMaster.MetaDescription ?? objMaster.TitleTag)" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    @if (Model.CustomCanonical == null)
+    @foreach (var href in objMaster.GoogleHrefs)
     {
-        foreach (var href in objMaster.GoogleHrefs)
-        {
-            <link rel="alternate" hreflang="@Html.Raw(href.hreflang)" href="@Html.Raw(href.href)" />
-        }
+        <link rel="alternate" hreflang="@Html.Raw(href.hreflang)" href="@Html.Raw(href.href)" />
     }
 
     <link rel="canonical" href="@(Model.CustomCanonical ?? Request.Url.GetLeftPart(UriPartial.Path))" />
