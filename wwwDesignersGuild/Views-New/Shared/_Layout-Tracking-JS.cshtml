@@ -59,10 +59,11 @@
 
             let dotDigitalModel = null;
 
-            let price = productPageModel.products().length ? Enumerable.From(productPageModel.products()).Select('$.displayPrice').Min() : null;
-            let salePrice = productPageModel.products().length ? Enumerable.From(productPageModel.products()).Select('$.displaySalePrice').Min() || price : null;
-            let priceMessage = null;
             if (productPageModel.hasOwnProperty('ProductPagePrice')) {
+
+                let priceMessage = null;
+                let price = productPageModel.ProductPagePrice.priceMin;
+                let salePrice = productPageModel.ProductPagePrice.salePriceMin
 
                 priceMessage = productPageModel.ProductPagePrice.priceMessage || productPageModel.ProductPagePrice.rRPMessage || '';
 
