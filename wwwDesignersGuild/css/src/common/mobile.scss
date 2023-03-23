@@ -852,17 +852,16 @@ ul.breadcrumb {
 }
 
 #site-corrector {
-    position: fixed;
-    top: 52px;
-    left: 0;
-    right: 0;
-    z-index: 4999;
     box-sizing: border-box;
-    opacity: 1.0;
-    transition: top 500ms ease-in-out;
-    height: auto;
+    opacity: 0;
+    transition: height 300ms ease-out,opacity 300ms ease-out;
     overflow: hidden;
+    height: 0;
+    width: 100%;
+    opacity: 0;
     border: 0;
+    position: relative;
+    top: 52px;
 
     p {
         margin-bottom: 0;
@@ -877,11 +876,13 @@ ul.breadcrumb {
     .btn {
         flex-shrink: 0;
     }
+
+    &.open {
+        opacity: 1.0;
+        border-bottom: 1px solid $blue-100;
+    }
 }
 
-#site-corrector.dismissed {
-    top: -68px;
-}
 #trade-clearance-card {
     margin: $m-gutter;
     border: 0;
