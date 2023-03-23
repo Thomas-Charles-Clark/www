@@ -58,6 +58,73 @@
         window.location.href = destination;
     }
 
+    self.hide = function () {
+
+        self.siteSelection.DOMElement.classList.remove('open');
+
+        // get the height of the element's inner content, regardless of its actual size
+        let sectionHeight = self.siteSelection.DOMElement.scrollHeight;
+
+        // temporarily disable all css transitions
+        let elementTransition = self.siteSelection.DOMElement.style.transition;
+        self.siteSelection.DOMElement.style.transition = '';
+
+        // on the next frame (as soon as the previous style change has taken effect),
+        // explicitly set the element's height to its current pixel height, so we 
+        // aren't transitioning out of 'auto'
+        requestAnimationFrame(function () {
+            self.siteSelection.DOMElement.style.height = sectionHeight + 'px';
+            self.siteSelection.DOMElement.style.transition = elementTransition;
+
+            // on the next frame (as soon as the previous style change has taken effect),
+            // have the element transition to height: 0
+            requestAnimationFrame(function () {
+                self.siteSelection.DOMElement.style.height = 0 + 'px';
+            });
+        });
+
+        // mark the section as "currently collapsed"
+        self.siteSelection.DOMElement.setAttribute('data-collapsed', 'true');
+
+        self.dismiss();
+    }
+
+    self.toggle = function (ev) {
+
+        if (self.siteSelection.DOMElement.classList.contains('open'))
+            self.hide();
+        else
+            self.show();
+
+        ev.stopPropagation();
+
+        return true;
+    }
+
+    self.show = function () {
+        self.siteSelection.DOMElement.classList.add('open');
+
+        var element = self.siteSelection.DOMElement;
+
+        // get the height of the element's inner content, regardless of its actual size
+        var sectionHeight = element.scrollHeight;
+
+        // have the element transition to the height of its inner content
+        element.style.height = sectionHeight + 'px';
+
+        // when the next css transition finishes (which should be the one we just triggered)
+        element.addEventListener('transitionend', function (e) {
+            // remove this event listener so it only gets triggered once
+            element.removeEventListener('transitionend', arguments.callee);
+
+            // remove "height" from the element's inline styles, so it can return to its initial value
+            element.style.height = 'auto';
+        });
+
+        // mark the section as "currently not collapsed"
+        element.setAttribute('data-collapsed', 'false');
+    }
+
     self.dismiss = () => {
         fetch('/api/generalapi/CountryCorrectorDismissed', {
             method: 'POST',
@@ -65,23 +132,24 @@
             cache: 'no-cache',
             credentials: 'same-origin'
         });
-
-        self.bodyInnerElement.style.paddingTop = '0px';
-        self.siteSelection.DOMElement.classList.toggle('dismissed');
-        self.bodyInnerElement.classList.toggle('site-corrector-dismissed');
     }
 
     self.init = () => {
-        self.bodyInnerElement.style.paddingTop = window.getComputedStyle(self.siteSelection.DOMElement).height;
+        //self.bodyInnerElement.style.paddingTop = window.getComputedStyle(self.siteSelection.DOMElement).height;
 
-        window.addLoadFunction(() => {
-            window.setTimeout(() => {
-                window.scrollTo(0, 0);
-                window.requestAnimationFrame(() => {
-                    self.bodyInnerElement.style.transition = 'padding-top 500ms ease-in-out'
-                });
-            }, 0);
-        });
+        //window.addLoadFunction(() => {
+        //    window.setTimeout(() => {
+        //        window.scrollTo(0, 0);
+        //        window.requestAnimationFrame(() => {
+        //            self.bodyInnerElement.style.transition = 'padding-top 500ms ease-in-out'
+        //        });
+        //    }, 0);
+        //});
+
+        self.show();
+        window.setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        }, 300);
     }
 
     //#endregion
