@@ -543,7 +543,8 @@
                              class="d-block w-100"
                              alt="@(b.altText ?? b.overlayText)"
                              loading="lazy"
-                             @HtmlHelperExtra.BannerImageSourceSetSizes(b.bannerId, b.version, ImageSize.Twelve) />
+                             src="/imagebanner@(Framework.WebPFallback)/512/@(b.bannerId)?v=@(b.version)"
+                             @HtmlHelperExtra.BannerImageSourceSetSizes(b.bannerId, b.version, ImageSize.Five) />
                     </div>
                     <div class="d-flex flex-column justify-content-center align-items-center">
                         <p class="text-center" data-bind="with: pageSectionForm">
