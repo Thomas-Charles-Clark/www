@@ -721,5 +721,5 @@
         }
     })
 </script>
-@Render.Script("~/js/dist/models/common/stock-info.min.js")
+@Render.Script($"~/js/dist/models/common/stock-info.min.js?v={DateTime.Now.ToUniversalTime().Ticks}")
 @Render.Script("~/bundles/js/basket-page")
