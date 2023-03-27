@@ -88,106 +88,115 @@
             //$('#stock-tab-menu').tabs({ active: +tab });
             //});
 
-            let d = ko.dataFor(self.stockModalElement);
-
-            if (d == null) {
-                ko.cleanNode(self.stockModalElement);
-
-                ko.applyBindings({
-                    stockInfoModel: self
-                }, self.stockModalElement);
+            if (self.stockModalElement == null) {
+                self.stockModalElement = document.querySelector('#stock-modal');
             }
 
-            if (typeof bootstrap !== 'undefined') {
-                bootstrap.Modal.getOrCreateInstance(self.stockModalElement).show();
-            } else {
-                window.addBootstrapLoadFunction(() => {
-                    bootstrap.Modal.getOrCreateInstance(self.stockModalElement).show();
-                });
-            }
+            if (self.stockModalElement != null) {
 
-            self.busy(true);
+                let d = ko.dataFor(self.stockModalElement);
 
-            if (self.parent.hasOwnProperty('deliveryAddressFactory')) {
-                if (self.product().PermitCutLengthBreakdown || self.product().PermitBatch) {
-                    self.parent.deliveryAddressFactory.actingCutLength(self.product());
-                } else {
-                    self.parent.deliveryAddressFactory.actingCutLength(undefined);
+                if (d == null) {
+                    ko.cleanNode(self.stockModalElement);
+
+                    ko.applyBindings({
+                        stockInfoModel: self
+                    }, self.stockModalElement);
                 }
-            }
 
-            self.supplierStockAvailabilityMessage(undefined);
+                if (typeof bootstrap !== 'undefined') {
+                    bootstrap.Modal.getOrCreateInstance(self.stockModalElement).show();
+                } else {
+                    window.addBootstrapLoadFunction(() => {
+                        bootstrap.Modal.getOrCreateInstance(self.stockModalElement).show();
+                    });
+                }
 
-            fetch('/api/stockist/GetPieceLevelStockInfo', {
-                method: 'POST',
-                headers: window.fetchHeaders,
-                cache: 'no-store',
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    productId: ko.unwrap(self.product().productId) || self.product().ProductID,
-                    countryId: getCountryId(),
-                    languageId: getLanguageId()
-                })
-            }).then(window.handleFetchResponse)
-                .then(data => {
-                    console.log('getpiecelevelstockinfo returned', data);
+                self.busy(true);
 
-                    if (data != null) {
+                if (self.parent.hasOwnProperty('deliveryAddressFactory')) {
+                    if (self.product().PermitCutLengthBreakdown || self.product().PermitBatch) {
+                        self.parent.deliveryAddressFactory.actingCutLength(self.product());
+                    } else {
+                        self.parent.deliveryAddressFactory.actingCutLength(undefined);
+                    }
+                }
 
-                        self.totalStock(data.TotalStock);
+                self.supplierStockAvailabilityMessage(undefined);
 
-                        ko.utils.arrayForEach(data.Batches, function (b) {
-                            let subTotal = 0;
-                            b.Pieces.forEach(p => {
-                                subTotal += Math.round((Number(p.Length) * Number(p.Quantity)) * 10) / 10;
+                fetch('/api/stockist/GetPieceLevelStockInfo', {
+                    method: 'POST',
+                    headers: window.fetchHeaders,
+                    cache: 'no-store',
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        productId: ko.unwrap(self.product().productId) || self.product().ProductID,
+                        countryId: getCountryId(),
+                        languageId: getLanguageId()
+                    })
+                }).then(window.handleFetchResponse)
+                    .then(data => {
+                        console.log('getpiecelevelstockinfo returned', data);
+
+                        if (data != null) {
+
+                            self.totalStock(data.TotalStock);
+
+                            ko.utils.arrayForEach(data.Batches, function (b) {
+                                let subTotal = 0;
+                                b.Pieces.forEach(p => {
+                                    subTotal += Math.round((Number(p.Length) * Number(p.Quantity)) * 10) / 10;
+                                });
+                                b.totalStock = Number(Math.round(subTotal * 10) / 10).toFixed(2);
                             });
-                            b.totalStock = Number(Math.round(subTotal * 10) / 10).toFixed(2);
-                        });
 
-                        self.inStockData(data.Batches);
+                            self.inStockData(data.Batches);
 
-                        self.supplierData(data.SupplierStock);
+                            self.supplierData(data.SupplierStock);
 
-                        self.dueInData(data.PurchaseOrders);
+                            self.dueInData(data.PurchaseOrders);
 
-                        self.totalPurchaseOrderStock(data.TotalPurchaseOrderLength);
+                            self.totalPurchaseOrderStock(data.TotalPurchaseOrderLength);
 
-                        self.supplierStockAvailabilityMessage(data.SupplierAvailabilityMessage);
+                            self.supplierStockAvailabilityMessage(data.SupplierAvailabilityMessage);
 
-                        if (tab == 2 && !self.supplierHasStock()) {
-                            let el = document.querySelector('#stock-tab-menu li:first-child button');
-                            let bsTab = bootstrap.Tab.getOrCreateInstance(el);
-                            bsTab.show();
-                            //$('#stock-tab-menu').tabs({ active: 0 });
-                        } else {
-                            let el = document.querySelector('#stock-tab-menu li:nth-child(' + (tab + 1) + ') button');
-                            let bsTab = bootstrap.Tab.getOrCreateInstance(el);
-                            bsTab.show();
-                            //$('#stock-tab-menu').tabs({ active: +tab });
+                            if (tab == 2 && !self.supplierHasStock()) {
+                                let el = document.querySelector('#stock-tab-menu li:first-child button');
+                                let bsTab = bootstrap.Tab.getOrCreateInstance(el);
+                                bsTab.show();
+                                //$('#stock-tab-menu').tabs({ active: 0 });
+                            } else {
+                                let el = document.querySelector('#stock-tab-menu li:nth-child(' + (tab + 1) + ') button');
+                                let bsTab = bootstrap.Tab.getOrCreateInstance(el);
+                                bsTab.show();
+                                //$('#stock-tab-menu').tabs({ active: +tab });
+                            }
+
+                            //$('#stock-tab-menu').tabs("refresh");
+                            //$('#stock-modal').modal('handleUpdate');
                         }
 
-                        //$('#stock-tab-menu').tabs("refresh");
-                        //$('#stock-modal').modal('handleUpdate');
-                    }
-
-                    if (self.parent.hasOwnProperty('deliveryAddressFactory')) {
-                        if (self.product().hasOwnProperty('cutLengthBreakdown')) {
-                            self.product().cutLengthBreakdown.selectedBatch(undefined);
-                            self.product().cutLengthBreakdown.availableBatches(self.inStockData().map(x => {
-                                return {
-                                    batch: x.BatchNumber,
-                                    text: x.BatchNumber
-                                }
-                            }));
+                        if (self.parent.hasOwnProperty('deliveryAddressFactory')) {
+                            if (self.product().hasOwnProperty('cutLengthBreakdown')) {
+                                self.product().cutLengthBreakdown.selectedBatch(undefined);
+                                self.product().cutLengthBreakdown.availableBatches(self.inStockData().map(x => {
+                                    return {
+                                        batch: x.BatchNumber,
+                                        text: x.BatchNumber
+                                    }
+                                }));
+                            }
                         }
-                    }
 
-                    self.busy(false);
-                })
-                .catch(err => {
-                    self.busy(false);
-                    window.catchFetchErrors(err);
-                });
+                        self.busy(false);
+                    })
+                    .catch(err => {
+                        self.busy(false);
+                        window.catchFetchErrors(err);
+                    });
+            } else {
+                console.error('#stock-modal was not found!');
+            }
         }
 
         self.init = () => {
