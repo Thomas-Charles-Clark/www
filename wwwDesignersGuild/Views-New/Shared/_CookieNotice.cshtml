@@ -20,15 +20,20 @@
      data-bind="toggleOpacity: visible">
     <p class="p-3">
         <span>
-            @HtmlHelperExtra.Resource("CookieNoticeOne", l, c, d)
+            @HtmlHelperExtra.Resource("CookieNoticeBlunt", l, c, d)
         </span>
-        <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.privacyPolicy, cd)">
-            @HtmlHelperExtra.Resource("ByReadingOurPrivacyPolicyHere", l, c, d)
-        </a>
+        <span class="small d-block">
+            <span>
+                @HtmlHelperExtra.Resource("CookieNoticeLearnMore", l, c, d)
+            </span>
+            <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.privacyPolicy, cd)">
+                @HtmlHelperExtra.Resource("ByReadingOurPrivacyPolicyHere", l, c, d)
+            </a>
+        </span>
     </p>
     <button class="btn btn-secondary"
             data-bind="click: accept">
-        @HtmlHelperExtra.Resource("CookieAcceptButton", l, c, d)
+        @HtmlHelperExtra.Resource("OkCapitalised", l, c, d)
     </button>
 </div>
 @Render.ScriptDefer("~/bundles/js/cookie-notice")

@@ -2622,4 +2622,8 @@ footer #change-country:focus-within {
 #related-searches .btn-link:hover {
   text-decoration: underline;
 }
+
+#cookie-notice span.small {
+  font-size: 0.825rem;
+}
 /*# sourceMappingURL=desktop.css.map */

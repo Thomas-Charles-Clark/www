@@ -712,6 +712,9 @@ ul.breadcrumb li {
   margin-top: var(--l-gutter);
   margin-inline-start: 0;
 }
+#cookie-notice p span.small {
+  text-align: center;
+}
 
 .breadcrumb-social-wrapper {
   flex-wrap: wrap;
