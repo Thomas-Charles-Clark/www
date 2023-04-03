@@ -377,7 +377,7 @@ namespace wwwDesignersGuild.Controllers
                 // Don't index this URL: it was invalid!
                 Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                Response.Headers.Add("cache-control", "max-age=86400");
+                Response.Headers.Add("cache-control", "no-cache");
 
                 return new RedirectResult(url, true);
             }
@@ -694,7 +694,7 @@ namespace wwwDesignersGuild.Controllers
 
                         // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
                         // become 301's instead of 302's, but with a cache-control: nocache
-                        Response.Headers.Add("cache-control", "max-age=86400");
+                        Response.Headers.Add("cache-control", "no-cache");
 
                         return new RedirectResult(tempUrl, true);
                     }
@@ -722,7 +722,7 @@ namespace wwwDesignersGuild.Controllers
 
                         // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
                         // become 301's instead of 302's, but with a cache-control: nocache
-                        Response.Headers.Add("cache-control", "max-age=86400");
+                        Response.Headers.Add("cache-control", "no-cache");
 
                         return new RedirectResult(tempUrl, true);
                     }
@@ -759,7 +759,7 @@ namespace wwwDesignersGuild.Controllers
 
                         // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
                         // become 301's instead of 302's, but with a cache-control: nocache
-                        Response.Headers.Add("cache-control", "max-age=86400");
+                        Response.Headers.Add("cache-control", "no-cache");
 
                         return new RedirectResult(tempUrl, true);
                     }
@@ -828,7 +828,7 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
@@ -874,7 +874,7 @@ namespace wwwDesignersGuild.Controllers
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
                     // Don't index the approached URL: it was an invalid or unavailable collection
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
@@ -893,7 +893,7 @@ namespace wwwDesignersGuild.Controllers
                                                                 !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                                 Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(tempUrl, true);
                 }
@@ -964,7 +964,7 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
@@ -977,7 +977,7 @@ namespace wwwDesignersGuild.Controllers
                                                                 !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                                 Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(tempUrl, true);
                 }
@@ -1177,7 +1177,7 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
@@ -1191,7 +1191,7 @@ namespace wwwDesignersGuild.Controllers
                                                         !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                         Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(tempUrl, true);
                 }
@@ -1263,7 +1263,7 @@ namespace wwwDesignersGuild.Controllers
                     // Don't index the approached URL: it's part of the checkout
                     Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
@@ -1281,7 +1281,7 @@ namespace wwwDesignersGuild.Controllers
                     // Don't index the approached URL: it's part of the checkout
                     Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                    Response.Headers.Add("cache-control", "max-age=86400");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(url, true);
                 }
