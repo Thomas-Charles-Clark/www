@@ -16,12 +16,13 @@
     }
 </script>
 
-@Render.Script("~/bundles/js/trade-price-display")
 @Render.StylesPreload("~/bundles/css/trade")
+
 @if (dgFramework.IsMobileDevice())
 {
     @Render.StylesPreload("~/bundles/css/trade-mobile")
 }
+
 <div data-bind="stopBinding">
     <div id="trade-wrapper">
         <div class="form-check">
@@ -81,3 +82,5 @@
         </div>
     </div>
 </div>
+
+@Render.Script("~/bundles/js/trade-price-display")
