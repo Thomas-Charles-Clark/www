@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -376,8 +377,9 @@ namespace wwwDesignersGuild.Controllers
                 // Don't index this URL: it was invalid!
                 Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                
-                return new RedirectResult(url, false); // NOT a permanent redirect.
+                Response.Headers.Add("cache-control", "no-cache");
+
+                return new RedirectResult(url, true);
             }
 
             #endregion
@@ -688,13 +690,13 @@ namespace wwwDesignersGuild.Controllers
                             !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                             Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                        ////////////
-                        //
-                        // REDIRECT No. 3 - URLKeywords Correction Redirect
-                        // Don't index the approached URL: it required correction
-                        Response.Headers.Add("X-Robots-Tag", "noindex");
+                        // 03/04/2023: Scratch that: apparently the noindex also means "don't register the redirect"
 
-                        return new RedirectResult(tempUrl, false);
+                        // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
+                        // become 301's instead of 302's, but with a cache-control: nocache
+                        Response.Headers.Add("cache-control", "no-cache");
+
+                        return new RedirectResult(tempUrl, true);
                     }
 
                     if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing &&
@@ -716,13 +718,13 @@ namespace wwwDesignersGuild.Controllers
                             !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                             Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                        ////////////
-                        //
-                        // REDIRECT No. 3 - URLKeywords Correction Redirect
-                        // Don't index the approached URL: it required correction
-                        Response.Headers.Add("X-Robots-Tag", "noindex");
+                        // 03/04/2023: Scratch that: apparently the noindex also means "don't register the redirect"
 
-                        return new RedirectResult(tempUrl, false);
+                        // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
+                        // become 301's instead of 302's, but with a cache-control: nocache
+                        Response.Headers.Add("cache-control", "no-cache");
+
+                        return new RedirectResult(tempUrl, true);
                     }
 
                     if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing &&
@@ -749,9 +751,16 @@ namespace wwwDesignersGuild.Controllers
                             !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                             Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                        // 20/03/2023 Amine wants us to serve 301's but we don't know that the content is gone FOREVER
-                        Response.Headers["cache-control"] = "no-cache";
-                        // so we're serving a hybrid nonsense result: a "temporary" moved permanently. Ugh.
+
+                        // Don't index the approached URL: it required correction
+                        // Response.Headers.Add("X-Robots-Tag", "noindex");
+                        //
+                        // 03/04/2023: Scratch that: apparently the noindex also means "don't register the redirect"
+
+                        // 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
+                        // become 301's instead of 302's, but with a cache-control: nocache
+                        Response.Headers.Add("cache-control", "no-cache");
+
                         return new RedirectResult(tempUrl, true);
                     }
                 }
@@ -818,16 +827,10 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-                    ////////////
-                    //
-                    // REDIRECT No. 1 - Home Redirect
-                    // NOT a permanent redirect
-                    //
 
-                    // Don't index the approached URL: it was an invalid collectionId
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(url, false);
+                    return new RedirectResult(url, true);
                 }
 
 
@@ -869,16 +872,11 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-                    ////////////
-                    //
-                    // REDIRECT No. 1 - Home Redirect
-                    // NOT a permanent redirect
-                    //
 
                     // Don't index the approached URL: it was an invalid or unavailable collection
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(url, false);
+                    return new RedirectResult(url, true);
                 }
                 else
                 {
@@ -895,13 +893,9 @@ namespace wwwDesignersGuild.Controllers
                                                                 !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                                 Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    ////////////
-                    //
-                    // REDIRECT No. 3 - URLKeywords Correction Redirect
-                    // Don't index the approached URL: it required correction
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(tempUrl, false);
+                    return new RedirectResult(tempUrl, true);
                 }
                 ////////////
                 //
@@ -969,16 +963,10 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-                    ////////////
-                    //
-                    // REDIRECT No. 1 - Home Redirect
-                    // NOT a permanent redirect
-                    //
 
-                    // Don't index the approached URL: it was an invalid productPageId
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(url, false);
+                    return new RedirectResult(url, true);
                 }
 
                 if (URLKeywordsRequireCorrecting(urlData.countryDetails.URL, objProductData.objCacheSelect.urlSemantics, urlParameterWithoutSuffix) == true)
@@ -989,13 +977,9 @@ namespace wwwDesignersGuild.Controllers
                                                                 !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                                 Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    ////////////
-                    //
-                    // REDIRECT No. 3 - URLKeywords Correction Redirect
-                    // Don't index the approached URL: it required correction
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(tempUrl, false);
+                    return new RedirectResult(tempUrl, true);
                 }
 
                 var objBasket = new basketRoutines();
@@ -1192,16 +1176,10 @@ namespace wwwDesignersGuild.Controllers
                                                     !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
                                                     !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                     Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-                    ////////////
-                    //
-                    // REDIRECT No. 1 - Home Redirect
-                    // NOT a permanent redirect
-                    //
 
-                    // Don't index the approached URL: it was an invalid articleId
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(url, false);
+                    return new RedirectResult(url, true);
                 }
 
 
@@ -1213,11 +1191,7 @@ namespace wwwDesignersGuild.Controllers
                                                         !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
                                                         Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    ////////////
-                    //
-                    // REDIRECT No. 3 - URLKeywords Correction Redirect
-                    // Don't index the approached URL: it required correcting
-                    Response.Headers.Add("X-Robots-Tag", "noindex");
+                    Response.Headers.Add("cache-control", "no-cache");
 
                     return new RedirectResult(tempUrl, true);
                 }
@@ -1289,7 +1263,9 @@ namespace wwwDesignersGuild.Controllers
                     // Don't index the approached URL: it's part of the checkout
                     Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                    return new RedirectResult(url, false);
+                    Response.Headers.Add("cache-control", "no-cache");
+
+                    return new RedirectResult(url, true);
                 }
                 else if (dgFramework.isCheckoutSessionValid(Session["checkoutExpiry"]) == false)
                 {
@@ -1305,7 +1281,9 @@ namespace wwwDesignersGuild.Controllers
                     // Don't index the approached URL: it's part of the checkout
                     Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                    return new RedirectResult(url, false);
+                    Response.Headers.Add("cache-control", "no-cache");
+
+                    return new RedirectResult(url, true);
                 }
 
                 var checkoutPartViewModel = await LandingPageViewModel.CreateAsync(
