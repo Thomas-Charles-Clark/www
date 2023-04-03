@@ -170,7 +170,7 @@
                 return 1;
                 break;
             case 'm':
-                return 0.1;
+                return 0.01;
                 break;
             case '"':
                 return 1;
@@ -187,19 +187,19 @@
     self.unitMaximumComputer = ko.computed(() => {
         switch (self.unit()) {
             case 'cm':
-                return 20000;
+                return 10000;
                 break;
             case 'm':
-                return 20;
+                return 100;
                 break;
             case '"':
-                return 720;
+                return 36000;
                 break;
             case 'ft':
-                return 60;
+                return 300;
                 break;
             case 'yd':
-                return 20;
+                return 100;
                 break;
         }
     }, self);
