@@ -38,7 +38,7 @@
     //#region Methods
 
     self.changeSite = () => {
-        let regex = new RegExp(`(${window.location.protocol}\/\/${window.location.host}\/)([a-z]*)(\/.*)?$`);
+        let regex = new RegExp(`(${window.location.protocol}\/\/${window.location.host}\/)([a-z\-]*)(\/.*)?$`);
 
         if (self.siteSelection() == 'country-picker') {
             window.location.href = `${window.location.protocol}//${window.location.host}/l50`;
