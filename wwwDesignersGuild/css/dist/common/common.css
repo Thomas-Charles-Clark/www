@@ -2064,12 +2064,10 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   justify-content: center;
   color: #4E4E4E;
   background-color: #fff;
-  padding: var(--l-gutter) var(--l-gutter);
-  margin: var(--l-gutter);
-  width: calc(100% - var(--xl-gutter));
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  width: 100%;
+  box-shadow: 0 -0.25rem 0.5rem rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
-  border: 3px solid #6c757d;
+  border-top: 1px solid #ddd;
   border-radius: 0;
 }
 #cookie-notice p {
