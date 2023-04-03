@@ -9,6 +9,13 @@
 
     @* Checked 13/07/2022 *@
 }
+
+<script type="text/javascript">
+    window.getTradePriceDisplay = () => {
+        return @(Model.MemberDetail.DisplayTradePrice.ToString().ToLower());
+    }
+</script>
+
 @Render.Script("~/bundles/js/trade-price-display")
 @Render.StylesPreload("~/bundles/css/trade")
 @if (dgFramework.IsMobileDevice())
@@ -74,9 +81,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-    window.getTradePriceDisplay = () => {
-        return @(Model.MemberDetail.DisplayTradePrice.ToString().ToLower());
-    }
-</script>
