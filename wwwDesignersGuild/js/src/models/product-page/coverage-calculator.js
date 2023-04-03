@@ -170,7 +170,7 @@
                 return 1;
                 break;
             case 'm':
-                return 0.1;
+                return 0.01;
                 break;
             case '"':
                 return 1;
@@ -182,6 +182,30 @@
                 return 0.33;
                 break;
         }
+    }, self);
+
+    self.unitMaximumComputer = ko.computed(() => {
+        switch (self.unit()) {
+            case 'cm':
+                return 10000;
+                break;
+            case 'm':
+                return 100;
+                break;
+            case '"':
+                return 36000;
+                break;
+            case 'ft':
+                return 300;
+                break;
+            case 'yd':
+                return 100;
+                break;
+        }
+    }, self);
+
+    self.unitValidationMessage = ko.computed(() => {
+        return `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.unitMinimumComputer()).replace(99, self.unitMaximumComputer())}`;
     }, self);
 
     //#endregion
@@ -367,11 +391,15 @@ const roomModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
@@ -386,11 +414,15 @@ const roomModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer(),
-            message: () => `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
@@ -405,11 +437,15 @@ const roomModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Length} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Length} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
@@ -436,6 +472,18 @@ const wallModel = ((parent) => {
         unit: parent.unit
     };
 
+    if (self.parent.parent.Definition.json.productTypeId != 18) {
+        self.exclusions = ko.observableArray([]);
+    }
+
+    self.remove = self.parent.removeWall;
+
+    self.unitMinimumComputer = self.parent.unitMinimumComputer;
+
+    self.unitMaximumComputer = self.parent.unitMaximumComputer;
+
+    self.unitValidationMessage = self.parent.unitValidationMessage;
+
     self.id = `${new Date().valueOf()}`;
 
     self.width = ko.observable();
@@ -454,11 +502,15 @@ const wallModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
@@ -473,22 +525,18 @@ const wallModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
-
-    if (self.parent.parent.Definition.json.productTypeId != 18) {
-        self.exclusions = ko.observableArray([]);
-    }
-
-    self.remove = self.parent.removeWall;
-
-    self.unitMinimumComputer = self.parent.unitMinimumComputer;
 
     self.addExclusion = () => {
         self.exclusions.push(exclusionModel(self));
@@ -535,11 +583,15 @@ const exclusionModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Width} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
@@ -554,11 +606,15 @@ const exclusionModel = ((parent) => {
         },
         min: {
             params: self.parent.unitMinimumComputer,
-            message: () => `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            message: () => () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         max: {
-            params: 99,
-            message: `${self.resources.Height} ${self.resources.CalculatorMustBeBetween.replace('1', self.parent.unitMinimumComputer())}`
+            params: self.parent.unitMaximumComputer,
+            message: () => {
+                return self.parent.unitValidationMessage();
+            }
         },
         errorPulse: {}
     });
