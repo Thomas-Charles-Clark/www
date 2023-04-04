@@ -19,7 +19,7 @@
                 @HtmlHelperExtra.Resource("mobileNumber", l, c, d)
             </label>
             <div id="phone-container"
-                 class="g-col-12 g-col-lg-6 d-flex"
+                 class="g-col-12 g-col-lg-6 gap-3 d-flex"
                  data-bind="css: { 'phone-confirmed': confirmed() }">
                 <input name="delivery-phone"
                         x-name="addressPhone"
@@ -33,7 +33,9 @@
         <span class="validation-message text-danger" style="margin-top: 5px;" data-bind="validationMessage: phone"></span>
         <!-- ko if: initLateExtenders() --><!-- /ko -->
     </div>
-    <div style="display: none;" data-bind="visible: parent.parent.paymentMethodFactory.amazonHappy() && phoneChanged()">
+    <div style="display: none;"
+         class="phone-unsaved-changes mb-3"
+         data-bind="visible: parent.parent.paymentMethodFactory.amazonHappy() && phoneChanged()">
         <span>
             @HtmlHelperExtra.Resource("MoodboardUnsavedChanges", l, c, d)
         </span>
