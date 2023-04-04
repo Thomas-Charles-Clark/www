@@ -2876,8 +2876,6 @@ const checkoutDeliveryAddress = (
                 } else {
                     return (self.validateNow()) &&
                             (self.parent.parent.checkoutType != 2 &&
-                             self.parent.parent.checkoutType != 3 &&
-                             self.parent.parent.checkoutType != 4 &&
                              self.deliveryOptionId() != 3);
                 }
             },
@@ -2916,6 +2914,8 @@ const checkoutDeliveryAddress = (
                 } else {
                     self.confirmed(true);
                 }
+            } else {
+                self.phone.isValid.notifySubscribers(false);
             }
         }, 0);
     }
@@ -4036,22 +4036,61 @@ const paymentMethodFactory = ((parent) => {
                     }
                     break;
                 case 3:
-                    if (self.parent.balanceNumber()) {
-                        self.showCompletingMessage();
-                        self.submitAmazonCheckout();
+                    self.parent.deliveryAddressFactory.currentAddress().validateNow(true);
+
+                    if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid() &&
+                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false) {
+                        if (self.parent.balanceNumber()) {
+                            self.showCompletingMessage();
+                            self.submitAmazonCheckout();
+                        } else {
+                            self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
+                            self.asyncPlaceOrderNow();
+                        }
                     } else {
-                        self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
-                        self.asyncPlaceOrderNow();
+                        if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid()) {
+                            // you can get here by not having a mobile number, providing one and then not saving the number.
+                            // in which case you're left with no red visual prompt to action, just the "You have unsaved changes" dialog.
+                            document.querySelector('.phone-unsaved-changes').classList.add('alert');
+                            document.querySelector('.phone-unsaved-changes').classList.add('alert-danger');
+                            document.querySelector('.phone-unsaved-changes').classList.remove('error-pulse');
+                            window.setTimeout(() => {
+                                document.querySelector('.phone-unsaved-changes').classList.add('error-pulse');
+                            }, 0);
+                        }
+                        self.parent.deliveryAddressFactory.currentAddress().errors.showAllMessages(true);
+                        self.parent.deliveryAddressFactory.currentAddress().phone.isValid.notifySubscribers(false);
                     }
+
                     break;
                 case 4:
-                    if (self.parent.balanceNumber()) {
-                        self.showCompletingMessage();
-                        self.submitBraintreeCheckout('paypal');
-                    } else {
-                        self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
-                        self.asyncPlaceOrderNow();
+                    self.parent.deliveryAddressFactory.currentAddress().validateNow(true);
+
+                    if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid() &&
+                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false)
+                    {
+                        if (self.parent.balanceNumber()) {
+                            self.showCompletingMessage();
+                            self.submitBraintreeCheckout('paypal');
+                        } else {
+                            self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
+                            self.asyncPlaceOrderNow();
+                        }
+                     } else {
+                        if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid()) {
+                            // you can get here by not having a mobile number, providing one and then not saving the number.
+                            // in which case you're left with no red visual prompt to action, just the "You have unsaved changes" dialog.
+                            document.querySelector('.phone-unsaved-changes').classList.add('alert');
+                            document.querySelector('.phone-unsaved-changes').classList.add('alert-danger');
+                            document.querySelector('.phone-unsaved-changes').classList.remove('error-pulse');
+                            window.setTimeout(() => {
+                                document.querySelector('.phone-unsaved-changes').classList.add('error-pulse');
+                            }, 0);
+                        }
+                        self.parent.deliveryAddressFactory.currentAddress().errors.showAllMessages(true);
+                        self.parent.deliveryAddressFactory.currentAddress().phone.isValid.notifySubscribers(false);
                     }
+
                     break;
             }
         }
