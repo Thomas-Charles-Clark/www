@@ -11,6 +11,7 @@ using wwwDesignersGuild.Models.Interface;
 using System.Configuration;
 using wwwDesignersGuild.Models.Helper;
 using Newtonsoft.Json;
+using static Antlr.Runtime.Tree.TreeWizard;
 
 namespace wwwDesignersGuild.Models.ProductPage
 {
@@ -69,9 +70,12 @@ namespace wwwDesignersGuild.Models.ProductPage
         {
             var dataContext = new databaseDataContext();
 
+            var results = dataContext.ProductPage_Select(productPageId, languageId, countryId, useDate, isTrade);
+
             var productPageStore = new cmsProductPageDefinition
             {
-                objCacheSelect = dataContext.ProductPage_Select(productPageId, languageId, countryId, useDate, isTrade).SingleOrDefault()
+                objCacheSelect = results.GetResult<productPageCacheSelect>().SingleOrDefault(),
+                objUnavailabilityRedirect = results.GetResult<productPageUnavailableRedirect>().SingleOrDefault()
             };
 
             return productPageStore;
