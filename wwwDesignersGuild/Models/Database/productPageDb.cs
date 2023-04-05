@@ -20,14 +20,16 @@ namespace wwwDesignersGuild.Models.Database
     public partial class databaseDataContext
     {
         [Function(Name = "cache.ProductPage_Select")]
-        public ISingleResult<productPageCacheSelect> ProductPage_Select([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "ProductPageID", DbType = "Int")] int productPageID,
+        [ResultTypeAttribute(typeof(productPageCacheSelect))]
+        [ResultTypeAttribute(typeof(productPageUnavailableRedirect))]
+        public IMultipleResults ProductPage_Select([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "ProductPageID", DbType = "Int")] int productPageID,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] byte languageID,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryID", DbType = "SmallInt")] short countryID,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Date", DbType = "Date")] DateTime date,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "IsTrade", DbType = "Bit")] bool isTrade)
         {
             IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), productPageID, languageID, countryID, date, isTrade);
-            return (ISingleResult<productPageCacheSelect>)result.ReturnValue;
+            return (IMultipleResults)result.ReturnValue;
         }
 
         [Function(Name = "pub.ProductPage_Generate")]
