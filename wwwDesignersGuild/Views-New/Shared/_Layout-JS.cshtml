@@ -221,6 +221,10 @@
     window.isImageInScrapbook = (imageId) => {
         return @(JsonConvert.SerializeObject(Model.Scrapbook?.Images.Select(sb => sb.ImageID))).indexOf(imageId) > -1;
     }
+
+    window.isMobileSite = () => {
+        return @(dgFramework.IsMobileDevice().ToString().ToLowerInvariant());
+    }
 </script>
 @if (tradeUser)
 {
