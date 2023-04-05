@@ -1818,7 +1818,10 @@ namespace wwwDesignersGuild.ViewModels
             var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
 
             // Filter index restrictions fn
-            var objFilterIndexRestrictionLoad = objDb.FetchFilterIndexRestrictionsAsync();
+            var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction().loadFilterIndexingRestrictionsFromCmsAsync(
+                    new PassFilterIndexRestrictionCacheFetch() { Date = model.Date },
+                    model
+                );
 
             // Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
 
@@ -1894,7 +1897,7 @@ namespace wwwDesignersGuild.ViewModels
             result.ProductTypes.ForEach(pt =>
             {
                 pt.ProductPageIDs = completeResultSet.Where(crs => crs.ProductTypeID == pt.ProductTypeID).Select(crs => crs.ProductPageID);
-                pt.FilterIndexRestrictions = filterIndexRestrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID);
+                pt.FilterIndexRestrictions = filterIndexRestrictions.Restrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID);
             });
 
             if (result.ProductTypes.Count > 1)
