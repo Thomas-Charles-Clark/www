@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
+using wwwDesignersGuild.Models;
 using wwwDesignersGuild.Models.Attribute;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
@@ -104,7 +105,11 @@ namespace wwwDesignersGuild.ViewModels
             var objAttributeLoad = objAttribute.loadAttributeFromCms(LanguageID).Result;
 
             // Filter index restrictions fn
-            var objFilterIndexRestrictionLoad = db.FetchFilterIndexRestrictions();
+            var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction()
+                .loadFilterIndexingRestrictionsFromCmsSync(
+                    new PassFilterIndexRestrictionCacheFetch() { Date = BaseViewModel.Date },
+                    BaseViewModel
+                );
 
             // Attribute results (cached)
             var attributeData = objAttributeLoad;
@@ -170,7 +175,7 @@ namespace wwwDesignersGuild.ViewModels
                 .Select(pt => new ProductType(
                     productType: pt,
                     productPageIds: Definition.searchResultCores.Where(p => p.ProductTypeID == pt.ProductTypeID).Select(p => p.ProductPageID),
-                    filterIndexRestrictions: filterIndexRestrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID)))
+                    filterIndexRestrictions: filterIndexRestrictions.Restrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID)))
                 .ToList();
 
             // Search results from the DT Search Engine
