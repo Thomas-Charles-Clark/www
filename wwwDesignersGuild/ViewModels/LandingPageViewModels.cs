@@ -1637,7 +1637,14 @@ namespace wwwDesignersGuild.ViewModels
                     aspectRatio: AspectRatio.LandscapeFeature,
                     heading: c.Heading,
                     images: images.Where(i => i.CollectionID == c.CollectionID)
-                                  .Select(i => new CarouselImage(i.ImageID, i.SortOrder, c.Heading, ImageSize.Nine))
+                                  .Select(i => new CarouselImage(
+                                      imageId: i.ImageID,
+                                      sortOrder: i.SortOrder,
+                                      altText: c.Heading, 
+                                      imageSize: ImageSize.Nine, 
+                                      overlay: null,
+                                      maxWidth: null, 
+                                      forceLazyLoading: true))
                                   .OrderBy(i => i.SortOrder),
                     baseViewModel: baseViewModel,
                     displayDashes: false

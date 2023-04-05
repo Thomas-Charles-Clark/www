@@ -23,14 +23,17 @@ namespace wwwDesignersGuild.Models.Carousel
         public int? MaxWidth { get; set; }
 
         public ImageSize ImageSize { get; set; }
-        
+
+        public bool ForceLazyLoading { get; set; }
+
         public CarouselImage (
             long imageId,
             byte? sortOrder,
             string altText,
             ImageSize imageSize,
             CarouselImageOverlay overlay = null,
-            int? maxWidth = null)
+            int? maxWidth = null,
+            bool forceLazyLoading = false)
         {
             ImageID = imageId;
             SortOrder = sortOrder;
@@ -38,6 +41,7 @@ namespace wwwDesignersGuild.Models.Carousel
             Overlay = overlay;
             MaxWidth = maxWidth;
             ImageSize = imageSize;
+            ForceLazyLoading = forceLazyLoading;
 
             Hotspots = new List<Hotspot.Hotspot>();
         } 
