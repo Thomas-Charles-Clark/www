@@ -4060,6 +4060,9 @@ const paymentMethodFactory = ((parent) => {
                         }
                         self.parent.deliveryAddressFactory.currentAddress().errors.showAllMessages(true);
                         self.parent.deliveryAddressFactory.currentAddress().phone.isValid.notifySubscribers(false);
+                        if (window.isMobileSite()) {
+                            window.scrollTo(0, 0);
+                        }
                     }
 
                     break;
@@ -4089,6 +4092,9 @@ const paymentMethodFactory = ((parent) => {
                         }
                         self.parent.deliveryAddressFactory.currentAddress().errors.showAllMessages(true);
                         self.parent.deliveryAddressFactory.currentAddress().phone.isValid.notifySubscribers(false);
+                        if (window.isMobileSite()) {
+                            window.scrollTo(0, 0);
+                        }
                     }
 
                     break;
