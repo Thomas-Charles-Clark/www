@@ -9,12 +9,33 @@
     var tradeUser = objMaster.TradeAllowed;
 
     var art = Model.Article;
+
+    var width = dgFramework.IsMobileDevice() ? 380 : 1024;
 }<div class="g-col-12 g-col-sm-6 g-col-md-6 g-col-lg-4">
-    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-        @Html.Raw(JsonConvert.SerializeObject(Model))
-    </span>
     <a class="pod-card" href="@Framework.URLFixup(@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, art.URLKeywords, (dgContentType)dgContentType.articlePage, art.ArticleID))">
         <div class="card">
+            @if (art.CarouselViewModel.Images.Count > 1)
+            {
+                @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", art.CarouselViewModel)
+            }
+            else
+            {
+                var image = art.CarouselViewModel.Images.First();
+
+                var height = (int)(width * (1.0m / art.CarouselViewModel.AspectRatio));
+
+                <div class="card-img-top">
+                    <img src="/image@(Framework.WebPFallback)/@(width)/@image.ImageID"
+                         class="d-block w-100"
+                         alt="@(image.AltText ?? art.CarouselViewModel.Heading)"
+                         width="@(width)"
+                         height="@(height)"
+                         data-bind="keepElement: data,
+                                @(art.CarouselViewModel.DisplayThumbnails && art.CarouselViewModel.PermitLargeImageModal ? @"click: (data, event) => { window.largeImageModal.load($parent, event) }" : "")"
+                         loading="lazy"
+                         @HtmlHelperExtra.ImageSourceSetSizes(image.ImageID, image.ImageSize, image.MaxWidth)>
+                </div>
+            }
             @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", art.CarouselViewModel)
             <div class="card-body">
                 @if (art.New)

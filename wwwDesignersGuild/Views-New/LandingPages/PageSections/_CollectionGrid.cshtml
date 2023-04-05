@@ -9,34 +9,57 @@
     var tradeUser = objMaster.TradeAllowed;
 
     var grid = (CollectionGridPageSection)Model.Definition;
+
+    var width = dgFramework.IsMobileDevice() ? 380 : 1024;
 }<div class="my-4">
     <div class="collection-grid grid" data-bind="foreachInit: { name: 'ko-blank-template', data: collectionGrid.visibleCollections, createElement: collectionGrid.createCollectionPod }">
-       @foreach(var co in grid.Collections)
+       @foreach (var co in grid.Collections)
         {
-        <div>
-            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-                @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
-            </span>
-            <a class="pod-card" href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, co.URLKeywords, (dgContentType)dgContentType.collectionPage, co.CollectionID)">
-                <div class="card">
-                    @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", co.CarouselViewModel)
-                    <div class="card-body">
-                        <h6 class="card-title text-uppercase">
-                            @Html.Raw(co.Heading)
-                            @if (co.New)
-                            {
-                                <sup class="heading-new">
-                                    @HtmlHelperExtra.Resource("PodNew", l, c, d)
-                                </sup>
-                            }
-                        </h6>
-                        <p>
-                            @Html.Raw(co.SubHeading)
-                        </p>
+            <div>
+                <a class="pod-card" href="@dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails, co.URLKeywords, (dgContentType)dgContentType.collectionPage, co.CollectionID)">
+                    <div class="card">
+                       @if (co.CarouselViewModel.Images.Count > 1)
+                        {
+                            @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", co.CarouselViewModel)
+                        }
+                        else
+                        {
+                            var image = co.CarouselViewModel.Images.First();
+
+                            var height = (int)(width * (1.0m / co.CarouselViewModel.AspectRatio));
+
+                            <div class="card-img-top">
+                                <img src="/image@(Framework.WebPFallback)/@(width)/@image.ImageID"
+                                     class="d-block w-100"
+                                     alt="@(image.AltText ?? co.CarouselViewModel.Heading)"
+                                     width="@(width)"
+                                     height="@(height)"
+                                     data-bind="keepElement: data,
+                                @(co.CarouselViewModel.DisplayThumbnails && co.CarouselViewModel.PermitLargeImageModal ? @"click: (data, event) => { window.largeImageModal.load($parent, event) }" : "")"
+                                     loading="lazy"
+                                     @HtmlHelperExtra.ImageSourceSetSizes(image.ImageID, image.ImageSize, image.MaxWidth)>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h6 class="card-title text-uppercase">
+                                @Html.Raw(co.Heading)
+                                @if (co.New)
+                                {
+                                    <sup class="heading-new">
+                                        @HtmlHelperExtra.Resource("PodNew", l, c, d)
+                                    </sup>
+                                }
+                            </h6>
+                            <p>
+                                @Html.Raw(co.SubHeading)
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </a>
-        </div>
+                </a>
+            </div>
         }
     </div>
 </div>
+<script type="text/javascript">
+    window.lazyImages();
+</script>
