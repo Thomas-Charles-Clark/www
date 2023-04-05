@@ -60,7 +60,7 @@
                         height="@(height)"
                         data-bind="keepElement: data,
                             @(Model.DisplayThumbnails && Model.PermitLargeImageModal ? @"click: (data, event) => { window.largeImageModal.load($parent, event) }" : "")"
-                        @if (dgFramework.IsMobileDevice() && index > 0)
+                        @if ((dgFramework.IsMobileDevice() && index > 0) || image.ForceLazyLoading)
                          {
                             <text>
                             loading="lazy"
