@@ -472,6 +472,7 @@
     <Compile Include="Models\Country\Country.cs" />
     <Compile Include="Models\County\CountyItem.cs" />
     <Compile Include="Models\CoverageCalculator\CoverageCalculator.cs" />
+    <Compile Include="Models\FilterIndexRestriction\FilterIndexRestrictionCacheProvider.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexRestriction.cs" />
     <Compile Include="Models\Hotspot\Hotspot.cs" />
     <Compile Include="Models\Hotspot\ImageHotspot.cs" />
