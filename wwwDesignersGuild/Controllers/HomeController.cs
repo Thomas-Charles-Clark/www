@@ -955,19 +955,29 @@ namespace wwwDesignersGuild.Controllers
 
                 if (objProductData.objCacheSelect == null)
                 {
-                    //  Redirect the UK home page (last fall back)
-                    var url = dgFramework.buildUrl(urlData.countryDetails,
-                                                    null,
-                                                    DefaultContentType,
-                                                    DefaultContentId,
-                                                    !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-                                                    !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-                                                    Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
+                    if (objProductData.objUnavailabilityRedirect == null || objProductData.objUnavailabilityRedirect.redirectUrl == null)
+                    {
+                        //  Redirect the UK home page (last fall back)
+                        var url = dgFramework.buildUrl(urlData.countryDetails,
+                                                        null,
+                                                        DefaultContentType,
+                                                        DefaultContentId,
+                                                        !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
+                                                        !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
+                                                        Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
-                    Response.Headers.Add("cache-control", "no-cache");
+                        Response.Headers.Add("cache-control", "no-cache");
 
-                    return new RedirectResult(url, true);
+                        return new RedirectResult(url, true);
+                    }
+                    else
+                    {
+                        Response.Headers.Add("cache-control", "no-cache");
+
+                        return new RedirectResult(objProductData.objUnavailabilityRedirect.redirectUrl, true);
+                    }
                 }
+
 
                 if (URLKeywordsRequireCorrecting(urlData.countryDetails.URL, objProductData.objCacheSelect.urlSemantics, urlParameterWithoutSuffix) == true)
                 {

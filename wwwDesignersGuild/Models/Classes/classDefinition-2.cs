@@ -1394,6 +1394,8 @@ namespace wwwDesignersGuild.Models.Classes
     {
         public productPageCacheSelect objCacheSelect { get; set; }
 
+        public productPageUnavailableRedirect objUnavailabilityRedirect { get; set; }
+
         //public List<productPageHeader> productPageHeaders { get; set; }
         //public List<productPageReviewSummary> productPageReviewSummarys { get; set; }
         //public List<productPageReviewLastFive> productPageReviewLastFives { get; set; }
@@ -1420,6 +1422,10 @@ namespace wwwDesignersGuild.Models.Classes
         //public List<productPageModuleOptionGroup> productPageModuleOptionGroups { get; set; }
     }
 
+    public class productPageUnavailableRedirect 
+    {
+        public string redirectUrl { get; set; }
+    }
 
     public class productPageHeader
     {
