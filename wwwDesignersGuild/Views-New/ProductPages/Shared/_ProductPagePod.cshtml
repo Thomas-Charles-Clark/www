@@ -12,7 +12,7 @@
     <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
         @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model.ProductPage)))
     </span>
-    @if (Model.UseLifestyleGalleryBehaviour == false)
+   @if (Model.UseLifestyleGalleryBehaviour == false)
     {
         var url = Model.ProductPage.URL;
 
@@ -64,7 +64,7 @@
                          title="@(Model.ProductPage.Heading)"
                          src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))/@(Model.ProductPage.ImageID)"
                          @HtmlHelperExtra.ImageSourceSetSizes(Model.ProductPage.ImageID, Model.ImageSize, Model.ProductPage.ImageWidth)
-                         @*loading="lazy"*@ />
+                         loading="lazy" />
                 </div>
                 <div class="card-body">
                     @if (Model.ProductPage.New)
