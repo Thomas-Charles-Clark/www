@@ -83,11 +83,11 @@
 @if (!tradeUser && c != 118)
 {
     var feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-uk?displayFeedbackType=BOTH&timeFrame=ALL";
-    var feefoImgUrl = "https://site.feefo.com/hubfs/Feefo_rt_gold_service_2021_white.png";
+    var feefoImgUrl = "/content/images/logo/feefo.jpg";
     if (c == 238)
     {
         feefoUrl = "https://www.feefo.com/en-GB/reviews/designers-guild-us?displayFeedbackType=BOTH&timeFrame=ALL";
-        feefoImgUrl = "https://site.feefo.com/hubfs/feefo_platinum_service_2021_wide_tag_light.png";
+        feefoImgUrl = "/content/images/logo/feefo-us.jpg";
     }
     <a href="@(feefoUrl)" target="_blank" rel="noreferrer" title="@HtmlHelperExtra.Resource("FeefoFindUs", l, c, d)">
         <img id="feefo"
