@@ -525,6 +525,12 @@ namespace wwwDesignersGuild.ViewModels
                 });
             }
 
+            if (PageSections.Where(ps => ps.Definition is ProductPageGridPageSection ppgps)
+                            .Any(ps => (ps.Definition as ProductPageGridPageSection).MustOverwritePageCanonical))
+            {
+                Definition.PageDetails.CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
+            }
+
             CustomCanonical = Definition.PageDetails.CustomCanonical;
 
             NoFollow = Definition.PageDetails.NoFollow;
@@ -1661,12 +1667,11 @@ namespace wwwDesignersGuild.ViewModels
         public bool FilterIndexingEnabled { get; set; }
 
         public Regex UrlParsingRegex = new Regex(@"(.*)\/([^\s\/]+)(\/)([a-z][\d]+)(\??)(.*)$");
-
         public string OriginalSemanticString { get; set; }
         public string OriginalTitle { get; set; }
         public string DeselectedAttributeNames { get; set; }
-
         public string OriginalURLKeywords { get; set; }
+        public bool MustOverwritePageCanonical { get; set; }
 
         // This for use by search 
         public ProductPageGridPageSection(
@@ -1691,7 +1696,9 @@ namespace wwwDesignersGuild.ViewModels
 
             OriginalURLKeywords = originalUrlKeywords;
 
-            ProductTypes = new List<Models.ProductPage.ProductType>();
+            ProductTypes = new List<ProductType>();
+
+            MustOverwritePageCanonical = false;
         }
 
         private ProductPageGridPageSection(
@@ -1720,7 +1727,9 @@ namespace wwwDesignersGuild.ViewModels
 
             DeselectedAttributeNames = null;
 
-            ProductTypes = new List<Models.ProductPage.ProductType>();
+            ProductTypes = new List<ProductType>();
+
+            MustOverwritePageCanonical = false;
         }
 
         //public List<int> FilteredProductPageIDs { get; set; }
@@ -2092,6 +2101,8 @@ namespace wwwDesignersGuild.ViewModels
 
             var attributeProductPageIds = new List<AttributeGroupProductPage>();
 
+            var detectedAttributeGroups = new List<AttributeGroup>();
+
             foreach (var a in overallSelection)
             {
                 var attributeGroup = result.AttributeGroups.SingleOrDefault(g => g.Selection.Contains(a));
@@ -2101,6 +2112,8 @@ namespace wwwDesignersGuild.ViewModels
                 if (attributeGroup != null &&
                     attribute != null)
                 {
+                    detectedAttributeGroups.Add(attributeGroup);
+
                     switch (attributeGroup.LogicalOperator)
                     {
                         case "AND":
@@ -2125,6 +2138,16 @@ namespace wwwDesignersGuild.ViewModels
                         default:
                             break;
                     }
+                }
+            }
+
+            if (detectedAttributeGroups.Count == attributesList.Count)
+            {
+                var attributeGroupSignature = String.Join(".", attributesList.Select(ag => $"{ag.AttributeGroupID}"));
+
+                if (filterIndexRestrictions.Restrictions.SingleOrDefault(r => r.AttributeGroupSignature == attributeGroupSignature) == null)
+                {
+                    result.MustOverwritePageCanonical = true;
                 }
             }
 
