@@ -1,5 +1,5 @@
 ﻿var LOG_ACTION_PAY_NOW_CLICK = 136,
-    LOG_ACTION_PAY_NOW_STEP =  138,
+    LOG_ACTION_PAY_NOW_STEP = 138,
     LOG_ACTION_PAY_NOW_VALIDATION_ERROR = 139
 
 const stockInfo = (function (parent) {
@@ -389,13 +389,61 @@ const checkoutSinglePageViewModel = ((resources) => {
             type: "GET",
             dataType: "html",
             success: function (data) {
-                //console.log('singlePageCheckout loadBasketSummary returned');
+                console.log('singlePageCheckout loadBasketSummary returned', data);
                 var basketSummary = $('#checkout-total-wrapper');
                 ko.cleanNode(basketSummary[0]);
                 basketSummary.html(data);
                 ko.applyBindings(viewModel, basketSummary[0]);
                 self.summaryBusy(false);
                 self.busy(false);
+
+                if (window.mustCompleteAppleShippingContactSelection) {
+
+                    let errors = [];
+
+                    if (!self.deliveryAddressFactory.dispatchOptionsAvailable()) {
+                        errors.push(new ApplePayError('addressUnserviceable', null, 'No delivery options were found. Please try again. If problems persist please contact Designers Guild directly.'));
+                    }
+
+                    self.paymentMethodFactory.activeApplePaySession.completeShippingContactSelection({
+                        newTotal: {
+                            type: 'final',
+                            label: 'Designers Guild',
+                            amount: data.paymentTotals[0].TotalBalance
+                        },
+                        newLineItems: [{
+                            label: 'Sub Total',
+                            type: 'pending',
+                            amount: data.paymentTotals[0].TotalItems ?? '0.00'
+
+                        }, {
+                            label: 'Delivery',
+                            type: 'pending',
+                            amount: data.paymentTotals[0].TotalPandP ?? '0.00'
+
+                        }, {
+                            label: 'Tax',
+                            type: 'pending',
+                            amount: data.paymentTotals[0].TotalTax ?? '0.00'
+                        }],
+                        errors: errors,
+                        newShippingMethods: [{
+                            label: '',
+                            detail: '',
+                            amount: '',
+                            identifier: '',
+                            dateComponentsRange: {
+                                startDateComponents: {
+
+                                },
+                                endDateComponents: {
+
+                                }
+                            }
+                        }]
+                    });
+                }
+
             },
             error: function (xhr, s, a) {
                 //console.log('singlePageCheckout loadBasketSummary failed', xhr, s, a);
@@ -413,7 +461,7 @@ const checkoutSinglePageViewModel = ((resources) => {
             type: "GET",
             dataType: "html",
             success: function (data) {
-                //console.log('singlePageCheckout loadDeliveryMethods returned');
+                console.log('singlePageCheckout loadDeliveryMethods returned');
 
                 var deliveryOptions = $('#despatch-items-wrapper');
 
@@ -2110,7 +2158,7 @@ const lineMemo = ((r) => {
                     self.savedMemo(true);
                 }
                 $('#line-memo-modal').modal('hide');
-            }, 
+            },
             error: function (xhr, s, a) {
                 alert(self.resources.MajorError);
             }
@@ -2549,8 +2597,8 @@ const dispatchLine = ({
     minDeliveryDate,
     maxDeliveryDate,
     customerRequestsFullDespatch
-} = { }) => {
-    let self = { };
+} = {}) => {
+    let self = {};
 
     self.dispatchId = dispatchId;
     self.deliveryBandId = deliveryBandId;
@@ -2629,7 +2677,7 @@ const checkoutDeliveryAddress = (
     }
 
     self.availableCounties = ko.observable(getAvailableCounties(country.Code));
-    
+
     self.PCASearchId = ko.observable();
 
     self.PCASearchTerm = ko.observable();
@@ -2637,7 +2685,7 @@ const checkoutDeliveryAddress = (
     self.PCAContainer = ko.observable();
 
     self.PCACountry = ko.observable(country);
-    
+
     self.validateNow = ko.observable(false);
 
     // true == list, false == text
@@ -2669,7 +2717,7 @@ const checkoutDeliveryAddress = (
         },
         minLength: {
             params: 1,
-            onlyIf: function () { 
+            onlyIf: function () {
                 return (self.validateNow() && (self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorName
@@ -2763,8 +2811,8 @@ const checkoutDeliveryAddress = (
             onlyIf: function () {
                 return (self.validateNow()) &&
                     ((self.town() !== 'London' && self.town() !== 'london') &&
-                    (self.countyListOrText() == true) &&
-                    (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
+                        (self.countyListOrText() == true) &&
+                        (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorCounty
         },
@@ -2778,8 +2826,8 @@ const checkoutDeliveryAddress = (
             onlyIf: function () {
                 return (self.validateNow()) &&
                     ((self.town() !== 'London' && self.town() !== 'london') &&
-                    (self.countyListOrText() == false) &&
-                    (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
+                        (self.countyListOrText() == false) &&
+                        (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorCounty
         },
@@ -2809,7 +2857,7 @@ const checkoutDeliveryAddress = (
             params: 1,
             onlyIf: function () {
                 return
-                    (self.validateNow()) &&
+                (self.validateNow()) &&
                     (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3);
             },
             message: self.resources.addressErrorPhone
@@ -2818,7 +2866,7 @@ const checkoutDeliveryAddress = (
             params: 60,
             onlyIf: function () {
                 return
-                    (self.validateNow()) &&
+                (self.validateNow()) &&
                     (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3);
             },
             message: self.resources.addressErrorPhone
@@ -2830,8 +2878,8 @@ const checkoutDeliveryAddress = (
                     return self.validateNow();
                 } else {
                     return (self.validateNow()) &&
-                            (self.parent.parent.checkoutType != 2 &&
-                             self.deliveryOptionId() != 3);
+                        (self.parent.parent.checkoutType != 2 &&
+                            self.deliveryOptionId() != 3);
                 }
             },
             message: self.resources.phoneValidation
@@ -2853,7 +2901,7 @@ const checkoutDeliveryAddress = (
             }
         }
     });
-    
+
     self.phoneSave = function () {
         self.validateNow(true);
         window.setTimeout(function () {
@@ -3177,9 +3225,9 @@ const checkoutDeliveryAddress = (
                                 //    self.county(undefined);
                                 //}
                                 //else {
-                                    self.countyListOrText(false);
-                                    //self.countyFromList(undefined);
-                                    self.county(county);
+                                self.countyListOrText(false);
+                                //self.countyFromList(undefined);
+                                self.county(county);
                                 //}
                                 self.postcode(data[0].PostalCode);
 
@@ -3331,7 +3379,7 @@ const checkoutDeliveryAddress = (
                     $(self.PCASearchTerm.DOMElement).val(undefined);
                     self.PCASearchId(undefined);
                     self.PCAContainer(undefined);
-                    
+
                     $(self.fullName.DOMElement).focus();
 
                 }
@@ -3351,12 +3399,12 @@ const checkoutDeliveryAddress = (
             }
         });
 
-        $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._resizeMenu = function() {
+        $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._resizeMenu = function () {
             this.menu.element.css('width', 'auto');
         }
 
         $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._renderItem = function (ul, item) {
-            return $('<li class="ui-menu-item">')                
+            return $('<li class="ui-menu-item">')
                 .attr("data-value", item.value)
                 .append('<div class="ui-menu-item-wrapper">' + item.label + '</div>')
                 .appendTo(ul);
@@ -3400,8 +3448,8 @@ const checkoutDeliveryAddress = (
             validation: {
                 validator: function (val, someOtherVal) {
                     // getNumberType
-                     //intlTelInputUtils.numberType.MOBILE
-                     //intlTelInputUtils.numberType.FIXED_LINE_OR_MOBILE
+                    //intlTelInputUtils.numberType.MOBILE
+                    //intlTelInputUtils.numberType.FIXED_LINE_OR_MOBILE
                     if (self.validateNow()) {
                         if (val) {
                             if (!$(self.phone.DOMElement).intlTelInput("isValidNumber")) {
@@ -3436,7 +3484,7 @@ const checkoutDeliveryAddress = (
         self.parent.parent.busy(false);
 
         window.setTimeout(function () {
-            
+
 
             if (getCheckoutType() == 3) {
                 //console.log('checkoutDeliveryAddress confirm: skipping address validation (AMAZON) valid address');
@@ -4025,8 +4073,7 @@ const paymentMethodFactory = ((parent) => {
                     self.parent.deliveryAddressFactory.currentAddress().validateNow(true);
 
                     if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid() &&
-                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false)
-                    {
+                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false) {
                         if (self.parent.balanceNumber()) {
                             self.showCompletingMessage();
                             self.submitBraintreeCheckout('paypal');
@@ -4034,7 +4081,7 @@ const paymentMethodFactory = ((parent) => {
                             self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
                             self.asyncPlaceOrderNow();
                         }
-                     } else {
+                    } else {
                         if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid()) {
                             // you can get here by not having a mobile number, providing one and then not saving the number.
                             // in which case you're left with no red visual prompt to action, just the "You have unsaved changes" dialog.
@@ -4696,6 +4743,141 @@ const paymentMethodFactory = ((parent) => {
                                     },
                                     '#paypal-button');
                             });
+                    } else if (self.parent.checkoutType == 5) { // Apple
+                        if (!window.ApplePaySession) {
+                            let errorString = self.resources.ApplePayDeviceNotSupported;
+                            console.log(errorString);
+                            notifyApplePayError(errorString);
+                        } else {
+                            if (!ApplePaySession.canMakePayments()) {
+                                let errorString = self.resources.ApplePayDeviceCannotPay;
+                                console.log(errorString);
+                                notifyApplePayError(errorString);
+                            } else {
+                                braintree.applePay.create({
+                                    client: clientInstance
+                                }, function (applePayErr, applePayInstance) {
+                                    if (applePayErr) {
+                                        console.error('applePay error', applePayErr);
+                                        notifyApplePayError(applePayErr);
+                                        return;
+                                    }
+
+                                    window.applePaymentRequest = applePayInstance.createPaymentRequest({
+                                        total: {
+                                            label: 'Designers Guild',
+                                            type: 'pending',
+                                            amount: getBalanceNumber(),
+                                            lineItems: [{
+                                                label: 'Sub Total',
+                                                type: 'pending',
+                                                amount: getItemSubTotalNumber()
+                                            }, {
+                                                label: 'Delivery',
+                                                type: 'pending',
+                                                amount: getShippingNumber()
+                                            }, {
+                                                label: 'Tax',
+                                                type: 'pending',
+                                                amount: getTaxNumber()
+                                            }]
+                                        },
+
+                                        // We recommend collecting billing address information, at minimum
+                                        // billing postal code, and passing that billing postal code with
+                                        // all Apple Pay transactions as a best practice.
+                                        applePayShippingType: 'delivery',
+                                        requiredBillingContactFields: ["postalAddress"],
+                                        requiredShippingContactFields: [
+                                            "postalAddress",
+                                            "email",
+                                            "phone"
+                                        ]
+                                    });
+
+                                    self.beginApplePay = () => {
+                                        self.parent.busy(true);
+
+                                        console.log('applePay window.beginApplePay called', window.applePaymentRequest);
+
+                                        self.activeApplePaySession = new ApplePaySession(3, window.applePaymentRequest);
+
+                                        self.activeApplePaySession.onvalidatemerchant = (e) => {
+                                            console.log('applePay onvalidatemerchant', e);
+                                            applePayInstance.performValidation({
+                                                validationURL: e.validationURL,
+                                                displayName: 'Designers Guild'
+                                            }, function (err, merchantSession) {
+                                                if (err) {
+                                                    window.showError(self.resources.ApplePayFailedToLoad);
+                                                    // You should show an error to the user, e.g. 'Apple Pay failed to load.'
+                                                    return;
+                                                }
+                                                console.log('applePay validatedmerchant', merchantSession);
+                                                self.activeApplePaySession.completeMerchantValidation(merchantSession);
+                                            });
+                                        };
+
+                                        self.activeApplePaySession.onshippingcontactselected = (e) => {
+                                            console.log('applePay onshippingcontactselected', e);
+
+                                            self.parent.deliveryAddressFactory.currentAddress().addressLine1('TEMPORARY');
+                                            self.parent.deliveryAddressFactory.currentAddress().addressLine2('TEMPORARY');
+                                            self.parent.deliveryAddressFactory.currentAddress().town(e.shippingContact.locality);
+                                            self.parent.deliveryAddressFactory.currentAddress().county('TEMPORARY');
+                                            self.parent.deliveryAddressFactory.currentAddress().country({
+                                                Name: e.shippingContact.country,
+                                                Code: e.shippingContact.countryCode
+                                            });
+                                            self.parent.deliveryAddressFactory.currentAddress().postcode(e.shippingContact.postalCode?.trim());
+                                            self.parent.deliveryAddressFactory.currentAddress().phone();
+
+                                            window.mustCompleteAppleShippingContactSelection = true;
+
+                                            // We've got... almost nothing out of Apple yet: they give you partial information until the transaction
+                                            // is completed. Evidently they believe what they give is sufficient for users to build out their shipping
+                                            // offerings. So it must be, right?
+                                            self.parent.deliveryAddressFactory.saveDeliveryAddress(self.parent.deliveryAddressFactory.currentAddress());
+                                        }
+
+                                        self.activeApplePaySession.onpaymentauthorized = (e) => {
+                                            console.log('applePay onpaymentauthorized', e);
+
+                                            applePayInstance.tokenize({
+                                                token: e.payment.token
+                                            }, function (tokenizeErr, payload) {
+                                                if (tokenizeErr) {
+                                                    console.error('applePay Error tokenizing:', tokenizeErr);
+                                                    self.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
+                                                    return;
+                                                }
+
+                                                // Send payload.nonce to your server.
+                                                console.log('applePay tokenized', payload);
+
+                                                // If requested, address information is accessible in event.payment
+                                                // and may also be sent to your server.
+                                                console.log('applyPay billingPostalCode:', e.payment.billingContact.postalCode);
+
+                                                // After you have transacted with the payload.nonce,
+                                                // call `completePayment` to dismiss the Apple Pay sheet.
+                                                self.parent.busy(false);
+
+                                                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
+                                            });
+                                        };
+
+                                        self.activeApplePaySession.oncancel = function (event) {
+                                            self.parent.busy(false);
+                                        }
+
+                                        self.activeApplePaySession.begin();
+                                    }
+
+                                    // Set up your Apple Pay button here
+                                });
+                            }
+                        }
                     }
                     else {
                         braintree.threeDSecure.create({
@@ -5835,7 +6017,7 @@ const giftCardFactory = ((parent) => {
     self.serverModel.subscribe(sv => {
         self.giftCards(sv.map(gc => giftCard(gc, self)));
     })
-    
+
     self.save = () => {
         self.busy(true);
 
@@ -5874,7 +6056,7 @@ const giftCard = ((record, parent) => {
         parent: parent,
         resources: parent.resources
     });
-    
+
     self.message = ko.observable(self.GiftVoucherMessage).extend({
         charsRemainingOptions: {
             maxLength: 300
@@ -6253,18 +6435,18 @@ function upsApMarker({
     map,
     parent
 } = {
-    upsLocatorResult: {
-        geocodeField: {
-            latitudeField: 0,
-            longitudeField: 0
+        upsLocatorResult: {
+            geocodeField: {
+                latitudeField: 0,
+                longitudeField: 0
+            },
+            addressKeyFormatField: {
+                consigneeNameField: 'error'
+            }
         },
-        addressKeyFormatField: {
-            consigneeNameField: 'error'
-        }
-    },
-    map: null,
-    parent: null
-}) {
+        map: null,
+        parent: null
+    }) {
     var self = $.extend(upsLocatorResult, {});
 
     self.parent = parent;

@@ -350,6 +350,11 @@ namespace wwwDesignersGuild.Models.Helper
         checkoutSessionExpired = 300,
 
         [LoginRequired(false)]
+        [Action("CheckoutProblem")]
+        [PageSectionViewModel("CheckoutProblem")]
+        checkoutProblem = 301,
+
+        [LoginRequired(false)]
         [Action("Stockists")]
         [PageSectionViewModel("Stockists")]
         stockists = 500,
@@ -1868,6 +1873,7 @@ namespace wwwDesignersGuild.Models.Helper
                 if (
                     tempContentId == (int)dgFixedPage.checkoutLogin ||
                     tempContentId == (int)dgFixedPage.checkoutSessionExpired ||
+                    tempContentId == (int)dgFixedPage.checkoutProblem ||
                     tempContentId == (int)dgFixedPage.checkoutSinglePage ||
                     tempContentId == (int)dgFixedPage.checkoutConfirmation ||
                     tempContentId == (int)dgFixedPage.checkoutConfirmationSpartan)

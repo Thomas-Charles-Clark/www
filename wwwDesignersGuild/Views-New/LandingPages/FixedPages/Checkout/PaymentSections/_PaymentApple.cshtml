@@ -12,137 +12,23 @@
 @if (HtmlHelperExtra.Debug)
 {
     @*<script>
-        if (!window.ApplePaySession) {
-            window.ApplePaySession = {
-                canMakePayments: () => true
+            if (!window.ApplePaySession) {
+                window.ApplePaySession = {
+                    canMakePayments: () => true
+                }
             }
-        }
-    </script>*@
+        </script>*@
 }
 
 <script type="text/javascript">
     window.notifyApplePayError = (error) => {
-        window.showInfo('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Sorry", l, c, d))', error, () => {
-            jumpToSessionExpired();
+        window.onInfoModalHide.push(() => {
+            jumpToCheckoutProblem();
         });
-        //viewModel.checkoutLog('Error', errorString);
+        window.showInfo('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Sorry", l, c, d))', error);
     }
-
-    window.addLoadFunction(() => {
-        if (!window.ApplePaySession) {
-            let errorString = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ApplePayDeviceNotSupported", l, c, d))';
-            console.log(errorString);
-            notifyApplePayError(errorString);
-        } else {
-            if (!ApplePaySession.canMakePayments()) {
-                let errorString = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ApplePayDeviceCannotPay", l, c, d))';
-                console.log(errorString);
-                notifyApplePayError(errorString);
-            } else {
-                braintree.applePay.create({
-                    client: clientInstance
-                }, function (applePayErr, applePayInstance) {
-                    if (applePayErr) {
-                        console.error('applePay error', applePayErr);
-                        notifyApplePayError(applePayErr);
-                        return;
-                    }
-
-                    window.applePaymentRequest = applePayInstance.createPaymentRequest({
-                        total: {
-                            label: 'Designers Guild',
-                            type: 'pending',
-                            amount: '@(Model.checkoutPayments.paymentTotals[0].TotalPayable?.ToString("N2", nfi))',
-                            lineItems: [{
-                                label: 'Sub Total',
-                                type: 'final',
-                                amount: '@(Model.checkoutPayments.paymentTotals[0].TotalPayable?.ToString("N2", nfi))'
-                            }, {
-                                label: 'Delivery',
-                                type: 'pending',
-                                amount: '@(Model.checkoutPayments.paymentTotals[0].TotalPandP?.ToString("N2", nfi) ?? "0.00")'
-                            }, {
-                                label: 'Tax',
-                                type: 'pending',
-                                amount: '@(Model.checkoutPayments.paymentTotals[0].TotalTax?.ToString("N2", nfi) ?? "0.00")'
-                            }]
-                        },
-
-                        // We recommend collecting billing address information, at minimum
-                        // billing postal code, and passing that billing postal code with
-                        // all Apple Pay transactions as a best practice.
-                        applePayShippingType: 'delivery',
-                        requiredBillingContactFields: ["postalAddress"],
-                        requiredShippingContactFields: [
-                            "postalAddress",
-                            "email",
-                            "phone"
-                        ]
-                    });
-
-                    window.beginApplePay = () => {
-                        loginModel.busy(true);
-
-                        console.log('applePay window.beginApplePay called', window.applePaymentRequest);
-
-                        let activeApplePaySession = new ApplePaySession(3, window.applePaymentRequest);
-
-                        activeApplePaySession.onvalidatemerchant = (e) => {
-                            applePayInstance.performValidation({
-                                validationURL: e.validationURL,
-                                displayName: 'Designers Guild'
-                            }, function (err, merchantSession) {
-                                if (err) {
-                                    window.showError('@HtmlHelperExtra.EscapeForJS("ApplePayFailedToLoad")')
-                                    // You should show an error to the user, e.g. 'Apple Pay failed to load.'
-                                    return;
-                                }
-                                window.activeApplePaySession.completeMerchantValidation(merchantSession);
-                            });
-                        };
-
-                        activeApplePaySession.onshippingcontactselected = (e) => {
-                            console.log('applePay onshippingcontactselected', e);
-                            activeApplePaySession.completeShippingContactSelection(e.shippingContact);
-                        }
-
-                        activeApplePaySession.onpaymentauthorized = (e) => {
-                            console.log('applePay onpaymentauthorized', e);
-
-                            applePayInstance.tokenize({
-                                token: e.payment.token
-                            }, function (tokenizeErr, payload) {
-                                if (tokenizeErr) {
-                                    console.error('applePay Error tokenizing:', tokenizeErr);
-                                    window.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
-                                    return;
-                                }
-
-                                // Send payload.nonce to your server.
-                                console.log('applePay nonce:', payload.nonce);
-
-                                // If requested, address information is accessible in event.payment
-                                // and may also be sent to your server.
-                                console.log('applyPay billingPostalCode:', e.payment.billingContact.postalCode);
-
-                                // After you have transacted with the payload.nonce,
-                                // call `completePayment` to dismiss the Apple Pay sheet.
-                                loginModel.busy(false);
-
-                                window.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
-                            });
-                        };
-
-                        activeApplePaySession.oncancel = function (event) {
-
-                        }
-
-                        activeApplePaySession.begin();
-                    }
-
-                    // Set up your Apple Pay button here
-                });
-            }
-        }
-    });
 </script>
+
+<script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js"></script>
+
+<apple-pay-button buttonstyle="black" type="buy" locale="@(Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" data-bind="click: paymentMethodFactory.beginApplePay"></apple-pay-button>

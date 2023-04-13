@@ -169,7 +169,7 @@
                     @displayItemTotal
                 </span>
             </div>
-           @if ((bool)Session["checkoutDisplayGiftTab"] == true)
+            @if ((bool)Session["checkoutDisplayGiftTab"] == true)
             {
                 <div class="total-detail">
                     <label>
@@ -180,9 +180,9 @@
                     </span>
                 </div>
             }
-           @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+            @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
             {
-                
+
             }
             else
             {
@@ -195,7 +195,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
             else
             {
                 <div class="total-detail">
@@ -207,7 +207,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
             else
             {
                 <div class="total-detail">
@@ -219,7 +219,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
             else
             {
                 <div class="total-detail">
@@ -231,7 +231,7 @@
                     </span>
                 </div>
             }
-            @{ 
+            @{
                 var grandTotalClass = "total";
 
                 if (hasVouchers)
@@ -248,7 +248,7 @@
                     @displayGrandTotal
                 </span>
             </div>
-           @if (hasVouchers)
+            @if (hasVouchers)
             {
                 <div class="total-detail">
                     <label>
@@ -268,7 +268,7 @@
                     </span>
                 </div>
             }
-           @if (Model.checkoutType == dgCheckoutType.Trade)
+            @if (Model.checkoutType == dgCheckoutType.Trade)
             {
                 <div class="trade-detail">
                     <span>
@@ -280,16 +280,19 @@
             }
         </div>
     </form>
-    <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
-        @if (Model.checkoutType == dgCheckoutType.Trade)
-        {
-            @HtmlHelperExtra.Resource("CheckoutTradeSubmitOrder", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
-        }
-        else
-        {
-            @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
-        }
-    </a>
+   @if (Model.checkoutType != dgCheckoutType.Apple)
+    {
+        <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
+            @if (Model.checkoutType == dgCheckoutType.Trade)
+            {
+                @HtmlHelperExtra.Resource("CheckoutTradeSubmitOrder", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+            }
+            else
+            {
+                @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+            }
+        </a>
+    }
     @if (Model.checkoutType != dgCheckoutType.Trade)
     {
         <div id="checkout-marketing-permissions" style="display: none;" data-bind="visible: marketingPermissions().length > 0">

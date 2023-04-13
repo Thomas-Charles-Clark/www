@@ -219,6 +219,15 @@
     function getMarketingPermissions() {
         return @Html.Raw(Json.Encode(Model.checkoutPaymentModel.marketingPermissions));
     }
+    function getShippingNumber() {
+        return Number('@(Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalPandP?.ToString(nfi) ?? "0")')
+    }
+    function getTaxNumber() {
+        return Number('@(Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalTax?.ToString(nfi) ?? "0")')
+    }
+    function getItemSubTotalNumber() {
+        return Number('@(Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalItems?.ToString(nfi) ?? "0")')
+    }
     function getBalanceNumber() {
         return Number('@Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalBalance.ToString(nfi)')
     }
@@ -590,6 +599,12 @@
         }
     }
 
+    function jumpToCheckoutProblem() {
+        @{
+            @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutProblem, objMaster.UrlBreakdown.countryDetails)';
+        }
+    }
+
 </script>
 
 @if (Model.checkoutType == dgCheckoutType.Amazon)
@@ -598,6 +613,17 @@
     <script type="text/javascript" defer>
         window.addLoadFunction(() => {
             viewModel.paymentMethodFactory.amazonAddressBookRebind();
+        });
+    </script>
+}
+
+@if (Model.checkoutType == dgCheckoutType.Apple)
+{
+    <script type="text/javascript" defer>
+        window.addLoadFunction(() => {
+            viewModel.paymentMethodFactory.initialiseBraintree(() => {
+
+            });
         });
     </script>
 }

@@ -847,7 +847,10 @@ namespace wwwDesignersGuild.ViewModels
                         "LiveChatNow",
                         "ThisWillRemoveCardFromVault",
                         "StockDetailNotAvailable",
-                        "Message"
+                        "Message",
+                        "ApplePayDeviceNotSupported",
+                        "ApplePayDeviceNotSupported",
+                        ""
                     });
                     break;
                 case (int)dgFixedPage.stockists:
