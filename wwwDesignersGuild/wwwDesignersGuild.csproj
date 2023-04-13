@@ -1636,6 +1636,11 @@
     <Content Include="Content\images\icon\AfercareSymbols\8.webp" />
     <Content Include="Content\images\icon\AfercareSymbols\9.GIF" />
     <Content Include="Content\images\icon\AfercareSymbols\9.webp" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-128.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-256.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-32.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-512.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-64.png" />
     <Content Include="Content\images\icon\Attributes\1.jpg" />
     <Content Include="Content\images\icon\Attributes\1.webp" />
     <Content Include="Content\images\icon\Attributes\10.jpg" />
@@ -2373,6 +2378,7 @@
     <Content Include="css\src\models\trade-document-wrapper.scss" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
+    <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
     <None Include="ExternalDependencies\MertexerV2.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -3032,6 +3038,8 @@
     <Content Include="Views-New\Shared\_Snippet.cshtml" />
     <Content Include="Views-New\Shared\_SnippetTextOnly.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_ReturnToBasket.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentApple.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressApple.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

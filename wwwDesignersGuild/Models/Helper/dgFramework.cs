@@ -493,7 +493,8 @@ namespace wwwDesignersGuild.Models.Helper
         Guest = 1,
         Trade = 2,
         Amazon = 3,
-        Paypal = 4
+        Paypal = 4,
+        Apple = 5
     }
 
     //mucho appreciado: https://stackoverflow.com/questions/27764692/validating-recaptcha-2-no-captcha-recaptcha-in-asp-nets-server-side#answer-27767239

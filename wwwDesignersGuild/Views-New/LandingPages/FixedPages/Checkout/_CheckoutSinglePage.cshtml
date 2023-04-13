@@ -233,7 +233,10 @@
     }
 </script>
 
-@if (Model.checkoutType == dgCheckoutType.Guest || Model.checkoutType == dgCheckoutType.Member || Model.checkoutType == dgCheckoutType.Paypal)
+@if (Model.checkoutType == dgCheckoutType.Guest ||
+    Model.checkoutType == dgCheckoutType.Member ||
+    Model.checkoutType == dgCheckoutType.Paypal ||
+    Model.checkoutType == dgCheckoutType.Apple)
 {
     <script src="https://js.braintreegateway.com/web/3.68.0/js/client.min.js"></script>
 
@@ -247,7 +250,12 @@
         <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
         <script src="https://js.braintreegateway.com/web/3.68.0/js/paypal-checkout.min.js"></script>
     }
+    else if (Model.checkoutType == dgCheckoutType.Apple)
+    {
+        <script src="https://js.braintreegateway.com/web/3.68.0/js/apple-pay.min.js"></script>
+    }
 }
+
 <div data-bind="stopBinding">
     <div id="checkout-wrapper"
          class="checkout-wrapper">
@@ -364,11 +372,11 @@
                                         </p>
                                     }
                                     @*if (!String.IsNullOrEmpty(CustomerServiceWeekendPhone) && !String.IsNullOrEmpty(CustomerServiceWeekendHours))
-                                    {
-                                    <p>
-                                        <a class="summary-help-phone" href="tel:@(CustomerServiceWeekendPhone)">@(CustomerServiceWeekendPhone)</a>&nbsp;@(CustomerServiceWeekendHours)
-                                    </p>
-                                    }*@
+                                        {
+                                        <p>
+                                            <a class="summary-help-phone" href="tel:@(CustomerServiceWeekendPhone)">@(CustomerServiceWeekendPhone)</a>&nbsp;@(CustomerServiceWeekendHours)
+                                        </p>
+                                        }*@
                                 }
                                 @if (DisplayCSEmail)
                                 {
@@ -578,11 +586,7 @@
 
     function jumpToSessionExpired() {
         @{
-#if DEBUG
-
-#else
             @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
-#endif
         }
     }
 

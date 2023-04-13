@@ -34,7 +34,7 @@
             @if (Model.checkoutMethod == dgCheckoutType.Guest ||
                  Model.checkoutMethod == dgCheckoutType.Member)
             {
-            <!-- ko if: getSavedCards().length > 0 -->
+                <!-- ko if: getSavedCards().length > 0 -->
                 <p>
                     @HtmlHelperExtra.Resource("CheckoutPayDefaultSelected", l, c, d)
                     <br />
@@ -42,18 +42,18 @@
                         @HtmlHelperExtra.Resource("CheckoutPayWithGiftVoucherAlt", l, c, d)
                     </a>
                 </p>
-            <!-- /ko -->
-            <!-- ko if: getSavedCards().length == 0 -->
+                <!-- /ko -->
+                <!-- ko if: getSavedCards().length == 0 -->
                 <p>
                     @HtmlHelperExtra.Resource("CheckoutPaymentDetailsOrGiftVoucher", l, c, d)
                     <a href="#" data-bs-toggle="modal" data-bs-target="#gift-voucher-modal">
                         @HtmlHelperExtra.Resource("CheckoutPayWithGiftVoucher", l, c, d)
                     </a>
                 </p>
-            <!-- /ko -->
+                <!-- /ko -->
             }
         </div>
-       @switch (Model.checkoutMethod)
+        @switch (Model.checkoutMethod)
         {
             case dgCheckoutType.Member:
             case dgCheckoutType.Guest:
@@ -66,9 +66,12 @@
             case dgCheckoutType.Trade:
                 @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentTrade.cshtml", Model)
                 break;
+            case dgCheckoutType.Apple:
+                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentApple.cshtml", Model)
+                break;
         }
 
-       @if (Model.checkoutMethod != dgCheckoutType.Trade)
+        @if (Model.checkoutMethod != dgCheckoutType.Trade)
         {
             @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/PaymentSections/_PaymentVoucher.cshtml", Model);
         }

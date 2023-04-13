@@ -285,6 +285,9 @@ namespace wwwDesignersGuild.Controllers
                     case dgCheckoutType.Amazon:
                         isValid = !(String.IsNullOrEmpty(objCheckoutType.guestEmail) || String.IsNullOrEmpty(objCheckoutType.token));
                         break;
+                    case dgCheckoutType.Apple:
+                        isValid = true;
+                        break;
                 }
 
                 if (!isValid)
@@ -353,6 +356,10 @@ namespace wwwDesignersGuild.Controllers
                         };
 
                         await objCheckout.checkoutAddressSave(checkoutId, new List<passCheckoutSaveAddressData> { address }, null, null, false);
+                        break;
+                    case dgCheckoutType.Apple:
+                        // We don't yet have the actual email address from Apple.
+                        email = $"{Guid.NewGuid()}@apple-pay-temporary-email.com";
                         break;
                 }
 

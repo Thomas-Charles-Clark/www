@@ -59,6 +59,7 @@ body {
 
     #checkout-option-paypal {
         border-color: $blue-600;
+
         #paypal-button {
             display: flex;
         }
@@ -70,6 +71,7 @@ body {
         #amazon-button {
             height: 54px;
             overflow: hidden;
+
             img {
                 margin-inline-end: 0;
                 width: 340px;
@@ -87,6 +89,25 @@ body {
     #checkout-option-trade {
         img {
             max-width: 390px;
+        }
+    }
+
+    #checkout-option-apple {
+        img {
+            width: 84px;
+            height: 54px;
+        }
+        apple-pay-button {
+            --apple-pay-button-width: 340px;
+            --apple-pay-button-height: 50px;
+            --apple-pay-border-radius: $border-radius;
+            --apple-pay-button-padding: 0 0;
+            --apple-pay-box-sizing: border-box;
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                opacity: 0.65;
+            }
         }
     }
 

@@ -53,6 +53,22 @@
             }
         }
     }
+
+    #checkout-option-apple {
+
+        img {
+            width: 84px;
+            height: 54px;
+        }
+
+        apple-pay-button {
+            --apple-pay-button-width: 100%;
+            --apple-pay-button-height: 50px;
+            --apple-pay-border-radius: $border-radius;
+            --apple-pay-button-padding: 0 0;
+            --apple-pay-box-sizing: border-box;
+        }
+    }
 }
 
 #collection-accordion {

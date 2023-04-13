@@ -65,6 +65,14 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public bool PermitApple
+        {
+            get
+            {
+                return SubTotal > 0 && CheckoutTypes.Any(p => p.CheckoutTypeId == (int)dgCheckoutType.Apple);
+            }
+        }
+
         public bool PermitGuest
         {
             get

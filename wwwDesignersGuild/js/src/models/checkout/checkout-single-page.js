@@ -1669,7 +1669,6 @@ const deliveryAddressFactory = ((parent) => {
     }
 
     self.invalidDeliveryCountry = function () {
-        $("#paymentSelectionLoading").hide();
 
         var message = self.resources.PaypalInvalidAddress;
 
@@ -1690,50 +1689,6 @@ const deliveryAddressFactory = ((parent) => {
         $('#payment-address-error-text').html(error);
         $("#payment-address-error").modal('show');
     }
-
-    //self.processPayPalAddress = function(address, nonce) {
-    //    hidePaymentAddressError();
-
-    //    //console.log('deliveryAddressFactpry processPayPalAddress called', address, nonce);
-
-    //    $.ajax({
-    //        url: '/api/checkout/isValidDeliveryCountry',
-    //        type: 'POST',
-    //        async: false,
-    //        cache: false,
-    //        data: {
-    //            basketCountry: getCountryDetail(),
-    //            deliveryCountry: address.country,
-    //        },
-    //        success: function (data) {
-    //            hidePaymentAddressError();
-    //            if (data) {
-
-    //                if (address.country == "UM" || address.country == "US") {
-    //                    asyncCheckSalesTaxZipCode(address, false, true);
-    //                } else {
-    //                    asyncSelectCheckoutAddress(address);
-    //                    viewModel.selectedAddress(address);
-    //                    singlePageCheckout.invalidAddressSelected(false);
-    //                    asyncSetPayPalNonce(nonce);
-    //                }
-    //            }
-    //            else {
-    //                var addressLine = [address.line1, address.postalCode, address.countryCode].join(', ');
-    //                asyncCheckoutLog(@Convert.ToInt32(dgCheckoutActionId.logInvalidAddress), addressLine);
-    //                // always display what address was selected, even though it is invalid
-    //                viewModel.selectedAddress(address);
-    //                singlePageCheckout.addressUpdated();
-    //                singlePageCheckout.invalidAddressSelected(true);
-    //                asyncSetPayPalNonce(null);
-    //                displayPaymentAddressError();
-    //            }
-    //        },
-    //        error: function (xhr, s, a) {
-    //
-    //        }
-    //    });
-    //}
 
     // here we're actively clearing out the paypal nonce... why... because if the nonce includes shipping data
     // and we've changed the shipping data or some how failed to arrive at a valid shipping address... then...
