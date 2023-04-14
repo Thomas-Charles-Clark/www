@@ -16,9 +16,9 @@
   if (typeof define === "function" && define.amd) {
     define(["knockout"], factory);
   } else if (typeof exports === "object") {
-    module.exports = factory(require("knockout"));
+      module.exports = factory(require("knockout"));
   } else {
-    root.KnockoutElse = factory(root.ko);
+      root.KnockoutElse = factory(root.ko);
   }
 })(this, function(ko) {
   // index.js

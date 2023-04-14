@@ -389,61 +389,13 @@ const checkoutSinglePageViewModel = ((resources) => {
             type: "GET",
             dataType: "html",
             success: function (data) {
-                console.log('singlePageCheckout loadBasketSummary returned', data);
+                //console.log('singlePageCheckout loadBasketSummary returned', data);
                 var basketSummary = $('#checkout-total-wrapper');
                 ko.cleanNode(basketSummary[0]);
                 basketSummary.html(data);
                 ko.applyBindings(viewModel, basketSummary[0]);
                 self.summaryBusy(false);
                 self.busy(false);
-
-                if (window.mustCompleteAppleShippingContactSelection) {
-
-                    let errors = [];
-
-                    if (!self.deliveryAddressFactory.dispatchOptionsAvailable()) {
-                        errors.push(new ApplePayError('addressUnserviceable', null, 'No delivery options were found. Please try again. If problems persist please contact Designers Guild directly.'));
-                    }
-
-                    self.paymentMethodFactory.activeApplePaySession.completeShippingContactSelection({
-                        newTotal: {
-                            type: 'final',
-                            label: 'Designers Guild',
-                            amount: data.paymentTotals[0].TotalBalance
-                        },
-                        newLineItems: [{
-                            label: 'Sub Total',
-                            type: 'pending',
-                            amount: data.paymentTotals[0].TotalItems ?? '0.00'
-
-                        }, {
-                            label: 'Delivery',
-                            type: 'pending',
-                            amount: data.paymentTotals[0].TotalPandP ?? '0.00'
-
-                        }, {
-                            label: 'Tax',
-                            type: 'pending',
-                            amount: data.paymentTotals[0].TotalTax ?? '0.00'
-                        }],
-                        errors: errors,
-                        newShippingMethods: [{
-                            label: '',
-                            detail: '',
-                            amount: '',
-                            identifier: '',
-                            dateComponentsRange: {
-                                startDateComponents: {
-
-                                },
-                                endDateComponents: {
-
-                                }
-                            }
-                        }]
-                    });
-                }
-
             },
             error: function (xhr, s, a) {
                 //console.log('singlePageCheckout loadBasketSummary failed', xhr, s, a);
@@ -4098,20 +4050,151 @@ const paymentMethodFactory = ((parent) => {
                             window.scrollTo(0, 0);
                         }
                     }
+                    break;
+                case 5:
+                    self.showCompletingMessage();
+
+                    self.applePaymentRequest = self.applePayInstance.createPaymentRequest({
+                        total: {
+                            label: 'Designers Guild',
+                            type: 'pending',
+                            amount: getBalanceNumber(),
+                            lineItems: [{
+                                label: 'Sub Total',
+                                type: 'final',
+                                amount: getItemSubTotalNumber()
+                            }, {
+                                label: 'Delivery',
+                                type: 'final',
+                                amount: getShippingNumber()
+                            }, {
+                                label: 'Tax',
+                                type: 'final',
+                                amount: getTaxNumber()
+                            }]
+                        },
+
+                        // We recommend collecting billing address information, at minimum
+                        // billing postal code, and passing that billing postal code with
+                        // all Apple Pay transactions as a best practice.
+                        applePayShippingType: 'delivery',
+                        requiredBillingContactFields: ["postalAddress"],
+                        requiredShippingContactFields: [
+                            "email"
+                        ]
+                    });
+
+                    //self.beginApplePay = () => {
+
+                    console.log('applePay window.beginApplePay called', self.applePaymentRequest);
+
+                    self.activeApplePaySession = new ApplePaySession(3, self.applePaymentRequest);
+
+                    self.activeApplePaySession.onvalidatemerchant = (e) => {
+                        console.log('applePay onvalidatemerchant', e);
+                        self.applePayInstance.performValidation({
+                            validationURL: e.validationURL,
+                            displayName: 'Designers Guild'
+                        }, function (err, merchantSession) {
+                            if (err) {
+                                self.hideCompletingMessage();
+                                window.showError(self.resources.ApplePayFailedToLoad);
+                                // You should show an error to the user, e.g. 'Apple Pay failed to load.'
+                                return;
+                            }
+                            console.log('applePay validatedmerchant', merchantSession);
+                            self.activeApplePaySession.completeMerchantValidation(merchantSession);
+                        });
+                    };
+
+                    self.activeApplePaySession.onshippingcontactselected = (e) => {
+                        console.log('applePay onshippingcontactselected', e);
+
+                        let errors = [];
+
+                        if (!self.parent.errors().length) {
+                            self.parent.errors().map(e => {
+                                errors.push(new ApplePayError('addressUnserviceable', null, e));
+                            })
+                        }
+
+                        self.paymentMethodFactory.activeApplePaySession.completeShippingContactSelection({
+                            newTotal: {
+                                type: 'final',
+                                label: 'Designers Guild',
+                                amount: getBalanceNumber()
+                            },
+                            newLineItems: [{
+                                label: 'Sub Total',
+                                type: 'pending',
+                                amount: getItemSubTotalNumber()
+
+                            }, {
+                                label: 'Delivery',
+                                type: 'pending',
+                                amount: getShippingNumber()
+
+                            }, {
+                                label: 'Tax',
+                                type: 'pending',
+                                amount: getTaxNumber()
+                            }],
+                            errors: errors
+                        });
+                    }
+
+                    self.activeApplePaySession.onpaymentauthorized = (e) => {
+                        console.log('applePay onpaymentauthorized', e);
+
+                        self.applePayInstance.tokenize({
+                            token: e.payment.token
+                        }, function (tokenizeErr, payload) {
+                            if (tokenizeErr) {
+                                self.hideCompletingMessage();
+                                console.error('applePay Error tokenizing:', tokenizeErr);
+                                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
+                                return;
+                            }
+
+                            console.log('applePay tokenized', payload);
+
+                            // Send payload.nonce to your server.
+                            self.submitBraintreeCheckout('apple', payload.nonce, e.payment.shippingContact.emailAddress);
+
+                            // If requested, address information is accessible in event.payment
+                            // and may also be sent to your server.
+                            console.log('applyPay billingPostalCode:', e.payment.billingContact.postalCode);
+
+                            // After you have transacted with the payload.nonce,
+                            // call `completePayment` to dismiss the Apple Pay sheet.
+
+                            self.endApple = () => {
+                                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
+                            }
+                        });
+                    };
+
+                    self.activeApplePaySession.oncancel = function (event) {
+                        self.hideCompletingMessage();
+                    }
+
+                    self.activeApplePaySession.begin();
 
                     break;
             }
         }
         catch (ex) {
             window.setTimeout(() => {
-                self.hideCompletingMessage();
+                window.onErrorModalHide.push(() => {
+                    self.hideCompletingMessage();
+                });
+                window.showError();
             }, 300);
             window.logClientSideError(JSON.stringify({
                 message: e.toString(),
                 source: e.stack,
                 url: window.location.href
             }));
-            window.showError();
         }
     }
 
@@ -4329,13 +4412,12 @@ const paymentMethodFactory = ((parent) => {
         }
     }
 
-    self.submitBraintreeCheckout = function (method) {
+    self.submitBraintreeCheckout = function (method, nonce, email) {
 
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout called');
 
         self.showCompletingMessage();
 
-        var nonce = null;
         var defaultCard = false;
 
         if (method === 'card') {
@@ -4348,8 +4430,11 @@ const paymentMethodFactory = ((parent) => {
             }
             defaultCard = card.defaultCard();
         }
-        else
+        else if (method === 'apple') {
+
+        } else {
             nonce = "paypal";
+        }
 
         var data = JSON.stringify({
             device_data: null,
@@ -4357,7 +4442,8 @@ const paymentMethodFactory = ((parent) => {
             masterDefinition: getMasterDefinition(),
             basketCountry: self.siteCountry,
             marketingPermissions: ko.toJS(self.parent.marketingPermissions()),
-            make_default: defaultCard
+            make_default: defaultCard,
+            email: email
         });
 
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout submitting: ' + data);
@@ -4371,6 +4457,7 @@ const paymentMethodFactory = ((parent) => {
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
 
+                console.log('paymentMethodFactory submitBraintreeCheckout returned', data);
                 self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout returned: ' + JSON.stringify(data));
 
                 if (data != null) {
@@ -4382,6 +4469,9 @@ const paymentMethodFactory = ((parent) => {
                             $('#checkout-complete-waiting .page-blocker').addClass('success');
                             $('#checkout-complete-waiting p').html(self.resources.CheckoutPaymentSuccessGeneratingOrder);
                             self.showCompletingMessage();
+                            if (typeof self.endApple === 'function') {
+                                self.endApple();
+                            }
                             $.ajax({
                                 url: '/api/checkout/checkoutOrderGenerate',
                                 type: 'POST',
@@ -4615,13 +4705,14 @@ const paymentMethodFactory = ((parent) => {
     }
 
     self.showCompletingMessage = function () {
-        //console.log('paymentMethodFactory showCompletingMessage');
-        $("#checkout-complete-waiting").modal('show');
+        console.log('paymentMethodFactory showCompletingMessage');
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).show();
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message shown');
     }
 
     self.hideCompletingMessage = function () {
-        $("#checkout-complete-waiting").modal('hide');
+        console.log('paymentMethodFactory hideCompletingMessage');
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).hide();
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message hidden');
     }
 
@@ -4763,118 +4854,7 @@ const paymentMethodFactory = ((parent) => {
                                         return;
                                     }
 
-                                    window.applePaymentRequest = applePayInstance.createPaymentRequest({
-                                        total: {
-                                            label: 'Designers Guild',
-                                            type: 'pending',
-                                            amount: getBalanceNumber(),
-                                            lineItems: [{
-                                                label: 'Sub Total',
-                                                type: 'pending',
-                                                amount: getItemSubTotalNumber()
-                                            }, {
-                                                label: 'Delivery',
-                                                type: 'pending',
-                                                amount: getShippingNumber()
-                                            }, {
-                                                label: 'Tax',
-                                                type: 'pending',
-                                                amount: getTaxNumber()
-                                            }]
-                                        },
-
-                                        // We recommend collecting billing address information, at minimum
-                                        // billing postal code, and passing that billing postal code with
-                                        // all Apple Pay transactions as a best practice.
-                                        applePayShippingType: 'delivery',
-                                        requiredBillingContactFields: ["postalAddress"],
-                                        requiredShippingContactFields: [
-                                            "postalAddress",
-                                            "email",
-                                            "phone"
-                                        ]
-                                    });
-
-                                    self.beginApplePay = () => {
-                                        self.parent.busy(true);
-
-                                        console.log('applePay window.beginApplePay called', window.applePaymentRequest);
-
-                                        self.activeApplePaySession = new ApplePaySession(3, window.applePaymentRequest);
-
-                                        self.activeApplePaySession.onvalidatemerchant = (e) => {
-                                            console.log('applePay onvalidatemerchant', e);
-                                            applePayInstance.performValidation({
-                                                validationURL: e.validationURL,
-                                                displayName: 'Designers Guild'
-                                            }, function (err, merchantSession) {
-                                                if (err) {
-                                                    window.showError(self.resources.ApplePayFailedToLoad);
-                                                    // You should show an error to the user, e.g. 'Apple Pay failed to load.'
-                                                    return;
-                                                }
-                                                console.log('applePay validatedmerchant', merchantSession);
-                                                self.activeApplePaySession.completeMerchantValidation(merchantSession);
-                                            });
-                                        };
-
-                                        self.activeApplePaySession.onshippingcontactselected = (e) => {
-                                            console.log('applePay onshippingcontactselected', e);
-
-                                            self.parent.deliveryAddressFactory.currentAddress().addressLine1('TEMPORARY');
-                                            self.parent.deliveryAddressFactory.currentAddress().addressLine2('TEMPORARY');
-                                            self.parent.deliveryAddressFactory.currentAddress().town(e.shippingContact.locality);
-                                            self.parent.deliveryAddressFactory.currentAddress().county('TEMPORARY');
-                                            self.parent.deliveryAddressFactory.currentAddress().country({
-                                                Name: e.shippingContact.country,
-                                                Code: e.shippingContact.countryCode
-                                            });
-                                            self.parent.deliveryAddressFactory.currentAddress().postcode(e.shippingContact.postalCode?.trim());
-                                            self.parent.deliveryAddressFactory.currentAddress().phone();
-
-                                            window.mustCompleteAppleShippingContactSelection = true;
-
-                                            // We've got... almost nothing out of Apple yet: they give you partial information until the transaction
-                                            // is completed. Evidently they believe what they give is sufficient for users to build out their shipping
-                                            // offerings. So it must be, right?
-                                            self.parent.deliveryAddressFactory.saveDeliveryAddress(self.parent.deliveryAddressFactory.currentAddress());
-                                        }
-
-                                        self.activeApplePaySession.onpaymentauthorized = (e) => {
-                                            console.log('applePay onpaymentauthorized', e);
-
-                                            applePayInstance.tokenize({
-                                                token: e.payment.token
-                                            }, function (tokenizeErr, payload) {
-                                                if (tokenizeErr) {
-                                                    console.error('applePay Error tokenizing:', tokenizeErr);
-                                                    self.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
-                                                    return;
-                                                }
-
-                                                // Send payload.nonce to your server.
-                                                console.log('applePay tokenized', payload);
-
-                                                // If requested, address information is accessible in event.payment
-                                                // and may also be sent to your server.
-                                                console.log('applyPay billingPostalCode:', e.payment.billingContact.postalCode);
-
-                                                // After you have transacted with the payload.nonce,
-                                                // call `completePayment` to dismiss the Apple Pay sheet.
-                                                self.parent.busy(false);
-
-                                                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
-                                            });
-                                        };
-
-                                        self.activeApplePaySession.oncancel = function (event) {
-                                            self.parent.busy(false);
-                                        }
-
-                                        self.activeApplePaySession.begin();
-                                    }
-
-                                    // Set up your Apple Pay button here
+                                    self.applePayInstance = applePayInstance;
                                 });
                             }
                         }

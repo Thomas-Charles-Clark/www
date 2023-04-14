@@ -38,14 +38,12 @@
             case dgCheckoutType.Member:
             case dgCheckoutType.Guest:
             case dgCheckoutType.Paypal:
+            case dgCheckoutType.Apple:
             case dgCheckoutType.Trade:
                 @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressMemberComponent.cshtml", Model)
                 break;
             case dgCheckoutType.Amazon:
                 @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressAmazon.cshtml", Model)
-                break;
-            case dgCheckoutType.Apple:
-                @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressApple.cshtml", Model)
                 break;
         }
     </div>

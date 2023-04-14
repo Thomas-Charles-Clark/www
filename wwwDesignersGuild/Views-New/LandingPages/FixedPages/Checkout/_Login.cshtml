@@ -13,6 +13,25 @@
 
     //var forceBusy = Model.OnlyShowTrade && Model.MasterDefinition.LoginStatus == dgLoginStatus.currentLogin;
 }
+
+@* this fools Apple Pay into thinking the device is compatible so we can render the button,
+    beyond that it doesn't help much
+*@
+@if (HtmlHelperExtra.Debug)
+{
+    <script>
+        //if (!window.ApplePaySession) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //} else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //}
+    </script>
+}
+
 @Render.Script("~/bundles/js/checkout-login-page")
 <div id="ko-wrapper"
      class="container my-4">
@@ -51,6 +70,13 @@
         }
         else
         {
+            if (Model.PermitApple)
+            {
+                <div id="checkout-option-apple" class="checkout-option" style="display: none;" data-bind="visible: (window.ApplePaySession)">
+                    <img class="apple-pay-mark" src="~/Content/images/checkout/apple-pay.svg" alt="@HtmlHelperExtra.Resource("PayWithApple", l, c, d)" />
+                    <apple-pay-button class="proceed-btn" buttonstyle="black" type="buy" locale="@(Model.MasterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" onclick="window.proceedToCheckout(@Html.Raw(Convert.ToInt32(dgCheckoutType.Apple)), null)"></apple-pay-button>
+                </div>
+            }
             if (Model.PermitPayPal)
             {
                 <div id="checkout-option-paypal" class="checkout-option">
@@ -63,13 +89,6 @@
                 <div id="checkout-option-amazon" class="checkout-option">
                     <img src="~/Content/images/checkout/amazon-pay.png" alt="@HtmlHelperExtra.Resource("PayWithAmazon", l, c, d)" />
                     <div id="amazon-button" class="btn proceed-btn p-0"></div>
-                </div>
-            }
-            if (Model.PermitApple)
-            {
-                <div id="checkout-option-apple" class="checkout-option" style="display: none;" data-bind="visible: (window.ApplePaySession && window.ApplePaySession.canMakePayments())">
-                    <img class="apple-pay-mark" src="~/Content/images/checkout/apple-pay.svg" alt="@HtmlHelperExtra.Resource("PayWithApple", l, c, d)" />
-                    <apple-pay-button class="proceed-btn" buttonstyle="black" type="buy" locale="@(Model.MasterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" onclick="window.proceedToCheckout(@Html.Raw(Convert.ToInt32(dgCheckoutType.Apple)), null)"></apple-pay-button>
                 </div>
             }
             if (Model.PermitGuest || Model.PermitMember)
@@ -429,17 +448,6 @@
         console.error('ApplePaySession not initialised');
     }
 </script>
-
-@if (HtmlHelperExtra.Debug)
-{
-    <script>
-        if (!window.ApplePaySession) {
-            window.ApplePaySession = {
-                canMakePayments: () => true
-            }
-        }
-    </script>
-}
 
 @if (Model.OnlyShowTrade == false)
 {

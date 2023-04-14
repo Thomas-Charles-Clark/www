@@ -49,7 +49,8 @@ namespace wwwDesignersGuild.Controllers
         giftVoucherFull,
         zeroValueRetailOrder,
         tradeOrder,
-        amazonPay
+        amazonPay,
+        applePay
     }
 
     public class SectionController : Controller

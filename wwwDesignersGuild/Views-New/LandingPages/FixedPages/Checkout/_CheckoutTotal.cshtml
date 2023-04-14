@@ -280,7 +280,7 @@
             }
         </div>
     </form>
-   @if (Model.checkoutType != dgCheckoutType.Apple)
+    @if (Model.checkoutType != dgCheckoutType.Apple)
     {
         <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
             @if (Model.checkoutType == dgCheckoutType.Trade)
@@ -292,6 +292,12 @@
                 @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
             }
         </a>
+    }
+    else
+    {
+        <div id="apple-pay-button-wrapper">
+            <apple-pay-button buttonstyle="black" type="buy" locale="@(Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" data-bind="click: complete"></apple-pay-button>
+        </div>
     }
     @if (Model.checkoutType != dgCheckoutType.Trade)
     {
@@ -329,5 +335,17 @@
 <script type="text/javascript">
     if (typeof viewModel != 'undefined') {
         viewModel.balanceNumber(@(toPay.ToString("F", nfi)));
+    }
+    function getShippingNumber() {
+        return Number('@(objSummary.checkoutTotals[0].TotalPandP?.ToString(nfi) ?? "0")')
+    }
+    function getTaxNumber() {
+        return Number('@(objSummary.checkoutTotals[0].TotalTax?.ToString(nfi) ?? "0")')
+    }
+    function getItemSubTotalNumber() {
+        return Number('@(objSummary.checkoutTotals[0].TotalItems?.ToString(nfi) ?? "0")')
+    }
+    function getBalanceNumber() {
+        return Number('@objSummary.checkoutTotals[0].TotalBalance.ToString(nfi)')
     }
 </script>

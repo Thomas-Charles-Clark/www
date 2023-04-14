@@ -3022,7 +3022,6 @@
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_CheckoutPart.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_CheckoutAddressClickCollect.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_CheckoutAddressUpsAccessPoint.cshtml" />
-    <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressAmazon.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressCollection.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressMemberComponent.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentAmazon.cshtml" />

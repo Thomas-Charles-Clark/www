@@ -173,10 +173,10 @@
                         'item_id': `ProductPageID: ${i.ProductPageID}`,
                         'item_name': i.Heading,
                         'index': index,
-                        'price': i.ProductPagePrice?.PriceMax,
+                        'price': i.ProductPagePrice ? i.ProductPagePrice.PriceMax : null,
                         'quantity': 1
                     }
-                    if (i.ProductPagePrice?.SalePriceMax) {
+                    if ((i.ProductPagePrice ? i.ProductPagePrice.SalePriceMax : null) != null) {
                         item.discount = i.ProductPagePrice.SalePriceMax
                     }
                     return item;

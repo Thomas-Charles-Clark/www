@@ -8,6 +8,7 @@ const
     sass = require('gulp-sass')(require('sass')),
     htmlmin = require('gulp-htmlmin'),
     filter = require('gulp-filter'),
+    flatmap = require('gulp-flatmap'),
     terser = require('gulp-terser'),
     sourcemaps = require('gulp-sourcemaps'),
     merge = require('merge-stream'),
@@ -149,9 +150,21 @@ function wildcardscss() {
 }
 
 function wildcardjs() {
+    let shouldBabel = false;
     var tasks = gulp
         .src('js/src/**/!(*.min).js', { since: gulp.lastRun(wildcardjs) })
         .pipe(sourcemaps.init())
+        .pipe(flatmap((stream, file) => {
+            console.log(file.path);
+            if (file.path.indexOf('models') > -1) {
+                console.log('running babel');
+                return stream.pipe(babel({
+                    presets: ['@babel/preset-env']
+                }))
+            } else {
+                return stream;
+            }
+        }))
         .pipe(terser())
         .pipe(rename({ suffix: '.min' }))
         .pipe(sourcemaps.write(''))

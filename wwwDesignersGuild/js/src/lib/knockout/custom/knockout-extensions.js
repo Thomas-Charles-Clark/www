@@ -864,7 +864,7 @@ ko.bindingHandlers.numeric = {
                 // Allow: Ctrl+A
                 (event.keyCode == 65 && event.ctrlKey === true) ||
                 // Allow: both . keys (comma is event.keyCode == 188) if the Europeans complain about formatting... 
-                ((event.keyCode == 190 || event.keyCode == 110) && currentValue?.toString().indexOf('.') == -1) ||
+                ((event.keyCode == 190 || event.keyCode == 110) && (currentValue ? currentValue.toString().indexOf('.') == -1 : true)) ||
                 // Allow: home, end, left, right
                 (event.keyCode >= 35 && event.keyCode <= 39)) {
 

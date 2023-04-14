@@ -2224,6 +2224,10 @@ namespace wwwDesignersGuild.Controllers
                         objCheckoutSubmission.payment_method_nonce = (string)Session["paypal_nonce_" + checkoutId.ToString()];
                     }
                 }
+                else if (checkoutType == dgCheckoutType.Apple) 
+                { 
+                    // must remember to save email
+                }
 
                 if (objCheckoutSubmission.masterDefinition == null)
                 {
@@ -2456,7 +2460,26 @@ namespace wwwDesignersGuild.Controllers
 
                                 try
                                 {
-                                    var paymentTakenStored = await objCheckout.checkoutPaymentTaken(checkoutId, transaction.Id == null ? nullIdMessage : result.Target.Id, paymentType.payWithBraintree.ToString(), XmlResult(result), objCheckoutSubmission.marketingPermissions);
+                                    if (checkoutType != dgCheckoutType.Apple)
+                                    {
+                                        var paymentTakenStored = await objCheckout.checkoutPaymentTaken(
+                                            checkoutId,
+                                            transaction.Id == null ? nullIdMessage : result.Target.Id,
+                                            paymentType.payWithBraintree.ToString(),
+                                            XmlResult(result),
+                                            objCheckoutSubmission.marketingPermissions);
+                                    }
+                                    else
+                                    {
+                                        var paymentTakenStored = await objCheckout.checkoutPaymentTaken(
+                                            checkoutId,
+                                            transaction.Id == null ? nullIdMessage : result.Target.Id,
+                                            paymentType.applePay.ToString(),
+                                            XmlResult(result),
+                                            objCheckoutSubmission.marketingPermissions,
+                                            null,
+                                            objCheckoutSubmission.email);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

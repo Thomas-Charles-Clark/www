@@ -850,7 +850,7 @@ namespace wwwDesignersGuild.ViewModels
                         "Message",
                         "ApplePayDeviceNotSupported",
                         "ApplePayDeviceNotSupported",
-                        ""
+                        "ApplePayDeviceCannotPay"
                     });
                     break;
                 case (int)dgFixedPage.stockists:

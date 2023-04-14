@@ -1015,7 +1015,14 @@ namespace wwwDesignersGuild.Models.Database
             return true;
         }
 
-        public Boolean checkoutPaymentTaken(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null)
+        public Boolean checkoutPaymentTaken(
+            long checkoutId, 
+            string paymentRef, 
+            string paymentType, 
+            string paymentDetails, 
+            List<MarketingPermission> marketingPermissions,
+            string orderReference = null,
+            string email = null)
         {
             var result = false;
 
@@ -1033,6 +1040,7 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@PaymentType", paymentType);
                 cmd.Parameters.AddWithValue("@PaymentDetails", paymentDetails);
                 cmd.Parameters.AddWithValue("@OrderReference", orderReference);
+                cmd.Parameters.AddWithValue("@Email", email);
 
                 var marketingPermission = cmd.CreateParameter();
 

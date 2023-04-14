@@ -78,8 +78,6 @@ footer p {
 
 #site-selector-background {
   height: 100%;
-  background-image: -webkit-image-set(url("/images/site-selector-background/mobile/1536x2049.jpg?v=SS23") 1x, url("/images/site-selector-background/mobile/2048x2732.jpg?v=SS23") 2x);
-  background-image: image-set(url("/images/site-selector-background/mobile/1536x2049.jpg?v=SS23") 1x, url("/images/site-selector-background/mobile/2048x2732.jpg?v=SS23") 2x);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

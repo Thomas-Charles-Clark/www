@@ -25,7 +25,7 @@ namespace wwwDesignersGuild.Models.Interface
         Task<checkoutGiftCard> getGiftVoucherData(Int64 checkoutId);
         Task<checkoutGift> getGiftData(Int64 checkoutId, short countryId, byte languageId);
         Task<Boolean> saveGiftOptions(Int64 checkoutId, DataTable giftBoxTableType, DataTable giftBasketTableType);
-        Task<Boolean> checkoutPaymentTaken(long checkoutId, string transactionId, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null);
+        Task<Boolean> checkoutPaymentTaken(long checkoutId, string transactionId, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null, string email = null);
         Task<Boolean> checkoutPaySaveRedux(long checkoutId);
         Task<Boolean> checkoutPaySave(Guid paymentToken, string transactionId, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions);
         Task<Boolean> checkoutAttemptSave(Int64 checkoutId,

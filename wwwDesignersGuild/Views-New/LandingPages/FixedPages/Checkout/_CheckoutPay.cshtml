@@ -32,7 +32,8 @@
         </div>
         <div id="gift-voucher-div">
             @if (Model.checkoutMethod == dgCheckoutType.Guest ||
-                 Model.checkoutMethod == dgCheckoutType.Member)
+                 Model.checkoutMethod == dgCheckoutType.Member ||
+                 Model.checkoutMethod == dgCheckoutType.Apple)
             {
                 <!-- ko if: getSavedCards().length > 0 -->
                 <p>

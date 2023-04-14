@@ -93,16 +93,20 @@ body {
     }
 
     #checkout-option-apple {
+        border-color: $black;
+
         img {
             width: 84px;
             height: 54px;
         }
+
         apple-pay-button {
             --apple-pay-button-width: 340px;
             --apple-pay-button-height: 50px;
             --apple-pay-border-radius: $border-radius;
             --apple-pay-button-padding: 0 0;
             --apple-pay-box-sizing: border-box;
+
             &.disabled {
                 cursor: default;
                 pointer-events: none;
@@ -113,6 +117,24 @@ body {
 
     .checkout-option + .checkout-option {
         margin-top: $xl-gutter;
+    }
+}
+
+#apple-pay-button-wrapper {
+    padding: 0 $l-gutter;
+
+    apple-pay-button {
+        --apple-pay-button-width: 100%;
+        --apple-pay-button-height: 34px;
+        --apple-pay-border-radius: $border-radius;
+        --apple-pay-button-padding: 0 0;
+        --apple-pay-box-sizing: border-box;
+
+        &.disabled {
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.65;
+        }
     }
 }
 

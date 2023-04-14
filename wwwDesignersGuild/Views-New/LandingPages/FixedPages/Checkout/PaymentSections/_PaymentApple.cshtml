@@ -11,13 +11,17 @@
 
 @if (HtmlHelperExtra.Debug)
 {
-    @*<script>
-            if (!window.ApplePaySession) {
-                window.ApplePaySession = {
-                    canMakePayments: () => true
-                }
-            }
-        </script>*@
+    <script>
+        //if (!window.ApplePaySession) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //} else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //}
+    </script>
 }
 
 <script type="text/javascript">
@@ -31,4 +35,4 @@
 
 <script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js"></script>
 
-<apple-pay-button buttonstyle="black" type="buy" locale="@(Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" data-bind="click: paymentMethodFactory.beginApplePay"></apple-pay-button>
+@* Apple Pay button replaces our own Buy Now button in _CheckoutTotal.cshtml *@
