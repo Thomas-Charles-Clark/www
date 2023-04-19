@@ -325,7 +325,7 @@ namespace wwwDesignersGuild.Models.Classes
     public class passLogin
     {
         public masterDefinition masterDefinition { get; set; }
-        public List<checkoutType> checkoutTypes { get; set; }
+        public List<CheckoutType> checkoutTypes { get; set; }
         public string braintreeClientKey { get; set; }
         public string braintreeEnvironment { get; set; }
         public string currency { get; set; }

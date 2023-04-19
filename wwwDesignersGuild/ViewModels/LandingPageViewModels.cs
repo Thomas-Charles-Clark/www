@@ -738,7 +738,12 @@ namespace wwwDesignersGuild.ViewModels
                         "LoginInvalid",
                         "PaypalInvalidAddress",
                         "PayWithCard",
-                        "CheckoutTradeCheckout"
+                        "CheckoutTradeCheckout",
+                        "CheckoutPaymentSuccessGeneratingOrder",
+                        "ApplePayFailedToLoad",
+                        "ApplePayFailureNotCharged",
+                        "CheckoutAddressZipCodeInvalid",
+                        "CheckoutAddressZipCodeProblem"
                     });
                     break;
                 case (int)dgFixedPage.checkoutSinglePage:
@@ -850,7 +855,8 @@ namespace wwwDesignersGuild.ViewModels
                         "Message",
                         "ApplePayDeviceNotSupported",
                         "ApplePayDeviceNotSupported",
-                        "ApplePayDeviceCannotPay"
+                        "ApplePayDeviceCannotPay",
+                        "ApplePayFailureNotCharged"
                     });
                     break;
                 case (int)dgFixedPage.stockists:
@@ -1987,7 +1993,12 @@ namespace wwwDesignersGuild.ViewModels
                 }
             });
 
-            var url = HttpContext.Current.Request.Url.ToString().Replace(originalUrlKeywords, "");
+            var url = HttpContext.Current.Request.Url.ToString();
+            
+            if (!String.IsNullOrEmpty(originalUrlKeywords))
+            {
+                url = url.Replace(originalUrlKeywords, "");
+            }
 
             var matches = result.UrlParsingRegex.Matches(url);
 

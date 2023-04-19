@@ -13,7 +13,7 @@ namespace wwwDesignersGuild.Models.Interface
     public interface ICheckout
     {
         Task<checkoutAddressGenerateResult> checkoutAddressGenerate(Int64 checkoutId, short countryId, byte languageId, long visitorId, int? memberId, int? tradeAccountId);
-        Task<Boolean> checkoutAddressSave(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddresses, bool isClickCollect);
+        Task<Boolean> checkoutAddressSave(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddresses, bool isClickCollect, bool resetDeliveryOptions);
         //Task<Boolean> validateCheckoutBasket(decimal totalPrice, int totalQuantity, DateTime snapshotCurrentDateTime, short countryId, byte languageId, Int64 visitorDbId, Int32? memberId, int? tradeAccountID);
         Task<checkoutCreateSnapshotBasket> createCheckoutBasket(long visitorDbId, byte languageId, short countryId, DateTime date, string cfCountryHeader, int? tradeAccountId);
         Task<Boolean> logCheckoutAction(Int64 checkoutId, int checkoutActionId, string details);

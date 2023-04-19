@@ -9,7 +9,7 @@ using wwwDesignersGuild.Models.Helper;
 
 namespace wwwDesignersGuild.Models.Checkout
 {
-    public class checkoutType
+    public class CheckoutType
     {
         public byte CheckoutTypeId { get; set; }
         public string Name { get; set; }
@@ -40,6 +40,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public masterDefinition masterDefinition { get; set; }
         public string USCounty { get; set; }
         public bool isClickCollect { get; set; }
+        public bool secondSave { get; set; }
     }
 
     public class webapiCheckoutSalesTaxZipCode

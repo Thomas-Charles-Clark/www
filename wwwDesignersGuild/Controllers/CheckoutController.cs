@@ -771,6 +771,25 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [System.Web.Http.HttpPost]
+        public async Task<IHttpActionResult> selectCheckoutAddress(byte languageId)
+        {
+            var session = HttpContext.Current.Session;
+
+            if (dgFramework.doesUserHaveACheckoutId(session["checkoutId"]) == false)
+            {
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutNoBasket);
+            }
+            else if (dgFramework.isCheckoutSessionValid(session["checkoutExpiry"]) == false)
+            {
+                return Ok(dgFramework.raiseErrorToHandle(webapiDataError.checkoutBasketExpired));
+            }
+
+            var checkoutId = Convert.ToInt64(session["checkoutId"].ToString());
+
+            return Ok(new checkoutDb().checkoutAddressSelect(checkoutId, languageId));
+        }
+
+        [System.Web.Http.HttpPost]
         public async Task<IHttpActionResult> saveCheckoutAddress(webapiCheckoutSaveAddress objDeliveryAddress)
         {
             var session = HttpContext.Current.Session;
@@ -873,7 +892,7 @@ namespace wwwDesignersGuild.Controllers
 
             if (deliveryCountry == null)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
+                return Ok(new { state = "FAIL", message = "invalidCountry" });
             }
 
             var raiseInvalidParameters = false;
@@ -1023,7 +1042,7 @@ namespace wwwDesignersGuild.Controllers
                 }
                 else
 
-                    if (salesTaxAddressesToSelectFrom.Count == 0)
+                if (salesTaxAddressesToSelectFrom.Count == 0)
                 {
                     return Ok(dgFramework.raiseErrorToHandle(webapiDataError.zipTaxServiceFailed));
                 }
@@ -1093,7 +1112,8 @@ namespace wwwDesignersGuild.Controllers
                 new List<passCheckoutSaveAddressData> { address }, 
                 objDeliveryAddress.UPSAPMemberAddressId,
                 upsIdAddressList,
-                objDeliveryAddress.isClickCollect);
+                objDeliveryAddress.isClickCollect,
+                resetDeliveryOptions: objDeliveryAddress.secondSave == true ? false : true);
 
             if (success == false)
             {
@@ -3461,7 +3481,20 @@ namespace wwwDesignersGuild.Controllers
                 dgCheckoutActionId.logInvalidAddress,
                 dgCheckoutActionId.logValidationError,
                 dgCheckoutActionId.logBraintreeBuyNowClick,
-                dgCheckoutActionId.logBraintreeBuyClientSideStep
+                dgCheckoutActionId.logBraintreeBuyClientSideStep,
+                dgCheckoutActionId.logAppleBegin,
+                dgCheckoutActionId.logAppleOnValidateMerchant,
+                dgCheckoutActionId.logAppleOnValidateMerchantError,
+                dgCheckoutActionId.logAppleOnValidateMerchantSuccess,
+                dgCheckoutActionId.logAppleOnShippingContactSelected,
+                dgCheckoutActionId.logAppleCompleteShippingContactSelection,
+                dgCheckoutActionId.logAppleOnShippingMethodSelected,
+                dgCheckoutActionId.logAppleCompleteShippingMethodSelection,
+                dgCheckoutActionId.logAppleOnPaymentAuthorized,
+                dgCheckoutActionId.logApplePaymentTokenizationError,
+                dgCheckoutActionId.logApplePaymentTokenizationSuccess,
+                dgCheckoutActionId.logAppleCompletePayment,
+                dgCheckoutActionId.logAppleOnCancel
             };
 
             if (validActions.Contains((dgCheckoutActionId)objLog.action))

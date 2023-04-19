@@ -323,7 +323,7 @@
     @RenderSection("DownloaderScripts", required: false)
     @RenderSection("DownloaderStyles", required: false)
 
-    @Html.JsonLD("Base", null, null)
+    @Html.Raw(Html.JsonLD("Base", null, null))
 
     @* This is for Pingdom *@
     <!-- stillAlive -->

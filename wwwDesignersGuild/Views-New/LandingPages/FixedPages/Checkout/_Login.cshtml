@@ -11,6 +11,18 @@
 
     var nfi = new System.Globalization.CultureInfo(Model.CountryItem.DotNetCulture).NumberFormat;
 
+    var urlCheckoutDeliveryOptions = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                            null,
+                                            dgContentType.checkoutPart,
+                                            (int)dgFixedPage.checkoutDispatch,
+                                            Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
+    var urlCheckoutSummary = dgFramework.buildUrl(objMaster.UrlBreakdown.countryDetails,
+                                    null,
+                                    dgContentType.checkoutPart,
+                                    (int)dgFixedPage.checkoutTotals,
+                                    Request.QueryString["dateOverride"], Request.QueryString["countryOverride"]);
+
     //var forceBusy = Model.OnlyShowTrade && Model.MasterDefinition.LoginStatus == dgLoginStatus.currentLogin;
 }
 
@@ -33,6 +45,7 @@
 }
 
 @Render.Script("~/bundles/js/checkout-login-page")
+
 <div id="ko-wrapper"
      class="container my-4">
     <div id="first-blocker"
@@ -133,6 +146,10 @@
                     </button>
                 </div>
             }
+        }
+        @if (!String.IsNullOrEmpty(Model.CheckoutTypeNotice.AlertMessage))
+        {
+            @Html.Raw(Model.CheckoutTypeNotice.AlertMessage)
         }
     </div>
     <p class="text-center mt-8">
@@ -260,194 +277,9 @@
 @if (Model.PermitApple)
 {
     @* This is used for building the Apple button *@
+    @Scripts.Render("~/bundles/js/checkout-apple")
     <script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js"></script>
 }
-
-<script type="text/javascript">
-
-    localStorage.removeItem('defaultToken'); @* Remove any previously saved card defaults *@
-    localStorage.removeItem('selectedCard');
-
-    $(document).ready(function () {
-
-        if (getUrlParameter('a') == '0') {
-            if (typeof (window.history.pushState) === 'function') {
-                var url = [location.protocol, '//', location.host, location.pathname].join('');
-                var stateObj = { path: url };
-                history.pushState(stateObj, '', url);
-            } else {
-                window.location.href = url;
-            }
-            $("#amazon-failure-modal").modal('show');
-        }
-
-    });
-
-    function getUrlParameter(name) {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    };
-
-    function jumpToSessionExpired() {
-        window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, ci)';
-    }
-
-    function asyncCheckoutLog(type, detail) {
-        $.ajax({
-            url: '/api/checkout/asyncSaveCheckoutLog',
-            type: 'POST',
-            async: false,
-            cache: false,
-            data: {
-                action: type,
-                detail: detail || "no detail provided"
-            },
-            success: function (data) {
-            },
-            error: function (xhr, s, a) {
-                console.log("braintree error logging failed");
-            }
-        });
-    }
-
-    function proceedToCheckout(checkoutType, email, token, shippingAddress) {
-
-        if (document.querySelector('#guest-member-login-modal').style.display != 'block') {
-            if (typeof window.pageModel === 'object' &&
-                typeof window.pageModel.fixedPage === 'function' &&
-                ko.unwrap(window.pageModel.fixedPage) != null) {
-                window.pageModel.fixedPage().checkoutLoginModel.busy(true);
-            } else {
-                window.addFixedPageLoadFunction(() => {
-                    window.pageModel.fixedPage().checkoutLoginModel.busy(true);
-                });
-            }
-        }
-
-        document.querySelectorAll('.proceed-btn').forEach(pb => {
-            pb.setAttribute('disabled', true);
-            pb.classList.add('disabled');
-        });
-
-        $.ajax({
-            url: "/api/checkout/setCheckoutType",
-            type: "Post",
-            cache: false,
-            async: true,
-            data: JSON.stringify({
-                checkoutType: checkoutType,
-                guestEmail: email,
-                token: token,
-                basketCountry: getSiteCountry(),
-                initialShippingAddress: shippingAddress
-            }),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                if (data.error) {
-                    switch (data.message) {
-                        case 'checkoutBasketExpired':
-                            window.showInfo(window.pageModel.fixedPage().resources['Sorry'], window.pageModel.fixedPage().resources['CheckoutExpired']);
-                            break;
-                        case 'invalidDeliveryAddress':
-
-                            let message = '';
-
-                            let siteCorrector = document.getElementById('site-corrector');
-
-                            let pClasses = 'mb-3';
-
-                            if (siteCorrector) {
-
-                                document.querySelector('#site-corrector p.d-flex').classList.add('flex-wrap');
-
-                                document.querySelector('#site-corrector button.btn-close').remove();
-
-                                siteCorrector.style.position = 'static';
-
-                                siteCorrector.classList.add('mb-3');
-
-                                ko.cleanNode(siteCorrector);
-
-                                let siteCorrectorMarkup = siteCorrector.outerHTML;
-
-                                document.querySelector('#body-inner').style['padding-top'] = 0;
-
-                                siteCorrector.remove();
-
-                                message += siteCorrectorMarkup;
-
-                                pClasses = 'mt-5 mb-3';
-                            }
-
-                            message += `<p class="${pClasses}">${window.pageModel.fixedPage().resources['CheckoutLoginInvalidDeliveryAddress'].replace('{siteCulture}', getSiteCountry().toUpperCase())}</p>`;
-
-                            message += `<ul class="undotted-list mb-3"><li>${JSON.parse(data.additionalInfo).flatMap(c => c.Name).join('</li><li>')}</li></ul>`;
-
-                            message += `${window.pageModel.fixedPage().resources['CheckoutLoginInvalidDeliveryAddress2']}`;
-
-                            window.showInfo(window.pageModel.fixedPage().resources['Sorry'], message);
-
-                            if (siteCorrector) {
-                                ko.applyBindings(window.siteCorrectorModel, siteCorrector)
-                            }
-                            break;
-                        default:
-                            window.showError();
-                            break;
-                    }
-                    document.querySelectorAll('.proceed-btn').forEach(pb => {
-                        pb.removeAttribute('disabled');
-                        pb.classList.remove('disabled');
-                    });
-                    window.pageModel.fixedPage().checkoutLoginModel.busy(false);
-                } else {
-                    window.location.href = data.redirect;
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                window.pageModel.fixedPage().checkoutLoginModel.busy(false);
-                document.querySelectorAll('.proceed-btn').forEach(pb => {
-                    pb.removeAttribute('disabled');
-                    pb.classList.remove('disabled');
-                });
-                console.log('dg-proceedToCheckout: ' + textStatus);
-                window.showError();
-            }
-        });
-    }
-
-    function displayPaymentAddressError() {
-
-        var message = '@Html.Raw(HtmlHelperExtra.Resource("PaypalInvalidAddress", l, c, d).ToString())';
-
-        var countries = getValidCountries();
-        var countryStr = '';
-
-        $.each(countries, function (i, country) {
-            if (countries.length > 1 && i == countries.length - 1)
-                countryStr += ' & '
-            else if (i > 0) {
-                countryStr += ', '
-            }
-            countryStr += country;
-        });
-
-        var error = message.replace('{Countries}', countryStr);
-
-        $('#address-failure-text').html(error);
-        $('#address-failure-modal').modal('show');
-    }
-
-    function getValidCountries() {
-        return @Html.Raw(Json.Encode(Model.CheckoutCountries));
-    }
-
-    function beginApplePay() {
-        console.error('ApplePaySession not initialised');
-    }
-</script>
 
 @if (Model.OnlyShowTrade == false)
 {
@@ -466,7 +298,7 @@
                     return;
                 }
                @if (Model.PermitPayPal)
-                {
+               {
                 <text>
                 braintree.paypalCheckout.create(
                     {
@@ -539,6 +371,22 @@
                     });
                 </text>
                 }
+                @if (Model.PermitApple)
+                {
+                <text>
+                    braintree.applePay.create({
+                        client: clientInstance
+                    }, function (applePayErr, applePayInstance) {
+                        if (applePayErr) {
+                            console.error('applePay error', applePayErr);
+                            notifyApplePayError(applePayErr);
+                            return;
+                        }
+
+                        clm.applePay = applePayViewModel(applePayInstance, clm);
+                    });
+                </text>
+                }
             });
 
         function notifyPaypalError(error) {
@@ -546,6 +394,12 @@
         }
     </script>
 }
+
+<script type="text/javascript">
+    function getBalanceNumber() {
+        return Number('@(Model.SubTotal.ToString(nfi) ?? "0")')
+    }
+</script>
 
 @if (Model.PermitAmazon && !Model.OnlyShowTrade)
 {
@@ -600,7 +454,75 @@
 
     <script type='text/javascript' src='@Html.Raw(Model.AmazonClientURL)' async></script>
 }
+@if (Model.PermitApple)
+{
+    <div id="checkout-complete-waiting" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="page-blocker">
+                        <div class="spinner-border"></div>
+                        <p>
+                            @HtmlHelperExtra.Resource("CheckoutCompleteWaiting", l, c, d)
+                            <br />
+                            <br />
+                            @HtmlHelperExtra.Resource("CheckoutDoNotRefresh", l, c, d)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="payment-processing-error" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        @HtmlHelperExtra.Resource("Sorry", l, c, d)
+                    </h4>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="payment-processing-error-text" class="validation-message mb-0">
+                        @Html.Raw(HtmlHelperExtra.Resource("CheckoutBraintreePaymentDeclined", l, c, d))
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="zip-modal" class="modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @HtmlHelperExtra.Resource("orderHistoryReceiptUSSaleTax", l, c, d)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0" id="sales-tax-message">
 
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="despatch-items-wrapper" class="d-none"></div>
+    <div id="totals-wrapper" class="d-none"></div>
+    <script>
+    function getUrlCheckoutDeliveryOptions() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutDeliveryOptions)';
+    }
+    function getUrlCheckoutDeliveryOptions() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutDeliveryOptions)';
+    }
+    function getUrlCheckoutSummary() {
+        return '@HtmlHelperExtra.EscapeForJS(urlCheckoutSummary)';
+    }
+    </script>
+}
 @if (Model.OnlyShowTrade && Model.MasterDefinition.LoginStatus == dgLoginStatus.currentLogin)
 {
     <script type="text/javascript">
@@ -608,4 +530,201 @@
             window.proceedToCheckout('Trade');
         });
     </script>
-} 
+}
+
+<script type="text/javascript">
+
+    localStorage.removeItem('defaultToken'); @* Remove any previously saved card defaults *@
+    localStorage.removeItem('selectedCard');
+
+    $(document).ready(function () {
+
+        if (getUrlParameter('a') == '0') {
+            if (typeof (window.history.pushState) === 'function') {
+                var url = [location.protocol, '//', location.host, location.pathname].join('');
+                var stateObj = { path: url };
+                history.pushState(stateObj, '', url);
+            } else {
+                window.location.href = url;
+            }
+            $("#amazon-failure-modal").modal('show');
+        }
+
+    });
+
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
+
+    function jumpToSessionExpired() {
+        window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, ci)';
+    }
+
+    function asyncCheckoutLog(type, detail) {
+        $.ajax({
+            url: '/api/checkout/asyncSaveCheckoutLog',
+            type: 'POST',
+            async: false,
+            cache: false,
+            data: {
+                action: type,
+                detail: detail || "no detail provided"
+            },
+            success: function (data) {
+            },
+            error: function (xhr, s, a) {
+                console.log("braintree error logging failed");
+            }
+        });
+    }
+
+    function proceedToCheckout(checkoutType, email, token, shippingAddress) {
+
+        if (document.querySelector('#guest-member-login-modal').style.display != 'block') {
+            if (typeof window.pageModel === 'object' &&
+                typeof window.pageModel.fixedPage === 'function' &&
+                ko.unwrap(window.pageModel.fixedPage) != null) {
+                window.pageModel.fixedPage().checkoutLoginModel.busy(true);
+            } else {
+                window.addFixedPageLoadFunction(() => {
+                    window.pageModel.fixedPage().checkoutLoginModel.busy(true);
+                });
+            }
+        }
+
+        document.querySelectorAll('.proceed-btn').forEach(pb => {
+            pb.setAttribute('disabled', true);
+            pb.classList.add('disabled');
+        });
+
+        if (checkoutType == 5) {
+            clm.applePay.begin();
+        }
+
+        $.ajax({
+            url: "/api/checkout/setCheckoutType",
+            type: "Post",
+            cache: false,
+            async: true,
+            data: JSON.stringify({
+                checkoutType: checkoutType,
+                guestEmail: email,
+                token: token,
+                basketCountry: getSiteCountry(),
+                initialShippingAddress: shippingAddress
+            }),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data.error) {
+                    switch (data.message) {
+                        case 'checkoutBasketExpired':
+                            window.showInfo(window.pageModel.fixedPage().resources['Sorry'], window.pageModel.fixedPage().resources['CheckoutExpired']);
+                            break;
+                        case 'invalidDeliveryAddress':
+
+                            let message = '';
+
+                            let siteCorrector = document.getElementById('site-corrector');
+
+                            let pClasses = 'mb-3';
+
+                            if (siteCorrector) {
+
+                                document.querySelector('#site-corrector p.d-flex').classList.add('flex-wrap');
+
+                                document.querySelector('#site-corrector button.btn-close').remove();
+
+                                siteCorrector.style.position = 'static';
+
+                                siteCorrector.classList.add('mb-3');
+
+                                ko.cleanNode(siteCorrector);
+
+                                let siteCorrectorMarkup = siteCorrector.outerHTML;
+
+                                document.querySelector('#body-inner').style['padding-top'] = 0;
+
+                                siteCorrector.remove();
+
+                                message += siteCorrectorMarkup;
+
+                                pClasses = 'mt-5 mb-3';
+                            }
+
+                            message += `<p class="${pClasses}">${window.pageModel.fixedPage().resources['CheckoutLoginInvalidDeliveryAddress'].replace('{siteCulture}', getSiteCountry().toUpperCase())}</p>`;
+
+                            message += `<ul class="undotted-list mb-3"><li>${JSON.parse(data.additionalInfo).flatMap(c => c.Name).join('</li><li>')}</li></ul>`;
+
+                            message += `${window.pageModel.fixedPage().resources['CheckoutLoginInvalidDeliveryAddress2']}`;
+
+                            window.showInfo(window.pageModel.fixedPage().resources['Sorry'], message);
+
+                            if (siteCorrector) {
+                                ko.applyBindings(window.siteCorrectorModel, siteCorrector)
+                            }
+                            break;
+                        default:
+                            window.showError();
+                            break;
+                    }
+                    document.querySelectorAll('.proceed-btn').forEach(pb => {
+                        pb.removeAttribute('disabled');
+                        pb.classList.remove('disabled');
+                    });
+
+                    clm.busy(false);
+
+                    if (clm.hasOwnProperty('activeApplePaySession')) {
+                        clm.activeApplePaySession.abort();
+                    }
+
+                } else {
+                    if (checkoutType != 5) {
+                        window.location.href = data.redirect;
+                    } else {
+                        // Apple Pay remains on the Welcome screen
+                        document.body.dispatchEvent(new Event('appleGo'));
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                window.pageModel.fixedPage().checkoutLoginModel.busy(false);
+                document.querySelectorAll('.proceed-btn').forEach(pb => {
+                    pb.removeAttribute('disabled');
+                    pb.classList.remove('disabled');
+                });
+                console.log('dg-proceedToCheckout: ' + textStatus);
+                window.showError();
+            }
+        });
+    }
+
+    function displayPaymentAddressError() {
+
+        var message = '@Html.Raw(HtmlHelperExtra.Resource("PaypalInvalidAddress", l, c, d).ToString())';
+
+        var countries = getValidCountries();
+        var countryStr = '';
+
+        $.each(countries, function (i, country) {
+            if (countries.length > 1 && i == countries.length - 1)
+                countryStr += ' & '
+            else if (i > 0) {
+                countryStr += ', '
+            }
+            countryStr += country;
+        });
+
+        var error = message.replace('{Countries}', countryStr);
+
+        $('#address-failure-text').html(error);
+        $('#address-failure-modal').modal('show');
+    }
+
+    function getValidCountries() {
+        return @Html.Raw(Json.Encode(Model.CheckoutCountries));
+    }
+</script>

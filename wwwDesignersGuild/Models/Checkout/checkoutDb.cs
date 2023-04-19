@@ -16,8 +16,6 @@ namespace wwwDesignersGuild.Models.Checkout
 {
     public class checkoutDb : ICheckout
     {
-
-
         #region Get Delivery Options
 
 
@@ -53,6 +51,7 @@ namespace wwwDesignersGuild.Models.Checkout
 
         #endregion
 
+
         #region Get Checkout Types
 
         public async Task<Boolean> checkoutTypeIsSet(Int64 checkoutId)
@@ -68,17 +67,21 @@ namespace wwwDesignersGuild.Models.Checkout
             return objDbCheckout.checkoutTypeIsSet(checkoutId);
         }
 
-        public async Task<List<checkoutType>> GetCheckoutTypes(short countryId, byte languageId, DateTime date, bool mobile)
+        public async Task<CheckoutTypeResponse> GetCheckoutTypes(short countryId, byte languageId, DateTime date, bool mobile, long visitorId, int? memberId, int? tradeAccountId)
         {
-            List<checkoutType> checkoutTypes = await Task.FromResult<List<checkoutType>>(getCheckoutTypesAsync(countryId, languageId, date, mobile));
-            return checkoutTypes;
+            var result = await Task.FromResult<CheckoutTypeResponse>(getCheckoutTypesAsync(countryId, languageId, date, mobile, visitorId, memberId, tradeAccountId));
+            return result;
         }
 
-        private List<checkoutType> getCheckoutTypesAsync(short countryId, byte languageId, DateTime date, bool mobile)
+        private CheckoutTypeResponse getCheckoutTypesAsync(short countryId, byte languageId, DateTime date, bool mobile, long visitorId, int? memberId, int? tradeAccountId)
         {
             var dataContext = new databaseDataContext();
-            IMultipleResults results = dataContext.CheckoutType_Select(countryId, languageId, date, mobile);
-            return results.GetResult<checkoutType>().ToList<checkoutType>();
+            IMultipleResults results = dataContext.CheckoutType_Select(countryId, languageId, date, mobile, visitorId, memberId, tradeAccountId);
+            return new CheckoutTypeResponse()
+            {
+                CheckoutTypes = results.GetResult<CheckoutType>().ToList(),
+                CheckoutTypeNotice = results.GetResult<CheckoutTypeNotice>().Single()
+            };
         }
 
         public async Task<dgCheckoutType> GetCheckoutType(Int64 checkoutId)
@@ -111,6 +114,7 @@ namespace wwwDesignersGuild.Models.Checkout
 
         #endregion
 
+
         #region Get Merchant Details
 
         public async Task<MerchantInfoSelectResult> getMerchantDetails(Int64 checkoutId)
@@ -136,6 +140,7 @@ namespace wwwDesignersGuild.Models.Checkout
         }
         #endregion        
 
+
         #region Save Checkout Type
         public async Task<Boolean> checkoutSaveType(Int64 checkoutId, DateTime date, dgCheckoutType type, int memberId, string email, int? siteMemberId, string loginStatus, int? tradeAccountId)
         {
@@ -151,20 +156,41 @@ namespace wwwDesignersGuild.Models.Checkout
         }
         #endregion
 
-        #region Save Checkout Delivery Address
-        
 
-        public async Task<Boolean> checkoutAddressSave(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddress, bool isClickCollect)
+        #region Get Checkout Address
+
+
+        public async Task<checkoutDeliveryAddress> checkoutAddressSelect(long checkoutId, byte languageId)
         {
-            Boolean deliveryOptions = await Task.FromResult<Boolean>(checkoutAddressSaveAsync(checkoutId, checkoutAddresses, UPSAPMemberAddressId, upsIDAddress, isClickCollect));
+            var address = await Task.FromResult(checkoutAddressSelectAsync(checkoutId, languageId));
+            return address;
+        }
+
+
+        private checkoutDeliveryAddress checkoutAddressSelectAsync(long checkoutId, byte languageId)
+        {
+            var objDbCheckout = new Database.checkoutDb();
+            return objDbCheckout.SelectDeliveryAddress(checkoutId, languageId);
+        }
+
+
+        #endregion
+
+
+        #region Save Checkout Delivery Address
+
+
+        public async Task<Boolean> checkoutAddressSave(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddress, bool isClickCollect, bool resetDeliveryOptions = true)
+        {
+            Boolean deliveryOptions = await Task.FromResult<Boolean>(checkoutAddressSaveAsync(checkoutId, checkoutAddresses, UPSAPMemberAddressId, upsIDAddress, isClickCollect, resetDeliveryOptions));
             return deliveryOptions;
         }
 
 
-        private Boolean checkoutAddressSaveAsync(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddress, bool isClickCollect)
+        private Boolean checkoutAddressSaveAsync(Int64 checkoutId, List<passCheckoutSaveAddressData> checkoutAddresses, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> upsIDAddress, bool isClickCollect, bool resetDeliveryOptions)
         {
             var objDbCheckout = new Database.checkoutDb();
-            return objDbCheckout.saveCheckoutAddress(checkoutId, checkoutAddresses, UPSAPMemberAddressId, upsIDAddress, isClickCollect);
+            return objDbCheckout.saveCheckoutAddress(checkoutId, checkoutAddresses, UPSAPMemberAddressId, upsIDAddress, isClickCollect, resetDeliveryOptions);
         }
 
 

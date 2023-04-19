@@ -797,6 +797,7 @@
     <Content Include="Content\images\checkout\amazon-pay.webp" />
     <Content Include="Content\images\checkout\american_express.png" />
     <Content Include="Content\images\checkout\american_express.webp" />
+    <Content Include="Content\images\checkout\apple-pay.svg" />
     <Content Include="Content\images\checkout\click-collect.png" />
     <Content Include="Content\images\checkout\click-collect.webp" />
     <Content Include="Content\images\checkout\cvvdemo-amex.png" />
@@ -2771,6 +2772,7 @@
     <Content Include="js\src\models\article-page\article-page.js" />
     <Content Include="js\src\models\basket-page\basket-item.js" />
     <Content Include="js\src\models\basket-page\basket-page.js" />
+    <Content Include="js\src\models\checkout\checkout-apple.js" />
     <Content Include="js\src\models\checkout\checkout-login.js" />
     <Content Include="js\src\models\checkout\checkout-single-page.js" />
     <Content Include="js\src\models\collection\collection-page.js" />

@@ -29,7 +29,8 @@ namespace wwwDesignersGuild.ViewModels
 
         public decimal SubTotal { get; set; }
 
-        public List<checkoutType> CheckoutTypes { get; set; }
+        public List<CheckoutType> CheckoutTypes { get; set; }
+        public CheckoutTypeNotice CheckoutTypeNotice { get; set; }
         public string BraintreeClientKey { get; set; }
         public string BraintreeEnvironment { get; set; }
         public string Currency { get; set; }
@@ -155,7 +156,10 @@ namespace wwwDesignersGuild.ViewModels
                 BaseViewModel.CountryID,
                 BaseViewModel.LanguageID,
                 BaseViewModel.Date,
-                dgFramework.IsMobileDevice());
+                dgFramework.IsMobileDevice(),
+                BaseViewModel.Visitor.visitorDbId,
+                BaseViewModel.Visitor.memberId,
+                BaseViewModel.Visitor.memberTradeAccountID);
 
             var merchantDetailsTask = objCheckout.getMerchantDetails(CheckoutID);
 
@@ -167,7 +171,11 @@ namespace wwwDesignersGuild.ViewModels
 
             var availableCountries = await availableCountriesTask;
 
-            CheckoutTypes = await checkoutTypesTask;
+            var checkoutTypeResponse = await checkoutTypesTask;
+
+            CheckoutTypes = checkoutTypeResponse.CheckoutTypes.ToList();
+            
+            CheckoutTypeNotice = checkoutTypeResponse.CheckoutTypeNotice;
 
             CheckoutCountries = availableCountries.countries.Select(c => c.Name).ToList();
 

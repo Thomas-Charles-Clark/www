@@ -20,6 +20,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using System.Dynamic;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.Models.Checkout;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -184,6 +185,19 @@ namespace wwwDesignersGuild.Models.Helper
         logBraintreeBuyNowClick = 136,
         logBraintreeBuyClientSideStep = 138,
         logValidationError = 139,
+        logAppleBegin = 170,
+        logAppleOnValidateMerchant = 171,
+        logAppleOnValidateMerchantError = 172,
+        logAppleOnValidateMerchantSuccess = 173,
+        logAppleOnShippingContactSelected = 174,
+        logAppleCompleteShippingContactSelection = 175,
+        logAppleOnShippingMethodSelected = 176,
+        logAppleCompleteShippingMethodSelection = 177,
+        logAppleOnPaymentAuthorized = 178,
+        logApplePaymentTokenizationError = 179,
+        logApplePaymentTokenizationSuccess = 180,
+        logAppleCompletePayment = 181,
+        logAppleOnCancel = 182,
         logSessionTimeout = 254,
         logCheckoutExit = 255
     }
@@ -500,6 +514,17 @@ namespace wwwDesignersGuild.Models.Helper
         Amazon = 3,
         Paypal = 4,
         Apple = 5
+    }
+
+    public class CheckoutTypeResponse 
+    { 
+        public IEnumerable<CheckoutType> CheckoutTypes { get; set; }
+        public CheckoutTypeNotice CheckoutTypeNotice { get; set; }
+    }
+
+    public class CheckoutTypeNotice
+    {
+        public string AlertMessage { get; set; }
     }
 
     //mucho appreciado: https://stackoverflow.com/questions/27764692/validating-recaptcha-2-no-captcha-recaptcha-in-asp-nets-server-side#answer-27767239
@@ -1946,7 +1971,7 @@ namespace wwwDesignersGuild.Models.Helper
             // Check in cache before performing request to 51 degrees
             string cloudflareDeviceTypeHeader = (HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ??
                                                 HttpContext.Current.Request.Headers["CF-Device-Type"] ?? 
-                                                "desktop")?.ToLowerInvariant();
+                                                "mobile")?.ToLowerInvariant();
 
 
             MobileDetectionDefinition mobileDetectionResult = objMobileDetectionCache.Get(cloudflareDeviceTypeHeader);

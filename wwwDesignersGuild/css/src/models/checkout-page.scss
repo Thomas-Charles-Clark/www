@@ -460,7 +460,18 @@ body {
     }
 }
 
+#totals-wrapper {
+    display: none;
+}
+
 #despatch-items-wrapper {
+    position: relative;
+
+    .page-blocker {
+        /* Necessary here because Apple Pay brings this forward to CheckoutLogin, which doesn't use a #checkout-wrapper div */
+        position: absolute;
+    }
+
     > div:not(.modal) {
         min-height: 250px;
         position: relative;
@@ -958,10 +969,12 @@ ul.address-autocomplete {
 
     .modal-body {
         min-height: 240px;
+        position: relative;
     }
 
     .page-blocker {
         opacity: 1.0;
+        position: absolute;
     }
 
     .page-blocker.success {

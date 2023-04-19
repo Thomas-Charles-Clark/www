@@ -280,25 +280,16 @@
             }
         </div>
     </form>
-    @if (Model.checkoutType != dgCheckoutType.Apple)
-    {
-        <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
-            @if (Model.checkoutType == dgCheckoutType.Trade)
-            {
-                @HtmlHelperExtra.Resource("CheckoutTradeSubmitOrder", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
-            }
-            else
-            {
-                @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
-            }
-        </a>
-    }
-    else
-    {
-        <div id="apple-pay-button-wrapper">
-            <apple-pay-button buttonstyle="black" type="buy" locale="@(Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" data-bind="click: complete"></apple-pay-button>
-        </div>
-    }
+    <a id="buy-now" class="btn btn-secondary" data-bind="click: complete">
+        @if (Model.checkoutType == dgCheckoutType.Trade)
+        {
+            @HtmlHelperExtra.Resource("CheckoutTradeSubmitOrder", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+        }
+        else
+        {
+            @HtmlHelperExtra.Resource("CheckoutBraintreePayButtonText", objMaster.UrlBreakdown.countryDetails.LanguageID, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.ContentDate)
+        }
+    </a>
     @if (Model.checkoutType != dgCheckoutType.Trade)
     {
         <div id="checkout-marketing-permissions" style="display: none;" data-bind="visible: marketingPermissions().length > 0">
@@ -333,19 +324,19 @@
 <div id="order-review-phase" style="display: none;"></div>
 
 <script type="text/javascript">
-    if (typeof viewModel != 'undefined') {
+    if (typeof viewModel != 'undefined' && viewModel.hasOwnProperty('balanceNumber')) {
         viewModel.balanceNumber(@(toPay.ToString("F", nfi)));
     }
     function getShippingNumber() {
-        return Number('@(objSummary.checkoutTotals[0].TotalPandP?.ToString(nfi) ?? "0")')
+        return Number('@(objSummary.checkoutTotals[0].TotalPandP?.ToString("N2", nfi) ?? "0")')
     }
     function getTaxNumber() {
-        return Number('@(objSummary.checkoutTotals[0].TotalTax?.ToString(nfi) ?? "0")')
+        return Number('@(objSummary.checkoutTotals[0].TotalTax?.ToString("N2", nfi) ?? "0")')
     }
     function getItemSubTotalNumber() {
-        return Number('@(objSummary.checkoutTotals[0].TotalItems?.ToString(nfi) ?? "0")')
+        return Number('@(objSummary.checkoutTotals[0].TotalItems?.ToString("N2", nfi) ?? "0")')
     }
     function getBalanceNumber() {
-        return Number('@objSummary.checkoutTotals[0].TotalBalance.ToString(nfi)')
+        return Number('@objSummary.checkoutTotals[0].TotalBalance.ToString("N2", nfi)')
     }
 </script>
