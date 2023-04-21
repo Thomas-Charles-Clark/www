@@ -356,6 +356,9 @@
         postable: true
     });
 
+    self.defaultErrorGroup = new ko.validation.group([
+    ]);
+
     self.appointmentErrorGroup = new ko.validation.group([
         self.appointmentAgendaId,
         self.appointmentTypeId,
@@ -420,7 +423,9 @@
             case 72: // Store Event Form
                 return self.storeEventErrors;
                 break;
-
+            default:
+                return self.defaultErrorGroup;
+                break;
         }
         if (self.sourceGroupId() == 6) {
             return self.brochureErrorGroup;
@@ -455,25 +460,25 @@
         ? self.storeEvent().StoreEventLocationID
         : undefined,
         self)
-    .extend({
-        postable: true
-    });
+        .extend({
+            postable: true
+        });
 
     self.storeEventDateId = ko.pureComputed(() => self.storeEvent()
         ? self.storeEvent().StoreEvent_DateID
         : undefined,
         self)
-    .extend({
-        postable: true
-    });
+        .extend({
+            postable: true
+        });
 
     self.storeEventTimeSlot = ko.pureComputed(() => self.storeEvent()
         ? self.storeEvent().StoreEvent_Date_TimeSlotID
         : undefined,
         self)
-    .extend({
-        postable: true
-    });
+        .extend({
+            postable: true
+        });
 
     //#endregion
 
@@ -545,7 +550,7 @@
     //#region General Methods
 
     self.init = () => {
-        
+
     }
 
     self.toJS = () => {
@@ -637,97 +642,97 @@
                 credentials: 'same-origin',
                 body: self.toJSON()
             })
-            .then(window.handleFetchResponse)
+                .then(window.handleFetchResponse)
                 .then(data => {
 
-                try {
-                    grecaptcha.reset();
-                }
-                catch (e) {
+                    try {
+                        grecaptcha.reset();
+                    }
+                    catch (e) {
 
-                }
-                if (data === true) {
-                    
-                    let emailOptIn = self.marketingPermissions().filter(mp => mp.MarketingPermissionID == 1);
-                    let emailOptOut = self.marketingPermissions().filter(mp => mp.MarketingPermissionID == 2);
+                    }
+                    if (data === true) {
 
-                    if (emailOptIn.length) {
-                        if (emailOptIn[0].Checked()) {
-                            // User has opted in to email marketing. If they were previously unsubscribed, we must resubscribe them.
-                            if (self.userUnsubscribedFromEmailMarketing())
+                        let emailOptIn = self.marketingPermissions().filter(mp => mp.MarketingPermissionID == 1);
+                        let emailOptOut = self.marketingPermissions().filter(mp => mp.MarketingPermissionID == 2);
+
+                        if (emailOptIn.length) {
+                            if (emailOptIn[0].Checked()) {
+                                // User has opted in to email marketing. If they were previously unsubscribed, we must resubscribe them.
+                                if (self.userUnsubscribedFromEmailMarketing())
+                                    self.mustResubscribe(true);
+                            } else {
+                                // User has not opted in to email marketing. No action (user should already not be subscribed).
+                            }
+                        } else if (emailOptOut.length) {
+                            if (emailOptOut[0].Checked()) {
+                                // User has opted out of email marketing. No action (user should not already be opted in to email marketing).
+                            } else {
+                                // User has opted in to email marketing. If they were previously unsubscribed, we must resubscribe them.
+                                if (self.userUnsubscribedFromEmailMarketing())
+                                    self.mustResubscribe(true);
+                            }
+                        }
+
+                        if (emailOptIn.length == 0 &&
+                            emailOptOut.length == 0) {
+                            if (self.userEmailMarketingPermitted() &&
+                                self.userUnsubscribedFromEmailMarketing()) {
+                                // We have not presented any email marketing permission options to the user, because they have already granted permission.
+                                // However, for whatever reason the user is also unsubscribed from email marketing. Consider a silent resubscribe?
                                 self.mustResubscribe(true);
-                        } else {
-                            // User has not opted in to email marketing. No action (user should already not be subscribed).
+                            }
                         }
-                    } else if (emailOptOut.length) {
-                        if (emailOptOut[0].Checked()) {
-                            // User has opted out of email marketing. No action (user should not already be opted in to email marketing).
-                        } else {
-                            // User has opted in to email marketing. If they were previously unsubscribed, we must resubscribe them.
-                            if (self.userUnsubscribedFromEmailMarketing())
-                                self.mustResubscribe(true);
+
+                        if (self.mustResubscribe()) {
+                            switch (self.sourceId()) {
+                                case 0:
+                                    fetchResources([
+                                        'ResubscribeNotice',
+                                        'ResubscribeFooter'])
+                                        .then(window.handleResourcesArray)
+                                        .then(resources => {
+                                            document.querySelector('#form-wrapper > .alert.alert-success').innerHTML
+                                                = `<i class="material-icons text-success">error</i><div>${resources.ResubscribeNotice}<br/><br/>${resources.ResubscribeFooter}</div>`
+                                        });
+                                    break;
+                                case 10:
+                                    fetchResources([
+                                        'ResubscribeNotice',
+                                        'ResubscribeFooter'])
+                                        .then(window.handleResourcesArray)
+                                        .then(resources => {
+                                            window.showInfo(resources.ResubscribeNotice, resources.ResubscribeFooter);
+                                        });
+                                    break;
+                            }
+                            self.beginResubscribe();
                         }
+
+                        self.success(data);
+
+                        window.scrollTo(0, document.querySelector('#form-wrapper').offsetTop);
+
+                        self.mustResubscribe(false);
                     }
-
-                    if (emailOptIn.length == 0 &&
-                        emailOptOut.length == 0) {
-                        if (self.userEmailMarketingPermitted() &&
-                            self.userUnsubscribedFromEmailMarketing()) {
-                            // We have not presented any email marketing permission options to the user, because they have already granted permission.
-                            // However, for whatever reason the user is also unsubscribed from email marketing. Consider a silent resubscribe?
-                            self.mustResubscribe(true);
-                        }
+                    else
+                        showError();
+                    self.busy(false);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    try {
+                        grecaptcha.reset();
                     }
+                    catch (e) {
 
-                    if (self.mustResubscribe()) {
-                        switch (self.sourceId()) {
-                            case 0:
-                                fetchResources([
-                                    'ResubscribeNotice',
-                                    'ResubscribeFooter'])
-                                    .then(window.handleResourcesArray)
-                                    .then(resources => {
-                                        document.querySelector('#form-wrapper > .alert.alert-success').innerHTML
-                                            = `<i class="material-icons text-success">error</i><div>${resources.ResubscribeNotice}<br/><br/>${resources.ResubscribeFooter}</div>`
-                                    });
-                                break;
-                            case 10:
-                                fetchResources([
-                                    'ResubscribeNotice',
-                                    'ResubscribeFooter'])
-                                    .then(window.handleResourcesArray)
-                                    .then(resources => {
-                                        window.showInfo(resources.ResubscribeNotice, resources.ResubscribeFooter);
-                                    });
-                                break;
-                        }
-                        self.beginResubscribe();
                     }
-
-                    self.success(data);
-
-                    window.scrollTo(0, document.querySelector('#form-wrapper').offsetTop);
-
-                    self.mustResubscribe(false);
-                }
-                else
+                    if (error instanceof TypeError)
+                        error = { message: error.message };
+                    window.logClientSideError(JSON.stringify(error));
+                    self.busy(false);
                     showError();
-                self.busy(false);
-            })
-            .catch((error) => {
-                console.error(error);
-                try {
-                    grecaptcha.reset();
-                }
-                catch (e) {
-
-                }
-                if (error instanceof TypeError)
-                    error = { message: error.message };
-                window.logClientSideError(JSON.stringify(error));
-                self.busy(false);
-                showError();
-            });
+                });
         }
     }
 
