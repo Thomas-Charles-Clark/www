@@ -32,15 +32,15 @@
 @if (HtmlHelperExtra.Debug)
 {
     <script>
-        //if (!window.ApplePaySession) {
-        //    window.ApplePaySession = {
-        //        canMakePayments: () => true
-        //    }
-        //} else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
-        //    window.ApplePaySession = {
-        //        canMakePayments: () => true
-        //    }
-        //}
+        if (!window.ApplePaySession) {
+            window.ApplePaySession = {
+                canMakePayments: () => true
+            }
+        } else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
+            window.ApplePaySession = {
+                canMakePayments: () => true
+            }
+        }
     </script>
 }
 
@@ -384,11 +384,11 @@
                     }, function (applePayErr, applePayInstance) {
                         if (applePayErr) {
                             console.error('applePay error', applePayErr);
-                            notifyApplePayError(applePayErr);
+                            window.showInfo('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Sorry", l, c, d))', error);
                             return;
                         }
 
-                        clm.applePay = applePayViewModel(applePayInstance, clm);
+                        clm.applePay = new ApplePayViewModel(applePayInstance, clm);
                     });
                 </text>
                 }
@@ -495,25 +495,6 @@
             </div>
         </div>
     </div>
-    <div id="zip-modal" class="modal">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        @HtmlHelperExtra.Resource("orderHistoryReceiptUSSaleTax", l, c, d)
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0" id="sales-tax-message">
-
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
     <div id="despatch-items-wrapper" class="d-none"></div>
     <div id="totals-wrapper" class="d-none"></div>
     <script>
@@ -606,7 +587,7 @@
         });
 
         if (checkoutType == 5) {
-            clm.applePay.begin();
+            clm.applePay.init();
         }
 
         $.ajax({
