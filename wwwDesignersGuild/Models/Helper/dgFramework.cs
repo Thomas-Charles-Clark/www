@@ -1972,7 +1972,7 @@ namespace wwwDesignersGuild.Models.Helper
             // Check in cache before performing request to 51 degrees
             string cloudflareDeviceTypeHeader = (HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ??
                                                 HttpContext.Current.Request.Headers["CF-Device-Type"] ?? 
-                                                "desktop")?.ToLowerInvariant();
+                                                "mobile")?.ToLowerInvariant();
 
 
             MobileDetectionDefinition mobileDetectionResult = objMobileDetectionCache.Get(cloudflareDeviceTypeHeader);

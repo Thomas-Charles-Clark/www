@@ -46,8 +46,7 @@
 
 @Render.Script("~/bundles/js/checkout-login-page")
 
-<div id="ko-wrapper"
-     class="container my-4">
+<div class="container my-4">
     <div id="first-blocker"
          class="page-blocker"
          data-bind="
@@ -86,7 +85,7 @@
             if (Model.PermitApple)
             {
                 <div id="checkout-option-apple" class="checkout-option" style="display: none;" data-bind="visible: (window.ApplePaySession)">
-                    <img class="apple-pay-mark" src="~/Content/images/checkout/apple-pay.svg" alt="@HtmlHelperExtra.Resource("PayWithApple", l, c, d)" />
+                    <img width="84" height="54" class="apple-pay-mark" src="~/Content/images/checkout/apple-pay.svg" alt="@HtmlHelperExtra.Resource("PayWithApple", l, c, d)" />
                     <apple-pay-button class="proceed-btn" buttonstyle="black" type="buy" locale="@(Model.MasterDefinition.UrlBreakdown.countryDetails.DotNetCulture)" onclick="window.proceedToCheckout(@Html.Raw(Convert.ToInt32(dgCheckoutType.Apple)), null)"></apple-pay-button>
                 </div>
             }

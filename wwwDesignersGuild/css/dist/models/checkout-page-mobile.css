@@ -104,6 +104,7 @@
 #checkout-option-wrapper #checkout-option-apple img {
   width: 84px;
   height: 54px;
+  max-width: 84px;
 }
 #checkout-option-wrapper #checkout-option-apple apple-pay-button {
   --apple-pay-button-width: 100%;
