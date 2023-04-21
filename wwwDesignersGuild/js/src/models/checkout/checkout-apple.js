@@ -65,6 +65,7 @@ class ApplePayViewModel {
         this.onValidateMerchant = this.onValidateMerchant.bind(this);
         this.onValidateMerchantResponse = this.onValidateMerchantResponse.bind(this);
         this.onPaymentAuthorized = this.onPaymentAuthorized.bind(this);
+        this.onPaymentTokenized = this.onPaymentTokenized.bind(this);
         this.onCancel = this.onCancel.bind(this);
 
         let paymentRequestParams = {
@@ -349,13 +350,44 @@ class ApplePayViewModel {
         }
 
         this.saveDispatch(e, () => {
+            console.log('applePayViewModel saveDispatch onComplete called');
+
             this.fetchTotals(() => {
+                console.log('applePayViewModel fetchTotals onComplete called');
 
                 let completionModel = this.completeShippingContactModel;
+
+                delete completionModel.newShippingMethods;
+
+                completionModel.newTotal = {
+                    'type': 'final',
+                    'label': 'Designers Guild',
+                    'amount': `${this.total().toFixed(2)}`
+                }
+
+                completionModel.newLineItems = [{
+                    'label': 'Sub Total',
+                    'type': 'final',
+                    'amount': `${this.subTotal().toFixed(2)}`
+                }, {
+                    'label': 'Delivery',
+                    'type': 'final',
+                    'amount': `${this.shipping().toFixed(2)}`
+                }];
+
+                if (this.tax()) {
+                    completeShippingContactModel.newLineItems.push({
+                        'label': 'Tax',
+                        'type': 'final',
+                        'amount': `${this.tax().toFixed(2)}`
+                    });
+                }
 
                 completionModel.status = ApplePaySession.STATUS_SUCCESS;
 
                 this.checkoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGMETHODSELECTION, JSON.stringify(completionModel));
+
+                console.log('applePayViewModel completeShippingMethodSelection calling with', completionModel);
 
                 this.activeApplePaySession.completeShippingMethodSelection(completionModel);
             });
@@ -401,60 +433,65 @@ class ApplePayViewModel {
 
         this.checkoutLog(LOG_ACTION_APPLE_ONPAYMENTAUTHORIZED, JSON.stringify(e));
 
+        this.paymentAuthorization = e.payment;
+
         this.applePayInstance.tokenize({
-            token: e.payment.token
-        }, function (tokenizeErr, payload) {
-            if (tokenizeErr) {
-                this.hideCompletingMessage();
-                console.error('applePayViewModel Error tokenizing:', tokenizeErr);
+                token: e.payment.token
+            },
+            this.onPaymentTokenized);
+    }
 
-                this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_ERROR, JSON.stringify(tokenizeErr));
+    onPaymentTokenized(tokenizeErr, payload) {
+        if (tokenizeErr) {
+            this.hideCompletingMessage();
+            console.error('applePayViewModel Error tokenizing:', tokenizeErr);
 
-                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
+            this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_ERROR, JSON.stringify(tokenizeErr));
 
-                this.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
+            window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
 
-                return;
-            }
+            this.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
 
-            console.trace(payload);
+            return;
+        }
 
-            this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_SUCCESS, JSON.stringify(payload));
+        console.log(payload);
 
-            let fullName = `${e.payment.shippingContact.givenName} ${e.payment.shippingContact.familyName}`.trim();
-            let addressLine1 = null;
-            let addressLine2 = null;
+        this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_SUCCESS, JSON.stringify(payload));
 
-            if (e.payment.shippingContact.addressLines.length >= 1) {
-                addressLine1 = e.payment.shippingContact.addressLines[0];
-            }
+        let fullName = `${this.paymentAuthorization.shippingContact.givenName} ${this.paymentAuthorization.shippingContact.familyName}`.trim();
+        let addressLine1 = null;
+        let addressLine2 = null;
 
-            if (e.payment.shippingContact.addressLines.length >= 2) {
-                addressLine2 = e.payment.shippingContact.addressLines[1];
-            }
+        if (this.paymentAuthorization.shippingContact.addressLines.length >= 1) {
+            addressLine1 = this.paymentAuthorization.shippingContact.addressLines[0];
+        }
 
-            this.saveDeliveryAddress({
-                DeliveryOptionID: 1,
-                MemberAddressID: null,
-                FullName: fullName,
-                CompanyName: null,
-                AddressLine1: addressLine1,
-                AddressLine2: addressLine2,
-                Town: e.payment.shippingContact.locality,
-                County: e.payment.shippingContact.administrativeArea,
-                Postcode: e.payment.shippingContact.postalCode,
-                CountryCode: e.payment.shippingContact.countryCode,
-                BasketCountry: getSiteCountry(),
-                PhoneNumber: null,
-                UPSAPID: null,
-                UPSAPMemberAddressId: null,
-                IsTradeAddress: false,
-                IsClickCollect: false,
-                masterDefinition: getMasterDefinition(),
-                secondSave: true
-            }, (result) => {
-                this.submit(payload.nonce, e.payment.shippingContact.emailAddress);
-            });
+        if (this.paymentAuthorization.shippingContact.addressLines.length >= 2) {
+            addressLine2 = this.paymentAuthorization.shippingContact.addressLines[1];
+        }
+
+        this.saveDeliveryAddress({
+            DeliveryOptionID: 1,
+            MemberAddressID: null,
+            FullName: fullName,
+            CompanyName: null,
+            AddressLine1: addressLine1,
+            AddressLine2: addressLine2,
+            Town: this.paymentAuthorization.shippingContact.locality,
+            County: this.paymentAuthorization.shippingContact.administrativeArea,
+            Postcode: this.paymentAuthorization.shippingContact.postalCode,
+            CountryCode: this.paymentAuthorization.shippingContact.countryCode,
+            BasketCountry: getSiteCountry(),
+            PhoneNumber: null,
+            UPSAPID: null,
+            UPSAPMemberAddressId: null,
+            IsTradeAddress: false,
+            IsClickCollect: false,
+            masterDefinition: getMasterDefinition(),
+            secondSave: true
+        }, (result) => {
+            this.submit(payload.nonce, this.paymentAuthorization.shippingContact.emailAddress);
         });
     }
 
@@ -729,16 +766,20 @@ class ApplePayViewModel {
             0
         ));
 
-        let deliveryBandId = this.dispatchOptionsFromServer().find(x => x.SortOrder == e.shippingMethod.identifier).DeliveryBandID;
-
-        let data = [{
-            dispatchId: 1,
-            deliveryBandId: deliveryBandId,
-            shouldPartShip: false,
-            minDeliveryDate: minDate.toISOString(),
-            maxDeliveryDate: maxDate.toISOString(),
-            customerRequestsFullDespatch: false
-        }];
+        let data = this.dispatchOptionsFromServer().flatMap((x, i) => {
+            if (x.SortOrder == e.shippingMethod.identifier) {
+                return [{
+                    dispatchId: x.DispatchID,
+                    deliveryBandId: x.DeliveryBandID,
+                    shouldPartShip: false,
+                    minDeliveryDate: minDate.toISOString(),
+                    maxDeliveryDate: maxDate.toISOString(),
+                    customerRequestsFullDespatch: false
+                }]
+            } else {
+                return []
+            }
+        });
 
         console.log('applePayViewModel saveDispatch calling with', data);
 

@@ -154,7 +154,7 @@ namespace wwwDesignersGuild.ViewModels
                 });
             }
 
-            PrefetchedResources = resourcesResult;
+            PrefetchedResources.AddRange(resourcesResult);
         }
 
         public override string ToString()

@@ -118,6 +118,18 @@ body {
     .checkout-option + .checkout-option {
         margin-top: $xl-gutter;
     }
+
+    #checkout-option-alert-message {
+        padding: 0;
+
+        .alert {
+            margin: 0;
+            border: 0;
+            padding: $mxl-gutter $xl-gutter;
+            display: block;
+            flex: 1;
+        }
+    }
 }
 
 #apple-pay-button-wrapper {

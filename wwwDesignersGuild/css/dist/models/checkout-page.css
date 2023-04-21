@@ -111,6 +111,16 @@ body {
 #checkout-option-wrapper .checkout-option + .checkout-option {
   margin-top: 2rem;
 }
+#checkout-option-wrapper #checkout-option-alert-message {
+  padding: 0;
+}
+#checkout-option-wrapper #checkout-option-alert-message .alert {
+  margin: 0;
+  border: 0;
+  padding: 1.5rem 2rem;
+  display: block;
+  flex: 1;
+}
 
 #apple-pay-button-wrapper {
   padding: 0 1rem;
