@@ -121,6 +121,8 @@ class ApplePayViewModel {
     // this is necessary because you have to create an ApplePaySession from a user guesture handler,
     // see _Login.cshtml proceedToCheckout
     init() {
+        console.log('applePayViewModel init called');
+
         this.activeApplePaySession = new ApplePaySession(3, this.applePaymentRequest);
 
         this.activeApplePaySession.onvalidatemerchant = this.onValidateMerchant;
@@ -136,7 +138,7 @@ class ApplePayViewModel {
 
     // to log things with
     checkoutLog(type, detail) {
-        console.log('applePayViewModel checkoutLog', type, detail);
+        console.log('applePayViewModel checkoutLog calling with', type, detail);
 
         $.ajax({
             url: '/api/checkout/asyncSaveCheckoutLog',
@@ -158,7 +160,7 @@ class ApplePayViewModel {
 
     // callback handler for the onshippingcontactselected apple event
     onShippingContactSelected(e) {
-        console.log('applePayViewModel onShippingContactSelected', e);
+        console.log('applePayViewModel onShippingContactSelected called', e);
 
         this.checkoutLog(LOG_ACTION_APPLE_ONSHIPPINGCONTACTSELECTED, JSON.stringify(e));
 
@@ -182,12 +184,16 @@ class ApplePayViewModel {
             IsClickCollect: false,
             masterDefinition: getMasterDefinition()
         }, (result) => {
+            console.log('applePayViewModel saveDeliveryAddress onComplete called with', result);
 
             if (result.state === 'OK') {
 
                 this.refreshDeliveryAndTotals(() => {
+                    console.log('applePayViewModel refreshDeliveryAndTotals onComplete called');
 
                     if (this.availableShippingMethods.length == 1) {
+
+                        console.log('applePayViewModel only one shipping method was available: it will be selected, saved, and presented to the ApplePay sheet');
 
                         this.selectedShippingMethod = this.availableShippingMethods[0];
 
@@ -203,6 +209,8 @@ class ApplePayViewModel {
                         });
 
                     } else {
+
+                        console.log('applePayViewModel multiple shipping methods are available, they will be presented to the ApplePay sheet');
 
                         this.checkoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(this.completeShippingContactModel));
 
@@ -330,7 +338,7 @@ class ApplePayViewModel {
     }
 
     onShippingMethodSelected(e) {
-        console.trace(e);
+        console.log('applePayViewModel onShippingMethodSelected called', e);
 
         this.checkoutLog(LOG_ACTION_APPLE_ONSHIPPINGMETHODSELECTED, JSON.stringify(e));
 
@@ -355,7 +363,7 @@ class ApplePayViewModel {
     }
 
     onValidateMerchant(e) {
-        console.trace(e);
+        console.log('applePayViewModel onValidateMerchant called', e);
 
         this.applePayInstance.performValidation({
                 validationURL: e.validationURL,
@@ -365,13 +373,14 @@ class ApplePayViewModel {
     };
 
     onValidateMerchantResponse(err, merchantSession) {
+        console.log('applePayViewModel onValidateMerchantResponse called', err, merchantSession);
+
         if (err) {
             this.abortApple();
             window.showInfo(this.resources.Sorry, this.resources.ApplePayFailedToLoad);
             this.checkoutLog(LOG_ACTION_APPLE_ONVALIDATEMERCHANT_ERROR, JSON.stringify(err));
             return;
         }
-        console.trace(merchantSession);
 
         this.checkoutLog(LOG_ACTION_APPLE_ONVALIDATEMERCHANT_SUCCESS, JSON.stringify(merchantSession));
 
@@ -379,6 +388,8 @@ class ApplePayViewModel {
     }
 
     onCancel(e) {
+        console.log('applePayViewModel onCancel called', e);
+
         this.hideCompletingMessage();
         this.parent.busy(false);
         this.checkoutLog(LOG_ACTION_APPLE_ONCANCEL, this.resources.ApplePayFailureNotCharged);
@@ -386,7 +397,7 @@ class ApplePayViewModel {
     }
 
     onPaymentAuthorized(e) {
-        console.trace(e);
+        console.log('applePayViewModel onPaymentAuthorized called', e);
 
         this.checkoutLog(LOG_ACTION_APPLE_ONPAYMENTAUTHORIZED, JSON.stringify(e));
 
@@ -450,10 +461,9 @@ class ApplePayViewModel {
     // This function fetches _CheckoutDespatch.cshtml from the server, renders it into a hidden element and then lifts delivery options.
     // onComplete is called as a callback if provided upon success.
     fetchDeliveryMethods(onComplete) {
-
         let data = {};
 
-        console.trace(data);
+        console.log('applePayViewModel fetchDeliveryMethods calling with', data);
 
         $.ajax({
             url: getUrlCheckoutDeliveryOptions(),
@@ -462,8 +472,6 @@ class ApplePayViewModel {
             dataType: "html",
             success: (function (data) {
 
-                console.log('ApplePayViewModel fetchDeliveryMethods returned', data);
-
                 var deliveryOptions = $('#despatch-items-wrapper');
 
                 deliveryOptions.html(data);
@@ -471,10 +479,12 @@ class ApplePayViewModel {
                 this.dispatchOptionsFromServer(getDispatchOptions().checkoutDispatchDeliveryOptions);
                 this.consolidatedDispatchOptionsFromServer(getDispatchOptions().checkoutDispatchAppleDeliveryOptions);
 
+                console.log('applePayViewModel fetchDeliveryMethods returned', this.dispatchOptionsFromServer(), this.consolidatedDispatchOptionsFromServer());
+
                 onComplete.apply(this);
             }).bind(this),
             error: (function (xhr, s, a) {
-                console.error('ApplePayViewModel fetchDeliveryMethods errored', xhr, s, a);
+                console.error('applePayViewModel fetchDeliveryMethods errored', xhr, s, a);
 
                 this.hideCompletingMessage();
                 this.hidePaymentProcessingError();
@@ -490,7 +500,7 @@ class ApplePayViewModel {
 
         let data = {};
 
-        console.trace(data);
+        console.log('applePayViewModel fetchTotals calling with', data);
 
         $.ajax({
             url: getUrlCheckoutSummary(),
@@ -498,8 +508,6 @@ class ApplePayViewModel {
             data: data,
             dataType: "html",
             success: (function (data) {
-                console.trace(data);
-
                 var totalsWrapper = $('#despatch-items-wrapper');
 
                 totalsWrapper.html(data);
@@ -508,9 +516,18 @@ class ApplePayViewModel {
                 this.subTotal(getItemSubTotalNumber());
                 this.tax(getTaxNumber());
                 this.shipping(getShippingNumber());
+
+                console.log('applePayViewModel fetchTotals returned',
+                    `total: ${this.total()}`,
+                    `subTotal: ${this.subTotal()}`,
+                    `tax: ${this.tax()}`,
+                    `shipping: ${this.shipping()}`);
+
                 onComplete.apply(this);
             }).bind(this),
             error: (function (xhr, s, a) {
+                console.error('applePayViewModel fetchTotals errored', xhr, s, a);
+
                 this.hideCompletingMessage();
                 this.hidePaymentProcessingError();
                 this.abortApple();
@@ -523,13 +540,13 @@ class ApplePayViewModel {
     // The callback to the fetchTotals call sets this.availableShippingMethods and this.completeShippingContactModel,
     // ready for handing this.completeShippingContactModel to the apple session.
     refreshDeliveryAndTotals (onComplete) {
-        console.log('applePayViewModel refreshDeliveryAndTotals');
+        console.log('applePayViewModel refreshDeliveryAndTotals called');
 
         this.fetchDeliveryMethods(() => {
-            console.log('applePayViewModel fetchDeliveryMethods onComplete');
+            console.log('applePayViewModel fetchDeliveryMethods onComplete called');
 
             this.fetchTotals(() => {
-                console.log('applePayViewModel fetchTotals onComplete');
+                console.log('applePayViewModel fetchTotals onComplete called');
 
                 let availableShippingMethods = this.consolidatedDispatchOptionsFromServer().map((d) => {
                     let minDateSplit = d.MinDeliveryDate.split(' ').map(i => Number(i));
@@ -595,7 +612,7 @@ class ApplePayViewModel {
 
     // This function saves the delivery address, then executes the onComplete callback function if provided.
     saveDeliveryAddress(data, onComplete) {
-        console.trace(data);
+        console.log('applePayViewModel saveDeliveryAddress calling with', data);
 
         this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, data);
 
@@ -606,13 +623,23 @@ class ApplePayViewModel {
             async: true,
             dataType: 'json',
             data: data,
+
             success: (function (data) {
+
                 console.log('applePayViewModel saveDeliveryAddress returned', data);
+
                 onComplete.apply(this, [data]);
+
             }).bind(this),
-            error: (function (xhr, textStatus, errorThrown) {
+
+            error: (function (xhr, s, a) {
+
+                console.error('applePayViewModel saveDeliveryAddress errored', xhr, s, a);
+
                 this.abortApple();
+
                 window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
+
             }).bind(this)
         });
     }
@@ -622,8 +649,12 @@ class ApplePayViewModel {
     // Calls hideCompletingMessage 
     // Calls session.abort wrapped in a try catch: the session might already be closed and no longer in an abortable state, which is fine.
     abortApple() {
+        console.log('applePayViewModel abortApple called');
+
         this.parent.busy(false);
+
         this.hideCompletingMessage();
+
         try {
             this.activeApplePaySession.abort();
         } catch (e) {
@@ -633,19 +664,23 @@ class ApplePayViewModel {
 
     // This is the sucessful end, should only be called from submit success branch
     endAppleSuccessfully() {
+        console.log('applePayViewModel endAppleSuccessfully called');
         this.checkoutLog(LOG_ACTION_APPLE_COMPLETEPAYMENT, 'completePayment(ApplePaySession.STATUS_SUCCESS)');
         this.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
     }
 
-    showPaymentProcessingError () {
+    showPaymentProcessingError() {
+        console.log('applePayViewModel showPaymentProcessingError called');
         bootstrap.Modal.getOrCreateInstance(document.querySelector("#payment-processing-error")).show();
     }
 
-    hidePaymentProcessingError () {
+    hidePaymentProcessingError() {
+        console.log('applePayViewModel hidePaymentProcessingError called');
         bootstrap.Modal.getOrCreateInstance(document.querySelector("#payment-processing-error")).hide();
     }
 
     showCompletingMessage() {
+        console.log('applePayViewModel showCompletingMessage called');
         // The Completing Message modal reads "Completing your order \n PLEASE DO NOT REFRESH THE PAGE"
         bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).show();
 
@@ -657,6 +692,8 @@ class ApplePayViewModel {
     }
 
     hideCompletingMessage() {
+        console.log('applePayViewModel hideCompletingMessage called');
+
         bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).hide();
 
         this.parent.busy(false);
@@ -718,7 +755,8 @@ class ApplePayViewModel {
                 console.log('applePayViewModel saveDispatch returned', data)
                 onComplete.apply(this);
             }).bind(this),
-            error: (function (xhr, textStatus, errorThrown) {
+            error: (function (xhr, s, a) {
+                console.error('applePayViewModel saveDispatch errored', xhr, s, a)
                 this.hideCompletingMessage();
                 this.hidePaymentProcessingError();
                 this.abortApple();
@@ -801,6 +839,8 @@ class ApplePayViewModel {
                 }
             }).bind(this),
             error: (function (e, s, a) {
+
+                console.error('applePayViewModel submit errored', e, s, a);
 
                 this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitApple ERRORED: ' + JSON.stringify(e));
 
