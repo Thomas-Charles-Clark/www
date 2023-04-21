@@ -25,122 +25,122 @@
 */
 class ApplePayViewModel { 
 
-    //#region properties
+    //#region Properties
 
-    // these are the despatch options delivered via _checkoutdespatch.cshtml. jquery is used to render the html onto the hidden container element, 
+    // These are the despatch options delivered via _CheckoutDespatch.cshtml. jQuery is used to render the HTML onto the hidden container element, 
     // so the script tags get processed into existence and we can call the functions therein to pull the data.
-    dispatchoptionsfromserver = ko.observablearray([]);
+    dispatchOptionsFromServer = ko.observableArray([]);
 
-    // these are necessary because apple in their wisdom don't allow merchants to require multiple delivery option selections.
-    consolidateddispatchoptionsfromserver = ko.observablearray([]);
+    // These are necessary because Apple in their wisdom don't allow merchants to require multiple delivery option selections.
+    consolidatedDispatchOptionsFromServer = ko.observableArray([]);
 
-    // this is the subtotal, lifted from getbalancenumber which first exists on _login.cshtml and is then overwritten by _checkouttotal.cshtml
-    subtotal = ko.observable(getbalancenumber());
+    // This is the subtotal, lifted from getBalanceNumber which first exists on _Login.cshtml and is then overwritten by _CheckoutTotal.cshtml
+    subTotal = ko.observable(getBalanceNumber());
 
-    // this is the shipping, rendered unto us by _checkouttotal.cshtml eventually
+    // This is the shipping, rendered unto us by _CheckoutTotal.cshtml eventually
     shipping = ko.observable(0);
 
-    // this is the shipping, rendered unto us by _checkouttotal.cshtml eventually
+    // This is the shipping, rendered unto us by _CheckoutTotal.cshtml eventually
     tax = ko.observable(0);
 
-    // this is the shipping, rendered unto us by _checkouttotal.cshtml eventually
+    // This is the shipping, rendered unto us by _CheckoutTotal.cshtml eventually
     total = ko.observable(0);
 
-    // this is the currently selected shipping method
-    selectedshippingmethod = null;
+    // This is the currently selected shipping method
+    selectedShippingMethod = null;
 
-    // this is the currently selected delivery address
-    selecteddeliveryaddress = null;
+    // This is the currently selected delivery address
+    selectedDeliveryAddress = null;
 
     //#endregion
 
-    constructor(applepayinstance, parent) 
+    constructor(applePayInstance, parent) 
     {
-        this.applepayinstance = applepayinstance;
+        this.applePayInstance = applePayInstance;
         this.parent = parent;
         this.resources = parent.resources;
 
-        this.onshippingcontactselected = this.onshippingcontactselected.bind(this);
-        this.onshippingmethodselected = this.onshippingmethodselected.bind(this);
-        this.onvalidatemerchant = this.onvalidatemerchant.bind(this);
-        this.onvalidatemerchantresponse = this.onvalidatemerchantresponse.bind(this);
-        this.onpaymentauthorized = this.onpaymentauthorized.bind(this);
-        this.oncancel = this.oncancel.bind(this);
+        this.onShippingContactSelected = this.onShippingContactSelected.bind(this);
+        this.onShippingMethodSelected = this.onShippingMethodSelected.bind(this);
+        this.onValidateMerchant = this.onValidateMerchant.bind(this);
+        this.onValidateMerchantResponse = this.onValidateMerchantResponse.bind(this);
+        this.onPaymentAuthorized = this.onPaymentAuthorized.bind(this);
+        this.onCancel = this.onCancel.bind(this);
 
-        let paymentrequestparams = {
+        let paymentRequestParams = {
             total: {
-                label: 'designers guild',
+                label: 'Designers Guild',
                 type: 'pending',
                 amount: this.total(),
-                lineitems: [{
-                    label: 'sub total',
+                lineItems: [{
+                    label: 'Sub Total',
                     type: 'pending',
-                    amount: this.subtotal()
+                    amount: this.subTotal()
                 }, {
-                    label: 'delivery',
+                    label: 'Delivery',
                     type: 'pending',
                     amount: this.shipping()
                 }]
             },
-            shippingtype: 'delivery',
-            shippingcontacteditingmode: 'enabled',
-            // we recommend collecting billing address information, at minimum
+            shippingType: 'delivery',
+            shippingContactEditingMode: 'enabled',
+            // We recommend collecting billing address information, at minimum
             // billing postal code, and passing that billing postal code with
-            // all apple pay transactions as a best practice.
-            applepayshippingtype: 'delivery',
-            requiredbillingcontactfields: ["postaladdress"],
-            requiredshippingcontactfields: [
-                "postaladdress",
+            // all Apple Pay transactions as a best practice.
+            applePayShippingType: 'delivery',
+            requiredBillingContactFields: ["postalAddress"],
+            requiredShippingContactFields: [
+                "postalAddress",
                 "email"
             ]
         }
 
         if (this.tax()) {
-            paymentrequestparams.total.lineitems.push({
-                label: 'tax',
+            paymentRequestParams.total.lineItems.push({
+                label: 'Tax',
                 type: 'pending',
                 amount: this.tax()
             });
         }
 
-        this.applepaymentrequest = this.applepayinstance.createpaymentrequest(paymentrequestparams);
+        this.applePaymentRequest = this.applePayInstance.createPaymentRequest(paymentRequestParams);
 
-        this.checkoutlog(log_action_apple_begin, json.stringify(paymentrequestparams));
+        this.checkoutLog(LOG_ACTION_APPLE_BEGIN, JSON.stringify(paymentRequestParams));
 
-        // this is necessary because i have to await setcheckouttype returning successfully
-        // before invoking the applepay sheet.
-        document.body.addeventlistener('applego', () => {
-            this.activeapplepaysession.begin();
+        // This is necessary because I have to await setCheckoutType returning successfully
+        // before invoking the ApplePay sheet.
+        document.body.addEventListener('appleGo', () => {
+            this.activeApplePaySession.begin();
         });
 
-        console.log('applepayviewmodel ctor called', this);
+        console.log('applePayViewModel ctor called', this);
     }
 
-    //#region methods
+    //#region Methods
 
-    // this is necessary because you have to create an applepaysession from a user guesture handler,
-    // see _login.cshtml proceedtocheckout
+    // this is necessary because you have to create an ApplePaySession from a user guesture handler,
+    // see _Login.cshtml proceedToCheckout
     init() {
-        this.activeapplepaysession = new applepaysession(3, this.applepaymentrequest);
+        this.activeApplePaySession = new ApplePaySession(3, this.applePaymentRequest);
 
-        this.activeapplepaysession.onvalidatemerchant = this.onvalidatemerchant;
+        this.activeApplePaySession.onvalidatemerchant = this.onValidateMerchant;
 
-        this.activeapplepaysession.onshippingcontactselected = this.onshippingcontactselected;
+        this.activeApplePaySession.onshippingcontactselected = this.onShippingContactSelected;
 
-        this.activeapplepaysession.onshippingmethodselected = this.onshippingmethodselected;
+        this.activeApplePaySession.onshippingmethodselected = this.onShippingMethodSelected;
 
-        this.activeapplepaysession.onpaymentauthorized = this.onpaymentauthorized;
+        this.activeApplePaySession.onpaymentauthorized = this.onPaymentAuthorized;
 
-        this.activeapplepaysession.oncancel = this.oncancel;
+        this.activeApplePaySession.oncancel = this.onCancel;
     }
 
     // to log things with
-    checkoutlog(type, detail) {
-        console.log('applepayviewmodel checkoutlog', type, detail);
+    checkoutLog(type, detail) {
+        console.log('applePayViewModel checkoutLog', type, detail);
 
         $.ajax({
-            url: '/api/checkout/asyncsavecheckoutlog',
-            type: 'post',
+            url: '/api/checkout/asyncSaveCheckoutLog',
+            type: 'POST',
             async: false,
             cache: false,
             data: {
@@ -157,660 +157,660 @@ class ApplePayViewModel {
     }
 
     // callback handler for the onshippingcontactselected apple event
-    onshippingcontactselected(e) {
-        console.log('applepayviewmodel onshippingcontactselected', e);
+    onShippingContactSelected(e) {
+        console.log('applePayViewModel onShippingContactSelected', e);
 
-        this.checkoutlog(log_action_apple_onshippingcontactselected, json.stringify(e));
+        this.checkoutLog(LOG_ACTION_APPLE_ONSHIPPINGCONTACTSELECTED, JSON.stringify(e));
 
-        this.savedeliveryaddress({
-            deliveryoptionid: 1,
-            memberaddressid: null,
-            fullname: 'temporary',
-            companyname: null,
-            addressline1: 'temporary',
-            addressline2: null,
+        this.saveDeliveryAddress({
+            DeliveryOptionID: 1,
+            MemberAddressID: null,
+            FullName: 'TEMPORARY',
+            CompanyName: null,
+            AddressLine1: 'TEMPORARY',
+            AddressLine2: null,
 
-            town: e.shippingcontact.locality,
-            county: e.shippingcontact.administrativearea,
-            postcode: e.shippingcontact.postalcode,
-            countrycode: e.shippingcontact.countrycode,
-            basketcountry: getsitecountry(),
-            phonenumber: null,
-            upsapid: null,
-            upsapmemberaddressid: null,
-            istradeaddress: false,
-            isclickcollect: false,
-            masterdefinition: getmasterdefinition()
+            Town: e.shippingContact.locality,
+            County: e.shippingContact.administrativeArea,
+            Postcode: e.shippingContact.postalCode,
+            CountryCode: e.shippingContact.countryCode,
+            BasketCountry: getSiteCountry(),
+            PhoneNumber: null,
+            UPSAPID: null,
+            UPSAPMemberAddressId: null,
+            IsTradeAddress: false,
+            IsClickCollect: false,
+            masterDefinition: getMasterDefinition()
         }, (result) => {
 
-            if (result.state === 'ok') {
+            if (result.state === 'OK') {
 
-                this.refreshdeliveryandtotals(() => {
+                this.refreshDeliveryAndTotals(() => {
 
-                    if (this.availableshippingmethods.length == 1) {
+                    if (this.availableShippingMethods.length == 1) {
 
-                        this.selectedshippingmethod = this.availableshippingmethods[0];
+                        this.selectedShippingMethod = this.availableShippingMethods[0];
 
-                        this.savedispatch({
-                            shippingmethod: this.selectedshippingmethod
+                        this.saveDispatch({
+                            shippingMethod: this.selectedShippingMethod
                         }, () => {
 
-                            this.checkoutlog(log_action_apple_completeshippingcontactselection, json.stringify(this.completeshippingcontactmodel));
+                            this.checkoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(this.completeShippingContactModel));
 
-                            console.log('applepayviewmodel calling completeshippingcontactselection', this.completeshippingcontactmodel);
+                            console.log('applePayViewModel calling completeShippingContactSelection', this.completeShippingContactModel);
 
-                            this.activeapplepaysession.completeshippingcontactselection(this.completeshippingcontactmodel);
+                            this.activeApplePaySession.completeShippingContactSelection(this.completeShippingContactModel);
                         });
 
                     } else {
 
-                        this.checkoutlog(log_action_apple_completeshippingcontactselection, json.stringify(this.completeshippingcontactmodel));
+                        this.checkoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(this.completeShippingContactModel));
 
-                        console.log('applepayviewmodel calling completeshippingcontactselection', this.completeshippingcontactmodel);
+                        console.log('applePayViewModel calling completeShippingContactSelection', this.completeShippingContactModel);
 
-                        this.activeapplepaysession.completeshippingcontactselection(this.completeshippingcontactmodel);
+                        this.activeApplePaySession.completeShippingContactSelection(this.completeShippingContactModel);
                     }
                 });
             } else {
 
-                if (result.message === "checkoutbasketexpired") {
-                    jumptosessionexpired();
+                if (result.message === "checkoutBasketExpired") {
+                    jumpToSessionExpired();
                     return;
                 }
 
                 let errors = [];
 
-                if (result.message === 'invalidcountry') {
-                    errors.push(new applepayerror('shippingcontactinvalid', 'country', `${this.resources.cannotdelivertothatcountry}`));
+                if (result.message === 'invalidCountry') {
+                    errors.push(new ApplePayError('shippingContactInvalid', 'country', `${this.resources.CannotDeliverToThatCountry}`));
                 }
 
                 if (errors.length == 0) {
 
-                    this.refreshdeliveryandtotals(() => {
+                    this.refreshDeliveryAndTotals(() => {
 
-                        if (result.hasownproperty('issalestaxknown')) {
+                        if (result.hasOwnProperty('isSalesTaxKnown')) {
 
-                            if (result.issalestaxknown) {
-                                oncomplete.apply(this);
+                            if (result.isSalesTaxKnown) {
+                                onComplete.apply(this);
                                 return;
                             } else {
 
-                                if (result.message === "invalidzipcode") {
+                                if (result.message === "invalidZipCode") {
                                     errors.push({
-                                        code: "shippingcontactinvalid",
-                                        contactfield: 'postalcode',
-                                        message: this.resources.checkoutaddresszipcodeinvalid
+                                        code: "shippingContactInvalid",
+                                        contactField: 'postalCode',
+                                        message: this.resources.CheckoutAddressZipCodeInvalid
                                     });
-                                } else if (result.message === "ziptaxservicefailed") {
+                                } else if (result.message === "zipTaxServiceFailed") {
                                     errors.push({
-                                        code: "shippingcontactinvalid",
-                                        contactfield: 'postalcode',
-                                        message: this.resources.checkoutaddresszipcodeproblem
+                                        code: "shippingContactInvalid",
+                                        contactField: 'postalCode',
+                                        message: this.resources.CheckoutAddressZipCodeProblem
                                     });
-                                } else if (result.salestaxaddresslist) {
+                                } else if (result.salesTaxAddressList) {
 
-                                    errors.push(new applepayerror(
-                                        'shippingcontactinvalid',
-                                        'postaladdress',
-                                        `${this.resources.ziptaxcouldnotdetermine}`
+                                    errors.push(new ApplePayError(
+                                        'shippingContactInvalid',
+                                        'postalAddress',
+                                        `${this.resources.ZipTaxCouldNotDetermine}`
                                     ));
 
-                                    let addresslines = `"${result.salestaxaddresslist.flatmap(s => s.addressline).join('", "')}"`;
-                                    let towns = `"${result.salestaxaddresslist.flatmap(s => s.town).join('", "')}"`;
-                                    let states = `"${result.salestaxaddresslist.flatmap(s => s.state).join('", "')}"`;
-                                    let counties = `"${result.salestaxaddresslist.flatmap(s => s.county).join('", "')}"`;
+                                    let addressLines = `"${result.salesTaxAddressList.flatMap(s => s.addressLine).join('", "')}"`;
+                                    let towns = `"${result.salesTaxAddressList.flatMap(s => s.town).join('", "')}"`;
+                                    let states = `"${result.salesTaxAddressList.flatMap(s => s.state).join('", "')}"`;
+                                    let counties = `"${result.salesTaxAddressList.flatMap(s => s.county).join('", "')}"`;
 
-                                    errors.push(new applepayerror(
-                                        'shippingcontactinvalid',
-                                        'addresslines',
-                                        `${addresslines}?`
+                                    errors.push(new ApplePayError(
+                                        'shippingContactInvalid',
+                                        'addressLines',
+                                        `${addressLines}?`
                                     ));
 
-                                    errors.push(new applepayerror(
-                                        'shippingcontactinvalid',
+                                    errors.push(new ApplePayError(
+                                        'shippingContactInvalid',
                                         'locality',
                                         `${towns}?`
                                     ));
 
-                                    errors.push(new applepayerror(
-                                        'shippingcontactinvalid',
-                                        'administrativearea',
+                                    errors.push(new ApplePayError(
+                                        'shippingContactInvalid',
+                                        'administrativeArea',
                                         `${states}?`
                                     ));
 
-                                    errors.push(new applepayerror(
-                                        'shippingcontactinvalid',
-                                        'subadministrativearea',
+                                    errors.push(new ApplePayError(
+                                        'shippingContactInvalid',
+                                        'subAdministrativeArea',
                                         `${counties}?`
                                     ));
                                 }
                             }
                         }
 
-                        let completeshippingcontactmodel = this.completeshippingcontactmodel;
+                        let completeShippingContactModel = this.completeShippingContactModel;
 
-                        completeshippingcontactmodel.errors = errors;
+                        completeShippingContactModel.errors = errors;
 
-                        this.checkoutlog(log_action_apple_savedeliveryaddress_error, json.stringify(object.assign(result, completeshippingcontactmodel)));
+                        this.checkoutLog(LOG_ACTION_APPLE_SAVEDELIVERYADDRESS_ERROR, JSON.stringify(Object.assign(result, completeShippingContactModel)));
 
-                        console.log('applepayviewmodel calling completeshippingcontactselection', completeshippingcontactmodel);
+                        console.log('applePayViewModel calling completeShippingContactSelection', completeShippingContactModel);
 
-                        this.activeapplepaysession.completeshippingcontactselection(completeshippingcontactmodel);
+                        this.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
                     });
                 } else {
 
-                    let completeshippingcontactmodel = {
-                        'status': applepaysession.status_success,
-                        'newtotal': {
+                    let completeShippingContactModel = {
+                        'status': ApplePaySession.STATUS_SUCCESS,
+                        'newTotal': {
                             'type': 'pending',
-                            'label': 'designers guild',
-                            'amount': `${this.total().tofixed(2)}`
+                            'label': 'Designers Guild',
+                            'amount': `${this.total().toFixed(2)}`
                         },
-                        'newlineitems': [{
-                            'label': 'sub total',
+                        'newLineItems': [{
+                            'label': 'Sub Total',
                             'type': 'pending',
-                            'amount': `${this.subtotal().tofixed(2)}`
+                            'amount': `${this.subTotal().toFixed(2)}`
                         }, {
-                            'label': 'delivery',
+                            'label': 'Delivery',
                             'type': 'pending',
-                            'amount': `${this.shipping().tofixed(2)}`
+                            'amount': `${this.shipping().toFixed(2)}`
                         }],
                         errors: errors
                     };
 
-                    this.checkoutlog(log_action_apple_savedeliveryaddress_error, json.stringify(object.assign(result, completeshippingcontactmodel)));
+                    this.checkoutLog(LOG_ACTION_APPLE_SAVEDELIVERYADDRESS_ERROR, JSON.stringify(Object.assign(result, completeShippingContactModel)));
 
-                    console.log('applepayviewmodel calling completeshippingcontactselection', completeshippingcontactmodel);
+                    console.log('applePayViewModel calling completeShippingContactSelection', completeShippingContactModel);
 
-                    this.activeapplepaysession.completeshippingcontactselection(completeshippingcontactmodel);
+                    this.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
 
                 }
             }
         });
     }
 
-    onshippingmethodselected(e) {
+    onShippingMethodSelected(e) {
         console.trace(e);
 
-        this.checkoutlog(log_action_apple_onshippingmethodselected, json.stringify(e));
+        this.checkoutLog(LOG_ACTION_APPLE_ONSHIPPINGMETHODSELECTED, JSON.stringify(e));
 
-        this.selectedshippingmethod = e.shippingmethod;
+        this.selectedShippingMethod = e.shippingMethod;
 
-        window.getshippingnumber = () => {
-            return +e.shippingmethod.amount;
+        window.getShippingNumber = () => {
+            return +e.shippingMethod.amount;
         }
 
-        this.savedispatch(e, () => {
-            this.fetchtotals(() => {
+        this.saveDispatch(e, () => {
+            this.fetchTotals(() => {
 
-                let completionmodel = this.completeshippingcontactmodel;
+                let completionModel = this.completeShippingContactModel;
 
-                completionmodel.status = applepaysession.status_success;
+                completionModel.status = ApplePaySession.STATUS_SUCCESS;
 
-                this.checkoutlog(log_action_apple_completeshippingmethodselection, json.stringify(completionmodel));
+                this.checkoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGMETHODSELECTION, JSON.stringify(completionModel));
 
-                this.activeapplepaysession.completeshippingmethodselection(completionmodel);
+                this.activeApplePaySession.completeShippingMethodSelection(completionModel);
             });
         });
     }
 
-    onvalidatemerchant(e) {
+    onValidateMerchant(e) {
         console.trace(e);
 
-        this.applepayinstance.performvalidation({
-                validationurl: e.validationurl,
-                displayname: 'designers guild'
+        this.applePayInstance.performValidation({
+                validationURL: e.validationURL,
+                displayName: 'Designers Guild'
             },
-            this.onvalidatemerchantresponse);
+            this.onValidateMerchantResponse);
     };
 
-    onvalidatemerchantresponse(err, merchantsession) {
+    onValidateMerchantResponse(err, merchantSession) {
         if (err) {
-            this.abortapple();
-            window.showinfo(this.resources.sorry, this.resources.applepayfailedtoload);
-            this.checkoutlog(log_action_apple_onvalidatemerchant_error, json.stringify(err));
+            this.abortApple();
+            window.showInfo(this.resources.Sorry, this.resources.ApplePayFailedToLoad);
+            this.checkoutLog(LOG_ACTION_APPLE_ONVALIDATEMERCHANT_ERROR, JSON.stringify(err));
             return;
         }
-        console.trace(merchantsession);
+        console.trace(merchantSession);
 
-        this.checkoutlog(log_action_apple_onvalidatemerchant_success, json.stringify(merchantsession));
+        this.checkoutLog(LOG_ACTION_APPLE_ONVALIDATEMERCHANT_SUCCESS, JSON.stringify(merchantSession));
 
-        this.activeapplepaysession.completemerchantvalidation(merchantsession);
+        this.activeApplePaySession.completeMerchantValidation(merchantSession);
     }
 
-    oncancel(e) {
-        this.hidecompletingmessage();
+    onCancel(e) {
+        this.hideCompletingMessage();
         this.parent.busy(false);
-        this.checkoutlog(log_action_apple_oncancel, this.resources.applepayfailurenotcharged);
-        window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+        this.checkoutLog(LOG_ACTION_APPLE_ONCANCEL, this.resources.ApplePayFailureNotCharged);
+        window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
     }
 
-    onpaymentauthorized(e) {
+    onPaymentAuthorized(e) {
         console.trace(e);
 
-        this.checkoutlog(log_action_apple_onpaymentauthorized, json.stringify(e));
+        this.checkoutLog(LOG_ACTION_APPLE_ONPAYMENTAUTHORIZED, JSON.stringify(e));
 
-        this.applepayinstance.tokenize({
+        this.applePayInstance.tokenize({
             token: e.payment.token
-        }, function (tokenizeerr, payload) {
-            if (tokenizeerr) {
-                this.hidecompletingmessage();
-                console.error('applepayviewmodel error tokenizing:', tokenizeerr);
+        }, function (tokenizeErr, payload) {
+            if (tokenizeErr) {
+                this.hideCompletingMessage();
+                console.error('applePayViewModel Error tokenizing:', tokenizeErr);
 
-                this.checkoutlog(log_action_apple_paymenttokenization_error, json.stringify(tokenizeerr));
+                this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_ERROR, JSON.stringify(tokenizeErr));
 
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
 
-                this.activeapplepaysession.completepayment(applepaysession.status_failure);
+                this.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
 
                 return;
             }
 
             console.trace(payload);
 
-            this.checkoutlog(log_action_apple_paymenttokenization_success, json.stringify(payload));
+            this.checkoutLog(LOG_ACTION_APPLE_PAYMENTTOKENIZATION_SUCCESS, JSON.stringify(payload));
 
-            let fullname = `${e.payment.shippingcontact.givenname} ${e.payment.shippingcontact.familyname}`.trim();
-            let addressline1 = null;
-            let addressline2 = null;
+            let fullName = `${e.payment.shippingContact.givenName} ${e.payment.shippingContact.familyName}`.trim();
+            let addressLine1 = null;
+            let addressLine2 = null;
 
-            if (e.payment.shippingcontact.addresslines.length >= 1) {
-                addressline1 = e.payment.shippingcontact.addresslines[0];
+            if (e.payment.shippingContact.addressLines.length >= 1) {
+                addressLine1 = e.payment.shippingContact.addressLines[0];
             }
 
-            if (e.payment.shippingcontact.addresslines.length >= 2) {
-                addressline2 = e.payment.shippingcontact.addresslines[1];
+            if (e.payment.shippingContact.addressLines.length >= 2) {
+                addressLine2 = e.payment.shippingContact.addressLines[1];
             }
 
-            this.savedeliveryaddress({
-                deliveryoptionid: 1,
-                memberaddressid: null,
-                fullname: fullname,
-                companyname: null,
-                addressline1: addressline1,
-                addressline2: addressline2,
-                town: e.payment.shippingcontact.locality,
-                county: e.payment.shippingcontact.administrativearea,
-                postcode: e.payment.shippingcontact.postalcode,
-                countrycode: e.payment.shippingcontact.countrycode,
-                basketcountry: getsitecountry(),
-                phonenumber: null,
-                upsapid: null,
-                upsapmemberaddressid: null,
-                istradeaddress: false,
-                isclickcollect: false,
-                masterdefinition: getmasterdefinition(),
-                secondsave: true
+            this.saveDeliveryAddress({
+                DeliveryOptionID: 1,
+                MemberAddressID: null,
+                FullName: fullName,
+                CompanyName: null,
+                AddressLine1: addressLine1,
+                AddressLine2: addressLine2,
+                Town: e.payment.shippingContact.locality,
+                County: e.payment.shippingContact.administrativeArea,
+                Postcode: e.payment.shippingContact.postalCode,
+                CountryCode: e.payment.shippingContact.countryCode,
+                BasketCountry: getSiteCountry(),
+                PhoneNumber: null,
+                UPSAPID: null,
+                UPSAPMemberAddressId: null,
+                IsTradeAddress: false,
+                IsClickCollect: false,
+                masterDefinition: getMasterDefinition(),
+                secondSave: true
             }, (result) => {
-                this.submit(payload.nonce, e.payment.shippingcontact.emailaddress);
+                this.submit(payload.nonce, e.payment.shippingContact.emailAddress);
             });
         });
     }
 
-    // this function fetches _checkoutdespatch.cshtml from the server, renders it into a hidden element and then lifts delivery options.
-    // oncomplete is called as a callback if provided upon success.
-    fetchdeliverymethods(oncomplete) {
+    // This function fetches _CheckoutDespatch.cshtml from the server, renders it into a hidden element and then lifts delivery options.
+    // onComplete is called as a callback if provided upon success.
+    fetchDeliveryMethods(onComplete) {
 
         let data = {};
 
         console.trace(data);
 
         $.ajax({
-            url: geturlcheckoutdeliveryoptions(),
-            type: "get",
+            url: getUrlCheckoutDeliveryOptions(),
+            type: "GET",
             data: data,
-            datatype: "html",
+            dataType: "html",
             success: (function (data) {
 
-                console.log('applepayviewmodel fetchdeliverymethods returned', data);
+                console.log('ApplePayViewModel fetchDeliveryMethods returned', data);
 
-                var deliveryoptions = $('#despatch-items-wrapper');
+                var deliveryOptions = $('#despatch-items-wrapper');
 
-                deliveryoptions.html(data);
+                deliveryOptions.html(data);
 
-                this.dispatchoptionsfromserver(getdispatchoptions().checkoutdispatchdeliveryoptions);
-                this.consolidateddispatchoptionsfromserver(getdispatchoptions().checkoutdispatchappledeliveryoptions);
+                this.dispatchOptionsFromServer(getDispatchOptions().checkoutDispatchDeliveryOptions);
+                this.consolidatedDispatchOptionsFromServer(getDispatchOptions().checkoutDispatchAppleDeliveryOptions);
 
-                oncomplete.apply(this);
+                onComplete.apply(this);
             }).bind(this),
             error: (function (xhr, s, a) {
-                console.error('applepayviewmodel fetchdeliverymethods errored', xhr, s, a);
+                console.error('ApplePayViewModel fetchDeliveryMethods errored', xhr, s, a);
 
-                this.hidecompletingmessage();
-                this.hidepaymentprocessingerror();
-                this.abortapple();
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+                this.hideCompletingMessage();
+                this.hidePaymentProcessingError();
+                this.abortApple();
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
             }).bind(this)
         });
     };
 
-    // this function fetches _checkouttotal.cshtml from the server, renders it into a hidden element and then lifts totals.
-    // oncomplete is called as a callback if provided upon success.
-    fetchtotals(oncomplete) {
+    // This function fetches _CheckoutTotal.cshtml from the server, renders it into a hidden element and then lifts totals.
+    // onComplete is called as a callback if provided upon success.
+    fetchTotals(onComplete) {
 
         let data = {};
 
         console.trace(data);
 
         $.ajax({
-            url: geturlcheckoutsummary(),
-            type: "get",
+            url: getUrlCheckoutSummary(),
+            type: "GET",
             data: data,
-            datatype: "html",
+            dataType: "html",
             success: (function (data) {
                 console.trace(data);
 
-                var totalswrapper = $('#despatch-items-wrapper');
+                var totalsWrapper = $('#despatch-items-wrapper');
 
-                totalswrapper.html(data);
+                totalsWrapper.html(data);
 
-                this.total(getbalancenumber());
-                this.subtotal(getitemsubtotalnumber());
-                this.tax(gettaxnumber());
-                this.shipping(getshippingnumber());
-                oncomplete.apply(this);
+                this.total(getBalanceNumber());
+                this.subTotal(getItemSubTotalNumber());
+                this.tax(getTaxNumber());
+                this.shipping(getShippingNumber());
+                onComplete.apply(this);
             }).bind(this),
             error: (function (xhr, s, a) {
-                this.hidecompletingmessage();
-                this.hidepaymentprocessingerror();
-                this.abortapple();
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+                this.hideCompletingMessage();
+                this.hidePaymentProcessingError();
+                this.abortApple();
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
             }).bind(this)
         });
     }
 
-    // this function chains fetchdeliverymethods and fetchtotals.
-    // the callback to the fetchtotals call sets this.availableshippingmethods and this.completeshippingcontactmodel,
-    // ready for handing this.completeshippingcontactmodel to the apple session.
-    refreshdeliveryandtotals (oncomplete) {
-        console.log('applepayviewmodel refreshdeliveryandtotals');
+    // This function chains fetchDeliveryMethods and fetchTotals.
+    // The callback to the fetchTotals call sets this.availableShippingMethods and this.completeShippingContactModel,
+    // ready for handing this.completeShippingContactModel to the apple session.
+    refreshDeliveryAndTotals (onComplete) {
+        console.log('applePayViewModel refreshDeliveryAndTotals');
 
-        this.fetchdeliverymethods(() => {
-            console.log('applepayviewmodel fetchdeliverymethods oncomplete');
+        this.fetchDeliveryMethods(() => {
+            console.log('applePayViewModel fetchDeliveryMethods onComplete');
 
-            this.fetchtotals(() => {
-                console.log('applepayviewmodel fetchtotals oncomplete');
+            this.fetchTotals(() => {
+                console.log('applePayViewModel fetchTotals onComplete');
 
-                let availableshippingmethods = this.consolidateddispatchoptionsfromserver().map((d) => {
-                    let mindatesplit = d.mindeliverydate.split(' ').map(i => number(i));
-                    let maxdatesplit = d.maxdeliverydate.split(' ').map(i => number(i));
-                    console.log('applepayviewmodel mapping to shippingmethod', d);
+                let availableShippingMethods = this.consolidatedDispatchOptionsFromServer().map((d) => {
+                    let minDateSplit = d.MinDeliveryDate.split(' ').map(i => Number(i));
+                    let maxDateSplit = d.MaxDeliveryDate.split(' ').map(i => Number(i));
+                    console.log('applePayViewModel mapping to shippingMethod', d);
                     return {
-                        'label': d.displayname,
+                        'label': d.DisplayName,
                         'detail': '',
-                        'amount': `${number(d.priceinc).tofixed(2)}`,
-                        'identifier': `${d.sortorder}`,
-                        'datecomponentsrange': {
-                            'startdatecomponents': {
-                                'years': `${mindatesplit[0]}`,
-                                'months': `${mindatesplit[1]}`,
-                                'days': `${mindatesplit[2]}`
+                        'amount': `${Number(d.PriceInc).toFixed(2)}`,
+                        'identifier': `${d.SortOrder}`,
+                        'dateComponentsRange': {
+                            'startDateComponents': {
+                                'years': `${minDateSplit[0]}`,
+                                'months': `${minDateSplit[1]}`,
+                                'days': `${minDateSplit[2]}`
                             },
-                            'enddatecomponents': {
-                                'years': `${maxdatesplit[0]}`,
-                                'months': `${maxdatesplit[1]}`,
-                                'days': `${maxdatesplit[2]}`
+                            'endDateComponents': {
+                                'years': `${maxDateSplit[0]}`,
+                                'months': `${maxDateSplit[1]}`,
+                                'days': `${maxDateSplit[2]}`
                             }
                         }
                     }
                 });
 
-                let completeshippingcontactmodel = {
-                    'status': applepaysession.status_success,
-                    'newtotal': {
+                let completeShippingContactModel = {
+                    'status': ApplePaySession.STATUS_SUCCESS,
+                    'newTotal': {
                         'type': 'final',
-                        'label': 'designers guild',
-                        'amount': `${this.total().tofixed(2)}`
+                        'label': 'Designers Guild',
+                        'amount': `${this.total().toFixed(2)}`
                     },
-                    'newlineitems': [{
-                        'label': 'sub total',
+                    'newLineItems': [{
+                        'label': 'Sub Total',
                         'type': 'final',
-                        'amount': `${this.subtotal().tofixed(2)}`
+                        'amount': `${this.subTotal().toFixed(2)}`
                     }, {
-                        'label': 'delivery',
+                        'label': 'Delivery',
                         'type': 'final',
-                        'amount': `${this.shipping().tofixed(2)}`
+                        'amount': `${this.shipping().toFixed(2)}`
                     }],
                     'errors': [],
-                    newshippingmethods: availableshippingmethods
+                    newShippingMethods: availableShippingMethods
                 };
 
                 if (this.tax()) {
-                    completeshippingcontactmodel.newlineitems.push({
-                        'label': 'tax',
+                    completeShippingContactModel.newLineItems.push({
+                        'label': 'Tax',
                         'type': 'final',
-                        'amount': `${this.tax().tofixed(2)}`
+                        'amount': `${this.tax().toFixed(2)}`
                     });
                 }
 
-                this.availableshippingmethods = availableshippingmethods;
+                this.availableShippingMethods = availableShippingMethods;
 
-                this.completeshippingcontactmodel = completeshippingcontactmodel;
+                this.completeShippingContactModel = completeShippingContactModel;
 
-                if (typeof oncomplete === 'function')
-                    oncomplete.apply(this);
+                if (typeof onComplete === 'function')
+                    onComplete.apply(this);
             });
         });
     }
 
-    // this function saves the delivery address, then executes the oncomplete callback function if provided.
-    savedeliveryaddress(data, oncomplete) {
+    // This function saves the delivery address, then executes the onComplete callback function if provided.
+    saveDeliveryAddress(data, onComplete) {
         console.trace(data);
 
-        this.checkoutlog(log_action_pay_now_step, data);
+        this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, data);
 
         $.ajax({
-            url: "/api/checkout/savecheckoutaddress",
-            type: "post",
+            url: "/api/checkout/saveCheckoutAddress",
+            type: "Post",
             cache: false,
             async: true,
-            datatype: 'json',
+            dataType: 'json',
             data: data,
             success: (function (data) {
-                console.log('applepayviewmodel savedeliveryaddress returned', data);
-                oncomplete.apply(this, [data]);
+                console.log('applePayViewModel saveDeliveryAddress returned', data);
+                onComplete.apply(this, [data]);
             }).bind(this),
-            error: (function (xhr, textstatus, errorthrown) {
-                this.abortapple();
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+            error: (function (xhr, textStatus, errorThrown) {
+                this.abortApple();
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
             }).bind(this)
         });
     }
 
-    // this is to be used when things go wrong
-    // unsets parent.busy
-    // calls hidecompletingmessage 
-    // calls session.abort wrapped in a try catch: the session might already be closed and no longer in an abortable state, which is fine.
-    abortapple() {
+    // This is to be used when things go wrong
+    // Unsets parent.busy
+    // Calls hideCompletingMessage 
+    // Calls session.abort wrapped in a try catch: the session might already be closed and no longer in an abortable state, which is fine.
+    abortApple() {
         this.parent.busy(false);
-        this.hidecompletingmessage();
+        this.hideCompletingMessage();
         try {
-            this.activeapplepaysession.abort();
+            this.activeApplePaySession.abort();
         } catch (e) {
 
         }
     }
 
-    // this is the sucessful end, should only be called from submit success branch
-    endapplesuccessfully() {
-        this.checkoutlog(log_action_apple_completepayment, 'completepayment(applepaysession.status_success)');
-        this.activeapplepaysession.completepayment(applepaysession.status_success);
+    // This is the sucessful end, should only be called from submit success branch
+    endAppleSuccessfully() {
+        this.checkoutLog(LOG_ACTION_APPLE_COMPLETEPAYMENT, 'completePayment(ApplePaySession.STATUS_SUCCESS)');
+        this.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
     }
 
-    showpaymentprocessingerror () {
-        bootstrap.modal.getorcreateinstance(document.queryselector("#payment-processing-error")).show();
+    showPaymentProcessingError () {
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#payment-processing-error")).show();
     }
 
-    hidepaymentprocessingerror () {
-        bootstrap.modal.getorcreateinstance(document.queryselector("#payment-processing-error")).hide();
+    hidePaymentProcessingError () {
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#payment-processing-error")).hide();
     }
 
-    showcompletingmessage() {
-        // the completing message modal reads "completing your order \n please do not refresh the page"
-        bootstrap.modal.getorcreateinstance(document.queryselector("#checkout-complete-waiting")).show();
+    showCompletingMessage() {
+        // The Completing Message modal reads "Completing your order \n PLEASE DO NOT REFRESH THE PAGE"
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).show();
 
-        // this blocks the entire page with an overlay which reads "please wait..." and has a spinner-border.
+        // This blocks the entire page with an overlay which reads "Please wait..." and has a spinner-border.
         this.parent.busy(true);
 
-        // this logs the fact that we've displayed the completing message.
-        this.checkoutlog(log_action_pay_now_step, 'completing message shown');
+        // This logs the fact that we've displayed the completing message.
+        this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message shown');
     }
 
-    hidecompletingmessage() {
-        bootstrap.modal.getorcreateinstance(document.queryselector("#checkout-complete-waiting")).hide();
+    hideCompletingMessage() {
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).hide();
 
         this.parent.busy(false);
 
-        // somewhere out there something disables the proceed-btn elements, preventing you from mashing buttons to try and hurt our checkout.
-        // when we're no longer showing the completing message, apparently we want to re-enable these buttons so people can have another go.
-        document.queryselectorall('.proceed-btn').foreach(pb => {
-            pb.removeattribute('disabled');
-            pb.classlist.remove('disabled');
+        // Somewhere out there something disables the proceed-btn elements, preventing you from mashing buttons to try and hurt our checkout.
+        // When we're no longer showing the completing message, apparently we want to re-enable these buttons so people can have another go.
+        document.querySelectorAll('.proceed-btn').forEach(pb => {
+            pb.removeAttribute('disabled');
+            pb.classList.remove('disabled');
         });
 
-        // this logs the fact that we've hidden the completing message.
-        this.checkoutlog(log_action_pay_now_step, 'completing message hidden');
+        // This logs the fact that we've hidden the completing message.
+        this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message hidden');
     }
 
-    savedispatch(e, oncomplete) {
+    saveDispatch(e, onComplete) {
 
-        let mindate = new date(date.utc(
-            e.shippingmethod.datecomponentsrange.startdatecomponents.years,
-            e.shippingmethod.datecomponentsrange.startdatecomponents.months - 1,
-            e.shippingmethod.datecomponentsrange.startdatecomponents.days,
+        let minDate = new Date(Date.UTC(
+            e.shippingMethod.dateComponentsRange.startDateComponents.years,
+            e.shippingMethod.dateComponentsRange.startDateComponents.months - 1,
+            e.shippingMethod.dateComponentsRange.startDateComponents.days,
             0,
             0,
             0
         ));
 
-        let maxdate = new date(date.utc(
-            e.shippingmethod.datecomponentsrange.enddatecomponents.years,
-            e.shippingmethod.datecomponentsrange.enddatecomponents.months - 1,
-            e.shippingmethod.datecomponentsrange.enddatecomponents.days,
+        let maxDate = new Date(Date.UTC(
+            e.shippingMethod.dateComponentsRange.endDateComponents.years,
+            e.shippingMethod.dateComponentsRange.endDateComponents.months - 1,
+            e.shippingMethod.dateComponentsRange.endDateComponents.days,
             0,
             0,
             0
         ));
 
-        let deliverybandid = this.dispatchoptionsfromserver().find(x => x.sortorder == e.shippingmethod.identifier).deliverybandid;
+        let deliveryBandId = this.dispatchOptionsFromServer().find(x => x.SortOrder == e.shippingMethod.identifier).DeliveryBandID;
 
         let data = [{
-            dispatchid: 1,
-            deliverybandid: deliverybandid,
-            shouldpartship: false,
-            mindeliverydate: mindate.toisostring(),
-            maxdeliverydate: maxdate.toisostring(),
-            customerrequestsfulldespatch: false
+            dispatchId: 1,
+            deliveryBandId: deliveryBandId,
+            shouldPartShip: false,
+            minDeliveryDate: minDate.toISOString(),
+            maxDeliveryDate: maxDate.toISOString(),
+            customerRequestsFullDespatch: false
         }];
 
-        console.log('applepayviewmodel savedispatch calling with', data);
+        console.log('applePayViewModel saveDispatch calling with', data);
 
         $.ajax({
-            url: "/api/checkout/savedispatch",
-            type: "post",
+            url: "/api/checkout/saveDispatch",
+            type: "Post",
             cache: false,
             async: true,
-            data: json.stringify({
-                dispatchlines: data
+            data: JSON.stringify({
+                dispatchLines: data
             }),
-            contenttype: 'application/json; charset=utf-8',
+            contentType: 'application/json; charset=utf-8',
             success: (function (data) {
-                console.log('applepayviewmodel savedispatch returned', data)
-                oncomplete.apply(this);
+                console.log('applePayViewModel saveDispatch returned', data)
+                onComplete.apply(this);
             }).bind(this),
-            error: (function (xhr, textstatus, errorthrown) {
-                this.hidecompletingmessage();
-                this.hidepaymentprocessingerror();
-                this.abortapple();
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+            error: (function (xhr, textStatus, errorThrown) {
+                this.hideCompletingMessage();
+                this.hidePaymentProcessingError();
+                this.abortApple();
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
             }).bind(this)
         });
     }
 
     submit(nonce, email) {
 
-        this.showcompletingmessage();
+        this.showCompletingMessage();
 
-        let defaultcard = false;
+        let defaultCard = false;
 
-        let data = json.stringify({
+        let data = JSON.stringify({
             device_data: null,
             payment_method_nonce: nonce,
-            masterdefinition: getmasterdefinition(),
-            basketcountry: getsitecountry(),
-            marketingpermissions: [],
-            make_default: defaultcard,
+            masterDefinition: getMasterDefinition(),
+            basketCountry: getSiteCountry(),
+            marketingPermissions: [],
+            make_default: defaultCard,
             email: email
         });
 
-        this.checkoutlog(log_action_pay_now_step, 'applepayviewmodel submit calling with', data);
+        this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'applePayViewModel submit calling with', data);
 
-        console.log('applepayviewmodel submit calling with', data);
+        console.log('applePayViewModel submit calling with', data);
 
         $.ajax({
-            url: '/api/checkout/checkoutbraintreesubmit',
-            type: 'post',
+            url: '/api/checkout/checkoutBraintreeSubmit',
+            type: 'POST',
             cache: false,
             async: true,
             data: data,
-            contenttype: 'application/json; charset=utf-8',
+            contentType: 'application/json; charset=utf-8',
             success: (function (data) {
 
-                console.log('applepayviewmodel submit returned', data);
+                console.log('applePayViewModel submit returned', data);
 
-                this.checkoutlog(log_action_pay_now_step, 'paymentmethodfactory submitapplecheckout returned: ' + json.stringify(data));
+                this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitAppleCheckout returned: ' + JSON.stringify(data));
 
                 if (data != null) {
-                    if (data.result === "ok") {
+                    if (data.result === "OK") {
                         if (data.redirect === "confirm") {
                             // defunct and should never be hit
-                            // window.location.href = '@dgframework.buildurl(model.masterdefinition.urlbreakdown.countrydetails, null, dgcontenttype.landingpage, (int)dgfixedpage.checkoutconfirmation, null, null)';
-                        } else if (data.redirect === "ordergen") {
-                            $('#checkout-complete-waiting .page-blocker').addclass('success');
-                            $('#checkout-complete-waiting p').html(this.parent.resources.checkoutpaymentsuccessgeneratingorder);
+                            // window.location.href = '@dgFramework.buildUrl(Model.masterDefinition.UrlBreakdown.countryDetails, null, dgContentType.landingPage, (int)dgFixedPage.checkoutConfirmation, null, null)';
+                        } else if (data.redirect === "orderGen") {
+                            $('#checkout-complete-waiting .page-blocker').addClass('success');
+                            $('#checkout-complete-waiting p').html(this.parent.resources.CheckoutPaymentSuccessGeneratingOrder);
 
-                            this.showcompletingmessage();
+                            this.showCompletingMessage();
 
-                            this.endapplesuccessfully();
+                            this.endAppleSuccessfully();
 
                             $.ajax({
-                                url: '/api/checkout/checkoutordergenerate',
-                                type: 'post',
+                                url: '/api/checkout/checkoutOrderGenerate',
+                                type: 'POST',
                                 cache: false,
                                 async: true,
                                 timeout: 30000,
                                 data: {},
-                                contenttype: 'application/json; charset=utf-8',
+                                contentType: 'application/json; charset=utf-8',
                                 success: function (data) {
-                                    window.location.href = '/' + getsitecountry() + '/l271'; //'@dgframework.buildurl(model.masterdefinition.urlbreakdown.countrydetails, null, dgcontenttype.landingpage, (int)dgfixedpage.checkoutconfirmation, null, null)';
+                                    window.location.href = '/' + getSiteCountry() + '/l271'; //'@dgFramework.buildUrl(Model.masterDefinition.UrlBreakdown.countryDetails, null, dgContentType.landingPage, (int)dgFixedPage.checkoutConfirmation, null, null)';
                                 },
-                                error: function (xhr, textstatus, errorthrown) {
-                                    window.location.href = '/' + getsitecountry() + '/l281'; //@dgframework.buildurl(model.masterdefinition.urlbreakdown.countrydetails, null, dgcontenttype.landingpage, (int)dgfixedpage.checkoutconfirmationspartan, null, null)';
+                                error: function (xhr, textStatus, errorThrown) {
+                                    window.location.href = '/' + getSiteCountry() + '/l281'; //@dgFramework.buildUrl(Model.masterDefinition.UrlBreakdown.countryDetails, null, dgContentType.landingPage, (int)dgFixedPage.checkoutConfirmationSpartan, null, null)';
                                 }
                             });
                         }
                     }
-                    else if (data.result === "fail") {
-                        this.hidecompletingmessage();
-                        this.showpaymentprocessingerror();
+                    else if (data.result === "FAIL") {
+                        this.hideCompletingMessage();
+                        this.showPaymentProcessingError();
                     }
                 }
                 else {
-                    this.hidecompletingmessage();
-                    this.showpaymentprocessingerror();
+                    this.hideCompletingMessage();
+                    this.showPaymentProcessingError();
                 }
             }).bind(this),
             error: (function (e, s, a) {
 
-                this.checkoutlog(log_action_pay_now_step, 'paymentmethodfactory submitapple errored: ' + json.stringify(e));
+                this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitApple ERRORED: ' + JSON.stringify(e));
 
-                this.hidecompletingmessage();
+                this.hideCompletingMessage();
 
-                this.hidepaymentprocessingerror();
+                this.hidePaymentProcessingError();
 
-                this.abortapple();
+                this.abortApple();
 
-                window.showinfo(this.resources.sorry, this.resources.applepayfailurenotcharged);
+                window.showInfo(this.resources.Sorry, this.resources.ApplePayFailureNotCharged);
 
             }).bind(this),
             timeout: 90000
