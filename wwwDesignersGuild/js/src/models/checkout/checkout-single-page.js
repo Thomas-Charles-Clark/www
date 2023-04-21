@@ -1303,6 +1303,8 @@ const deliveryAddressFactory = ((parent) => {
 
         var data = {
             MemberAddressID: ko.unwrap(checkoutAddress.memberAddressId),
+            Town: ko.unwrap(checkoutAddress.town),
+            County: ko.unwrap(checkoutAddress.county),
             Postcode: ko.unwrap(checkoutAddress.postcode),
             Country: ko.unwrap(checkoutAddress.country).Code,
             BasketCountry: getSiteCountry()
@@ -3114,8 +3116,8 @@ const checkoutDeliveryAddress = (
 
     self.initPCAAutocomplete = function () {
         $(self.PCASearchTerm.DOMElement).autocomplete({
-            //appendTo: 'body',
-            //position: { my: "right top", at: "right bottom", of: $('.ui-front'), collision: "none" },
+            appendTo: 'body',
+            position: { my: "right top", at: "right bottom", of: $('.ui-front'), collision: "none" },
             source: function (request, response) {
                 $.ajax({
                     url: "/api/member/addressLookupSearch",

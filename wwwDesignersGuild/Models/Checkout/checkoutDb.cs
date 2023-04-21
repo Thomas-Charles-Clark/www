@@ -353,7 +353,8 @@ namespace wwwDesignersGuild.Models.Checkout
                 checkoutDispatchDeliverySelections = results.GetResult<checkoutDispatchDeliverySelection>().ToList(),
                 checkoutDispatchStockStatusLines = results.GetResult<checkoutDispatchStockStatusLine>().ToList(),
                 checkoutDispatchPartShipPrices = results.GetResult<checkoutDispatchPartShipPrice>().ToList(),
-                checkoutDispatchNotice = results.GetResult<checkoutDispatchNotice>().SingleOrDefault()
+                checkoutDispatchNotice = results.GetResult<checkoutDispatchNotice>().SingleOrDefault(),
+                checkoutDispatchAppleDeliveryOptions = results.GetResult<checkoutDispatchAppleDeliveryOption>().ToList()
             };
 
             return dispatchOptions;

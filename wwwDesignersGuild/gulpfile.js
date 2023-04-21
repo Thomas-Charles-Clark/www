@@ -151,8 +151,12 @@ function wildcardscss() {
     return merge(tasks);
 }
 
+function handleBabelError(error) {
+    console.error(error.toString());
+    this.emit('end');
+}
+
 function wildcardjs() {
-    let shouldBabel = false;
     var tasks = gulp
         .src('js/src/**/!(*.min).js', { since: gulp.lastRun(wildcardjs) })
         .pipe(debug({ title: 'wildcardjs:' }))
@@ -168,6 +172,7 @@ function wildcardjs() {
                 return stream;
             }
         }))
+        .on('error', handleBabelError)
         .pipe(terser())
         .pipe(rename({ suffix: '.min' }))
         .pipe(sourcemaps.write(''))

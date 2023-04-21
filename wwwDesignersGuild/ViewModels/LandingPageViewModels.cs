@@ -743,7 +743,9 @@ namespace wwwDesignersGuild.ViewModels
                         "ApplePayFailedToLoad",
                         "ApplePayFailureNotCharged",
                         "CheckoutAddressZipCodeInvalid",
-                        "CheckoutAddressZipCodeProblem"
+                        "CheckoutAddressZipCodeProblem",
+                        "ZipTaxCouldNotDetermine",
+                        "CannotDeliverToThatCountry"
                     });
                     break;
                 case (int)dgFixedPage.checkoutSinglePage:

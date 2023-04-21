@@ -198,8 +198,9 @@ namespace wwwDesignersGuild.Models.Helper
         logApplePaymentTokenizationSuccess = 180,
         logAppleCompletePayment = 181,
         logAppleOnCancel = 182,
+        logAppleAddressError = 183,
         logSessionTimeout = 254,
-        logCheckoutExit = 255
+        logCheckoutExit = 255,
     }
 
     public enum dgFixedPage
@@ -613,7 +614,7 @@ namespace wwwDesignersGuild.Models.Helper
         {
             var resp = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
             {
-                ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}"
+                ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")
             };
             throw new System.Web.Http.HttpResponseException(resp);
         }
@@ -1971,7 +1972,7 @@ namespace wwwDesignersGuild.Models.Helper
             // Check in cache before performing request to 51 degrees
             string cloudflareDeviceTypeHeader = (HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ??
                                                 HttpContext.Current.Request.Headers["CF-Device-Type"] ?? 
-                                                "mobile")?.ToLowerInvariant();
+                                                "desktop")?.ToLowerInvariant();
 
 
             MobileDetectionDefinition mobileDetectionResult = objMobileDetectionCache.Get(cloudflareDeviceTypeHeader);

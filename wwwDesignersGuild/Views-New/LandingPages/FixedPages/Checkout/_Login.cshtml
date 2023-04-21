@@ -147,9 +147,14 @@
                 </div>
             }
         }
-        @if (!String.IsNullOrEmpty(Model.CheckoutTypeNotice.AlertMessage))
+        @if (Model.PermitApple)
         {
-            @Html.Raw(Model.CheckoutTypeNotice.AlertMessage)
+            if (!String.IsNullOrEmpty(Model.CheckoutTypeNotice.AlertMessage))
+            {
+                <div class="checkout-option">
+                    @Html.Raw(Model.CheckoutTypeNotice.AlertMessage)
+                </div>
+            }
         }
     </div>
     <p class="text-center mt-8">

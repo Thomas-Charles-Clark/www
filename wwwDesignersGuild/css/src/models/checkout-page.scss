@@ -786,7 +786,6 @@ body {
 }
 
 ul.address-autocomplete {
-    z-index: 50;
     cursor: pointer;
     display: inline-block;
     padding: 0;
@@ -798,7 +797,9 @@ ul.address-autocomplete {
     min-width: 320px;
 
     li.ui-menu-item {
+
         div.ui-menu-item-wrapper {
+            background: $white;
             font-weight: $font-weight-base;
             color: $gray-dg-body;
             padding: $input-padding-y $input-padding-x;

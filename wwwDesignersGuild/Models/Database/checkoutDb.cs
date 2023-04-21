@@ -1522,6 +1522,7 @@ namespace wwwDesignersGuild.Models.Database
         //[ResultTypeAttribute(typeof(checkoutDispatchStockStatus))]
         [ResultTypeAttribute(typeof(checkoutDispatchPartShipPrice))]
         [ResultTypeAttribute(typeof(checkoutDispatchNotice))]
+        [ResultTypeAttribute(typeof(checkoutDispatchAppleDeliveryOption))]
         public IMultipleResults DispatchOptions_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CheckoutID", DbType = "BigInt")] System.Nullable<Int64> checkoutId)
         {
 

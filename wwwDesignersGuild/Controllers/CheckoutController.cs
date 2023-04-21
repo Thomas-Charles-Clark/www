@@ -452,7 +452,7 @@ namespace wwwDesignersGuild.Controllers
                 {
                     return new 
                     { 
-                        redirect = dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, objCountryItem)
+                        redirect = dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutProblem, objCountryItem)
                     };
                 }
             }
@@ -888,7 +888,7 @@ namespace wwwDesignersGuild.Controllers
 
             var objDeliverableCountries = await objCountry.countrySelectList(objCountryItem.CountryID, objCountryItem.LanguageID);
             
-            var deliveryCountry = objDeliverableCountries.countries.Where(c => c.Code == objDeliveryAddress.CountryCode).SingleOrDefault();
+            var deliveryCountry = objDeliverableCountries.countries.Where(c => c.Code == objDeliveryAddress.CountryCode?.ToUpperInvariant()).SingleOrDefault();
 
             if (deliveryCountry == null)
             {
@@ -1048,7 +1048,7 @@ namespace wwwDesignersGuild.Controllers
                 }
                 else
                 {
-                    return Ok(new { state = "selectSalesTaxAddress", salesTaxAddressList = salesTaxAddressesToSelectFrom });
+                    return Ok(new { isSalesTaxKnown = false, state = "selectSalesTaxAddress", salesTaxAddressList = salesTaxAddressesToSelectFrom });
                 }
             }
 
@@ -1235,6 +1235,28 @@ namespace wwwDesignersGuild.Controllers
                                                     System.Web.Configuration.WebConfigurationManager.AppSettings["zipTaxKey"],
                                                     Uri.EscapeDataString(postCode));
 
+            if (objDeliveryAddress.County != null && objDeliveryAddress.Town != null)
+            {
+                // don't know why ZipTaxCounty isn't used... probably because Town is sufficiently specific
+                zipTaxApiUrl = String.Format("{0}?key={1}&postalcode={2}&state={3}&city={4}&format=XML",
+                                                WebConfigurationManager.AppSettings["zipTaxUrl"],
+                                                WebConfigurationManager.AppSettings["zipTaxKey"],
+                                                Uri.EscapeDataString(postCode),
+                                                Uri.EscapeDataString(objDeliveryAddress.County), // State != County
+                                                Uri.EscapeDataString(objDeliveryAddress.Town));
+
+                if (objDeliveryAddress.USCounty != null)
+                {
+                    // don't know why ZipTaxCounty isn't used... probably because Town is sufficiently specific
+                    zipTaxApiUrl = String.Format("{0}?key={1}&postalcode={2}&state={3}&city={4}&county={5}&format=XML",
+                                                    WebConfigurationManager.AppSettings["zipTaxUrl"],
+                                                    WebConfigurationManager.AppSettings["zipTaxKey"],
+                                                    Uri.EscapeDataString(postCode),
+                                                    Uri.EscapeDataString(objDeliveryAddress.County), // State != County
+                                                    Uri.EscapeDataString(objDeliveryAddress.Town),
+                                                    Uri.EscapeDataString(objDeliveryAddress.USCounty)); // USCounty == County
+                }
+            }
             try
             {
                 XDocument xmlResponse = XDocument.Load(zipTaxApiUrl);
@@ -3494,7 +3516,8 @@ namespace wwwDesignersGuild.Controllers
                 dgCheckoutActionId.logApplePaymentTokenizationError,
                 dgCheckoutActionId.logApplePaymentTokenizationSuccess,
                 dgCheckoutActionId.logAppleCompletePayment,
-                dgCheckoutActionId.logAppleOnCancel
+                dgCheckoutActionId.logAppleOnCancel,
+                dgCheckoutActionId.logAppleAddressError
             };
 
             if (validActions.Contains((dgCheckoutActionId)objLog.action))

@@ -15,7 +15,7 @@
     LOG_ACTION_APPLE_PAYMENTTOKENIZATION_SUCCESS = 180,
     LOG_ACTION_APPLE_COMPLETEPAYMENT = 181,
     LOG_ACTION_APPLE_ONCANCEL = 182,
-    LOG_ACTION_APPLE_FETCHADDRESS = 183
+    LOG_ACTION_APPLE_SAVEDELIVERYADDRESS_ERROR = 183
 
 const applePayViewModel = ((applePayInstance, parent) => {
     let self = {
@@ -40,7 +40,17 @@ const applePayViewModel = ((applePayInstance, parent) => {
         asyncCheckoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message hidden');
     }
 
+    self.showZipModal = () => {
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#zip-modal")).show();
+    }
+
+    self.hideZipModal = () => {
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#zip-modal")).hide();
+    }
+
     self.dispatchOptionsFromServer = ko.observableArray([]);
+
+    self.consolidatedDispatchOptionsFromServer = ko.observableArray([]);
 
     self.subTotal = ko.observable(getBalanceNumber());
 
@@ -53,6 +63,77 @@ const applePayViewModel = ((applePayInstance, parent) => {
     self.selectedShippingMethod = null;
 
     self.selectedDeliveryAddress = null;
+
+    self.refreshDeliveryAndTotals = (onComplete) => {
+        console.log('applePay refreshDeliveryAndTotals');
+
+        self.loadDeliveryMethods(() => {
+            console.log('applePay loadDeliveryMethods onComplete');
+
+            self.loadTotals(() => {
+                console.log('applePay loadTotals onComplete');
+
+                let availableShippingMethods = self.consolidatedDispatchOptionsFromServer().map((d) => {
+                    let minDateSplit = d.MinDeliveryDate.split(' ').map(i => Number(i));
+                    let maxDateSplit = d.MaxDeliveryDate.split(' ').map(i => Number(i));
+                    console.log('applePay mapping to shippingMethod', d);
+                    return {
+                        'label': d.DisplayName,
+                        'detail': '',
+                        'amount': `${Number(d.PriceInc).toFixed(2)}`,
+                        'identifier': `${d.SortOrder}`,
+                        'dateComponentsRange': {
+                            'startDateComponents': {
+                                'years': `${minDateSplit[0]}`,
+                                'months': `${minDateSplit[1]}`,
+                                'days': `${minDateSplit[2]}`
+                            },
+                            'endDateComponents': {
+                                'years': `${maxDateSplit[0]}`,
+                                'months': `${maxDateSplit[1]}`,
+                                'days': `${maxDateSplit[2]}`
+                            }
+                        }
+                    }
+                });
+
+                let completeShippingContactModel = {
+                    'status': ApplePaySession.STATUS_SUCCESS,
+                    'newTotal': {
+                        'type': 'final',
+                        'label': 'Designers Guild',
+                        'amount': `${self.total().toFixed(2)}`
+                    },
+                    'newLineItems': [{
+                        'label': 'Sub Total',
+                        'type': 'final',
+                        'amount': `${self.subTotal().toFixed(2)}`
+                    }, {
+                        'label': 'Delivery',
+                        'type': 'final',
+                        'amount': `${self.shipping().toFixed(2)}`
+                    }],
+                    'errors': [],
+                    newShippingMethods: availableShippingMethods
+                };
+
+                if (self.tax()) {
+                    completeShippingContactModel.newLineItems.push({
+                        'label': 'Tax',
+                        'type': 'final',
+                        'amount': `${self.tax().toFixed(2)}`
+                    });
+                }
+
+                self.availableShippingMethods = availableShippingMethods;
+
+                self.completeShippingContactModel = completeShippingContactModel;
+
+                if (typeof onComplete === 'function')
+                    onComplete();
+            });
+        });
+    }
 
     self.begin = () => {
 
@@ -130,6 +211,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
                 CompanyName: null,
                 AddressLine1: 'TEMPORARY',
                 AddressLine2: null,
+
                 Town: e.shippingContact.locality,
                 County: e.shippingContact.administrativeArea,
                 Postcode: e.shippingContact.postalCode,
@@ -141,80 +223,140 @@ const applePayViewModel = ((applePayInstance, parent) => {
                 IsTradeAddress: false,
                 IsClickCollect: false,
                 masterDefinition: getMasterDefinition()
-            }, () => {
-                self.selectCheckoutAddress(() => {
-                    self.loadDeliveryMethods(() => {
-                        self.loadTotals(() => {
-                            let availableShippingMethods = self.dispatchOptionsFromServer().map((d) => {
-                                let minDateSplit = d.MinDeliveryDate.split(' ').map(i => Number(i));
-                                let maxDateSplit = d.MaxDeliveryDate.split(' ').map(i => Number(i));
-                                console.log('applePay mapping to shippingMethod', d);
-                                return {
-                                    'label': d.DisplayName,
-                                    'detail': '',
-                                    'amount': `${Number(d.PriceInc).toFixed(2)}`,
-                                    'identifier': `${d.DeliveryBandID}`,
-                                    'dateComponentsRange': {
-                                        'startDateComponents': {
-                                            'years': `${minDateSplit[0]}`,
-                                            'months': `${minDateSplit[1]}`,
-                                            'days': `${minDateSplit[2]}`
-                                        },
-                                        'endDateComponents': {
-                                            'years': `${maxDateSplit[0]}`,
-                                            'months': `${maxDateSplit[1]}`,
-                                            'days': `${maxDateSplit[2]}`
-                                        }
+            }, (result) => {
+                if (result.state === 'OK') {
+                    self.refreshDeliveryAndTotals(() => {
+                        if (self.availableShippingMethods.length == 1) {
+                            self.selectedShippingMethod = self.availableShippingMethods[0];
+                            self.saveDispatch({
+                                shippingMethod: self.selectedShippingMethod
+                            }, () => {
+                                asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(self.completeShippingContactModel));
+                                console.log('applePay calling completeShippingContactSelection', self.completeShippingContactModel);
+
+                                self.activeApplePaySession.completeShippingContactSelection(self.completeShippingContactModel);
+                            });
+                        } else {
+                            asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(self.completeShippingContactModel));
+                            console.log('applePay calling completeShippingContactSelection', self.completeShippingContactModel);
+
+                            self.activeApplePaySession.completeShippingContactSelection(self.completeShippingContactModel);
+                        }
+                    });
+                } else {
+                    if (result.message === "checkoutBasketExpired") {
+                        jumpToSessionExpired();
+                        return;
+                    }
+
+                    let errors = [];
+
+                    if (result.message === 'invalidCountry') {
+                        errors.push(new ApplePayError('shippingContactInvalid', 'country', `${self.resources.CannotDeliverToThatCountry}`));
+                    }
+
+                    if (errors.length == 0) {
+
+                        self.refreshDeliveryAndTotals(() => {
+
+                            if (result.hasOwnProperty('isSalesTaxKnown')) {
+
+                                if (result.isSalesTaxKnown) {
+                                    onComplete();
+                                    return;
+                                } else {
+
+                                    if (result.message === "invalidZipCode") {
+                                        errors.push({
+                                            code: "shippingContactInvalid",
+                                            contactField: 'postalCode',
+                                            message: self.resources.CheckoutAddressZipCodeInvalid
+                                        });
+                                    } else if (result.message === "zipTaxServiceFailed") {
+                                        errors.push({
+                                            code: "shippingContactInvalid",
+                                            contactField: 'postalCode',
+                                            message: self.resources.CheckoutAddressZipCodeProblem
+                                        });
+                                    } else if (result.salesTaxAddressList) {
+
+                                        errors.push(new ApplePayError(
+                                            'shippingContactInvalid',
+                                            'postalAddress',
+                                            `${self.resources.ZipTaxCouldNotDetermine}`
+                                        ));
+
+                                        let addressLines = `"${result.salesTaxAddressList.flatMap(s => s.addressLine).join('", "')}"`;
+                                        let towns = `"${result.salesTaxAddressList.flatMap(s => s.town).join('", "')}"`;
+                                        let states = `"${result.salesTaxAddressList.flatMap(s => s.state).join('", "')}"`;
+                                        let counties = `"${result.salesTaxAddressList.flatMap(s => s.county).join('", "')}"`;
+
+                                        errors.push(new ApplePayError(
+                                            'shippingContactInvalid',
+                                            'addressLines',
+                                            `${addressLines}?`
+                                        ));
+
+                                        errors.push(new ApplePayError(
+                                            'shippingContactInvalid',
+                                            'locality',
+                                            `${towns}?`
+                                        ));
+
+                                        errors.push(new ApplePayError(
+                                            'shippingContactInvalid',
+                                            'administrativeArea',
+                                            `${states}?`
+                                        ));
+
+                                        errors.push(new ApplePayError(
+                                            'shippingContactInvalid',
+                                            'subAdministrativeArea',
+                                            `${counties}?`
+                                        ));
                                     }
                                 }
-                            });
-                            let completeShippingContactModel = {
-                                'status': ApplePaySession.STATUS_SUCCESS,
-                                'newTotal': {
-                                    'type': 'final',
-                                    'label': 'Designers Guild',
-                                    'amount': `${self.total().toFixed(2)}`
-                                },
-                                'newLineItems': [{
-                                    'label': 'Sub Total',
-                                    'type': 'final',
-                                    'amount': `${self.subTotal().toFixed(2)}`
-                                }, {
-                                    'label': 'Delivery',
-                                    'type': 'final',
-                                    'amount': `${self.shipping().toFixed(2)}`
-                                }],
-                                'errors': [],
-                                newShippingMethods: availableShippingMethods
-                            };
-
-                            if (self.tax()) {
-                                completeShippingContactModel.newLineItems.push({
-                                    'label': 'Tax',
-                                    'type': 'final',
-                                    'amount': `${self.tax().toFixed(2)}`
-                                });
                             }
 
-                            if (availableShippingMethods.length == 1) {
-                                self.selectedShippingMethod = availableShippingMethods[0];
-                                self.saveDispatch({
-                                    shippingMethod: self.selectedShippingMethod
-                                }, () => {
-                                    asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(completeShippingContactModel));
-                                    console.log('applePay calling completeShippingContactSelection', completeShippingContactModel);
+                            let completeShippingContactModel = self.completeShippingContactModel;
 
-                                    self.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
-                                });
-                            } else {
-                                asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGCONTACTSELECTION, JSON.stringify(completeShippingContactModel));
-                                console.log('applePay calling completeShippingContactSelection', completeShippingContactModel);
+                            completeShippingContactModel.errors = errors;
 
-                                self.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
-                            }
+                            asyncCheckoutLog(LOG_ACTION_APPLE_SAVEDELIVERYADDRESS_ERROR, JSON.stringify(Object.assign(result, completeShippingContactModel)));
+
+                            console.log('applePay calling completeShippingContactSelection', completeShippingContactModel);
+
+                            self.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
                         });
-                    });
-                })
+                    } else {
+
+                        let completeShippingContactModel = {
+                            'status': ApplePaySession.STATUS_SUCCESS,
+                            'newTotal': {
+                                'type': 'pending',
+                                'label': 'Designers Guild',
+                                'amount': `${self.total().toFixed(2)}`
+                            },
+                            'newLineItems': [{
+                                'label': 'Sub Total',
+                                'type': 'pending',
+                                'amount': `${self.subTotal().toFixed(2)}`
+                            }, {
+                                'label': 'Delivery',
+                                'type': 'pending',
+                                'amount': `${self.shipping().toFixed(2)}`
+                            }],
+                            errors: errors
+                        };
+
+                        asyncCheckoutLog(LOG_ACTION_APPLE_SAVEDELIVERYADDRESS_ERROR, JSON.stringify(Object.assign(result, completeShippingContactModel)));
+
+                        console.log('applePay calling completeShippingContactSelection', completeShippingContactModel);
+
+                        self.activeApplePaySession.completeShippingContactSelection(completeShippingContactModel);
+
+                    }
+                }
             });
         }
 
@@ -230,33 +372,16 @@ const applePayViewModel = ((applePayInstance, parent) => {
             }
 
             self.saveDispatch(e, () => {
+                self.loadTotals(() => {
 
-                let completionModel = {
-                    status: ApplePaySession.STATUS_SUCCESS,
-                    newTotal: {
-                        type: 'final',
-                        label: 'Designers Guild',
-                        amount: getItemSubTotalNumber() + getShippingNumber()
-                    },
-                    newLineItems: [{
-                        label: 'Sub Total',
-                        type: 'final',
-                        amount: getItemSubTotalNumber()
+                    let completionModel = self.completeShippingContactModel;
 
-                    }, {
-                        label: 'Delivery',
-                        type: 'final',
-                        amount: getShippingNumber()
-                    }, {
-                        label: 'Tax',
-                        type: 'final',
-                        amount: '0.00'
-                    }]
-                };
+                    completionModel.status = ApplePaySession.STATUS_SUCCESS;
 
-                asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGMETHODSELECTION, JSON.stringify(completionModel));
+                    asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETESHIPPINGMETHODSELECTION, JSON.stringify(completionModel));
 
-                self.activeApplePaySession.completeShippingMethodSelection(completionModel);
+                    self.activeApplePaySession.completeShippingMethodSelection(completionModel);
+                });
             });
         }
 
@@ -316,7 +441,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
                     IsClickCollect: false,
                     masterDefinition: getMasterDefinition(),
                     secondSave: true
-                }, () => {
+                }, (result) => {
                     self.submit(payload.nonce, e.payment.shippingContact.emailAddress);
                 });
             });
@@ -330,6 +455,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
         }
     }
 
+    // This is the sucessful end, should only be called from submit success branch
     self.endApple = () => {
         asyncCheckoutLog(LOG_ACTION_APPLE_COMPLETEPAYMENT, 'completePayment(ApplePaySession.STATUS_SUCCESS)');
         self.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
@@ -371,35 +497,15 @@ const applePayViewModel = ((applePayInstance, parent) => {
 
                 deliveryOptions.html(data);
 
-                ko.cleanNode(deliveryOptions[0]);
-
-                let model = {
-                    deliveryAddressFactory: {
-                        dispatchBusy: ko.observable(false),
-                        parent: {
-                            dispatchBusy: ko.observable(false)
-                        },
-                        dispatchOptions: ko.observableArray([])
-                    }
-                };
-
-                ko.applyBindings(model, deliveryOptions[0]);
-
-                // this because the markup contains a call which binding the binding hits
-                // which throws dispatchBusy true
-                window.setTimeout(() => {
-                    model.deliveryAddressFactory.dispatchBusy(false);
-                    model.deliveryAddressFactory.parent.dispatchBusy(false);
-                }, 0);
-
                 self.dispatchOptionsFromServer(getDispatchOptions().checkoutDispatchDeliveryOptions);
+                self.consolidatedDispatchOptionsFromServer(getDispatchOptions().checkoutDispatchAppleDeliveryOptions);
 
                 onComplete();
             },
             error: function (xhr, s, a) {
                 self.hideCompletingMessage();
                 self.hidePaymentProcessingError();
-                self.endApple();
+                self.abortApple();
                 window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
             }
         });
@@ -429,7 +535,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
             error: function (xhr, s, a) {
                 self.hideCompletingMessage();
                 self.hidePaymentProcessingError();
-                self.endApple();
+                self.abortApple();
                 window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
             }
         });
@@ -449,108 +555,11 @@ const applePayViewModel = ((applePayInstance, parent) => {
             data: addressData,
             success: function (data) {
                 console.log('applePay saveDeliveryAddress returned', data);
-
-                if (data.state === 'OK') {
-                    onComplete();
-                } else {
-                    if (data.message === "checkoutBasketExpired") {
-                        jumpToSessionExpired();
-                        return;
-                    } else if (data.message === "invalidZipCode") {
-                        document.querySelector('#sales-tax-text').innerHTML = `${self.resources.CheckoutAddressZipCodeProblem}<br/><br/>${self.resources.ApplePayFailureNotCharged}`;
-                        self.showZipModal();
-                    } else if (data.message === "zipTaxServiceFailed") {
-                        document.querySelector('#sales-tax-text').innerHTML = `${self.resources.CheckoutAddressZipCodeProblem}<br/><br/>${self.resources.ApplePayFailureNotCharged}`;
-                        self.showZipModal();
-                    }
-                    self.hideCompletingMessage();
-                    self.hidePaymentProcessingError();
-                    self.endApple();
-                }
+                onComplete(data);
             },
             error: function (xhr, textStatus, errorThrown) {
                 self.abortApple();
                 window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
-            }
-        });
-    }
-
-    self.selectDeliveryAddress = (onComplete) => {
-        console.log('applePay selectDeliveryAddress calling');
-
-        asyncCheckoutLog(LOG_ACTION_APPLE_FETCHADDRESS, addressData);
-
-        $.ajax({
-            url: "/api/checkout/selectCheckoutAddress",
-            type: "Post",
-            cache: false,
-            async: true,
-            dataType: 'json',
-            data: addressData,
-            success: function (data) {
-                console.log('applePay selectDeliveryAddress returned', data);
-                self.selectedDeliveryAddress = data;
-                if (data.ShouldPerformSalesTaxCheck) {
-                    self.salesTaxCheck(onComplete);
-                } else {
-                    onComplete();
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                self.hideCompletingMessage();
-                self.hidePaymentProcessingError();
-                self.endApple();
-                window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
-            }
-        });
-    }
-
-    self.showZipModal = () => {
-        bootstrap.Modal.getOrCreateInstance(document.querySelector("#zip-modal")).show();
-    }
-
-    self.hideZipModal = () => {
-        bootstrap.Modal.getOrCreateInstance(document.querySelector("#zip-modal")).hide();
-    }
-
-    self.salesTaxCheck = (onComplete) => {
-        async = typeof async === 'undefined' ? true : async;
-        guest = typeof guest === 'undefined' ? true : guest;
-
-        var url = '/api/checkout/checkSalesTaxZipCode';
-
-        var data = {
-            MemberAddressID: ko.unwrap(checkoutAddress.memberAddressId),
-            Postcode: ko.unwrap(checkoutAddress.postcode),
-            Country: ko.unwrap(checkoutAddress.country).Code,
-            BasketCountry: getSiteCountry()
-        };
-
-        if (guest) {
-            url = '/api/checkout/guestCheckSalesTaxZipCode';
-            data = {
-                country: ko.unwrap(checkoutAddress.country).Code,
-                postcode: ko.unwrap(checkoutAddress.postcode)
-            }
-        }
-
-        //console.log('deliveryAddressFactory checkSalesTaxZipCode called', data, async, guest, checkoutAddress)
-
-        $.ajax({
-            url: url,
-            type: "Post",
-            cache: false,
-            async: async,
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-
-                //console.log('deliveryAddressFactory checkSalesTaxZipCode returned', data);
-
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                //console.log('deliveryAddressFactory checkSalesTaxZipCode error:', xhr, textStatus, errorThrown);
-                alert(self.resources.MajorError);
             }
         });
     }
@@ -575,9 +584,11 @@ const applePayViewModel = ((applePayInstance, parent) => {
             0
         ));
 
+        let deliveryBandId = self.dispatchOptionsFromServer().find(x => x.SortOrder == e.shippingMethod.identifier).DeliveryBandID;
+
         let data = [{
             dispatchId: 1,
-            deliveryBandId: e.shippingMethod.identifier,
+            deliveryBandId: deliveryBandId,
             shouldPartShip: false,
             minDeliveryDate: minDate.toISOString(),
             maxDeliveryDate: maxDate.toISOString(),
@@ -602,7 +613,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
             error: function (xhr, textStatus, errorThrown) {
                 self.hideCompletingMessage();
                 self.hidePaymentProcessingError();
-                self.endApple();
+                self.abortApple();
                 window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
             }
         });
@@ -686,7 +697,7 @@ const applePayViewModel = ((applePayInstance, parent) => {
 
                 self.hideCompletingMessage();
                 self.hidePaymentProcessingError();
-                self.endApple();
+                self.abortApple();
                 window.showInfo(self.resources.Sorry, self.resources.ApplePayFailureNotCharged);
             },
             timeout: 90000
