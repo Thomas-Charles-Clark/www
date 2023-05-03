@@ -147,7 +147,7 @@
         }
 
         <div class="pod-card pointer"
-             onclick="window.loadQuickLook('@url', '@Model.ProductPage.Heading')">
+             onclick="window.loadQuickLook('@url', '@HtmlHelperExtra.EscapeForJS(Html.Raw(Model.ProductPage.Heading))')">
             <div class="card">
                 @if (HtmlHelperExtra.Debug)
                 {
@@ -163,8 +163,8 @@
                 <img class="card-img-top"
                      width="488"
                      height="488"
-                     alt="@(Model.ProductPage.Heading)"
-                     title="@(Model.ProductPage.Heading)"
+                     alt="@Html.Raw(Model.ProductPage.Heading)"
+                     title="@Html.Raw(Model.ProductPage.Heading)"
                      src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))/@(Model.ProductPage.ImageID)"
                      @HtmlHelperExtra.ImageSourceSetSizes(Model.ProductPage.ImageID, Model.ImageSize)
                      loading="lazy" />
