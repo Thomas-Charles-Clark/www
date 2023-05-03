@@ -167,7 +167,7 @@
                                      Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
                 <!-- /ko -->
             }
-            if (Model.ProductTypeID == 18 && c == 81 && l == 1)
+            if (!Model.IsHotspot && Model.ProductTypeID == 18 && c == 81 && l == 1)
             {
                 <div class="order-form-item mt-3">
                     <div class="order-form-controls">
@@ -198,7 +198,7 @@
         }
         else
         {
-            if (Model.ProductTypeID == 18 && c == 81 && l == 1)
+            if (!Model.IsHotspot && Model.ProductTypeID == 18 && c == 81 && l == 1)
             {
                 <div class="order-form-item mt-3">
                     <div class="order-form-controls">

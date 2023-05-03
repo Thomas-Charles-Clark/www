@@ -295,6 +295,8 @@ namespace wwwDesignersGuild.ViewModels
         [JsonIgnore]
         public BasketGenerateQuick Basket { get; set; }
 
+        public bool IsHotspot { get; set; }
+
         public OrderFormItemViewModel(
             object productBase,
             NewMasterDefinition objMaster,
@@ -334,6 +336,8 @@ namespace wwwDesignersGuild.ViewModels
 
                 ((JArray)Product["orderFormProperties"]).Insert(0, JToken.FromObject(new { key = nameResource, value = BasketName }));
             }
+
+            IsHotspot = false;
         }
     }
 }
