@@ -35,7 +35,6 @@ else
         @Render.StylesPreload("~/bundles/css/trade-mobile")
     }
     @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
-    @Render.Script("~/bundles/js/trade-address-management")
     <div class="mb-8"
          data-bind="stopBinding">
         <div id="trade-account-contact-details">
@@ -121,4 +120,6 @@ else
         }
 
     </script>
+    @Render.Script("/js/dist/lib/intl-tel-input/dist/intl-tel-input-jquery.min.js")
+    @Render.Script("~/bundles/js/trade-address-management")
 }
