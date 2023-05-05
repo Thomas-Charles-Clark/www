@@ -1481,6 +1481,12 @@ namespace wwwDesignersGuild.ViewModels
                         "SomeoneSharedAMoodboardWithYou"
                     });
                     break;
+                case (int)dgFixedPage.tradeClearance:
+                    required.AddRange(new string[] { 
+                        "AreYouSure",
+                        "ChangingFiltersClearsSelection"
+                    });
+                    break;
                 default:
                     break;
             }
