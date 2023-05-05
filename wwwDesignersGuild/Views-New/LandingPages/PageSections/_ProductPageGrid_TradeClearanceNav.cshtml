@@ -10,7 +10,6 @@
 
     var grid = (ProductPageGridPageSection)Model.Definition;
 }
-@Render.Script("~/bundles/js/trade-clearance")
 <div id="trade-clearance-card" class="card" data-bind="tradeClearanceAddition: productPageGrid, with: productPageGrid">
     <button disabled type="button" class="card-img-top btn btn-primary filters-button collapsed" data-bs-target="#trade-clearance-control-panel" data-bs-toggle="collapse" data-bind="class: 'loaded', enable: true, click: () => { selectMode(!selectMode()) }">
         @HtmlHelperExtra.Resource("DownloadClearanceList", l, c, d)
@@ -48,3 +47,4 @@
         </div>
     </div>
 </div>
+@Render.Script("~/bundles/js/trade-clearance")
