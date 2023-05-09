@@ -82,5 +82,6 @@
 //#endregion
 
 if (typeof window.onBootstrapLoad === 'function') {
+    console.log('window.onBootstrapLoad');
     window.onBootstrapLoad();
 }

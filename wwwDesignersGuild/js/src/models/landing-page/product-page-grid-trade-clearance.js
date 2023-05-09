@@ -169,43 +169,41 @@
         //    return fileName;
         //}
 
-        self.setupOffcanvasEvents = () => {
+        self.handleOffCanvasShow = (e) => {
+            console.log(`#grid-filters${self.parent.pageSectionId} offCanvas show`, e);
+            let productPageIds = self.filteredContent().flatMap(pp => pp.selected() ? [pp.ProductPageID] : []);
+            if (productPageIds.length) {
+                console.log(`#grid-filters${self.parent.pageSectionId} offCanvas show interrupted`);
+                e.preventDefault();
+                window.showConfirm(self.resources.AreYouSure, self.resources.ChangingFiltersClearsSelection, () => {
+                    console.log(`#grid-filters${self.parent.pageSectionId} offCanvas show confirmed`);
+                    self.filteredContent().forEach(fc => {
+                        fc.selected(false);
+                    });
+                    self.offCanvas._element.removeEventListener('show.bs.offcanvas', self.handleOffCanvasShow);
+                    self.offCanvas._element.addEventListener('show.bs.offcanvas', self.setupOffCanvasEvents, {
+                        once: true
+                    });
+                    self.offCanvas.show();
+                }, () => {
+                    console.log(`#grid-filters${self.parent.pageSectionId} offCanvas show refused`);
+                });
+            }
+        }
 
+        self.setupOffCanvasEvents = () => {
+            console.log('setupOffCanvasEvents');
             self.offCanvasElementId = `grid-filters-${self.parent.pageSectionId}`;
 
             self.offCanvasElement = document.getElementById(self.offCanvasElementId);
 
             self.offCanvas = bootstrap.Offcanvas.getOrCreateInstance(self.offCanvasElement);
 
-            self.offCanvas._element.addEventListener('show.bs.offcanvas', (e) => {
-                console.log(`#grid-filters${self.parent.pageSectionId} offCanvas show`, e);
-                let productPageIds = self.filteredContent().flatMap(pp => pp.selected() ? [pp.ProductPageID] : []);
-                if (productPageIds.length) {
-                    e.preventDefault();
-                    window.showConfirm(self.resources.AreYouSure, self.resources.ChangingFiltersClearsSelection, () => {
-                        self.filteredContent().forEach(fc => {
-                            fc.selected(false);
-                        });
-                        self.offCanvas.show();
-                    }, null);
-                } else {
-                    self.offCanvas.show();
-                }
-            }, {
-                once: true
-            });
-
-            self.offCanvas._element.addEventListener('shown.bs.offcanvas', (e) => {
-                self.setupOffcanvasEvents();
-            }, {
-                once: true
-            })
+            self.offCanvas._element.addEventListener('show.bs.offcanvas', self.handleOffCanvasShow);
         }
 
         window.addBootstrapLoadFunction(() => {
-
-            self.setupOffcanvasEvents();
-
+            self.setupOffCanvasEvents();
         });
     }
 }
