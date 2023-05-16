@@ -12,6 +12,7 @@ using wwwDesignersGuild.Models.Interface;
 using System.Data.SqlClient;
 using System.Configuration;
 using wwwDesignersGuild.Models.Cache.ProductPages;
+using System.Management.Automation;
 
 namespace wwwDesignersGuild.Models.LandingPage
 {
@@ -22,14 +23,17 @@ namespace wwwDesignersGuild.Models.LandingPage
             byte? result = null;
 
             var cache = new SiteSectionCacheProvider();
-
+             
             result = cache.Get(pageId, useDate);
 
             if (result == null) // neat trick! all landing pages have a site section, so this stands.
             {
                 result = await Task.FromResult(loadSiteSectionFromCmsDatabase(pageId));
 
-                cache.Set(pageId, useDate, result);
+                if (result != null)
+                {
+                    cache.Set(pageId, useDate, result);
+                }
             }
 
             return result;
