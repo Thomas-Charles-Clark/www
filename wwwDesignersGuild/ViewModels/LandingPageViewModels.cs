@@ -1990,7 +1990,10 @@ namespace wwwDesignersGuild.ViewModels
                 }
             });
 
-            var url = HttpContext.Current.Request.Url.ToString().Replace(originalUrlKeywords, "");
+            var url = HttpContext.Current.Request.Url.ToString();
+            
+            if (!String.IsNullOrEmpty(originalUrlKeywords))
+                url = url.Replace(originalUrlKeywords, "");
 
             var matches = result.UrlParsingRegex.Matches(url);
 
