@@ -2682,3 +2682,15 @@ nav.article-type-nav.article-sub-type-nav {
         }
     }
 }
+
+.ui-autocomplete {
+    position: absolute;
+    background: #fff;
+    list-style-type: none;
+    text-indent: 0;
+
+    &.address-autocomplete{
+        right: 2px !important;
+        left: unset !important;
+    }
+}
