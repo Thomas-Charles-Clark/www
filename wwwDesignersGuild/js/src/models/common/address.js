@@ -1839,8 +1839,9 @@ var addressSearchFactory = ((
 
             if (countryId) {
                 self.addressObject.countryId(countryId);
+                self.addressObject.countryWidget().value(countryId);
+                self.addressObject.countryWidget().dataSource.read();
                 self.countryId(countryId); // set the search as well, why not - also means we don't float and notch the label while unselected
-                //self.addressObject.countryWidget().dataSource.read();
             }
 
             self.showEditModal();

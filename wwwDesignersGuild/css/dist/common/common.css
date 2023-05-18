@@ -2310,4 +2310,15 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   justify-content: center;
   margin: 1rem 0;
 }
+
+.ui-autocomplete {
+  position: absolute;
+  background: #fff;
+  list-style-type: none;
+  text-indent: 0;
+}
+.ui-autocomplete.address-autocomplete {
+  right: 2px !important;
+  left: unset !important;
+}
 /*# sourceMappingURL=common.css.map */
