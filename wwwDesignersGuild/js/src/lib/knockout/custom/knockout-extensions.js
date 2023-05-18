@@ -302,13 +302,19 @@ ko.extenders.pcaPredict = function (observable, options) {
                                 }
 
                                 options.mapFunction(
-                                    data[0].Company,
-                                    "",
-                                    line1,
-                                    data[0].Line2,
-                                    data[0].City,
-                                    county,
-                                    data[0].PostalCode);
+                                    data[0].Company, // companyName
+                                    "", // contactName
+                                    line1, // adressLine1
+                                    data[0].Line2, // addressLine2
+                                    data[0].City, // town
+                                    county, // county
+                                    data[0].PostalCode, // postcode
+                                    null, // phone
+                                    null, // email
+                                    null, // deliveryReference
+                                    true, // loqateAddress
+                                    ko.unwrap(options.country).CountryID // countryId
+                                );
 
                                 $(options.elementId || options.element).autocomplete("close");
 
