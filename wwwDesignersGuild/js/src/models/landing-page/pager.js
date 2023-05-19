@@ -2,13 +2,19 @@
     let self = {
         parent: grid,
         page: ko.observable(1),
-        pageSize: ko.observable(),
+        pageSize: ko.observable(48),
         breadth: ko.observable(),
         sort: ko.observable()
     };
 
     self.page.subscribe(nv => {
+
         console.log('pager.page subscribe hit', nv);
+
+        if (nv > self.pageCount()) {
+            self.page(self.pageCount());
+            return;
+        }
         let koWrapper = document.querySelector('.page-section-grid-nav');
         if (koWrapper && koWrapper.offsetTop < window.scrollY) {
             console.log('pager.page.subscribe scrolling to ', koWrapper.offsetTop)
@@ -19,6 +25,17 @@
             });
         }
     })
+
+    self.pageSize.subscribe(nv => {
+        console.log('pager.pageSize subscribe hit', nv);
+        if (self.page() > self.pageCount()) {
+            self.page(self.pageCount());
+        }
+    });
+
+    self.sort.subscribe(nv => {
+        console.log('pager.sort subscribe hit', nv);
+    });
 
     // Only true for Search at the moment
     self.ajax = ko.observable();
@@ -32,11 +49,8 @@
     // We have no desire to re-render the first page
     self.skipRender = ko.observable(true);
 
-    // What does this hold...?
+    // This holds PageCount from the server. It is fed by prerendered binding.
     self.pages = ko.observable();
-
-    // Where did this go...?
-    self.pageSize = ko.observable();
 
     self.pageCount = ko.pureComputed({
         read: () => {
@@ -57,12 +71,6 @@
         rateLimit: {
             timeout: 10,
             method: 'notifyWhenChangesStop'
-        }
-    });
-
-    self.pageSize.subscribe((newValue) => {
-        if (self.page() > self.pageCount()) {
-            self.page(self.pageCount())
         }
     });
 

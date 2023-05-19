@@ -27,6 +27,7 @@ using MertexerV2.Models.Accounts;
 using MertexerV2SQL.Accounts;
 using MertexerV2SQL.Models.Accounts;
 using System.Net.Http.Headers;
+using System.Xml.Linq;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -1095,7 +1096,7 @@ namespace wwwDesignersGuild.Controllers
 
             var products = data.Document.Element("result").Element("Products").Elements("Product").ToList();
 
-            var stocks = data.Document.Element("result").Element("Stocks").Elements("Stock").ToList();
+            var stocks = data.Document.Element("result").Element("Stocks")?.Elements("Stock").ToList() ?? new List<XElement>();
 
             Util.SpreadsheetHelper.WriteClearanceSpreadsheet(filePath, products, stocks);
 
@@ -1290,7 +1291,7 @@ namespace wwwDesignersGuild.Controllers
 
             var products = data.Document.Element("result").Element("Products").Elements("Product").ToList();
 
-            var stocks = data.Document.Element("result").Element("Stocks").Elements("Stock").ToList();
+            var stocks = data.Document.Element("result").Element("Stocks")?.Elements("Stock").ToList() ?? new List<XElement>();
             
             Util.SpreadsheetHelper.WriteClearanceSpreadsheet(filePath, products, stocks);
 
