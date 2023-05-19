@@ -19,7 +19,7 @@
 @{
     @* Leave console.log and console.trace alone for status@designersguild.com *@
     if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]) &&
-        Model.Visitor?.memberId != 1547882)
+        (Model.Visitor?.memberId != 1547882 && Model.Visitor?.memberId != 8))
     {
         @:console.trace = function () { };
         @:console.log = function () { };

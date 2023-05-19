@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml.Linq;
+
 using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Country;
@@ -802,7 +804,7 @@ namespace wwwDesignersGuild.Controllers
 
             var products = data.Document.Element("result").Element("Products").Elements("Product").ToList();
 
-            var stocks = data.Document.Element("result").Element("Stocks").Elements("Stock").ToList();
+            var stocks = data.Document.Element("result").Element("Stocks")?.Elements("Stock").ToList() ?? new List<XElement>();
 
             Util.SpreadsheetHelper.WriteClearanceSpreadsheet(filePath, products, stocks);
 

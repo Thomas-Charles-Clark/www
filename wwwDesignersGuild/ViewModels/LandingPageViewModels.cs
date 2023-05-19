@@ -2104,6 +2104,8 @@ namespace wwwDesignersGuild.ViewModels
             var overallSelection = result.AttributeGroups.Where(ag => ag.Selection.Any())
                 .SelectMany(ag => ag.Selection).Distinct().ToList();
 
+            result.InitialisePager();
+
             var initialProductPageIds = completeResultSet
                 .Where(crs => result.ProductType == null || crs.ProductTypeFormValue == result.ProductType)
                 .Select(p => p.ProductPageID).ToList();
@@ -2216,8 +2218,6 @@ namespace wwwDesignersGuild.ViewModels
                 result.FilteredIDs = completeResultSet.Select(p => p.ProductPageID).ToList();
             }
 
-            result.InitialisePager();
-
             #region Perform Sorting
 
             result.SortContents(ref completeResultSet);
@@ -2231,6 +2231,8 @@ namespace wwwDesignersGuild.ViewModels
                 result.TakeCount = result.Contents.Count();
             else
                 result.TakeCount = result.PageSize;
+
+            result.InitialisePager();
 
             return result;
         }
