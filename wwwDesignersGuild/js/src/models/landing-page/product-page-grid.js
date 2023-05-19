@@ -22,10 +22,22 @@
 
     self.selectedAttributes = ko.observableArray([]);
 
+    self.selectedAttributes.subscribe(nv => {
+        console.log('selectedAttributes subscribe hit');
+    });
+
     self.searchable = ko.observable();
 
+    self.searchable.subscribe(nv => {
+        console.log('searchable subscribe hit', nv);
+    });
+        
     // Not in use by the search results product page grid.+
     self.allProductPages = ko.observableArray([]);
+
+    self.allProductPages.subscribe(nv => {
+        console.log('allProductPages subscribe hit', nv);
+    });
 
     self.allProductPagesReady = ko.observable(false);
 
@@ -35,9 +47,17 @@
 
     self.filteredContent = ko.observableArray([]); //this is used by the pager
 
+    self.filteredContent.subscribe(nv => {
+        console.log('filteredContent subscribe hit', nv);
+    });
+
     self.lazyImageNonce = ko.observable();
 
     self.readyToCalculateAvailability = ko.observable(false);
+
+    self.readyToCalculateAvailability.subscribe(nv => {
+        console.log('readyToCalculateAvailability subscribe hit', nv);
+    });
 
     self.offcanvas = ko.observable();
 
@@ -156,6 +176,7 @@
     //#region Subscriptions
 
     self.allProductPagesReady.subscribe(nv => {
+        console.log('allProductPagesReady subscribe hit', nv);
         self.allProductPages().forEach(pp => {
             if (typeof pp === 'object') {
                 pp.Heading = ko.observable(pp.Heading);
@@ -189,6 +210,8 @@
 
                 let obj = {};
 
+                console.log(`updateUrl #page-section-${self.parent.PageSection.PageSectionID}-form FormData.entries():`);
+
                 for (const kvp of e.entries()) {
                     if (obj.hasOwnProperty(kvp[0])) {
                         obj[kvp[0]] = [obj[kvp[0]]];
@@ -196,6 +219,7 @@
                     } else {
                         obj[kvp[0]] = kvp[1];
                     }
+                    console.log(kvp);
                 }
 
                 let qs = new URLSearchParams(obj);
@@ -435,7 +459,7 @@
                     self.skippedFirstUrlUpdate == null) {
                     self.skippedFirstUrlUpdate = true;
                 } else {
-                    console.log('updating URL');
+                    console.log('updating URL', url);
                     window.history.replaceState({}, '', url);
                 }
             }
@@ -513,6 +537,7 @@
     //#region Computeds
 
     self.selectedProductType = ko.pureComputed(() => {
+        console.log('selectedProductType computing');
         if (self.productTypes().length)
             return self.productTypes().flatMap(pt => pt.FormValue == self.productType() ? [pt] : [])[0];
         else
@@ -520,6 +545,7 @@
     }, self);
 
     self.productTypeId = ko.pureComputed(() => {
+        console.log('productTypeId computing');
         return ko.unwrap(self.selectedProductType)?.ProductTypeID;
     }, self);
 
@@ -572,6 +598,7 @@
     }, self);
 
     self.determineAvailableProductPages = ko.computed(() => {
+        console.log('determineAvailableProductPages computing');
         // We're only ready once we've built all attributes
         if (self.readyToCalculateAvailability()) {
             // Wait for a product type to be selected (one always will be)
@@ -691,6 +718,10 @@
     // this because we want to skip the first re-render: the server has already done that render.
     self.skipProductPageRenderer = ko.observable(true);
 
+    self.skipProductPageRenderer.subscribe(nv => {
+        console.log('skipProductPageRenderer subscribe hit',)
+    });
+    
     self.productPageRenderer = ko.computed({
         read: () => {
 
@@ -699,6 +730,9 @@
             let page = self.pager.page();
 
             let pageSize = self.pager.pageSize();
+
+            console.log('productPageRenderer page', page);
+            console.log('productPageRenderer pageSize', pageSize);
 
             let sort = self.searchable() ? self.pager.sort.peek() : self.pager.sort();
 
