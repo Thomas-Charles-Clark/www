@@ -83,12 +83,19 @@
 
     self.originalTitle = ko.observable();
 
+    self.attributeSignatures = null;
+
     self.filterTextComputer = ko.computed(() => {
 
         // grab dependencies
         let productTypeText = self.productTypeText();
         let productTypeTextPlural = self.productTypeTextPlural();
         let filterText = self.filterText();
+
+        let selectedAttributeIdsSignature = self.selectedAttributes().map(sa => {
+            return self.attributes().find(a => a.FormValue == sa).AttributeID;
+        }).join('.')
+        let attributeSignature = self.attributeSignatures && self.attributeSignatures.find(a => a.AttributeSignature == selectedAttributeIdsSignature)?.FooterText;
 
         // parent doesn't necessarily have Definition yet; init might not have taken place yet
         if (self.parent.hasOwnProperty('Definition')) {
@@ -156,14 +163,29 @@
                     self.allProductPages().forEach(pp => {
                         if (typeof pp === 'object') {
                             if (ko.isObservable(pp.Heading)) {
-                                 pp.Heading(pp.OriginalHeading);
+                                pp.Heading(pp.OriginalHeading);
                             }
                         }
                     });
                 }
+
+                if (attributeSignature) {
+                    document.querySelectorAll('.attribute-signature-text').forEach(e => {
+                        e.innerHTML = `${attributeSignature}`;
+                    });
+                } else {
+                    document.querySelectorAll('.attribute-signature-text').forEach(e => {
+                        e.innerHTML = e.dataset['originalContents'];
+                    });
+                }
             }
         }
-    }, self);
+    }, self).extend({
+        rateLimit: {
+            timeout: 20,
+            method: 'notifyWhenChangesStop'
+        }
+    });
 
     //#endregion
 
