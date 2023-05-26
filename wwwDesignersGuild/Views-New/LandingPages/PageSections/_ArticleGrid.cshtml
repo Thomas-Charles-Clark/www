@@ -41,7 +41,7 @@
         <div class="my-3">
             <nav class="article-type-nav article-sub-type-nav nav-justified" aria-label="@HtmlHelperExtra.Resource("ArticleSubTypes", l, c, d)">
                 <ul class="nav">
-                @foreach(var ast in grid.ArticleSubTypes)
+               @foreach(var ast in grid.ArticleSubTypes)
                 {
                     <li class="nav-item @(Model.Base.ContentID == ast.PageID ? "active" : "")">
                         <a class="nav-link" href="@Framework.URLFixup(ast.URL)">
@@ -66,14 +66,14 @@ else
         </span>
         <select class="form-select my-2"
                 data-bind="value: articleTypeId">
-            @foreach(var at in grid.ArticleTypes)
+           @foreach(var at in grid.ArticleTypes)
             {
                 <option value="@at.URL" @(grid.GridArticleType == at.ArticleTypeID ? "selected" : "")>
                     @(at.Name)
                 </option>
             }
         </select> 
-        @if (grid.ArticleSubTypes.Any())
+       @if (grid.ArticleSubTypes.Any())
         {
             <span class="d-none" data-bind="init: { convert: parseString }, text: articleSubTypeId, remove">
                 @(grid.ArticleSubTypes.SingleOrDefault(ast => ast.PageID == Model.Base.ContentID)?.URL)
@@ -81,7 +81,7 @@ else
             <select id="article-sub-type-select"
                     class="form-select my-2"
                     data-bind="value: articleSubTypeId">
-            @foreach(var ast in grid.ArticleSubTypes)
+           @foreach(var ast in grid.ArticleSubTypes)
             {
                 <option value="@ast.URL" @(Model.Base.ContentID == ast.PageID ? "selected" : "")>
                     @(ast.Name)
@@ -104,7 +104,7 @@ else
     }
     <div class="my-3">
         <div class="article-grid grid" data-bind="foreachInit: { name: 'ko-article-pod-template', data: articleGrid.visibleArticles, createElement: articleGrid.createArticlePod, afterQueueFlush: window.lazyImages }">
-            @if (Model.PageSection.Paging)
+           @if (Model.PageSection.Paging)
             {
                 foreach (var a in grid.GetArticles(objMaster).Skip((grid.Page - 1) * grid.PageSize).Take(grid.PageSize))
                 {
@@ -120,7 +120,7 @@ else
             }
         </div>
         <div class="d-none" data-bind="foreachInit: { name: 'ko-blank-template', data: articleGrid.allArticles, createElement: articleGrid.createArticlePod }, css: { 'ready': articleGrid.allArticlesInitialised() }, remove">
-            @foreach (var p in grid.Contents)
+           @foreach (var p in grid.Contents)
             {
                 <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
                     @Html.Encode(Html.Raw(JsonConvert.SerializeObject(p)))
