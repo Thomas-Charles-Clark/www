@@ -5,6 +5,8 @@ using System.Runtime.Caching;
 using System.Web;
 using System.Web.Configuration;
 
+using Tweetinvi.Parameters;
+
 using U2.Data.ClientTypes;
 
 using wwwDesignersGuild.Models.Hotspot;
@@ -22,22 +24,25 @@ namespace wwwDesignersGuild.Models
 
         public void Set(PassFilterIndexRestrictionCacheFetch objFetch, cmsFilterIndexRestrictionResult data)
         {
-            if (Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool _))
+            if (Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled))
             {
-                var policy = new CacheItemPolicy();
-
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+                if (cacheEnabled)
                 {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+                    var policy = new CacheItemPolicy();
 
-                var key = buildKey(objFetch);
+                    if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+                    {
+                        policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+                    }
+                    else
+                    {
+                        policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+                    }
 
-                Cache.Add(new CacheItem(key, data), policy);
+                    var key = buildKey(objFetch);
+
+                    Cache.Add(new CacheItem(key, data), policy);
+                }
             }
         }
 

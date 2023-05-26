@@ -1,6 +1,10 @@
-﻿using HtmlAgilityPack;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+
+using HtmlAgilityPack;
 
 using iTextSharp.text;
+
+using MertexerV2.SQLFunctions;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -1678,6 +1682,7 @@ namespace wwwDesignersGuild.ViewModels
         public string DeselectedAttributeNames { get; set; }
         public string OriginalURLKeywords { get; set; }
         public bool MustOverwritePageCanonical { get; set; }
+        public IEnumerable<FilterIndexAttributeCombination> AttributeCombinations { get; set; }
 
         // This for use by search 
         public ProductPageGridPageSection(
@@ -1838,13 +1843,23 @@ namespace wwwDesignersGuild.ViewModels
                     model
                 );
 
+            // Filter index restrictions fn
+            var objFilterIndexCombinationLoad = new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
+                    new PassFilterIndexAttributeCombinationCacheFetch() { LanguageID = model.LanguageID, Date = model.Date },
+                    model
+                );
+
             // Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
 
-            await Task.WhenAll(objAttributeLoad, objFilterIndexRestrictionLoad); //(, ...);
+            await Task.WhenAll(objAttributeLoad, objFilterIndexRestrictionLoad, objFilterIndexCombinationLoad); //(, ...);
 
             var attributeData = await objAttributeLoad;
 
             var filterIndexRestrictions = await objFilterIndexRestrictionLoad;
+
+            var filterIndexCombinations = await objFilterIndexCombinationLoad;
+
+            result.AttributeCombinations = filterIndexCombinations.Combinations;
 
             var preResultSet = new List<ProductPageFilterablePodWrapper>();
 
@@ -2032,7 +2047,11 @@ namespace wwwDesignersGuild.ViewModels
 
             attributesList = attributesList.OrderBy(al => al.LexicographicalSortOrder).ToList();
 
+            var attributeSignature = String.Join(".", attributesList.Select(a => $"{a.AttributeID}"));
+
             model.AttributeFilterText = String.Join(" ", attributesList.Select(al => al.AttributeName));
+
+            model.AttributeSignatureText = result.AttributeCombinations.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
 
             if (attributesList.Any())
             {
@@ -2070,6 +2089,7 @@ namespace wwwDesignersGuild.ViewModels
                         filterText: result.MasterDefinition.MetaDescription ?? "",
                         attributeFilterText: model.AttributeFilterText,
                         productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
+                        attributeSignatureText: model.AttributeSignatureText,
                         useHtml: false);
 
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"filter-text\">", "");
@@ -2216,6 +2236,8 @@ namespace wwwDesignersGuild.ViewModels
                 result.DeselectedAttributeNames = String.Join(", ", problemAttributes.Select(pa => pa.Name));
 
                 result.FilteredIDs = completeResultSet.Select(p => p.ProductPageID).ToList();
+
+                model.AttributeSignatureText = null;
             }
 
             #region Perform Sorting

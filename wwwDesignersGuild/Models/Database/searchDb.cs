@@ -362,5 +362,41 @@ namespace wwwDesignersGuild.Models.Database
 
             return db.Connection.Query<FilterIndexRestriction>("SELECT ProductTypeID, AttributeGroupSignature, AttributeGroupDescription FROM dbo.FilterIndexRestrictions WHERE Deleted = 0 AND Enabled = 1", null, null, true, 30, CommandType.Text);
         }
+
+        internal async Task<IEnumerable<FilterIndexAttributeCombination>> FetchFilterIndexAttributeCombinationsAsync(byte languageId)
+        {
+            var db = new databaseDataContext();
+
+            return await db.Connection.QueryAsync<FilterIndexAttributeCombination>(@"
+                SELECT
+                    FIC.ProductTypeID, 
+                    FIC.AttributeSignature,
+                    FIC.AttributeDescription,
+                    FICL.FooterText 
+                FROM 
+                    dbo.FilterIndexCombination_Language AS FICL
+                    INNER JOIN dbo.FilterIndexCombinations AS FIC ON FIC.FilterIndexCombinationID = FICL.FilterIndexCombinationID
+                WHERE FICL.LanguageID = @LanguageID AND FIC.Deleted = 0 AND FIC.Enabled = 1", new { 
+                LanguageID = languageId
+            }, null, 30, CommandType.Text);
+        } 
+
+        internal IEnumerable<FilterIndexAttributeCombination> FetchFilterIndexAttributeCombinations(byte languageId)
+        {
+            var db = new databaseDataContext();
+
+            return db.Connection.Query<FilterIndexAttributeCombination>(@"
+                SELECT
+                    FIC.ProductTypeID, 
+                    FIC.AttributeSignature,
+                    FIC.AttributeDescription,
+                    FICL.FooterText 
+                FROM 
+                    dbo.FilterIndexCombination_Language AS FICL
+                    INNER JOIN dbo.FilterIndexCombinations AS FIC ON FIC.FilterIndexCombinationID = FICL.FilterIndexCombinationID
+                WHERE FICL.LanguageID = @LanguageID AND FIC.Deleted = 0 AND FIC.Enabled = 1", new { 
+                LanguageID = languageId
+            }, null, true, 30, CommandType.Text);
+        }
     }
 }
