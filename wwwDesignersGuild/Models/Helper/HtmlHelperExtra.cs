@@ -864,12 +864,14 @@ namespace wwwDesignersGuild.Models.Helper
             return result;
         }
 
-        public static string ProcessAttributeFilterText(string filterText, string attributeFilterText, string productTypePluralPropercase, bool useHtml = true)
+        // This should be working with the addition of AttributeSignature
+        // However something still needs to be done about JS not being able to pull the appropriate AttributeSignature text for a given filter change
+        public static string ProcessAttributeFilterText(string filterText, string attributeFilterText, string productTypePluralPropercase, string attributeSignatureText, bool useHtml = true)
         {
             var filterRegex = new Regex(@"{FilterStart}((.|\n|\r)*?){FilterEnd}");
-            //var noFilterRegex = new Regex(@"{NoFilterStart}((.|\n|\r)*?){NoFilterEnd}");
             var productTypeProperRegex = new Regex(@"{ProductTypeProperStart}((.|\n|\r)*?){ProductTypeProperEnd}");
             var productTypeRegex = new Regex(@"{ProductTypeStart}((.|\n|\r)*?){ProductTypeEnd}");
+            var attributeSignatureRegex = new Regex(@"{AttributeSignatureStart}((.|\n|\r)*?){AttributeSignatureEnd}");
 
             if (useHtml)
             {
@@ -893,6 +895,15 @@ namespace wwwDesignersGuild.Models.Helper
                     filterText = productTypeProperRegex.Replace(filterText, $"<span class=\"product-type-propercase-text\" data-original-contents=\"$1\">{productTypePluralPropercase}</span> ");
                     filterText = productTypeRegex.Replace(filterText, $"<span class=\"product-type-text\" data-original-contents=\"$1\">{productTypePluralPropercase.ToLowerInvariant()}</span> ");
                 }
+
+                if (!String.IsNullOrEmpty(attributeSignatureText))
+                {
+                    filterText = attributeSignatureRegex.Replace(filterText, $"<span class=\"attribute-signature-text\" data-original-contents=\"$1\">{attributeSignatureText}</span> ");
+                }
+                else
+                {
+                    filterText = attributeSignatureRegex.Replace(filterText, "");
+                }
             }
             else
             {
@@ -907,6 +918,15 @@ namespace wwwDesignersGuild.Models.Helper
                 {
                     filterText = productTypeProperRegex.Replace(filterText, productTypePluralPropercase);
                     filterText = productTypeRegex.Replace(filterText, productTypePluralPropercase.ToLowerInvariant());
+                }
+
+                if (!String.IsNullOrEmpty(attributeSignatureText))
+                {
+                    filterText = attributeSignatureRegex.Replace(filterText, attributeSignatureText);
+                }
+                else
+                {
+                    filterText = attributeSignatureRegex.Replace(filterText, "");
                 }
             }
 
@@ -1172,7 +1192,7 @@ namespace wwwDesignersGuild.Models.Helper
                 }
             }
 
-            return new HtmlString(ProcessAttributeFilterText(doc.DocumentNode.OuterHtml, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural));
+            return new HtmlString(ProcessAttributeFilterText(doc.DocumentNode.OuterHtml, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural, objBase.AttributeSignatureText));
         }
     }
 }

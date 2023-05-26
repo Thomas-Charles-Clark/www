@@ -35,6 +35,7 @@ namespace wwwDesignersGuild.ViewModels
         public bool NoIndex { get; set; }
         public string CustomCanonical { get; set; }
         public string AttributeFilterText { get; set; }
+        public string AttributeSignatureText { get; set; } // this comes from dbo.FilterIndexCombination_Language
 
         public bool UserInCorrectSite
         {

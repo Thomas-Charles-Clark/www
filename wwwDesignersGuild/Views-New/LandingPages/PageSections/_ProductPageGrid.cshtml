@@ -64,6 +64,9 @@
     <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle, remove">
         @grid.OriginalTitle
     </span>
+    <div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures">
+        @JsonConvert.SerializeObject(grid.AttributeCombinations)
+    </div>
    @if (grid.Searchable)
     {
         <input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)"/>
