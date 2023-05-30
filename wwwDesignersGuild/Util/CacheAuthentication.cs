@@ -221,5 +221,6 @@ namespace wwwDesignersGuild.Util
         public bool? TradeSwitch { get; set; }
         public byte? templateId { get; set; }
         public DateTimeOffset? ExplicitExpiry { get; set; }
+        public IEnumerable<long> PageSectionIDs { get; set; }
     }
 }
