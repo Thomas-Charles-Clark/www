@@ -7,6 +7,7 @@ using wwwDesignersGuild.Models.Cache;
 using System.Diagnostics;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Helper;
+using wwwDesignersGuild.Models.Cache.ProductPages;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -179,6 +180,8 @@ namespace wwwDesignersGuild.Controllers
         {
             var cache = new LandingPageCacheProvider();
 
+            var productPageGridCache = new ProductPageGridCacheProvider();
+
             switch (objPurge.TradeSwitch)
             {
                 case true:
@@ -189,6 +192,13 @@ namespace wwwDesignersGuild.Controllers
                     cache.Invalidate(Convert.ToInt32(objPurge.ContentID), objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate, false);
                     cache.Invalidate(Convert.ToInt32(objPurge.ContentID), objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate, true);
                     break;
+            }
+
+            // We must pass all the PageSections belonging to this LandingPage that we wish to purge from the cache
+            foreach (var ps in objPurge.PageSectionIDs)
+            {
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
             }
         }
 
