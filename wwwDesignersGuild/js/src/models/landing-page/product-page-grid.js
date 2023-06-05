@@ -175,7 +175,7 @@
                     });
                 } else {
                     document.querySelectorAll('.attribute-signature-text').forEach(e => {
-                        e.innerHTML = e.dataset['originalContents'];
+                        e.innerHTML = e.dataset['originalContents'] || null;
                     });
                 }
             }
