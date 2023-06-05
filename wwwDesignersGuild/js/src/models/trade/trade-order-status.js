@@ -346,6 +346,9 @@
     ]);
 
     self.customFromDatePicker = {
+        //popup: {
+        //    appendTo: $('#custom-from-date-wrapper')
+        //},
         widget: ko.observable(),
         value: self.customFromDate,
         format: 'dd/MM/yyyy',
@@ -357,6 +360,9 @@
     };
 
     self.customToDatePicker = {
+        //popup: {
+        //    appendTo: $('#custom-to-date-wrapper')
+        //},
         widget: ko.observable(),
         value: self.customToDate,
         format: 'dd/MM/yyyy',
@@ -983,6 +989,19 @@
         if (newValue != -1) {
             self.refresh(self.viewingStatus(), true);
         }
+
+        window.setTimeout(() => {
+            self.customFromDatePicker.widget().setOptions({
+                popup: {
+                    appendTo: $('#custom-from-date')
+                }
+            });
+            self.customToDatePicker.widget().setOptions({
+                popup: {
+                    appendTo: document.querySelector('#custom-to-date')
+                }
+            });
+        }, 0);
     });
 
     self.dateRangeType.subscribe(function (newValue) {

@@ -506,6 +506,13 @@
     }
 }
 
+#custom-from-date-wrapper, #custom-to-date-wrapper {
+    position: relative;
+    .validation-message {
+        padding-right: 32px;
+    }
+}
+
 .invoice-search-controls {
     display: flex;
     gap: $l-gutter;
@@ -548,6 +555,16 @@
     .custom-date-wrapper {
         margin-top: $l-gutter;
         text-align: right;
+
+        span.k-picker-wrap {
+            position: relative;
+        }
+
+        .k-datepicker {
+            width: auto;
+            flex-grow: 0;
+            border: 1px solid $gray-400;
+        }
 
         label:first-of-type {
             margin-right: $l-gutter;
