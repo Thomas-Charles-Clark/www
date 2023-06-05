@@ -80,8 +80,8 @@ else
                     <select class="form-select" data-bind="value: dateRangeType, options: availableDateRangeTypes, optionsValue: 'dateRangeTypeId', optionsText: 'name'"></select>
                     <select class="form-select" data-bind="value: dateRange, options: dateRanges, optionsValue: 'dateRangeId', optionsText: 'name'"></select>
                 </div>
-                <!-- ko if: dateRange() == -1 -->
-                <div class="custom-date-wrapper">
+                <div id="custom-from-date-wrapper" class="custom-date-wrapper">
+                    <!-- ko if: dateRange() == -1 -->
                     <label>
                         @HtmlHelperExtra.Resource("FromProperCase", l, c, d)
                     </label>
@@ -93,8 +93,10 @@ else
                     </button>
                     <span class="validation-message text-danger" data-bind="validationMessage: customFromDate"></span>
                     <span class="validation-message text-danger" data-bind="validationMessage: fromPreceedsTo"></span>
+                    <!-- /ko -->
                 </div>
-                <div class="custom-date-wrapper">
+                <div id="custom-to-date-wrapper" class="custom-date-wrapper">
+                    <!-- ko if: dateRange() == -1 -->
                     <label>
                         @HtmlHelperExtra.Resource("ToProperCase", l, c, d)
                     </label>
@@ -105,8 +107,8 @@ else
                         </span>
                     </button>
                     <span class="validation-message text-danger" data-bind="validationMessage: customToDate"></span>
+                    <!-- /ko -->
                 </div>
-                <!-- /ko -->
             </div>
             <div>
                 <div class="input-group">
@@ -219,7 +221,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'outstanding' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("AllOutstandingOrders", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
@@ -245,7 +249,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'backOrders' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("BackOrders", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
@@ -271,7 +277,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'reserveOrders' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("ReservedStock", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
@@ -297,7 +305,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'despatchedOrders' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("DespatchedOrders", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
@@ -323,7 +333,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'ordersInProgress' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("OrdersInProgress", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
@@ -349,7 +361,9 @@ else
                                 @HtmlHelperExtra.Resource("TradeOutstandingOrdersPleaseWait", l, c, d)
                             </h5>
                         </div>
+                        <!-- ko if: viewingStatus() == 'held' -->
                         <div class="flex-container" data-bind="template: { name: 'search-controls-template' }"></div>
+                        <!-- /ko -->
                         <h6 class="accounts-title">
                             @HtmlHelperExtra.Resource("HeldOrders", l, c, d)
                             <a class="pull-right" data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
