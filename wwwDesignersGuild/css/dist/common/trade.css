@@ -477,6 +477,13 @@
   width: 100%;
 }
 
+#custom-from-date-wrapper, #custom-to-date-wrapper {
+  position: relative;
+}
+#custom-from-date-wrapper .validation-message, #custom-to-date-wrapper .validation-message {
+  padding-right: 32px;
+}
+
 .invoice-search-controls {
   display: flex;
   gap: 1rem;
@@ -510,6 +517,14 @@
 .invoice-search-controls .custom-date-wrapper {
   margin-top: 1rem;
   text-align: right;
+}
+.invoice-search-controls .custom-date-wrapper span.k-picker-wrap {
+  position: relative;
+}
+.invoice-search-controls .custom-date-wrapper .k-datepicker {
+  width: auto;
+  flex-grow: 0;
+  border: 1px solid #ced4da;
 }
 .invoice-search-controls .custom-date-wrapper label:first-of-type {
   margin-right: 1rem;
