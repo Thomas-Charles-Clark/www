@@ -902,7 +902,7 @@ namespace wwwDesignersGuild.Models.Helper
                 }
                 else
                 {
-                    filterText = attributeSignatureRegex.Replace(filterText, "");
+                    filterText = attributeSignatureRegex.Replace(filterText, "<span class=\"attribute-signature-text\"></span>"); //placeholder necessary to receive ast as filters change
                 }
             }
             else
