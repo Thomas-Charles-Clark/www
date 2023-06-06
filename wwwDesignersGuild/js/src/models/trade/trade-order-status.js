@@ -97,7 +97,7 @@
         required: {
             params: true,
             onlyIf: function () {
-                return self.validateSearchNow() && self.dateRange() == -1 && self.customToDate() != null
+                return self.dateRange() == -1;
             },
             message: self.resources.PleaseProvideFromDate
         }
@@ -107,6 +107,13 @@
         date: {
             params: true,
             message: self.resources.ToMustBeDate
+        },
+        required: {
+            params: true,
+            onlyIf: function () {
+                return self.dateRange() == -1;
+            },
+            message: self.resources.PleaseProvideToDate
         }
     });
 
@@ -339,16 +346,7 @@
 
     //#region Components
 
-    self.searchErrors = ko.validation.group([
-        self.customFromDate,
-        self.customToDate,
-        self.fromPreceedsTo
-    ]);
-
     self.customFromDatePicker = {
-        //popup: {
-        //    appendTo: $('#custom-from-date-wrapper')
-        //},
         widget: ko.observable(),
         value: self.customFromDate,
         format: 'dd/MM/yyyy',
@@ -360,9 +358,6 @@
     };
 
     self.customToDatePicker = {
-        //popup: {
-        //    appendTo: $('#custom-to-date-wrapper')
-        //},
         widget: ko.observable(),
         value: self.customToDate,
         format: 'dd/MM/yyyy',
@@ -985,23 +980,44 @@
 
     //#region Subscriptions
 
+    self.customDateSubscriber = ko.computed(() => {
+        let a = self.customFromDate(),
+            b = self.customToDate();
+
+        if (a && b) {
+            window.setTimeout(() => {
+                self.performInvoiceSearch();
+            }, 0);
+        }
+    }, self).extend({
+        rateLimt: {
+            timeout: 0,
+            method: 'notifyWhenChangesStop'
+        }
+    });
+
     self.dateRange.subscribe(function (newValue) {
         if (newValue != -1) {
             self.refresh(self.viewingStatus(), true);
-        }
+        } else {
+            if (!self.customFromDate() && !self.customToDate()) {
 
-        window.setTimeout(() => {
-            self.customFromDatePicker.widget().setOptions({
-                popup: {
-                    appendTo: $('#custom-from-date')
-                }
-            });
-            self.customToDatePicker.widget().setOptions({
-                popup: {
-                    appendTo: document.querySelector('#custom-to-date')
-                }
-            });
-        }, 0);
+                let currentDate = new Date();
+
+                let year = currentDate.getFullYear();
+                let month = currentDate.getMonth();
+                let day = currentDate.getDate();
+                let hours = currentDate.getHours();
+                let minutes = currentDate.getMinutes();
+                let seconds = currentDate.getSeconds();
+                let milliseconds = currentDate.getMilliseconds();
+
+                let adjustedDate = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+
+                self.customToDate(currentDate);
+                self.customFromDate(adjustedDate);
+            }
+        }
     });
 
     self.dateRangeType.subscribe(function (newValue) {
@@ -1088,7 +1104,7 @@
 
     self.fromPreceedsTo = ko.pureComputed(function () {
         if (self.customFromDate() && self.customToDate()) {
-            return self.customFromDate().getTime() <= self.customToDate().getTime();
+            return self.customFromDate().getTime() < self.customToDate().getTime();
         }
     }, self).extend({
         equal: {
@@ -1100,25 +1116,45 @@
         }
     });
 
+    self.toFollowsFrom = ko.pureComputed(function () {
+        if (self.customFromDate() && self.customToDate()) {
+            return self.customFromDate().getTime() < self.customToDate().getTime();
+        }
+    }, self).extend({
+        equal: {
+            params: true,
+            onlyIf: function () {
+                return self.customFromDate() && self.customToDate()
+            },
+            message: self.resources.ToMustFollowFrom
+        }
+    });
+
     //#endregion
 
 
     //#region Methods
+
+    // This would normally be lifted to e.g. components, but can't be because
+    // fromPreceedsTo and toFollowsFrom don't get hoisted
+    self.searchErrors = ko.validation.group([
+        self.fromPreceedsTo,
+        self.toFollowsFrom,
+        self.customFromDate,
+        self.customToDate,
+    ]);
 
     self.search = () => {
         self.refresh(self.viewingStatus(), true);
     }
 
     self.refresh = (orderStatus, force, clean) => {
+
         if (clean) {
-            //self.dateRange(12);
-            //self.dateRangeType(?);
             self.searchTerm(undefined);
         }
 
         self.validateSearchNow(true);
-
-        self.searchErrors.showAllMessages(false);
 
         window.setTimeout(function () {
             if (self.searchErrors().length) {

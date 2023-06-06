@@ -92,6 +92,7 @@
 
     self.customToDate = ko.observable();
 
+
     self.customFromDate.extend({
         date: {
             params: true,
@@ -100,9 +101,9 @@
         required: {
             params: true,
             onlyIf: function () {
-                return self.validateInvoiceSearchNow() && self.dateRange() == -1 && self.customToDate() == null
+                return self.dateRange() == -1;
             },
-            message: self.resources.PleaseProvideFromToOrBoth
+            message: self.resources.PleaseProvideFromDate
         }
     });
 
@@ -114,9 +115,9 @@
         required: {
             params: true,
             onlyIf: function () {
-                return self.validateInvoiceSearchNow() && self.dateRange() == -1 && self.customFromDate() == null
+                return self.dateRange() == -1;
             },
-            message: self.resources.PleaseProvideFromToOrBoth
+            message: self.resources.PleaseProvideToDate
         }
     });
 
@@ -355,7 +356,7 @@
 
     self.fromPreceedsTo = ko.pureComputed(function () {
         if (self.customFromDate() && self.customToDate()) {
-            return self.customFromDate().getTime() <= self.customToDate().getTime();
+            return self.customFromDate().getTime() < self.customToDate().getTime();
         }
     }, self).extend({
         equal: {
@@ -364,6 +365,20 @@
                 return self.validateInvoiceSearchNow() && self.customFromDate() && self.customToDate()
             },
             message: self.resources.FromMustPreceedTo
+        }
+    });
+
+    self.toFollowsFrom = ko.pureComputed(function () {
+        if (self.customFromDate() && self.customToDate()) {
+            return self.customFromDate().getTime() < self.customToDate().getTime();
+        }
+    }, self).extend({
+        equal: {
+            params: true,
+            onlyIf: function () {
+                return self.customFromDate() && self.customToDate()
+            },
+            message: self.resources.ToMustFollowFrom
         }
     });
 
@@ -411,12 +426,6 @@
 
 
     //#region Components
-
-    self.invoiceSearchErrors = ko.validation.group([
-        self.customFromDate,
-        self.customToDate,
-        self.fromPreceedsTo
-    ]);
 
     self.customFromDatePicker = {
         widget: ko.observable(),
@@ -919,10 +928,43 @@
 
     //#region Subscriptions
 
+    self.customDateSubscriber = ko.computed(() => {
+        let a = self.customFromDate(),
+            b = self.customToDate();
+
+        if (a && b) {
+            window.setTimeout(() => {
+                self.performInvoiceSearch();
+            }, 0);
+        }
+    }, self).extend({
+        rateLimt: {
+            timeout: 0,
+            method: 'notifyWhenChangesStop'
+        }
+    });
 
     self.dateRange.subscribe(function (newValue) {
         if (newValue != -1) {
             self.performInvoiceSearch();
+        } else {
+            if (!self.customFromDate() && !self.customToDate()) {
+
+                let currentDate = new Date();
+
+                let year = currentDate.getFullYear();
+                let month = currentDate.getMonth();
+                let day = currentDate.getDate();
+                let hours = currentDate.getHours();
+                let minutes = currentDate.getMinutes();
+                let seconds = currentDate.getSeconds();
+                let milliseconds = currentDate.getMilliseconds();
+
+                let adjustedDate = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+
+                self.customToDate(currentDate);
+                self.customFromDate(adjustedDate);
+            }
         }
     });
 
@@ -937,6 +979,15 @@
 
 
     //#region Methods
+
+    // This would normally be lifted to e.g. components, but can't be because
+    // fromPreceedsTo and toFollowsFrom don't get hoisted
+    self.invoiceSearchErrors = ko.validation.group([
+        self.fromPreceedsTo,
+        self.toFollowsFrom,
+        self.customFromDate,
+        self.customToDate,
+    ]);
 
     self.refreshAccountSummary = function () {
         self.accountSummaryBusy(true);
