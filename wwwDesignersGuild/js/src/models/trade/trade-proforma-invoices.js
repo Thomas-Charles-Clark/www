@@ -72,7 +72,7 @@
         required: {
             params: true,
             onlyIf: function () {
-                return self.validateSearchNow() && self.dateRange() == -1 && self.customToDate() != null
+                return self.dateRange() == -1;
             },
             message: self.resources.PleaseProvideFromDate
         }
@@ -82,6 +82,13 @@
         date: {
             params: true,
             message: self.resources.ToMustBeDate
+        },
+        required: {
+            params: true,
+            onlyIf: function () {
+                return self.dateRange() == -1;
+            },
+            message: self.resources.PleaseProvideToDate
         }
     });
 
@@ -272,12 +279,6 @@
 
     //#region Components
 
-    self.searchErrors = ko.validation.group([
-        self.customFromDate,
-        self.customToDate,
-        self.fromPreceedsTo
-    ]);
-
     self.customFromDatePicker = {
         widget: ko.observable(),
         value: self.customFromDate,
@@ -346,6 +347,22 @@
 
     //#region Subscriptions
 
+    self.customDateSubscriber = ko.computed(() => {
+        let a = self.customFromDate(),
+            b = self.customToDate();
+
+        if (a && b) {
+            window.setTimeout(() => {
+                self.performInvoiceSearch();
+            }, 0);
+        }
+    }, self).extend({
+        rateLimt: {
+            timeout: 0,
+            method: 'notifyWhenChangesStop'
+        }
+    });
+
     self.proformaStatus.subscribe(function (newValue) {
         self.performInvoiceSearch();
     });
@@ -353,6 +370,24 @@
     self.dateRange.subscribe(function (newValue) {
         if (newValue != -1) {
             self.performInvoiceSearch();
+        } else {
+            if (!self.customFromDate() && !self.customToDate()) {
+
+                let currentDate = new Date();
+
+                let year = currentDate.getFullYear();
+                let month = currentDate.getMonth();
+                let day = currentDate.getDate();
+                let hours = currentDate.getHours();
+                let minutes = currentDate.getMinutes();
+                let seconds = currentDate.getSeconds();
+                let milliseconds = currentDate.getMilliseconds();
+
+                let adjustedDate = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+
+                self.customToDate(currentDate);
+                self.customFromDate(adjustedDate);
+            }
         }
     });
 
@@ -381,6 +416,20 @@
         }
     });
 
+    self.toFollowsFrom = ko.pureComputed(function () {
+        if (self.customFromDate() && self.customToDate()) {
+            return self.customFromDate().getTime() < self.customToDate().getTime();
+        }
+    }, self).extend({
+        equal: {
+            params: true,
+            onlyIf: function () {
+                return self.customFromDate() && self.customToDate()
+            },
+            message: self.resources.ToMustFollowFrom
+        }
+    });
+
     self.proformaInvoicesTotal = ko.pureComputed(function () {
         return Enumerable.From(self.proformaInvoices()).Select(function (x) {
             return x.Value
@@ -391,6 +440,15 @@
 
 
     //#region Methods
+
+    // This would normally be lifted to e.g. components, but can't be because
+    // fromPreceedsTo and toFollowsFrom don't get hoisted
+    self.searchErrors = ko.validation.group([
+        self.fromPreceedsTo,
+        self.toFollowsFrom,
+        self.customFromDate,
+        self.customToDate,
+    ]);
 
     self.refreshProformaInvoices = () => {
         self.outstandingInvoicesBusy(true);
