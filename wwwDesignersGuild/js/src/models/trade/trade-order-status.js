@@ -986,7 +986,7 @@
 
         if (a && b) {
             window.setTimeout(() => {
-                self.performInvoiceSearch();
+                self.refresh(self.viewingStatus(), false);
             }, 0);
         }
     }, self).extend({
