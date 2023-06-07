@@ -70,6 +70,12 @@
 
     self.vatRegistered = ko.observable(false);
 
+    self.vatCountryId = ko.observable();
+
+    self.vatCountry = ko.observable();
+
+    self.vatCountryWidget = ko.observable();
+
     self.companyVATNumber = ko.observable().extend({
         required: {
             params: true,
@@ -77,6 +83,11 @@
             message: self.resources.PleaseProvideVATNumber
         }
     });
+
+    self.vatNumberDisplay = ko.observable();
+
+    // Swiss only
+    self.taxId = ko.observable();
 
     self.eoriRegistered = ko.observable(false);
 
@@ -480,6 +491,119 @@
         permitRevert: false,
         charsRemainingOptions: {
             maxLength: 20
+        }
+    };
+
+    self.vatNumberDisplayParams = {
+        label: self.resources.VATInvoiceFormat,
+        observable: self.vatNumberDisplay,
+        useNativeValidation: false,
+        decorateInputElement: false,
+        insertValidationMessages: false,
+        showClear: true,
+        clearFunction: function () {
+            var self = this;
+            self.observable(undefined);
+            $(self.observable.DOMElement).focus();
+        },
+        permitRevert: false,
+        charsRemainingOptions: {
+            maxLength: 20
+        }
+    };
+
+    self.vatCountryDropDownListParams = {
+        observable: self.vatCountry,
+        showClear: false,
+        width: '180px',
+        label: self.resources.VATCountry,
+        valuePrimitive: false,
+        useNativeValidation: false,
+        decorateInputElement: false,
+        insertValidationMessages: false,
+        controlClass: 'form-control',
+        disabled: ko.observable(false),
+        dropDownListSettings: ko.observable({
+            value: self.vatCountryId,
+            dataItem: self.vatCountry,
+            dataValueField: 'CountryID',
+            dataTextField: 'Name',
+            widget: self.vatCountryWidget,
+            open: function (e) {
+                (self.vatCountry.mdcSelect.root_).classList.add('mdc-select--focused');
+            },
+            close: function (e, event) {
+                (self.vatCountry.mdcSelect.root_).classList.remove('mdc-select--focused');
+            },
+            data: new kendo.data.DataSource({
+                serverFiltering: true,
+                serverSorting: true,
+                serverGrouping: true,
+                schema: Object.assign({
+                    data: "Data",
+                    total: "Total",
+                    filters: "Filters",
+                    aggregates: "Aggregates",
+                    errors: "Errors"
+                }, kendo.data.schemas.webapi),
+                transport: {
+                    read: function (options) {
+                        var webapi = new kendo.data.transports.webapi({ prefix: "" });
+                        var mapped = webapi.parameterMap(options.data);
+
+                        var data = {};
+
+                        for (var propertyName in mapped) {
+                            data[propertyName] = mapped[propertyName];
+                        }
+
+                        data.includeEU = true;
+
+                        fetch(`/api/tradeapi/getcountries?${new URLSearchParams(data).toString()}`, {
+                            method: 'GET',
+                            headers: window.fetchHeaders,
+                        })
+                            .then(window.handleFetchResponse)
+                            .then(data => {
+                                options.success(data);
+                            })
+                            .catch(err => {
+                                options.error();
+                                window.catchFetchErrors(err);
+                            });
+                    }
+                }
+            }),
+            valuePrimitive: false,
+            autoWidth: false,
+            autoBind: true,
+            optionLabel: ' ',
+            filter: 'startswith'
+        }),
+        clearFunction: function () {
+            var self = this;
+            self.observable(undefined);
+            self.dropDownListSettings.widget().value('');
+            self.dropDownListSettings.widget()._widgetOptions.dataItem.mdcSelect.getDefaultFoundation().adapter_.closeOutline();
+            self.dropDownListSettings.widget()._widgetOptions.dataItem.mdcSelect.label_.float(false);
+        }
+    }
+
+    self.taxIdParams = {
+        label: self.resources.TaxID,
+        observable: self.taxId,
+        useNativeValidation: false,
+        decorateInputElement: false,
+        insertValidationMessages: false,
+        showClear: true,
+        clearFunction: function () {
+            var self = this;
+            self.observable(undefined);
+            $(self.observable.DOMElement).focus();
+        },
+        permitRevert: false,
+        charsRemainingOptions: {
+            maxLength: 50
         }
     };
 
@@ -950,6 +1074,27 @@
 
     //#region Subscriptions
 
+    self.vatRegistered.subscribe(nv => {
+        if (!self.vatCountryId()) {
+            window.setTimeout(() => {
+                self.vatCountryId(getCountryId());
+            }, 0);
+        }
+    });
+
+    self.vatCountry.subscribe(nv => {
+        if (nv) {
+            let vn = self.companyVATNumber() || '';
+            self.vatNumberDisplay(`${nv.Code}${vn}`);
+        }
+    });
+
+    self.companyVATNumber.subscribe(nv => {
+        if (self.vatCountry() && nv) {
+            self.vatNumberDisplay(`${self.vatCountry().Code}${nv}`);
+        }
+    });
+
     self.email.subscribe((nv) => {
         if (self.email.isValid()) {
             if (self.orderConfirmationsSameAsPrimary())
@@ -1286,6 +1431,9 @@
                 channelId: self.channelId(),
                 companyRegistration: self.companyRegistration(),
                 companyVATNumber: self.companyVATNumber(),
+                vatCountryId: self.vatCountryId(),
+                vatNumberDisplay: self.vatNumberDisplay(),
+                taxId: self.taxId(),
                 companyEORINumber: self.companyEORINumber(),
                 companyTypeId: self.companyTypeId(),
                 website: self.website(),
@@ -1382,8 +1530,11 @@
         self.companyRegistration(undefined);
         self.businessType(undefined);
         self.companyVATNumber(undefined);
+        self.vatNumberDisplay(undefined);
+        self.vatCountryWidget().value(getCountryId());
         self.companyEORINumber(undefined);
         self.companyTypeId(undefined);
+        self.taxId(undefined);
         self.website(undefined);
         self.tradingSinceId(undefined);
         self.contactTypeId(undefined);

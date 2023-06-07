@@ -690,8 +690,11 @@ namespace wwwDesignersGuild.Models.Classes
         public byte channelId { get; set; }
         public string companyRegistration { get; set; }
         public string companyVATNumber { get; set; }
+        public string vatCountryId { get; set; }
+        public string vatNumberDisplay { get; set; }
         public string companyEORINumber { get; set; }
         public byte? companyTypeId { get; set; }
+        public string taxId { get; set; }
         public string website { get; set; }
         public byte? tradingSinceId { get; set; }
         public byte contactTypeId { get; set; }

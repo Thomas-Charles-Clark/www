@@ -73,8 +73,19 @@
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: businessTypeDropDownList }"></div>
                     <div class="mb-3" data-bind="visible: channelId() === 0, component: { name: 'mdc-text-field-component', params: businessTypeOtherParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyRegistrationParams }"></div>
+                    @* Only the Swiss have this separate *@
+                    <div class="mb-3" data-bind="visible: invoiceAddress.countryId() === 46">
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: taxIdParams }"></div>
+                    </div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
-                    <div class="mb-3" data-bind="visible: vatRegistered, component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                    @* But anyone could have a VAT Number *@
+                    <div class="mb-3" data-bind="visible: vatRegistered">
+                        <div class="hstack gap-0 address-search-wrapper mb-3">
+                            <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: vatCountryDropDownListParams }"></div>
+                            <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                        </div>
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberDisplayParams }"></div>
+                    </div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
                     <div class="mb-3" data-bind="visible: eoriRegistered, component: { name: 'mdc-text-field-component', params: eoriNumberParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: companyTypeDropDownList }"></div>
