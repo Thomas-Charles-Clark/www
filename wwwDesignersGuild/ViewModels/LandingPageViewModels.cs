@@ -1,4 +1,6 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
+﻿using Braintree;
+
+using DocumentFormat.OpenXml.Wordprocessing;
 
 using HtmlAgilityPack;
 
@@ -1851,23 +1853,13 @@ namespace wwwDesignersGuild.ViewModels
                     model
                 );
 
-            // Filter index restrictions fn
-            var objFilterIndexCombinationLoad = new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
-                    new PassFilterIndexAttributeCombinationCacheFetch() { LanguageID = model.LanguageID, Date = model.Date },
-                    model
-                );
-
             // Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
 
-            await Task.WhenAll(objAttributeLoad, objFilterIndexRestrictionLoad, objFilterIndexCombinationLoad); //(, ...);
+            await Task.WhenAll(objAttributeLoad, objFilterIndexRestrictionLoad); //(, ...);
 
             var attributeData = await objAttributeLoad;
 
             var filterIndexRestrictions = await objFilterIndexRestrictionLoad;
-
-            var filterIndexCombinations = await objFilterIndexCombinationLoad;
-
-            result.AttributeCombinations = filterIndexCombinations.Combinations;
 
             var preResultSet = new List<ProductPageFilterablePodWrapper>();
 
@@ -1953,6 +1945,14 @@ namespace wwwDesignersGuild.ViewModels
                 if (result.ProductTypes.Count() == 1)
                 {
                     result.ProductType = result.ProductTypes[0].FormValue;
+
+                    // Filter index restrictions fn
+                    var objFilterIndexCombinations = await new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
+                            new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date),
+                            model
+                        );
+
+                    result.AttributeCombinations = objFilterIndexCombinations.Combinations;
                 }
             }
 
