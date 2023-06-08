@@ -8,6 +8,7 @@ using System.Diagnostics;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Cache.ProductPages;
+using wwwDesignersGuild.Models;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -62,6 +63,9 @@ namespace wwwDesignersGuild.Controllers
                         break;
                     case "collectionPage":
                         PurgeCollectionPage(objPurge);
+                        break;
+                    case "filterIndexing":
+                        PurgeFilterIndexing(objPurge);
                         break;
                 }
             }
@@ -254,5 +258,17 @@ namespace wwwDesignersGuild.Controllers
 
             cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
         }
+
+        public void PurgeFilterIndexing(PassCachePurge objPurge)
+        {
+            var cache = new FilterIndexAttributeCombinationCacheProvider();
+
+            var otherCache = new FilterIndexRestrictionCacheProvider();
+
+            cache.Invalidate(new PassFilterIndexAttributeCombinationCacheFetch(objPurge.LanguageID, (byte)objPurge.ContentID, objPurge.ContentDate));
+
+            otherCache.Invalidate(new PassFilterIndexRestrictionCacheFetch() { Date = objPurge.ContentDate });
+        }
     }
 }
+ 

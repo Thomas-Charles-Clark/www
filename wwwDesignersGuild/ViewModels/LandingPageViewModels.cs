@@ -2059,7 +2059,7 @@ namespace wwwDesignersGuild.ViewModels
 
             model.AttributeFilterText = String.Join(" ", attributesList.Select(al => al.AttributeName));
 
-            model.AttributeSignatureText = result.AttributeCombinations.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
+            model.AttributeSignatureText = result.AttributeCombinations?.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
 
             if (attributesList.Any())
             {
