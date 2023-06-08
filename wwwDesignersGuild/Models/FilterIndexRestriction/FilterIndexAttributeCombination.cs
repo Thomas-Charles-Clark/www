@@ -30,7 +30,15 @@ namespace wwwDesignersGuild.Models
     public class PassFilterIndexAttributeCombinationCacheFetch
     {
         public byte LanguageID { get; set; }
+        public byte ProductTypeID { get; set; }
         public DateTime Date { get; set; }
+
+        public PassFilterIndexAttributeCombinationCacheFetch(byte languageID, byte productTypeID, DateTime date)
+        {
+            LanguageID = languageID;
+            ProductTypeID = productTypeID;
+            Date = date;
+        }
     }
 
     public class cmsFilterIndexAttributeCombination
@@ -54,7 +62,7 @@ namespace wwwDesignersGuild.Models
 
         private async Task<cmsFilterIndexAttributeCombinationResult> loadFilterIndexingAttributeCombinationsFromCms(PassFilterIndexAttributeCombinationCacheFetch objFetch, BaseViewModel objBase)
         {
-            var results = await new databaseDataContext().FetchFilterIndexAttributeCombinationsAsync(objFetch.LanguageID);
+            var results = await new databaseDataContext().FetchFilterIndexAttributeCombinationsAsync(objFetch.LanguageID, objFetch.ProductTypeID);
 
             return new cmsFilterIndexAttributeCombinationResult()
             {
