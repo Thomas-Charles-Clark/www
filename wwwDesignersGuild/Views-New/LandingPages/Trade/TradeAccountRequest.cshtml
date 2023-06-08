@@ -97,6 +97,7 @@
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: titleDropDownList }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: fullNameParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: phoneNumberParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: autoCorrespondenceLanguageDropDownList }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
                     <p>
                         @HtmlHelperExtra.Resource("TradeAccountRequestEmailGather", l, c, d)
@@ -391,6 +392,10 @@
 
     function getAvailableProductTypeGroupBrands() {
         return @Html.Raw(Json.Encode(Model.productTypeGroups));
+    }
+
+    function getAvailableLanguages() {
+        return @Html.Raw(Json.Encode(Model.availableLanguages));
     }
 
     function getContactTypes() {

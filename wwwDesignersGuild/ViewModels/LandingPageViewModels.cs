@@ -954,6 +954,8 @@ namespace wwwDesignersGuild.ViewModels
                         "TARFIUnderstand",
                         "TaxID",
                         "PleaseProvideTaxID",
+                        "WhichLanguageForAutomatedCorrespondence",
+                        "PleaseSelectLanguage",
                         "MajorError"
                     });
                     break;

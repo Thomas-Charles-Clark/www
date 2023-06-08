@@ -25,6 +25,8 @@
 
     self.availableChannels = ko.observable(getChannels());
 
+    self.availableLanguages = ko.observable(getAvailableLanguages());
+
     self.deliverySameAsInvoice = ko.observable(true);
 
     self.visitSameAsInvoice = ko.observable(true);
@@ -88,6 +90,14 @@
 
     // Swiss only
     self.taxId = ko.observable();
+
+    self.autoCorrespondenceLanguageCode = ko.observable().extend({
+        required: {
+            params: true,
+            onlyIf: self.validateNow,
+            message: self.resources.PleaseSelectLanguage
+        }
+    });
 
     self.eoriRegistered = ko.observable(false);
 
@@ -606,6 +616,46 @@
             maxLength: 50
         }
     };
+
+    self.autoCorrespondenceLanguageDropDownList = {
+        observable: self.autoCorrespondenceLanguageCode,
+        showClear: true,
+        width: 'auto',
+        label: self.resources.WhichLanguageForAutomatedCorrespondence,
+        valuePrimitive: false,
+        useNativeValidation: false,
+        decorateInputElement: false,
+        insertValidationMessages: false,
+        controlClass: 'form-control',
+        dropDownListSettings: {
+            value: self.autoCorrespondenceLanguageCode,
+            dataItem: ko.observable(),
+            dataValueField: 'LanguageCode',
+            dataTextField: 'Name',
+            widget: ko.observable(),
+            dataBound: function (e) {
+                self.autoCorrespondenceLanguageCode.mdcSelect.layout();
+            },
+            data: self.availableLanguages,
+            valuePrimitive: false,
+            autoWidth: false,
+            autoBind: true,
+            optionLabel: ' '
+        },
+        clearFunction: function () {
+            var self = this;
+            self.observable(undefined);
+            self.dropDownListSettings.widget().value('');
+            self.observable.mdcSelect.getDefaultFoundation().adapter_.closeOutline();
+            self.observable.mdcSelect.label_.float(false);
+        }
+    }
+
+    self.autoCorrespondenceLanguageDropDownList.dropDownListSettings.widget.subscribe(nv => {
+        let defaultCode = getAvailableLanguages().find(l => l.LanguageID == getLanguageId())?.LanguageCode;
+        self.autoCorrespondenceLanguageCode(defaultCode);
+        nv.value(defaultCode);
+    });
 
     self.doYouHaveEORIParams = {
         checkboxId: 'do-you-have-eori',
@@ -1434,6 +1484,7 @@
                 vatCountryId: self.vatCountryId(),
                 vatNumberDisplay: self.vatNumberDisplay(),
                 taxId: self.taxId(),
+                autoCorrespondenceLanguageCode: self.autoCorrespondenceLanguageCode(),
                 companyEORINumber: self.companyEORINumber(),
                 companyTypeId: self.companyTypeId(),
                 website: self.website(),
@@ -1535,6 +1586,7 @@
         self.companyEORINumber(undefined);
         self.companyTypeId(undefined);
         self.taxId(undefined);
+        self.autoCorrespondenceLanguageCode(undefined);
         self.website(undefined);
         self.tradingSinceId(undefined);
         self.contactTypeId(undefined);
