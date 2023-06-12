@@ -63,8 +63,5 @@ namespace wwwDesignersGuild.Models.Cache
         {
             return String.Format("ATTRIBUTE~{0}", languageId.ToString());
         }
-
-
     }
-
 }
