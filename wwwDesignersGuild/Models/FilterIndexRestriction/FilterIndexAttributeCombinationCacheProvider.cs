@@ -56,7 +56,7 @@ namespace wwwDesignersGuild.Models
 
         private string buildKey(PassFilterIndexAttributeCombinationCacheFetch objFetch)
         {
-            return $"FILTER-INDEX-COMBINATION-LANGUAGES~{objFetch.LanguageID}~{objFetch.Date.Year}~{objFetch.Date.Month}~{objFetch.Date.Day}";
+            return $"FILTER-INDEX-COMBINATION-LANGUAGES~{objFetch.ProductTypeID}~{objFetch.LanguageID}~{objFetch.Date.Year}~{objFetch.Date.Month}~{objFetch.Date.Day}";
         }
     }
 }
