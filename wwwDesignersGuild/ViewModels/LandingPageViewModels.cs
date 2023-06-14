@@ -2100,13 +2100,13 @@ namespace wwwDesignersGuild.ViewModels
                         attributeSignatureText: model.AttributeSignatureText,
                         useHtml: false);
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"filter-text\">", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("</span> ", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"no-filter-text\">", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("</span> ", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
 
                     completeResultSet.ForEach(crs => 
                     {
@@ -2118,14 +2118,14 @@ namespace wwwDesignersGuild.ViewModels
                 }
                 else
                 {
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{ProductTypeStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{ProductTypeEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{FilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{FilterEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{NoFilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{NoFilterEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterEnd}", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Trim();
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Trim();
                 }
             }
 
