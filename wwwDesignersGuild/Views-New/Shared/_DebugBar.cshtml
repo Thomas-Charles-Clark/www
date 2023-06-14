@@ -16,8 +16,11 @@
 
     var objMenu = Model.MasterDefinition.Menu;
 }
-@if (Convert.ToBoolean(WebConfigurationManager.AppSettings["productionVersion"]) == false 
-    || (Model.Visitor.memberId == 8 || Model.Visitor.memberId == 39 || Model.Visitor.memberId == 431394))
+@if (Convert.ToBoolean(WebConfigurationManager.AppSettings["productionVersion"]) == false
+    || (Model.Visitor.memberId == 2 || /* mchristie@designersguild.com */
+        Model.Visitor.memberId == 8 || /* tclark@designersguild.com */
+        Model.Visitor.memberId == 39 || /* thoams@gmail.com */
+        Model.Visitor.memberId == 431394) /* poachedheads@gmail.com */ )
 {
 <nav id="debug-navbar" class="navbar navbar-dark bg-dark">
         <div class="navbar-container">
