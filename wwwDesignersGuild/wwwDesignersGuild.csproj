@@ -491,6 +491,7 @@
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\MemberAddress\MemberAddress.cs" />
     <Compile Include="Models\Member\Member.cs" />
+    <Compile Include="Models\MertexLanguage\MertexLanguage.cs" />
     <Compile Include="Models\ModularFurniture\Module.cs" />
     <Compile Include="Models\ModularFurniture\ModuleOptionGroup.cs" />
     <Compile Include="Models\ModularFurniture\ModuleOption.cs" />

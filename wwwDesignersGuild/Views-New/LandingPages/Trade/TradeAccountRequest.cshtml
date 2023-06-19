@@ -73,8 +73,19 @@
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: businessTypeDropDownList }"></div>
                     <div class="mb-3" data-bind="visible: channelId() === 0, component: { name: 'mdc-text-field-component', params: businessTypeOtherParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyRegistrationParams }"></div>
+                    @* Only the Swiss have this separate *@
+                    <div class="mb-3" data-bind="visible: invoiceAddress.countryId() === 46">
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: taxIdParams }"></div>
+                    </div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
-                    <div class="mb-3" data-bind="visible: vatRegistered, component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                    @* But anyone could have a VAT Number *@
+                    <div class="mb-3" data-bind="visible: vatRegistered">
+                        <div class="hstack gap-0 address-search-wrapper mb-3">
+                            <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: vatCountryDropDownListParams }"></div>
+                            <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                        </div>
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberDisplayParams }"></div>
+                    </div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
                     <div class="mb-3" data-bind="visible: eoriRegistered, component: { name: 'mdc-text-field-component', params: eoriNumberParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: companyTypeDropDownList }"></div>
@@ -86,6 +97,7 @@
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: titleDropDownList }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: fullNameParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: phoneNumberParams }"></div>
+                    <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: autoCorrespondenceLanguageDropDownList }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
                     <p>
                         @HtmlHelperExtra.Resource("TradeAccountRequestEmailGather", l, c, d)
@@ -109,6 +121,7 @@
                                     <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
                                     <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
                                 </div>
+                                <hr class="me-5"/>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
@@ -134,6 +147,7 @@
                                     <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
                                     <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
                                 </div>
+                                <hr class="me-5"/>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
@@ -159,6 +173,7 @@
                                     <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: $parent.countryDropDownList() }"></div>
                                     <div class="flex-grow-1" data-bind="component: { name: 'mdc-text-field-pca-component', params: $parent.pcaLookup, descendantsComplete: $parent.descendantsComplete }"></div>
                                 </div>
+                                <hr class="me-5"/>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: name }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: companyName }"></div>
                                 <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: addressLine1 }"></div>
@@ -380,6 +395,10 @@
 
     function getAvailableProductTypeGroupBrands() {
         return @Html.Raw(Json.Encode(Model.productTypeGroups));
+    }
+
+    function getAvailableLanguages() {
+        return @Html.Raw(Json.Encode(Model.availableLanguages));
     }
 
     function getContactTypes() {
