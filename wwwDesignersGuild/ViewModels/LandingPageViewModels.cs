@@ -2184,7 +2184,7 @@ namespace wwwDesignersGuild.ViewModels
             {
                 var attributeGroupSignature = String.Join(".", attributesList.Select(ag => $"{ag.AttributeGroupID}"));
 
-                if (filterIndexRestrictions.Restrictions.FirstOrDefault(r => r.AttributeGroupSignature == attributeGroupSignature) == null)
+                if (filterIndexRestrictions.Restrictions.FirstOrDefault(r => gridProductTypeIds.Contains(r.ProductTypeID) && r.AttributeGroupSignature == attributeGroupSignature) == null)
                 {
                     result.MustOverwritePageCanonical = true;
                 }
