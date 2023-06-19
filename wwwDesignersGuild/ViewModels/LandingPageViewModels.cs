@@ -936,6 +936,8 @@ namespace wwwDesignersGuild.ViewModels
                         "FormsCountry",
                         "AreYouVATRegistered",
                         "VATNumber",
+                        "VATCountry",
+                        "VATInvoiceFormat",
                         "DoYouHaveEORI",
                         "EORINumber",
                         "SellOnline",
@@ -952,6 +954,10 @@ namespace wwwDesignersGuild.ViewModels
                         "Notes",
                         "WhyWorkWithDG",
                         "TARFIUnderstand",
+                        "TaxID",
+                        "PleaseProvideTaxID",
+                        "WhichLanguageForAutomatedCorrespondence",
+                        "PleaseSelectLanguage",
                         "MajorError"
                     });
                     break;

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using wwwDesignersGuild.Models;
 using wwwDesignersGuild.Models.Classes;
 
 namespace wwwDesignersGuild.ViewModels.Trade
@@ -33,5 +35,7 @@ namespace wwwDesignersGuild.ViewModels.Trade
         public List<channel> channels { get; set; }
 
         public List<leadContactType> contactTypes { get; set; }
+
+        public List<MertexLanguage> availableLanguages { get; set; }
     }
 }
