@@ -532,12 +532,11 @@ namespace wwwDesignersGuild.ViewModels
             }
 
             if (PageSections.Where(ps => ps.Definition is ProductPageGridPageSection ppgps)
-                            .Any(ps => (ps.Definition as ProductPageGridPageSection).MustOverwritePageCanonical))
+                            .Any(ps => (ps.Definition as ProductPageGridPageSection).MustOverwritePageCanonical) &&
+                            String.IsNullOrEmpty(Definition.PageDetails.CustomCanonical))
             {
-                Definition.PageDetails.CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
+                CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
             }
-
-            CustomCanonical = Definition.PageDetails.CustomCanonical;
 
             NoFollow = Definition.PageDetails.NoFollow;
 
@@ -1850,9 +1849,9 @@ namespace wwwDesignersGuild.ViewModels
             var objDb = new databaseDataContext();
 
             var objAttribute = new cmsAttribute();
-
+            
             var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
-
+            
             // Filter index restrictions fn
             var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction().loadFilterIndexingRestrictionsFromCmsAsync(
                     new PassFilterIndexRestrictionCacheFetch() { Date = model.Date },
@@ -2186,13 +2185,13 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
-            if (detectedAttributeGroups.Count == attributesList.Count)
+            if (detectedAttributeGroups.Any() && detectedAttributeGroups.Count == attributesList.Count)
             {
                 var attributeGroupSignature = String.Join(".", attributesList.Select(ag => $"{ag.AttributeGroupID}"));
 
                 if (filterIndexRestrictions.Restrictions.FirstOrDefault(r => gridProductTypeIds.Contains(r.ProductTypeID) && r.AttributeGroupSignature == attributeGroupSignature) == null)
                 {
-                    result.MustOverwritePageCanonical = true;
+                     result.MustOverwritePageCanonical = true;
                 }
             }
 
@@ -2200,7 +2199,7 @@ namespace wwwDesignersGuild.ViewModels
             {
                 initialProductPageIds = initialProductPageIds.Intersect(appid.ProductPageIDs).ToList();
             });
-
+            
             result.AttributeGroups.ForEach(ag =>
             {
                 var productPageIdsAffectingThisAttributeGroup = new List<int>();
