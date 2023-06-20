@@ -46,7 +46,8 @@ namespace wwwDesignersGuild.Models.Trade
                 tradingForOptions = new System.Collections.Generic.List<byteSelectOption>(),
                 productTypeGroups = results.GetResult<productTypeGroup_Brand_Country>().ToList(),
                 channels = results.GetResult<channel>().ToList(),
-                contactTypes = results.GetResult<leadContactType>().ToList()
+                contactTypes = results.GetResult<leadContactType>().ToList(),
+                availableLanguages = results.GetResult<MertexLanguage>().ToList()
             };
 
             var res = new cmsResource().loadResourceFromCms(

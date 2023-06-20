@@ -142,6 +142,10 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@ChannelID", objFormDetails.channelId);
                 cmd.Parameters.AddWithValue("@CompanyNumber", objFormDetails.companyRegistration ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@VATNumber", objFormDetails.companyVATNumber ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@VATNumberDisplay", objFormDetails.vatNumberDisplay ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@VATCountryID", objFormDetails.vatCountryId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@TaxID", objFormDetails.taxId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@MertexLanguageCode", objFormDetails.autoCorrespondenceLanguageCode ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@EORINumber", objFormDetails.companyEORINumber ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@CompanyTypeID", objFormDetails.companyTypeId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@TradingSince", tradingSinceDT ?? (object)DBNull.Value);
