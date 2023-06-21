@@ -80,12 +80,17 @@
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
                     @* But anyone could have a VAT Number *@
                     <div class="mb-3" data-bind="visible: vatRegistered">
+                        <!-- ko if: getCountryId() != 238 -->
                         <div class="hstack gap-0 address-search-wrapper mb-3">
                             <div data-bind="component: { name: 'mdc-kendo-dropdown-component', params: vatCountryDropDownListParams }"></div>
                             <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
                         </div>
                         <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberDisplayParams }"></div>
-                    </div>
+                        <!-- /ko -->
+                        <!-- ko if: getCountryId() == 238 -->
+                        <div data-bind="component: { name: 'mdc-text-field-component', params: vatNumberParams }"></div>
+                        <!-- /ko -->
+                      </div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
                     <div class="mb-3" data-bind="visible: eoriRegistered, component: { name: 'mdc-text-field-component', params: eoriNumberParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: companyTypeDropDownList }"></div>
@@ -159,7 +164,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    @*<div class="form-group">
                         <div class="flex-heading my-4">
                             <h5 class="field-label">
                                 @HtmlHelperExtra.Resource("TradeAccountVisitAddress", l, c, d)
@@ -184,7 +189,7 @@
                                 <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: countryDropDownList() }"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-area-component', params: brandsCurrentlyWorkedWithParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-text-area-component', params: whyWorkWithDGParams }"></div>
                     <!-- ko if: availableProductTypeGroups().length -->

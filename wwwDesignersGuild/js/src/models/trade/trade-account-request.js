@@ -652,7 +652,7 @@
     }
 
     self.autoCorrespondenceLanguageDropDownList.dropDownListSettings.widget.subscribe(nv => {
-        let defaultCode = getAvailableLanguages().find(l => l.LanguageID == getLanguageId())?.LanguageCode;
+        let defaultCode = getAvailableLanguages().find(l => l.LanguageID == getLanguageId())?.LanguageCode ?? "01";
         self.autoCorrespondenceLanguageCode(defaultCode);
         nv.value(defaultCode);
     });
@@ -1482,7 +1482,7 @@
                 companyRegistration: self.companyRegistration(),
                 companyVATNumber: self.companyVATNumber(),
                 vatCountryId: self.vatCountryId(),
-                vatNumberDisplay: self.vatNumberDisplay(),
+                vatNumberDisplay: getCountryId() == 238 ? null : self.vatNumberDisplay(),
                 taxId: self.taxId(),
                 autoCorrespondenceLanguageCode: self.autoCorrespondenceLanguageCode(),
                 companyEORINumber: self.companyEORINumber(),
