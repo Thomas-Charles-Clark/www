@@ -957,6 +957,9 @@ namespace wwwDesignersGuild.ViewModels
                         "PleaseProvideTaxID",
                         "WhichLanguageForAutomatedCorrespondence",
                         "PleaseSelectLanguage",
+                        "USSalesTaxExemptionCertificationRequired",
+                        "USSalesTaxExemptionCertification",
+                        "PleaseProvideExemptionCertificate",
                         "MajorError"
                     });
                     break;

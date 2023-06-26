@@ -720,6 +720,7 @@ namespace wwwDesignersGuild.Models.Classes
         public leadAddress deliveryAddress { get; set; }
         public leadAddress visitAddress { get; set; }
         public List<productTypeGroup_Brand_Country> leadInterests { get; set; }
+        public byte[] salesTaxExemptionCertificateUpload { get; set; }
     }
 
     public class leadAddress

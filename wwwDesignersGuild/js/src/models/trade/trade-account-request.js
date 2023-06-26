@@ -94,7 +94,6 @@
     self.autoCorrespondenceLanguageCode = ko.observable().extend({
         required: {
             params: true,
-            onlyIf: self.validateNow,
             message: self.resources.PleaseSelectLanguage
         }
     });
@@ -311,6 +310,36 @@
         }
     });
 
+    // Lowered because requires invoiceAddress, sorry. US Only.
+    self.usSalesTaxExemptionCertificate = ko.observable().extend({
+      required: {
+        params: true,
+        onlyIf: () => {
+          return self.vatRegistered() && self.invoiceAddress.countryId() == 238;
+        },
+        message: self.resources.USSalesTaxExemptionCertificationRequired
+      }
+    });
+
+    self.usSalesTaxExemptionCertificateParams = {
+    accept: ".pdf, .jpg, .jpeg",
+      label: self.resources.USSalesTaxExemptionCertification,
+      observable: self.usSalesTaxExemptionCertificate,
+      useNativeValidation: false,
+      decorateInputElement: false,
+      insertValidationMessages: false,
+      showClear: true,
+      clearFunction: function () {
+        var self = this;
+        self.observable(undefined);
+        $(self.observable.DOMElement).focus();
+      },
+      permitRevert: false,
+      charsRemainingOptions: {
+        maxLength: 50
+      }
+    }
+
     // Lifted because it has to be, sorry
     self.availableProductTypeGroups = ko.pureComputed({
         read: function () {
@@ -390,6 +419,7 @@
         self.companyTypeId,
         self.companyRegistration,
         self.companyVATNumber,
+        self.vatCountry,
         self.companyEORINumber,
         self.tradingSinceId,
         self.titleId,
@@ -408,7 +438,9 @@
         self.potentiallyMandatoryOptIn,
         self.website,
         self.businessTypeOther,
-        self.positionOther
+        self.positionOther,
+        self.autoCorrespondenceLanguageCode,
+        self.usSalesTaxExemptionCertificate
     ]);
 
     self.leadId = ko.observable(getLeadId());
@@ -1474,43 +1506,53 @@
                 }
             }
 
+            let salesTaxExemptionUpload = null;
+
+            let fd = new FormData(document.getElementById('tarf-form'));
+
             var params = {
-                gRecaptcha: captcha,
-                objMaster: getMasterDefinition(),
-                companyName: self.companyName(),
-                channelId: self.channelId(),
-                companyRegistration: self.companyRegistration(),
-                companyVATNumber: self.companyVATNumber(),
-                vatCountryId: self.vatCountryId(),
-                vatNumberDisplay: getCountryId() == 238 ? null : self.vatNumberDisplay(),
-                taxId: self.taxId(),
-                autoCorrespondenceLanguageCode: self.autoCorrespondenceLanguageCode(),
-                companyEORINumber: self.companyEORINumber(),
-                companyTypeId: self.companyTypeId(),
-                website: self.website(),
-                tradingSinceId: self.tradingSinceId(),
-                contactTypeId: self.contactTypeId(),
-                titleId: self.titleId(),
-                fullName: self.fullName(),
-                phone: self.phone(),
-                email: self.email(),
-                orderConfirmationsEmail: self.orderConfirmationsEmail(),
-                invoicesStatementsEmail: self.invoicesStatementsEmail(),
-                productNewsEventsEmail: self.productNewsEventsEmail(),
-                pricelistsEmail: self.pricelistsEmail(),
-                notes: self.notes() + "\n\n" + self.whyWorkWithDG(),
-                leadInterests: self.leadInterests(),
-                invoiceAddress: invoiceAddress,
-                deliveryAddress: deliveryAddress,
-                visitAddress: visitAddress,
-                deliverySameAsInvoice: self.deliverySameAsInvoice(),
-                visitSameAsInvoice: self.visitSameAsInvoice(),
-                patternBookInterest: self.patternBookInterest(),
-                distributorConsent: self.potentiallyMandatoryOptIn(),
-                sellOnline: self.sellOnline(),
-                businessTypeOther: self.businessTypeOther(),
-                positionOther: self.positionOther(),
-                leadId: self.leadId()
+                obj: JSON.stringify({gRecaptcha: captcha,
+                    objMaster: getMasterDefinition(),
+                    companyName: self.companyName(),
+                    channelId: self.channelId(),
+                    companyRegistration: self.companyRegistration(),
+                    companyVATNumber: self.companyVATNumber(),
+                    vatCountryId: self.vatCountryId(),
+                    vatNumberDisplay: getCountryId() == 238 ? null : self.vatNumberDisplay(),
+                    taxId: self.taxId(),
+                    usSalesTaxExemptionCertificate: self.usSalesTaxExemptionCertificate(),
+                    autoCorrespondenceLanguageCode: self.autoCorrespondenceLanguageCode(),
+                    companyEORINumber: self.companyEORINumber(),
+                    companyTypeId: self.companyTypeId(),
+                    website: self.website(),
+                    tradingSinceId: self.tradingSinceId(),
+                    contactTypeId: self.contactTypeId(),
+                    titleId: self.titleId(),
+                    fullName: self.fullName(),
+                    phone: self.phone(),
+                    email: self.email(),
+                    orderConfirmationsEmail: self.orderConfirmationsEmail(),
+                    invoicesStatementsEmail: self.invoicesStatementsEmail(),
+                    productNewsEventsEmail: self.productNewsEventsEmail(),
+                    pricelistsEmail: self.pricelistsEmail(),
+                    notes: self.notes() + "\n\n" + self.whyWorkWithDG(),
+                    leadInterests: self.leadInterests(),
+                    invoiceAddress: invoiceAddress,
+                    deliveryAddress: deliveryAddress,
+                    visitAddress: visitAddress,
+                    deliverySameAsInvoice: self.deliverySameAsInvoice(),
+                    visitSameAsInvoice: self.visitSameAsInvoice(),
+                    patternBookInterest: self.patternBookInterest(),
+                    distributorConsent: self.potentiallyMandatoryOptIn(),
+                    sellOnline: self.sellOnline(),
+                    businessTypeOther: self.businessTypeOther(),
+                    positionOther: self.positionOther(),
+                    leadId: self.leadId()
+                })
+            }
+
+            for (const key in params) {
+                fd.append(key, params[key]);
             }
 
             self.submitBusy(true);
@@ -1518,8 +1560,9 @@
             $.ajax({
                 url: '/api/form/SaveTradeAccountRequestForm',
                 type: 'POST',
-                dataType: 'json',
-                data: params,
+                data: fd,
+                processData: false,
+                contentType: false,
                 success: function(data) {
                     self.submitBusy(false);
                     if (data.hasOwnProperty('handleErrorMessage')) {
@@ -1542,7 +1585,13 @@
 
                     }
                 },
-                error: function(xhr, e, s) {
+                error: function (xhr, e, s) {
+                    if (xhr.status === 417 && typeof xhr.responseText === 'string') {
+                        window.showInfo('Error', xhr.responseText.replace(/\"/g, ''));
+                    }
+                    if (xhr.status === 500 && typeof xhr?.responseJSON?.Message === 'string') {
+                        window.showInfo('Error', xhr.responseJSON.Message.replace(/\"/g, ''));
+                    }
                     self.submitBusy(false);
                     try {
                         grecaptcha.reset();
@@ -1586,6 +1635,7 @@
         self.companyEORINumber(undefined);
         self.companyTypeId(undefined);
         self.taxId(undefined);
+        self.usSalesTaxExemptionCertificate(undefined);
         self.autoCorrespondenceLanguageCode(undefined);
         self.website(undefined);
         self.tradingSinceId(undefined);
