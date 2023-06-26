@@ -16,18 +16,18 @@ namespace wwwDesignersGuild.Models.Form
 
     public class formRoutines : IForm
     {
-        public async Task<long?> saveTradeAccountRequestForm(long visitorId, webapiTradeAccountRequestFormSave objFormDetails)
+        public async Task<long?> saveTradeAccountRequestForm(long visitorId, webapiTradeAccountRequestFormSave objFormDetails, byte[] usSalesTaxExemptionCertificate = null, string usSalesTaxExemptionCertificateFileType = null)
         {
-            long? result = await Task.FromResult<long?>(saveTradeAccountRequestFormAsync(visitorId, objFormDetails));
+            long? result = await Task.FromResult<long?>(saveTradeAccountRequestFormAsync(visitorId, objFormDetails, usSalesTaxExemptionCertificate, usSalesTaxExemptionCertificateFileType));
 
             return result;
         }
 
-        private long? saveTradeAccountRequestFormAsync(long visitorId, webapiTradeAccountRequestFormSave objFormDetails)
+        private long? saveTradeAccountRequestFormAsync(long visitorId, webapiTradeAccountRequestFormSave objFormDetails, byte[] usSalesTaxExemptionCertificate = null, string usSalesTaxExemptionCertificateFileType = null)
         {
             formDb objDbForm = new formDb();
 
-            return objDbForm.SaveTradeAccountRequestForm(visitorId, objFormDetails);
+            return objDbForm.SaveTradeAccountRequestForm(visitorId, objFormDetails, usSalesTaxExemptionCertificate, usSalesTaxExemptionCertificateFileType);
         }
 
         public async Task<bool> saveLeadImmediateOrderFlag(long leadId)

@@ -10,6 +10,7 @@ using System.Data.Linq.Mapping;
 using System.Reflection;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Form;
+using static DevExpress.Utils.Drawing.Helpers.NativeMethods;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -73,7 +74,7 @@ namespace wwwDesignersGuild.Models.Database
             return true;
         }
 
-        public long? SaveTradeAccountRequestForm(long visitorId, webapiTradeAccountRequestFormSave objFormDetails)
+        public long? SaveTradeAccountRequestForm(long visitorId, webapiTradeAccountRequestFormSave objFormDetails, byte[] usSalesTaxExemptionCertificate = null, string usSalesTaxExemptionCertificateFileType = null)
         {
             long? result = null;
 
@@ -145,6 +146,17 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@VATNumberDisplay", objFormDetails.vatNumberDisplay ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@VATCountryID", objFormDetails.vatCountryId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@TaxID", objFormDetails.taxId ?? (object)DBNull.Value);
+               
+                if (usSalesTaxExemptionCertificate != null &&
+                    usSalesTaxExemptionCertificate?.Length > 0)
+                {
+                    var salesTaxExemptionCertificateParam = new SqlParameter("@USSalesTaxExemptionCertificate", SqlDbType.VarBinary, usSalesTaxExemptionCertificate?.Length ?? 0);
+                    salesTaxExemptionCertificateParam.Value = usSalesTaxExemptionCertificate;
+
+                    cmd.Parameters.Add(salesTaxExemptionCertificateParam);
+                    cmd.Parameters.AddWithValue("@USSalesTaxExemptionCertificateFileType", usSalesTaxExemptionCertificateFileType);
+                }
+
                 cmd.Parameters.AddWithValue("@MertexLanguageCode", objFormDetails.autoCorrespondenceLanguageCode ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@EORINumber", objFormDetails.companyEORINumber ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@CompanyTypeID", objFormDetails.companyTypeId ?? (object)DBNull.Value);
