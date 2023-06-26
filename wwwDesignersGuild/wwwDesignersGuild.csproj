@@ -3078,6 +3078,7 @@
     <Folder Include="Models\ColonyRedirect\" />
     <Folder Include="PDFs\Returns\" />
     <Folder Include="TradeDownloads\" />
+    <Folder Include="Uploads\" />
     <Folder Include="WebReferences\" />
   </ItemGroup>
   <ItemGroup>
