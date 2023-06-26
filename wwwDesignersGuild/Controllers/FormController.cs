@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -21,49 +25,158 @@ namespace wwwDesignersGuild.Controllers
     {
          
         [HttpPost]
-        public async Task<object> SaveTradeAccountRequestForm(webapiTradeAccountRequestFormSave objFormDetails)
+        public async Task<object> SaveTradeAccountRequestForm()//webapiTradeAccountRequestFormSave objFormDetails)
         {
-            formRoutines objFormRoutines = new formRoutines();
-
-            Int64 visitorId = -1;
-
-            if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
+            // Check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);
-            }
-            else
-            {
-                visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            if (objFormDetails.gRecaptcha == null)
+            var root = HttpContext.Current.Server.MapPath("~/Uploads");
+
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            webapiTradeAccountRequestFormSave objFormDetails = null;
+
+            var result = await Request.Content.ReadAsMultipartAsync(provider);
+
+            List<byte> bytes = null;
+
+            string fileExtension = null;
+
+            try
             {
-                var error = dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
-                return error;
-            }
-            else
-            {
-                //  Validate captcha
-                if (String.IsNullOrEmpty(objFormDetails.gRecaptcha))
+                if (provider.FileData.Any())
                 {
-                    return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
-                }
-                else
-                {
-                    if (ReCaptchaVerifier.Validate(objFormDetails.gRecaptcha) == "true")
+                    bytes = File.ReadAllBytes(result.FileData[0].LocalFileName).ToList();
+
+                    if (bytes.Count > 2097152)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.ExpectationFailed, "File too large");
+                    }
+
+                    switch (provider.FileData[0].Headers.ContentType.MediaType)
+                    {
+                        case "application/pdf":
+                            fileExtension = "pdf";
+                            break;
+                        case "image/jpg":
+                        case "image/jpeg":
+                        case "image/jfif":
+                            fileExtension = "jpg";
+                            break;
+                    }
+
+                    try
+                    {
+                        File.Delete(result.FileData[0].LocalFileName);
+                    }
+                    catch (Exception _)
                     {
 
                     }
-                    else
+                }
+
+                // Show all the key-value pairs.
+                foreach (var key in provider.FormData.AllKeys)
+                {
+                    if (key == "obj")
                     {
-                        return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+                        objFormDetails = JsonConvert.DeserializeObject<webapiTradeAccountRequestFormSave>(provider.FormData.GetValues(key)[0]);
+
+                        var objFormRoutines = new formRoutines();
+
+                        var visitorId = -1L;
+
+                        if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
+                        {
+                            dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);
+                        }
+                        else
+                        {
+                            visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+                        }
+
+                        if (objFormDetails.gRecaptcha == null)
+                        {
+                            var error = dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+                            return error;
+                        }
+                        else
+                        {
+                            //  Validate captcha
+                            if (String.IsNullOrEmpty(objFormDetails.gRecaptcha))
+                            {
+                                return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+                            }
+                            else
+                            {
+                                if (ReCaptchaVerifier.Validate(objFormDetails.gRecaptcha) == "true")
+                                {
+
+                                }
+                                else
+                                {
+                                    return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+                                }
+                            }
+                        }
+
+                        var saveResult = await objFormRoutines.saveTradeAccountRequestForm(visitorId, objFormDetails, bytes.ToArray(), fileExtension);
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
                     }
                 }
+
+                return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
+            }
+            catch (System.Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
 
-            var result = await objFormRoutines.saveTradeAccountRequestForm(visitorId, objFormDetails);
+            //var files = HttpContext.Current.Request.Files;
 
-            return result;
+            //formRoutines objFormRoutines = new formRoutines();
+
+            //Int64 visitorId = -1;
+
+            //if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
+            //{
+            //    dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);
+            //}
+            //else
+            //{
+            //    visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+            //}
+
+            //if (objFormDetails.gRecaptcha == null)
+            //{
+            //    var error = dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+            //    return error;
+            //}
+            //else
+            //{
+            //    //  Validate captcha
+            //    if (String.IsNullOrEmpty(objFormDetails.gRecaptcha))
+            //    {
+            //        return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+            //    }
+            //    else
+            //    {
+            //        if (ReCaptchaVerifier.Validate(objFormDetails.gRecaptcha) == "true")
+            //        {
+
+            //        }
+            //        else
+            //        {
+            //            return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
+            //        }
+            //    }
+            //}
+
+            //return result;
         }
 
         [HttpPost]

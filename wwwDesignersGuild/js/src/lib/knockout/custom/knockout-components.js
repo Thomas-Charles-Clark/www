@@ -45,3 +45,7 @@ ko.components.register('mdc-text-area-component', {
 ko.components.register('mdc-checkbox-component', {
     template: { element: document.getElementById('mdc-checkbox-component') }
 });
+
+ko.components.register('mdc-file-field-component', {
+    template: { element: document.getElementById('mdc-file-field-component') }
+});
