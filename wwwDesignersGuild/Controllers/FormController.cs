@@ -123,7 +123,7 @@ namespace wwwDesignersGuild.Controllers
                             }
                         }
 
-                        var saveResult = await objFormRoutines.saveTradeAccountRequestForm(visitorId, objFormDetails, bytes.ToArray(), fileExtension);
+                        var saveResult = await objFormRoutines.saveTradeAccountRequestForm(visitorId, objFormDetails, bytes?.ToArray(), fileExtension);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

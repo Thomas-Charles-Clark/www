@@ -157,9 +157,9 @@
 
     self.invoicesStatementsSameAsPrimary = ko.observable(true);
 
-    self.productNewsEventsSameAsPrimary = ko.observable(true);
+    self.pricelistsProductsNewsEventsSameAsPrimary = ko.observable(true);
 
-    self.pricelistsSameAsPrimary = ko.observable(true);
+    self.deliveryNotificationsSameAsPrimary = ko.observable(true);
 
     self.orderConfirmationsEmail = ko.observable().extend({
         email: {
@@ -168,9 +168,9 @@
         },
         required: {
             params: true,
-            onlyIf: function () {
-                return !self.orderConfirmationsSameAsPrimary();
-            },
+            //onlyIf: function () {
+            //    return !self.orderConfirmationsSameAsPrimary();
+            //},
             message: self.resources.emailValidation
         }
     });
@@ -182,37 +182,37 @@
         },
         required: {
             params: true,
-            onlyIf: function () {
-                return !self.invoicesStatementsSameAsPrimary();
-            },
+            //onlyIf: function () {
+            //    return !self.invoicesStatementsSameAsPrimary();
+            //},
             message: self.resources.emailValidation
         }
     });
 
-    self.productNewsEventsEmail = ko.observable().extend({
+    self.pricelistsProductsNewsEventsEmail = ko.observable().extend({
         email: {
             params: true,
             message: self.resources.emailValidationFormat
         },
         required: {
             params: true,
-            onlyIf: function () {
-                return !self.productNewsEventsSameAsPrimary();
-            },
+            //onlyIf: function () {
+            //    return !self.pricelistsProductsNewsEventsSameAsPrimary();
+            //},
             message: self.resources.emailValidation
         }
     });
 
-    self.pricelistsEmail = ko.observable().extend({
+    self.deliveryNotificationsEmail = ko.observable().extend({
         email: {
             params: true,
             message: self.resources.emailValidationFormat
         },
         required: {
             params: true,
-            onlyIf: function () {
-                return !self.pricelistsSameAsPrimary();
-            },
+            //onlyIf: function () {
+            //    return !self.deliveryNotificationsSameAsPrimary();
+            //},
             message: self.resources.emailValidation
         }
     });
@@ -430,8 +430,8 @@
         self.email,
         self.orderConfirmationsEmail,
         self.invoicesStatementsEmail,
-        self.productNewsEventsEmail,
-        self.pricelistsEmail,
+        self.pricelistsProductsNewsEventsEmail,
+        self.deliveryNotificationsEmail,
         self.invoiceAddress,
         self.notes,
         self.whyWorkWithDG,
@@ -867,17 +867,17 @@
         disabled: self.invoicesStatementsSameAsPrimary
     };
 
-    self.productNewsEventsSameAsPrimaryParams = {
+    self.pricelistsProductsNewsEventsSameAsPrimaryParams = {
         checkboxId: 'product-news-same-as-primary',
         label: self.resources.SameAsPrimary,
-        observable: self.productNewsEventsSameAsPrimary,
+        observable: self.pricelistsProductsNewsEventsSameAsPrimary,
         useNativeValidation: false,
         disabled: false
     };
 
-    self.productNewsEventsEmailParams = {
+    self.pricelistsProductsNewsEventsEmailParams = {
         label: self.resources.ProductsNewsEvents,
-        observable: self.productNewsEventsEmail,
+        observable: self.pricelistsProductsNewsEventsEmail,
         useNativeValidation: false,
         decorateInputElement: false,
         insertValidationMessages: false,
@@ -891,20 +891,20 @@
         charsRemainingOptions: {
             maxLength: 256
         },
-        disabled: self.productNewsEventsSameAsPrimary
+        disabled: self.pricelistsProductsNewsEventsSameAsPrimary
     };
 
-    self.pricelistsSameAsPrimaryParams = {
+    self.deliveryNotificationsSameAsPrimaryParams = {
         checkboxId: 'pricelists-same-as-primary',
         label: self.resources.SameAsPrimary,
-        observable: self.pricelistsSameAsPrimary,
+        observable: self.deliveryNotificationsSameAsPrimary,
         useNativeValidation: false,
         disabled: false
     };
 
-    self.pricelistsEmailParams = {
-        label: self.resources.Pricelists,
-        observable: self.pricelistsEmail,
+    self.deliveryNotificationsEmailParams = {
+        label: self.resources.DeliveryNotifications,
+        observable: self.deliveryNotificationsEmail,
         useNativeValidation: false,
         decorateInputElement: false,
         insertValidationMessages: false,
@@ -918,7 +918,7 @@
         charsRemainingOptions: {
             maxLength: 256
         },
-        disabled: self.pricelistsSameAsPrimary
+        disabled: self.deliveryNotificationsSameAsPrimary
     };
 
     self.deliverySameAsInvoiceParams = {
@@ -1145,8 +1145,6 @@
         }
     }
 
-    self.formErrors = ko.validation.group(self.toValidate());
-
     self.interestErrors = ko.validation.group([
         self.leadInterests
     ]);
@@ -1183,10 +1181,10 @@
                 self.orderConfirmationsEmail(nv);
             if (self.invoicesStatementsSameAsPrimary())
                 self.invoicesStatementsEmail(nv);
-            if (self.productNewsEventsSameAsPrimary())
-                self.productNewsEventsEmail(nv);
-            if (self.pricelistsSameAsPrimary())
-                self.pricelistsEmail(nv);
+            if (self.pricelistsProductsNewsEventsSameAsPrimary())
+                self.pricelistsProductsNewsEventsEmail(nv);
+            if (self.deliveryNotificationsSameAsPrimary())
+                self.deliveryNotificationsEmail(nv);
         }
     })
 
@@ -1199,11 +1197,11 @@
                 if (self.invoicesStatementsSameAsPrimary()) {
                     self.invoicesStatementsEmail(self.email());
                 }
-                if (self.productNewsEventsSameAsPrimary()) {
-                    self.productNewsEventsEmail(self.email());
+                if (self.pricelistsProductsNewsEventsSameAsPrimary()) {
+                    self.pricelistsProductsNewsEventsEmail(self.email());
                 }
-                if (self.pricelistsSameAsPrimary()) {
-                    self.pricelistsEmail(self.email());
+                if (self.deliveryNotificationsSameAsPrimary()) {
+                    self.deliveryNotificationsEmail(self.email());
                 }
             }
         }
@@ -1220,6 +1218,9 @@
         } else {
             self.orderConfirmationsEmail(undefined);
             self.orderConfirmationsEmail.isModified(false);
+            window.setTimeout(() => {
+                self.orderConfirmationsEmail.DOMElement.focus();
+            }, 0);
         }
     });
 
@@ -1234,34 +1235,43 @@
         } else {
             self.invoicesStatementsEmail(undefined);
             self.invoicesStatementsEmail.isModified(false);
+            window.setTimeout(() => {
+                self.invoicesStatementsEmail.DOMElement.focus();
+            }, 0);
         }
     });
 
-    self.productNewsEventsSameAsPrimary.subscribe(function (newValue) {
+    self.pricelistsProductsNewsEventsSameAsPrimary.subscribe(function (newValue) {
         if (newValue) {
             if (self.email.isValid())
-                self.productNewsEventsEmail(self.email());
+                self.pricelistsProductsNewsEventsEmail(self.email());
             else {
-                self.productNewsEventsEmail(undefined);
-                self.productNewsEventsEmail.isModified(false);
+                self.pricelistsProductsNewsEventsEmail(undefined);
+                self.pricelistsProductsNewsEventsEmail.isModified(false);
             }
         } else {
-            self.productNewsEventsEmail(undefined);
-            self.productNewsEventsEmail.isModified(false);
+            self.pricelistsProductsNewsEventsEmail(undefined);
+            self.pricelistsProductsNewsEventsEmail.isModified(false);
+            window.setTimeout(() => {
+                self.pricelistsProductsNewsEventsEmail.DOMElement.focus();
+            }, 0);
         }
     });
 
-    self.pricelistsSameAsPrimary.subscribe(function (newValue) {
+    self.deliveryNotificationsSameAsPrimary.subscribe(function (newValue) {
         if (newValue) {
             if (self.email.isValid())
-                self.pricelistsEmail(self.email());
+                self.deliveryNotificationsEmail(self.email());
             else {
-                self.pricelistsEmail(undefined);
-                self.pricelistsEmail.isModified(false);
+                self.deliveryNotificationsEmail(undefined);
+                self.deliveryNotificationsEmail.isModified(false);
             }
         } else {
-            self.pricelistsEmail(undefined);
-            self.pricelistsEmail.isModified(false);
+            self.deliveryNotificationsEmail(undefined);
+            self.deliveryNotificationsEmail.isModified(false);
+            window.setTimeout(() => {
+                self.deliveryNotificationsEmail.DOMElement.focus();
+            }, 0);
         }
     });
 
@@ -1294,6 +1304,8 @@
             }, 0);
         }
     });
+
+    self.formErrors = ko.validation.group(self.toValidate());
 
     //#endregion
 
@@ -1533,8 +1545,8 @@
                     email: self.email(),
                     orderConfirmationsEmail: self.orderConfirmationsEmail(),
                     invoicesStatementsEmail: self.invoicesStatementsEmail(),
-                    productNewsEventsEmail: self.productNewsEventsEmail(),
-                    pricelistsEmail: self.pricelistsEmail(),
+                    pricelistsProductsNewsEventsEmail: self.pricelistsProductsNewsEventsEmail(),
+                    deliveryNotificationsEmail: self.deliveryNotificationsEmail(),
                     notes: self.notes() + "\n\n" + self.whyWorkWithDG(),
                     leadInterests: self.leadInterests(),
                     invoiceAddress: invoiceAddress,
@@ -1617,6 +1629,62 @@
     self.closeWarningModal = () => {
         bootstrap.Modal.getOrCreateInstance(self.warningModalElement).hide();
     }
+
+    //self.setTest = (countryId) => {
+    //    switch (countryId) {
+    //        case 81:
+    //            self.companyName('Company Name');
+    //            self.channelId(1);
+    //            self.companyRegistration('Company Registration');
+    //            self.vatRegistered(true);
+    //            self.vatCountryId(81);
+    //            self.companyVATNumber('VATNumber');
+    //            self.eoriRegistered(true);
+    //            self.companyEORINumber('EORI Number');
+    //            self.companyTypeId(4);
+    //            self.sellOnline(true);
+    //            self.website('https://www.designersguild.com/uk/l0');
+    //            self.tradingSinceId(7);
+    //            self.contactTypeId(0);
+    //            self.positionOther('Software Engineer');
+    //            self.titleId(3);
+    //            self.fullName('Full Name');
+    //            self.phone('01234 567 890');
+    //            self.email('primary@example.com');
+    //            self.orderConfirmationsSameAsPrimary(false);
+    //            self.orderConfirmationsEmail('order.confirmations@example.com');
+    //            self.invoicesStatementsSameAsPrimary(false);
+    //            self.invoicesStatementsEmail('invoice.statements@example.com');
+    //            self.pricelistsProductsNewsEventsSameAsPrimary(false);
+    //            self.pricelistsProductsNewsEventsEmail('pricelists.products.news.events@example.com');
+    //            self.deliveryNotificationsSameAsPrimary(false);
+    //            self.deliveryNotificationsEmail('delivery.notifications@example.com');
+    //            self.invoiceAddress.name.observable('Full Name');
+    //            self.invoiceAddress.companyName.observable('Company Name');
+    //            self.invoiceAddress.addressLine1.observable('Address Line 1');
+    //            self.invoiceAddress.addressLine2.observable('Address Line 2');
+    //            self.invoiceAddress.town.observable('Town');
+    //            self.invoiceAddress.county.observable('County');
+    //            self.invoiceAddress.postcode.observable('Postcode');
+    //            self.deliverySameAsInvoice(false);
+    //            self.deliveryAddress.name.observable('Delivery Full Name');
+    //            self.deliveryAddress.companyName.observable('Delivery Company Name');
+    //            self.deliveryAddress.addressLine1.observable('Delivery Address Line 1');
+    //            self.deliveryAddress.addressLine2.observable('Delivery Address Line 2');
+    //            self.deliveryAddress.town.observable('Delivery Town');
+    //            self.deliveryAddress.county.observable('Delivery County');
+    //            self.deliveryAddress.postcode.observable('Delivery Postcode');
+    //            self.notes('Brands');
+    //            self.whyWorkWithDG('Reasons');
+    //            self.interestedInAllBrandsForProductType(1);
+    //            self.interestedInAllBrandsForProductType(2);
+    //            self.interestedInAllBrandsForProductType(3);
+    //            window.scrollTo(0, 3000);
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 
     self.reset = function () {
         self.ignoreWarning(false);
