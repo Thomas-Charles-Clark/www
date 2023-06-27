@@ -705,8 +705,8 @@ namespace wwwDesignersGuild.Models.Classes
         public string email { get; set; }
         public string orderConfirmationsEmail { get; set; }
         public string invoicesStatementsEmail { get; set; }
-        public string productNewsEventsEmail { get; set; }
-        public string pricelistsEmail { get; set; }
+        public string pricelistsProductsNewsEventsEmail { get; set; }
+        public string deliveryNotificationsEmail { get; set; }
         public string notes { get; set; }
         public bool patternBookInterest { get; set; }
         public bool distributorConsent { get; set; }

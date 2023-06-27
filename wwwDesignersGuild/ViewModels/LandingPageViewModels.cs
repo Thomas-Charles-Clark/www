@@ -949,6 +949,7 @@ namespace wwwDesignersGuild.ViewModels
                         "InvoicesStatements",
                         "ProductsNewsEvents",
                         "Pricelists",
+                        "DeliveryNotifications",
                         "DeliverySameAsInvoiceAddress",
                         "Notes",
                         "WhyWorkWithDG",
