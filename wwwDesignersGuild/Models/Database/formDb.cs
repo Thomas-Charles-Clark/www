@@ -170,8 +170,8 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@Email", objFormDetails.email);
                 cmd.Parameters.AddWithValue("@OrderConfirmationsEmail", objFormDetails.orderConfirmationsEmail ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@InvoiceStatementsEmail", objFormDetails.invoicesStatementsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@ProductNewsEventsEmail", objFormDetails.productNewsEventsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@PricelistsEmail", objFormDetails.pricelistsEmail ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@PriceListsProductsNewsEventsEmail", objFormDetails.pricelistsProductsNewsEventsEmail ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@DeliveryNotificationsEmail", objFormDetails.deliveryNotificationsEmail ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Notes", objFormDetails.notes ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@WillBuyPatternBooks", objFormDetails.patternBookInterest);
                 cmd.Parameters.AddWithValue("@DistributorDataSharingConsent", objFormDetails.distributorConsent);

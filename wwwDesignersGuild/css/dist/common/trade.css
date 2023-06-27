@@ -919,6 +919,9 @@ textarea.mdc-text-field__input:focus-within {
 #trade-account-request .address-form {
   padding: 1rem;
 }
+#trade-account-request .mdc-text-field--disabled .mdc-floating-label {
+  color: rgba(0, 0, 0, 0.68);
+}
 
 #warning-modal .btn-secondary {
   width: 100%;
