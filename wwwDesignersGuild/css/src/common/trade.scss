@@ -1014,6 +1014,10 @@ textarea.mdc-text-field__input:focus-within {
     .address-form {
         padding: $l-gutter;
     }
+
+    .mdc-text-field--disabled .mdc-floating-label {
+        color: rgba(0,0,0,0.68);
+    }
 }
 
 #warning-modal {
