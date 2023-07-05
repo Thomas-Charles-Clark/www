@@ -30,17 +30,21 @@ namespace wwwDesignersGuild.ViewModels
                 return $"order-form-group-{OrderFormGroupID}-carousel";
             }
         }
+
+        public bool AutoOpenFirstSize { get; set; }
         
         public OrderFormGroupViewModel(
             int? orderFormGroupId, 
             string name,
             bool useSizeButtons,
+            bool autoOpenFirstSize,
             IEnumerable<OrderFormItemViewModel> items,
             NewMasterDefinition objMaster)
         {
             OrderFormGroupID = orderFormGroupId;
             Name = name;
             UseSizeButtons = useSizeButtons;
+            AutoOpenFirstSize = autoOpenFirstSize;
             Items = items;
             MasterDefinition = objMaster;
         }
