@@ -81,12 +81,16 @@ namespace wwwDesignersGuild.ViewModels
         {
             get
             {
+                var autoOpenFirstSize = AllProducts
+                    .GroupBy(p => new { OrderFormGroupID = p.OrderFormGroupID == null ? (int?)-1 : p.OrderFormGroupID }).Count() == 1;
+
                 return AllProducts
                     .GroupBy(p => new { p.OrderFormGroupID, p.OrderFormGroup })
                     .Select(g => new OrderFormGroupViewModel(
                         orderFormGroupId: g.Key.OrderFormGroupID,
                         name: g.Key.OrderFormGroup,
                         useSizeButtons: UseSizeButtons,
+                        autoOpenFirstSize: autoOpenFirstSize,
                         items: g,
                         objMaster: MasterDefinition));
             }
