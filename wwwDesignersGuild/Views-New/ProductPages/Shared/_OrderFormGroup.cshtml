@@ -24,7 +24,7 @@
         {
             var item = obj.value;
             var index = obj.index + 1;
-            <button class="btn btn-light size-button g-col-1"
+            <button class="btn btn-light size-button g-col-1 @(Model.AutoOpenFirstSize && obj.index == 0 ? "active" : "")"
                     type="button"
                     aria-controls="@(item.OrderFormCarouselID.Replace("#", ""))"
                     data-bs-target="#@(Model.OrderFormCarouselID)"
@@ -35,13 +35,19 @@
     </div>
     <div id="@(Model.OrderFormCarouselID)" class="pt-2 carousel slide carousel-fade order-form-group-carousel" data-bs-interval="false" data-bs-touch="false">
         <div class="carousel-inner">
-            <div class="order-form-product carousel-item active mt-0 mb-4 placeholder">
-            </div>
-            <!-- ko foreachInit: { name: 'ko-blank-template', data: sizeGroups, createElement: createSizeGroup } -->
-           @foreach (var item in Model.Items.OrderBy(p => p.SortOrder))
+           @if (!Model.AutoOpenFirstSize)
             {
+                <div class="order-form-product carousel-item active mt-0 mb-4 placeholder">
+                </div>
+            }
+            <!-- ko foreachInit: { name: 'ko-blank-template', data: sizeGroups, createElement: createSizeGroup } -->
+            @foreach (var value in Model.Items.Select((item, i) => new { item, i }).OrderBy(p => p.item.SortOrder))
+            {
+                var item = value.item;
+                var index = value.i;
+
                 <div id="@(item.OrderFormCarouselID.Replace("#", ""))"
-                     class="order-form-product carousel-item"
+                     class="order-form-product carousel-item @(Model.AutoOpenFirstSize && index == 0 ? "active" : "")"
                      data-init>
                     @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", item)
                 </div>
