@@ -231,7 +231,7 @@ namespace wwwDesignersGuild.ViewModels
                 aspectRatio: 1.636m,
                 heading: Definition.ArticleDetails.Heading,
                 images: Definition.articleImageSelects
-                                  .Where(i => i.TemplateImageID == 2)
+                                  .Where(i => i.TemplateImageID == 2 || i.TemplateImageID == 3)
                                   .OrderBy(i => i.SortOrder)
                                   .Select(i => new CarouselImage(i.ImageID, i.SortOrder, i.AltText, ImageSize.Twelve)),
                 this
