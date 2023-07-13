@@ -126,7 +126,7 @@
     }
     <div id="article-main"
          class="grid">
-        <article>
+        <article style="@(Model.ArticleTemplateID == 1 ? "grid-column: auto/span 12" : "")">
             <h1 class="text-uppercase my-3">
                 @Model.Heading
             </h1>
