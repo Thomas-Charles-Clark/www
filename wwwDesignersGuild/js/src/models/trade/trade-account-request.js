@@ -760,7 +760,7 @@
     };
 
     self.fullNameParams = {
-        label: self.resources.FormsFullName,
+        label: self.resources.AddAddressBookFullName,
         observable: self.fullName,
         useNativeValidation: false,
         decorateInputElement: false,
