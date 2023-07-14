@@ -923,7 +923,7 @@ namespace wwwDesignersGuild.ViewModels
                         "PleaseSelectCountry",
                         "PleaseSelectCountryBefore",
                         "FormsCompanyName",
-                        "FormsFullName",
+                        "AddAddressBookFullName",
                         "FormsAddressLineOne",
                         "FormsAddressLineTwo",
                         "FormsTown",
