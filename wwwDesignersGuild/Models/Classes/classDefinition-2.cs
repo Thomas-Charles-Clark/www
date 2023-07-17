@@ -166,6 +166,33 @@ namespace wwwDesignersGuild.Models.Classes
 
             }
         }
+
+        public string FinalURL(string siteCountry)
+        {
+            var result = "";
+
+            if (URL == null)
+            {
+                return "javascript:;";
+            }
+
+            if (!ExternalURL)
+            {
+                result = $@"/{siteCountry}/{(FontClass == "menu-spacer"
+                            ? "javascript:;"
+                            : $@"{URL?.TrimStart(Framework.ForwardSlash)}{QueryStringParameters}")}"
+                .TrimEnd(Framework.QueryStringTrim);
+            }
+            else
+            {
+                result = $@"{(FontClass == "menu-spacer"
+                            ? "javascript:;"
+                            : $@"{URL}{QueryStringParameters}")}"
+                .TrimEnd(Framework.QueryStringTrim);
+            }
+
+            return Framework.URLFixup(result);
+        }
     }
 
 
