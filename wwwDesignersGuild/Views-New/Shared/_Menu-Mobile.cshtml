@@ -366,27 +366,30 @@
     var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
     var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
     var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = model.MasterDefinition.UrlBreakdown.countryDetails;
 
     // this menuItem's children are all those menuItems subsequent to it until the next Heading
 
     var subMenus = objMenu.MobileMenuItems.Where(p =>
-        p.IsMenuItemAlreadyBuilt == false &&
-        p.MenuItem.MenuID == menu.MenuID &&
-        p.MenuItem.BannerLocationID == null &&
-        p.MenuItem.FontClass?.ToLowerInvariant().Contains("header") == true)
-        .OrderBy(p => p.MenuItem.Column)
-        .ThenBy(p => p.MenuItem.SortOrder)
-        .ToList(); // this should have 11 or 12 in it
+    p.IsMenuItemAlreadyBuilt == false &&
+    p.MenuItem.MenuID == menu.MenuID &&
+    p.MenuItem.BannerLocationID == null &&
+    p.MenuItem.FontClass?.ToLowerInvariant().Contains("header") == true)
+    .OrderBy(p => p.MenuItem.Column)
+    .ThenBy(p => p.MenuItem.SortOrder)
+    .ToList(); // this should have 11 or 12 in it
 
     // a menu always has sub menus
 
     if (subMenus.Any())
     {
-        var href = ($"{menu.URL?.TrimStart(Framework.ForwardSlash)}{menu.QueryStringParameters}" +
-            (HtmlHelperExtra.Debug
-                ? $"{(String.IsNullOrEmpty(menu.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
-                : "")
-            ).TrimEnd(Framework.QuestionMark);
+        //var href = ($"{menu.URL?.TrimStart(Framework.ForwardSlash)}{menu.QueryStringParameters}" +
+        //    (HtmlHelperExtra.Debug
+        //        ? $"{(String.IsNullOrEmpty(menu.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
+        //        : "")
+        //    ).TrimEnd(Framework.QuestionMark);
+
+        var href = menu.FinalURL(ci.URL);
 
         <span class="nav-link @menu.FontClass collapsed">
             <a href="@Framework.URLFixup(String.IsNullOrEmpty(href) ? "javascript:;" : href)"
@@ -426,11 +429,13 @@
     }
     else
     {
-        var href = ($"{menu.URL?.TrimStart(Framework.ForwardSlash)}{menu.QueryStringParameters}" +
-            (HtmlHelperExtra.Debug
-                ? $"{(String.IsNullOrEmpty(menu.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
-                : "")
-            ).TrimEnd(Framework.QuestionMark);
+        //var href = ($"{menu.URL?.TrimStart(Framework.ForwardSlash)}{menu.QueryStringParameters}" +
+        //    (HtmlHelperExtra.Debug
+        //        ? $"{(String.IsNullOrEmpty(menu.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
+        //        : "")
+        //    ).TrimEnd(Framework.QuestionMark);
+
+        var href = menu.FinalURL(ci.URL);
 
         <a class="nav-link collapsed @menu.FontClass"
            aria-label="@(menu.Name)"
@@ -452,6 +457,7 @@
     var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
     var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
     var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = model.MasterDefinition.UrlBreakdown.countryDetails;
 
     var allSubsequentColumnChildren = objMenu.MobileMenuItems.Where(p =>
             p.IsMenuItemAlreadyBuilt == false &&
@@ -487,11 +493,13 @@
 
     if (!children.Any())
     {
-        var href = ($"{item.MenuItem.URL?.TrimStart(Framework.ForwardSlash)}{item.MenuItem.QueryStringParameters}" +
-                (HtmlHelperExtra.Debug
-                    ? $"{(String.IsNullOrEmpty(item.MenuItem.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
-                    : "")
-            ).TrimEnd(Framework.QuestionMark);
+        //var href = ($"{item.MenuItem.URL?.TrimStart(Framework.ForwardSlash)}{item.MenuItem.QueryStringParameters}" +
+        //        (HtmlHelperExtra.Debug
+        //            ? $"{(String.IsNullOrEmpty(item.MenuItem.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
+        //            : "")
+        //    ).TrimEnd(Framework.QuestionMark);
+
+        var href = item.MenuItem.FinalURL(ci.URL);
 
         <a class="nav-link collapsed @item.MenuItem.FontClass"
            aria-label="@(item.MenuItem.Name)"
@@ -506,11 +514,13 @@
     }
     else
     {
-        var href = ($"{item.MenuItem.URL?.TrimStart(Framework.ForwardSlash)}{item.MenuItem.QueryStringParameters}" +
-            (HtmlHelperExtra.Debug
-                ? $"{(String.IsNullOrEmpty(item.MenuItem.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
-                : "")
-        ).TrimEnd(Framework.QuestionMark);
+        //var href = ($"{item.MenuItem.URL?.TrimStart(Framework.ForwardSlash)}{item.MenuItem.QueryStringParameters}" +
+        //    (HtmlHelperExtra.Debug
+        //        ? $"{(String.IsNullOrEmpty(item.MenuItem.QueryStringParameters) ? $"?{Request.QueryString}" : $"&{Request.QueryString}")}"
+        //        : "")
+        //).TrimEnd(Framework.QuestionMark);
+
+        var href = item.MenuItem.FinalURL(ci.URL);
 
         <span class="nav-link @item.MenuItem.FontClass collapsed">
             <a href="@Framework.URLFixup(String.IsNullOrEmpty(href) ? "javascript:;" : href)"
