@@ -478,6 +478,7 @@
     var l = model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
     var c = model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
     var d = model.MasterDefinition.UrlBreakdown.ContentDate;
+    var ci = model.MasterDefinition.UrlBreakdown.countryDetails;
 
     var children = objMenu.menuItems.Where(p => p.MenuID == group.MenuID)
                                     .OrderBy(p => p.SortOrder)
@@ -492,7 +493,7 @@
                    class="nav-link @group.FontClass"
                    aria-label="@(group.Name)"
                    href="@Framework.URLFixup((group.FontClass == "menu-spacer" ? "javascript:;" :
-                    $"{group.URL}{group.QueryStringParameters}"))"
+                    $"{group.FinalURL(ci.URL)}"))"
                    target="@(group.NewWindow ? "_blank" : "_self")"
                    onclick="@(group.TrackExternalURL ? "return trackOutbound(this);" : "")"
                    rel="@(group.NoFollow ? "nofollow noopener" : "")">
@@ -510,7 +511,7 @@
         <li>
             <a  id="menu-@(group.MenuID)"
                 class="nav-link @group.FontClass"
-                href="@Framework.URLFixup(group.URL ?? "javascript:;")"
+                href="@Framework.URLFixup(group.FinalURL(ci.URL) ?? "javascript:;")"
                 target="@(group.NewWindow ? "_blank" : "_self")"
                 onmouseenter="this.focus()"
                 onmouseout="this.blur()"
