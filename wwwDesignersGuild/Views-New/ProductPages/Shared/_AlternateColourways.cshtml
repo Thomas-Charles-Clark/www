@@ -57,7 +57,7 @@
                     var ac = alternateColourway.value;
                     var index = alternateColourway.index;
                     <div class="@(ac.productPageId == Model.Definition.productPageId ? "active" : "")">
-                        <a class="alternate-colourway-card ripple" href="@(ac.url)">
+                        <a class="alternate-colourway-card ripple" href="@Framework.URLFixup(ac.url)">
                             <div class="card">
                                 <img class="card-img-top"
                                         width="488"
