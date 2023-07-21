@@ -593,9 +593,20 @@ ul.breadcrumb {
 }
 .grid {
     gap: $m-gutter;
+
     > button {
         font-size: $small-font-size;
-    }    
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: $l-gutter;
+    }
+
+    .filters-button.form-select {
+        text-align: left;
+        width: 202px;
+    }
 }
 .product-page-grid,
 .page-grid,
