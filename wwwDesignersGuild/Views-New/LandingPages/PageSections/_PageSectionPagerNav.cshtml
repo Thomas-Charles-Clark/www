@@ -51,7 +51,7 @@
         <div class="filter-buttons g-col-12 g-col-sm-4 g-col-lg-4">
             @if (grid.AttributeGroups.Any())
             {
-                <button class="btn btn-secondary my-2 filters-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#grid-filters-@(Model.PageSectionID)" aria-controls="grid-filters-@(Model.PageSectionID)">
+                <button class="form-select my-2 filters-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#grid-filters-@(Model.PageSectionID)" aria-controls="grid-filters-@(Model.PageSectionID)">
                     @HtmlHelperExtra.Resource("Filters", l, c, d)
                     <span data-bind="text: parent.filterCount() > 0 ? '(' + parent.filterCount() + ')' : ''">
                         @(grid.FilterCount > 0 ? $"({grid.FilterCount})" : "")
