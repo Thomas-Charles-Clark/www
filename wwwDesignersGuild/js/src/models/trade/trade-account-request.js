@@ -1630,61 +1630,64 @@
         bootstrap.Modal.getOrCreateInstance(self.warningModalElement).hide();
     }
 
-    //self.setTest = (countryId) => {
-    //    switch (countryId) {
-    //        case 81:
-    //            self.companyName('Company Name');
-    //            self.channelId(1);
-    //            self.companyRegistration('Company Registration');
-    //            self.vatRegistered(true);
-    //            self.vatCountryId(81);
-    //            self.companyVATNumber('VATNumber');
-    //            self.eoriRegistered(true);
-    //            self.companyEORINumber('EORI Number');
-    //            self.companyTypeId(4);
-    //            self.sellOnline(true);
-    //            self.website('https://www.designersguild.com/uk/l0');
-    //            self.tradingSinceId(7);
-    //            self.contactTypeId(0);
-    //            self.positionOther('Software Engineer');
-    //            self.titleId(3);
-    //            self.fullName('Full Name');
-    //            self.phone('01234 567 890');
-    //            self.email('primary@example.com');
-    //            self.orderConfirmationsSameAsPrimary(false);
-    //            self.orderConfirmationsEmail('order.confirmations@example.com');
-    //            self.invoicesStatementsSameAsPrimary(false);
-    //            self.invoicesStatementsEmail('invoice.statements@example.com');
-    //            self.pricelistsProductsNewsEventsSameAsPrimary(false);
-    //            self.pricelistsProductsNewsEventsEmail('pricelists.products.news.events@example.com');
-    //            self.deliveryNotificationsSameAsPrimary(false);
-    //            self.deliveryNotificationsEmail('delivery.notifications@example.com');
-    //            self.invoiceAddress.name.observable('Full Name');
-    //            self.invoiceAddress.companyName.observable('Company Name');
-    //            self.invoiceAddress.addressLine1.observable('Address Line 1');
-    //            self.invoiceAddress.addressLine2.observable('Address Line 2');
-    //            self.invoiceAddress.town.observable('Town');
-    //            self.invoiceAddress.county.observable('County');
-    //            self.invoiceAddress.postcode.observable('Postcode');
-    //            self.deliverySameAsInvoice(false);
-    //            self.deliveryAddress.name.observable('Delivery Full Name');
-    //            self.deliveryAddress.companyName.observable('Delivery Company Name');
-    //            self.deliveryAddress.addressLine1.observable('Delivery Address Line 1');
-    //            self.deliveryAddress.addressLine2.observable('Delivery Address Line 2');
-    //            self.deliveryAddress.town.observable('Delivery Town');
-    //            self.deliveryAddress.county.observable('Delivery County');
-    //            self.deliveryAddress.postcode.observable('Delivery Postcode');
-    //            self.notes('Brands');
-    //            self.whyWorkWithDG('Reasons');
-    //            self.interestedInAllBrandsForProductType(1);
-    //            self.interestedInAllBrandsForProductType(2);
-    //            self.interestedInAllBrandsForProductType(3);
-    //            window.scrollTo(0, 3000);
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //}
+    self.setTest = (countryId) => {
+        switch (countryId) {
+            case 81:
+                self.companyName('Tom\'s Company Name');
+                self.channelId(1);
+                self.companyRegistration('Company Registration');
+                self.vatRegistered(true);
+                self.vatCountryId(81);
+                self.companyVATNumber('VATNumber');
+                self.eoriRegistered(true);
+                self.companyEORINumber('EORI Number');
+                self.companyTypeId(4);
+                self.sellOnline(true);
+                self.website('https://www.designersguild.com/uk/l0');
+                self.tradingSinceId(7);
+                self.contactTypeId(0);
+                self.positionOther('Software Engineer');
+                self.titleId(3);
+                self.fullName('Full Name');
+                self.phone('01234 567 890');
+                self.email('primary@example.com');
+                self.orderConfirmationsSameAsPrimary(false);
+                self.orderConfirmationsEmail('order.confirmations@example.com');
+                self.invoicesStatementsSameAsPrimary(false);
+                self.invoicesStatementsEmail('invoice.statements@example.com');
+                self.pricelistsProductsNewsEventsSameAsPrimary(false);
+                self.pricelistsProductsNewsEventsEmail('pricelists.products.news.events@example.com');
+                self.deliveryNotificationsSameAsPrimary(false);
+                self.deliveryNotificationsEmail('delivery.notifications@example.com');
+                self.invoiceAddress.name.observable('Full Name');
+                self.invoiceAddress.companyName.observable('Company Name');
+                self.invoiceAddress.addressLine1.observable('Address Line 1');
+                self.invoiceAddress.addressLine2.observable('Address Line 2');
+                self.invoiceAddress.town.observable('Town');
+                self.invoiceAddress.county.observable('County');
+                self.invoiceAddress.postcode.observable('Postcode');
+                self.deliverySameAsInvoice(false);
+                self.deliveryAddress.name.observable('Delivery Full Name');
+                self.deliveryAddress.companyName.observable('Delivery Company Name');
+                self.deliveryAddress.addressLine1.observable('Delivery Address Line 1');
+                self.deliveryAddress.addressLine2.observable('Delivery Address Line 2');
+                self.deliveryAddress.town.observable('Delivery Town');
+                self.deliveryAddress.county.observable('Delivery County');
+                self.deliveryAddress.postcode.observable('Delivery Postcode');
+                self.notes('Brands');
+                self.whyWorkWithDG('Reasons');
+                self.interestedInAllBrandsForProductType(11);
+                self.interestedInAllBrandsForProductType(12);
+                self.interestedInAllBrandsForProductType(1)
+                self.interestedInAllBrandsForProductType(2);
+                self.interestedInAllBrandsForProductType(3);
+                self.interestedInAllBrandsForProductType(4);
+                window.scrollTo(0, 3000);
+                break;
+            default:
+                break;
+        }
+    }
 
     self.reset = function () {
         self.ignoreWarning(false);
