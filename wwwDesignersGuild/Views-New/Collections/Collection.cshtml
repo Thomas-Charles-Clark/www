@@ -51,6 +51,17 @@
                             @HtmlHelperExtra.Resource("LifestyleGalleryFindLocalStockist", l, c, d)
                         </a>
                     }
+                    @if (Model.Definition.collectionBrochureSelects.Any())
+                    {
+                        foreach (var cb in Model.Definition.collectionBrochureSelects)
+                        {
+                            <a class="btn btn-light"
+                               href="@(cb.InteractiveBrochureURL)"
+                               target="_blank">
+                                @HtmlHelperExtra.Resource("ViewBrochure", l, c, d)
+                            </a>
+                        }
+                    }
                     <a class="btn btn-light"
                        href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.moodboard, objMaster.UrlBreakdown.countryDetails)"
                        target="_self">
