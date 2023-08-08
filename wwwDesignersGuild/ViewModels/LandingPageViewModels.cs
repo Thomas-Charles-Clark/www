@@ -537,6 +537,10 @@ namespace wwwDesignersGuild.ViewModels
             {
                 CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
             }
+            else
+            {
+                CustomCanonical = Definition.PageDetails.CustomCanonical;
+            }
 
             NoFollow = Definition.PageDetails.NoFollow;
 
