@@ -494,9 +494,10 @@
         var dateOverride = Request.QueryString["dateOverride"];
         var countryOverride = Request.QueryString["countryOverride"];
 
-        <script type="text/javascript">
+<script type="text/javascript">
             window.loadQuickLook = (url, title) => {
-                let dateOverride = '@(dateOverride)';
+                @* This no longer necessary as the pods produce full URLs to pass in as params. 08/08/2023 *@
+                @*let dateOverride = '@(dateOverride)';
                 let countryOverride = '@(countryOverride)';
                 let params = new URLSearchParams({
                     lifestyle: 1
@@ -510,7 +511,7 @@
                     params.append('countryOverride', countryOverride);
                 }
 
-                url = `${url}?${params.toString()}`
+                url = `${url}?${params.toString()}`*@
 
                 console.trace(url);
 
@@ -528,7 +529,7 @@
                     modal.show();
                 }, 0);
             }
-        </script>
+</script>
     }
     <script type="text/javascript">
         window.quickLookBusy = () => {
