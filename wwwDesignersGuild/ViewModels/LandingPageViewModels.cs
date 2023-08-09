@@ -1705,6 +1705,7 @@ namespace wwwDesignersGuild.ViewModels
         public string DeselectedAttributeNames { get; set; }
         public string OriginalURLKeywords { get; set; }
         public bool MustOverwritePageCanonical { get; set; }
+        public string CurrentAttributeSignature { get; set; }
         public IEnumerable<FilterIndexAttributeCombination> AttributeCombinations { get; set; }
 
         // This for use by search 
@@ -2070,6 +2071,8 @@ namespace wwwDesignersGuild.ViewModels
 
             var attributeSignature = String.Join(".", attributesList.Select(a => $"{a.AttributeID}"));
 
+            result.CurrentAttributeSignature = attributeSignature;
+
             model.AttributeFilterText = String.Join(" ", attributesList.Select(al => al.AttributeName));
 
             model.AttributeSignatureText = result.AttributeCombinations?.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
@@ -2350,7 +2353,7 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
-        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions)
+        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
         {
             // if FilterIndexing is enabled on this grid's containing page
             if (FilterIndexingEnabled && attribute.EnableFilterIndexing)
@@ -2460,20 +2463,30 @@ namespace wwwDesignersGuild.ViewModels
                                     url = url.Substring(0, url.IndexOf("?"));
                                 }
 
+                                if (attribute.FormValue == "outdoor")
+                                {
+                                    int f = 0;
+                                }
+
+                                if (attributeCombinations.SingleOrDefault(ac => ac.AttributeSignature == $"{currentAttributeSignature}.{attribute.AttributeID}") == null)
+                                {
+                                    return null;
+                                }
+
                                 return url;
                             }
                             else
                             {
-                                return null;
+                                return "#";
                             }
                         }
                     }
                 }
 
-                return null;
+                return "#";
             }
 
-            return null;
+            return "#";
         }
     }
 
