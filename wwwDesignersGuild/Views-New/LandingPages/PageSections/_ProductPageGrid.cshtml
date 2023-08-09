@@ -36,6 +36,10 @@
     }
 
     var filterIndexRestrictions = grid.ProductTypes.SingleOrDefault(pt => pt.FormValue == grid.ProductType)?.FilterIndexRestrictions;
+
+    var attributeCombinations = grid.AttributeCombinations;
+
+    var currentAttributeSignature = grid.CurrentAttributeSignature;
 }
 <script type="text/javascript">
     //history.scrollRestoration = 'manual';
@@ -280,7 +284,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions)" target="_self" onclick="(event) => { event.preventDefault() }">
+                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions, currentAttributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
                                                         <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
                                                                for="attribute-@(a.AttributeID)-check"
                                                                data-bind="css: { 'unavailable': disabled }">
@@ -377,7 +381,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions)" target="self" onclick="(event) => { event.preventDefault(); }">
+                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions, currentAttributeSignature, attributeCombinations)" target="self" onclick="(event) => { event.preventDefault(); }">
                                                         <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
                                                                for="attribute-@(a.AttributeID)-check"
                                                                data-bind="css: { 'unavailable': disabled }">
