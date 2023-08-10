@@ -78,12 +78,11 @@
    @if (grid.AttributeGroups.Any())
     {
         <div id="grid-filters-@(Model.PageSection.PageSectionID)"
-             class="offcanvas offcanvas-start show"
+             class="offcanvas offcanvas-start"
              tabindex="-1"
              data-bs-scroll="true"
              aria-labelledby="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d)"
              data-bind="keepElement: productPageGrid.offcanvas"
-             style="visibility: visible"
              >
             <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.offcanvas, remove">
                 Ready
