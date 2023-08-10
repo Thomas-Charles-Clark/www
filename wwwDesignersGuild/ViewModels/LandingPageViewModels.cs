@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -2204,24 +2205,29 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
-            attributeProductPageIds.ForEach(appid =>
-            {
-                initialProductPageIds = initialProductPageIds.Intersect(appid.ProductPageIDs).ToList();
-            });
-            
             result.AttributeGroups.ForEach(ag =>
             {
+                var productPageIdsToConsider = initialProductPageIds;
+
+                attributeProductPageIds.ForEach(appid =>
+                {
+                    if (appid.AttributeGroupID != ag.AttributeGroupID)
+                    {
+                        productPageIdsToConsider = productPageIdsToConsider.Intersect(appid.ProductPageIDs).ToList();
+                    }
+                });
+
                 var productPageIdsAffectingThisAttributeGroup = new List<int>();
 
                 switch (ag.LogicalOperator)
                 {
                     case "AND":
-                        productPageIdsAffectingThisAttributeGroup = initialProductPageIds.Intersect(
+                        productPageIdsAffectingThisAttributeGroup = productPageIdsToConsider.Intersect(
                             attributeProductPageIds.SelectMany(appid => appid.ProductPageIDs)
                         ).ToList();
                         break;
                     case "OR":
-                        productPageIdsAffectingThisAttributeGroup = initialProductPageIds.Intersect(
+                        productPageIdsAffectingThisAttributeGroup = productPageIdsToConsider.Intersect(
                             attributeProductPageIds.Where(appid => appid.AttributeGroupID != ag.AttributeGroupID)
                                                    .SelectMany(appid => appid.ProductPageIDs)
                         ).ToList();
@@ -2230,6 +2236,11 @@ namespace wwwDesignersGuild.ViewModels
 
                 ag.Attributes.ForEach(a =>
                 {
+                    if (a.FormValue == "pink")
+                    {
+                        int f = 0;
+                    }
+
                     if (productPageIdsAffectingThisAttributeGroup.Any())
                     {
                         a.AvailableProductPageIDs = a.ProductPageIDs.Intersect(productPageIdsAffectingThisAttributeGroup).ToList();
