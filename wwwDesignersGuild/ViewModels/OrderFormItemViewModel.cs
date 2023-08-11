@@ -88,6 +88,14 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public bool PrimaryProduct
+        {
+            get
+            {
+                return Product.SelectToken("primaryProduct")?.Value<bool?>() ?? false;
+            }
+        }
+
         public int? OrderFormGroupID
         {
             get
