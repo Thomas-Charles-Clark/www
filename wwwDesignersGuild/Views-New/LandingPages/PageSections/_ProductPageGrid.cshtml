@@ -244,7 +244,7 @@
                                        @{ 
                                             var selectedAttributeIds = ag.Attributes.Where(a => ag.Selection.Contains(a.FormValue)).Select(a => a.AttributeID.ToString()).ToList();
 
-                                            var currentAttributeSplit = currentAttributeSignature.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                            var currentAttributeSplit = currentAttributeSignature?.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
                                             selectedAttributeIds.ForEach(said =>
                                             {
@@ -362,7 +362,7 @@
                                        @{
                                            var selectedAttributeIds = ag.Attributes.Where(a => ag.Selection.Contains(a.FormValue)).Select(a => a.AttributeID.ToString()).ToList();
 
-                                           var currentAttributeSplit = currentAttributeSignature.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                           var currentAttributeSplit = currentAttributeSignature?.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
                                            selectedAttributeIds.ForEach(said =>
                                            {
