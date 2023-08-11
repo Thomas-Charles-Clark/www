@@ -77,20 +77,22 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
         }
+
         public IEnumerable<OrderFormGroupViewModel> OrderFormGroups 
         {
             get
             {
                 var autoOpenFirstSize = AllProducts
+                    .Where(p => p.PrimaryProduct)
                     .GroupBy(p => new { OrderFormGroupID = p.OrderFormGroupID == null ? (int?)-1 : p.OrderFormGroupID }).Count() == 1;
 
                 return AllProducts
-                    .GroupBy(p => new { p.OrderFormGroupID, p.OrderFormGroup })
+                    .GroupBy(p => new { p.OrderFormGroupID, p.OrderFormGroup, p.PrimaryProduct })
                     .Select(g => new OrderFormGroupViewModel(
                         orderFormGroupId: g.Key.OrderFormGroupID,
                         name: g.Key.OrderFormGroup,
                         useSizeButtons: UseSizeButtons,
-                        autoOpenFirstSize: autoOpenFirstSize,
+                        autoOpenFirstSize: g.Key.PrimaryProduct && autoOpenFirstSize,
                         items: g,
                         objMaster: MasterDefinition));
             }
