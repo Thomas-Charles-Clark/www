@@ -135,48 +135,6 @@ namespace wwwDesignersGuild.Controllers
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-
-            //var files = HttpContext.Current.Request.Files;
-
-            //formRoutines objFormRoutines = new formRoutines();
-
-            //Int64 visitorId = -1;
-
-            //if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
-            //{
-            //    dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);
-            //}
-            //else
-            //{
-            //    visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
-            //}
-
-            //if (objFormDetails.gRecaptcha == null)
-            //{
-            //    var error = dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
-            //    return error;
-            //}
-            //else
-            //{
-            //    //  Validate captcha
-            //    if (String.IsNullOrEmpty(objFormDetails.gRecaptcha))
-            //    {
-            //        return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
-            //    }
-            //    else
-            //    {
-            //        if (ReCaptchaVerifier.Validate(objFormDetails.gRecaptcha) == "true")
-            //        {
-
-            //        }
-            //        else
-            //        {
-            //            return dgFramework.raiseErrorToHandle(webapiDataError.InvalidCaptcha);
-            //        }
-            //    }
-            //}
-
-            //return result;
         }
 
         [HttpPost]
