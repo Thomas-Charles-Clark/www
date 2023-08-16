@@ -1577,9 +1577,11 @@
                 contentType: false,
                 success: function(data) {
                     self.submitBusy(false);
-                    if (data.hasOwnProperty('handleErrorMessage')) {
-                        if (data.handleErrorMessage === "InvalidCaptcha") {
-                            $("#g-recaptcha-tip").show();
+                    if (data.hasOwnProperty('message')) {
+                        if (data.message === "InvalidCaptcha") {
+                            window.showInfo(self.resources.Sorry, self.resources.FormsErrorCaptchaCompare);
+                        } else {
+                            window.showInfo(self.resources.Sorry, data.message);
                         }
                     } else {
                         if (data != null) {
