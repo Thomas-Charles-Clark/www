@@ -577,13 +577,7 @@
     }
 
     function jumpToSessionExpired() {
-        @{
-#if DEBUG
-
-#else
-            @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
-#endif
-        }
+        window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
     }
 
 </script>
