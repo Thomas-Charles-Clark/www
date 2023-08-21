@@ -21,27 +21,24 @@
     </span>
     <div class="grid justify-content-between align-items-center">
        @foreach (var obj in Model.Items.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
-        {
-            var item = obj.value;
-            var index = obj.index + (Model.AutoOpenFirstSize ? 0 : 1);
+       {
+           var item = obj.value;
+           var index = obj.index;
             <button class="btn btn-light size-button g-col-1 @(Model.AutoOpenFirstSize && obj.index == 0 ? "active" : "")"
                     type="button"
                     aria-controls="@(item.OrderFormCarouselID.Replace("#", ""))"
                     data-bs-target="#@(Model.OrderFormCarouselID)"
-                    data-bs-slide-to="@(index)">
+                    data-bs-slide-to="@(index + 1)">
                 @item.OrderFormName
             </button>
         }
     </div>
     <div id="@(Model.OrderFormCarouselID)" class="pt-2 carousel slide carousel-fade order-form-group-carousel" data-bs-interval="false" data-bs-touch="false">
         <div class="carousel-inner">
-           @if (!Model.AutoOpenFirstSize)
-            {
-                <div class="order-form-product carousel-item active mt-0 mb-4 placeholder">
-                </div>
-            }
+            <div class="order-form-product carousel-item mt-0 mb-4 placeholder @(Model.AutoOpenFirstSize ? "" : "active")">
+            </div>
             <!-- ko foreachInit: { name: 'ko-blank-template', data: sizeGroups, createElement: createSizeGroup } -->
-            @foreach (var value in Model.Items.Select((item, i) => new { item, i }).OrderBy(p => p.item.SortOrder))
+            @foreach (var value in Model.Items.OrderBy(p => p.SortOrder).Select((item, i) => new { item, i }))
             {
                 var item = value.item;
                 var index = value.i;
