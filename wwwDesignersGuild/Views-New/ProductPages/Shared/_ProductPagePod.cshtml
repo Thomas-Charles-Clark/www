@@ -7,6 +7,8 @@
     var d = objMaster.UrlBreakdown.ContentDate;
 
     var tradeUser = objMaster.TradeAllowed;
+
+    var heading = Model.ProductPage.Heading?.Replace("\"", "'");
 }
 <div>
     <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
@@ -28,7 +30,7 @@
             new string[] {
                 "countryOverride",
                 "dateOverride"
-                    });
+            });
         }
         else
         {
@@ -60,8 +62,8 @@
                     <img class="card-img-top"
                          width="@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))"
                          height="@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))"
-                         alt="@(Model.ProductPage.Heading)"
-                         title="@(Model.ProductPage.Heading)"
+                         alt="@(heading)"
+                         title="@(heading)"
                          src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))/@(Model.ProductPage.ImageID)"
                          @HtmlHelperExtra.ImageSourceSetSizes(Model.ProductPage.ImageID, Model.ImageSize, Model.ProductPage.ImageWidth)
                          loading="lazy" />
@@ -147,7 +149,7 @@
         }
 
         <div class="pod-card pointer"
-             onclick="window.loadQuickLook('@url', '@HtmlHelperExtra.EscapeForJS(Html.Raw(Model.ProductPage.Heading))')">
+             onclick="window.loadQuickLook('@url', '@HtmlHelperExtra.EscapeForJS(heading)')">
             <div class="card">
                 @if (HtmlHelperExtra.Debug)
                 {
@@ -163,8 +165,8 @@
                 <img class="card-img-top"
                      width="488"
                      height="488"
-                     alt="@Html.Raw(Model.ProductPage.Heading)"
-                     title="@Html.Raw(Model.ProductPage.Heading)"
+                     alt="@(heading)"
+                     title="@(heading)"
                      src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))/@(Model.ProductPage.ImageID)"
                      @HtmlHelperExtra.ImageSourceSetSizes(Model.ProductPage.ImageID, Model.ImageSize)
                      loading="lazy" />
@@ -226,92 +228,5 @@
                 </div>
             </div>
         </div>
-
-        @*if (Model.ProductPage.IsLifestyle)
-        {
-            <a class="pod-card" href="@(url)">
-                <div class="card">
-                    @if (HtmlHelperExtra.Debug)
-                    {
-                        <div class="sort-data grid">
-                            <span>Sales Rank:</span><span>@Model.ProductPage.SalesRank</span>
-                            <span>Search Sort Order:</span><span>@Model.ProductPage.SearchSortOrder</span>
-                            <span>AZ Sort Order:</span><span>@Model.ProductPage.AZSortOrder</span>
-                            <span>Colour Sort:</span><span>@Model.ProductPage.ColourSort</span>
-                            <span>New Sort:</span><span>@Model.ProductPage.NewSort</span>
-                            <span>Price Sort:</span><span>@Model.ProductPage.PriceSortOrder</span>
-                            <span>Discount Sort:</span><span>@Model.ProductPage.DiscountSortOrder</span>
-                        </div>
-                    }
-                    <img class="card-img-top"
-                         width="488"
-                         height="488"
-                         alt="@(Model.ProductPage.Heading)"
-                         title="@(Model.ProductPage.Heading)"
-                         src="/image@(Framework.WebPFallback)/@(HtmlHelperExtra.InitialImageFolderSize(Model.ImageSize))/@(Model.ProductPage.ImageID)"
-                         @HtmlHelperExtra.ImageSourceSetSizes(Model.ProductPage.ImageID, Model.ImageSize)
-                         />
-                    <div class="card-body">
-                        @if (Model.ProductPage.New)
-                        {
-                            <h6 class="card-new">
-                                @HtmlHelperExtra.Resource("PodNew", l, c, d)
-                            </h6>
-                        }
-                        <h6 class="card-title text-uppercase">
-                            @Html.Raw(Model.ProductPage.Heading)
-                        </h6>
-                        @if (!String.IsNullOrEmpty(Model.ProductPage.SubHeading))
-                        {
-                            <h5 class="card-title">
-                                @Html.Raw(Model.ProductPage.SubHeading)
-                            </h5>
-                        }
-                        @if (Model.DisplayParagraph)
-                        {
-                            <p class="card-text mb-0">
-                                @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.CodeMessage))
-                                {
-                                    <span class="d-block">
-                                        @Html.Raw(Model.ProductPage.ProductPagePrice.CodeMessage)
-                                    </span>
-                                }
-                                @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.DiscountMessage))
-                                {
-                                    <span class="d-block discount pricing-info">
-                                        @Html.Raw(Model.ProductPage.ProductPagePrice.DiscountMessage)
-                                    </span>
-                                }
-                                @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.PriceMessage))
-                                {
-                                    <span class="d-block pricing-info">
-                                        @Html.Raw(Model.ProductPage.ProductPagePrice.PriceMessage)
-                                    </span>
-                                }
-                                @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.RRPMessage))
-                                {
-                                    <span class="d-block pricing-info">
-                                        @Html.Raw(Model.ProductPage.ProductPagePrice.RRPMessage)
-                                    </span>
-                                }
-                                <button type="button"
-                                        class="btn btn-light mt-2">
-                                    @HtmlHelperExtra.Resource("QuickLook", l, c, d)
-                                </button>
-                            </p>
-                        }
-                        @if (Model.DisplayRating)
-                        {
-                            <div class="mt-1">
-                                @Html.Raw(Model.ProductPage.ReviewStarsDisplay)
-                            </div>
-                        }
-                    </div>
-                </div>
-            </a>
-        }
-        else
-        {
-        }*@
     }
 </div>
