@@ -349,15 +349,15 @@
         self.country.subscribe(function (newValue) {
             if (newValue) {
                 window.setTimeout(function () {
-                    if (self.phone.observable.hasOwnProperty('intlTel')) {
+                    if (self.phone.observable.hasOwnProperty('intlTel') && self.phone.observable.intlTel.hasOwnProperty('setCountry')) {
                         if (newValue.Code != null)
-                            $(self.phone.observable.intlTel).intlTelInput('setCountry', newValue.Code.toLowerCase());
+                            self.phone.observable.intlTel.setCountry(newValue.Code.toLowerCase());
                     }
                 }, 100);
             } else {
                 window.setTimeout(function () {
                     if (self.phone.observable.hasOwnProperty('intlTel')) {
-                        $(self.phone.observable.intlTel).intlTelInput('setCountry', 'gb');
+                        self.phone.observable.intlTel.setCountry('gb');
                     }
                 }, 100);
             }
@@ -429,8 +429,8 @@
         let hasPhoneErrored = false;
 
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            if ($(self.phone.observable.DOMElement).intlTelInput('getNumber')) {
-                if (!$(self.phone.observable.DOMElement).intlTelInput('isValidNumber')) {
+            if (self.phone.observable.intlTel.getNumber() || self.phone.required) {
+                if (!self.phone.observable.intlTel.isValidNumber()) {
                     hasPhoneErrored = true;
                     self.phone.observable.isValid.notifySubscribers(false);
                 }
@@ -1055,7 +1055,7 @@
             countryId: self.country() ? self.country().CountryID : self.countryId(),
         }
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            data.phone = $(self.phone.observable.intlTel).intlTelInput('getNumber');
+            data.phone = self.phone.observable.intlTel.getNumber();
         } else {
             data.phone = self.phone.observable();
         }
@@ -1082,7 +1082,7 @@
             email: self.email.observable()
         }
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            data.deliveryPhoneNumber = $(self.phone.observable.intlTel).intlTelInput('getNumber');
+            data.deliveryPhoneNumber = self.phone.observable.intlTel.getNumber();
         } else {
             data.deliveryPhoneNumber = self.phone.observable();
         }
@@ -1388,7 +1388,7 @@
             email: self.email.observable()
         }
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            data.deliveryPhoneNumber = $(self.phone.observable.intlTel).intlTelInput('getNumber');
+            data.deliveryPhoneNumber = self.phone.observable.intlTel.getNumber();
         } else {
             data.deliveryPhoneNumber = self.phone.observable();
         }
@@ -1408,7 +1408,7 @@
             countryId: self.country() ? self.country().CountryID : self.countryId()
         }
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            data.phoneNumber = $(self.phone.observable.intlTel).intlTelInput('getNumber');
+            data.phoneNumber = self.phone.observable.intlTel.getNumber();
         } else {
             data.phoneNumber = self.phone.observable();
         }
@@ -1553,8 +1553,8 @@
 
     self.notifySubscribers = function () {
         if (self.phone.observable.hasOwnProperty('intlTel')) {
-            if ($(self.phone.observable.intlTel).intlTelInput('getNumber')) {
-                if (!$(self.phone.observable.intlTel).intlTelInput('isValidNumber')) {
+            if (self.phone.observable.intlTel.getNumber()) {
+                if (!self.phone.observable.intlTel.isValidNumber()) {
                     self.phone.observable.isValid.notifySubscribers(false);
                 }
             }

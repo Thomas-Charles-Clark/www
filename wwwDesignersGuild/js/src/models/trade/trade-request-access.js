@@ -71,8 +71,8 @@
                     if (p == null)
                         return isValid;
                     if (self.phone.hasOwnProperty('intlTel')) {
-                        if ($(self.phone.DOMElement).intlTelInput('getNumber')) {
-                            if (!$(self.phone.DOMElement).intlTelInput('isValidNumber')) {
+                        if (self.phone.intlTel.getNumber()) {
+                            if (!self.phone.intlTel.isValidNumber()) {
                                 hasPhoneErrored = true;
                                 self.phone.isValid.notifySubscribers(false);
                                 isValid = false;
