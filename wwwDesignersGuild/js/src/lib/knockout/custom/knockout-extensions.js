@@ -1461,15 +1461,18 @@ ko.bindingHandlers.intlMobile = {
     init: function (element, valueAccessor, allBindingsAccessor) {
         var params = valueAccessor();
 
-        params.phone.intlTel = $(element).intlTelInput({
-            //utilsScript: '/Scripts/int-tel/utils.js',
-            dropdownContainer: document.body,
-            initialCountry: params.country() ? params.country().Code : undefined,
-            preferredCountries: params.preferredCountries,
-            //customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
-            //    return '';
-            //}
-        });
+        //params.phone.intlTel = $(element).intlTelInput({
+        if (window.intlTelInput) {
+            params.phone.intlTel = window.intlTelInput(element, {
+                //utilsScript: '/Scripts/int-tel/utils.js',
+                dropdownContainer: document.body,
+                initialCountry: params.country() ? params.country().Code : undefined,
+                preferredCountries: params.preferredCountries,
+                //customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                //    return '';
+                //}
+            });
+        }
 
         params.phone.subscribe(function (newValue) {
             params.phone.isValid.notifySubscribers(true);

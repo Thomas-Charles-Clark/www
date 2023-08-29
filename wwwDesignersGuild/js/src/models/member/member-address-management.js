@@ -31,7 +31,12 @@
         controlClass: 'form-control mdc-text-field__input',
         phoneIntlMobile: true,
         email: false,
-        defaultCountry: getCountryId()
+        defaultCountry: getCountryId(),
+        phoneValidation: {
+            required: {
+                params: true
+            }
+        }
     }, self.resources);
 
     self.addressSearch = addressSearchFactory(
