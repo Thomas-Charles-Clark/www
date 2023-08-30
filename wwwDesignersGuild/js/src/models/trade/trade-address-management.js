@@ -250,7 +250,9 @@
 });
 
 window.tradeAddressModel = tradeAddressManagementViewModel(getPrefetchedResources(), {});
-ko.applyBindings(window.tradeAddressModel, document.querySelector('#trade-account-contact-details'));
+if (document.getElementById("trade-account-contact-details")) {
+    ko.applyBindings(window.tradeAddressModel, document.getElementById("trade-account-contact-details"));
+}
 window.tradeAddressModel.addressSearch.ready.subscribe(nv => {
     window.tradeAddressModel.addressSearch.addressLookup.clearFunction();
 });
