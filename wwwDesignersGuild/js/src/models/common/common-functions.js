@@ -202,11 +202,11 @@ document.addEventListener('show.bs.modal', function (event) {
     if (typeof Enumerable === 'undefined') {
         var self = event.target;
 
-        var zIndex = 1040 + (10 * document.querySelectorAll('.modal.show').length);
+        var zIndex = 1040 + (10 * document.querySelectorAll('.modal.fade.show').length);
 
         var adj = 0;
 
-        document.querySelectorAll('.modal.show').forEach(function (i, ele) {
+        document.querySelectorAll('.modal.fade.show').forEach(function (i, ele) {
             if (+ele.style.zIndex >= zIndex) {
                 adj++;
             }
@@ -237,7 +237,7 @@ document.addEventListener('show.bs.modal', function (event) {
 
         let openModals = [];
 
-        document.querySelectorAll('.modal.show').forEach(n => {
+        document.querySelectorAll('.modal.fade.show').forEach(n => {
             if (n != self) {
                 openModals.push(n);
             }
