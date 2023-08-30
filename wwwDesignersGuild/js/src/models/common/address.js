@@ -1272,8 +1272,8 @@
         self.town.observable.mdcTextField.layout();
         self.county.observable.mdcTextField.layout();
         self.postcode.observable.mdcTextField.layout();
+        self.country.mdcSelect.layout();
         if (self.country()) {
-            self.country.mdcSelect.layout();
             self.country.mdcSelect.outline_.notch(self.country.mdcSelect.label_.getWidth() * 0.75);
         }
         if (self.email.observable.hasOwnProperty('mdcTextField'))
@@ -1281,7 +1281,9 @@
         if (self.phone.observable.hasOwnProperty('mdcTextField'))
             self.phone.observable.mdcTextField.layout();
         self.addressSearcher.countryDropDownList.observable.mdcSelect.layout();
-        self.addressSearcher.countryDropDownList.observable.mdcSelect.outline_.notch(self.addressSearcher.countryDropDownList.observable.mdcSelect.label_.getWidth() * 0.75);
+        if (self.addressSearcher.countryDropDownList.observable()) {
+            self.addressSearcher.countryDropDownList.observable.mdcSelect.outline_.notch(self.addressSearcher.countryDropDownList.observable.mdcSelect.label_.getWidth() * 0.75);
+        }
     }
 
     self.errors = ko.validation.group([

@@ -66,19 +66,24 @@ namespace wwwDesignersGuild.Controllers
                     var countries = new cmsCountry();
                     var countryResults = await countries.countryLanguageSelect(DateTime.Now);
 
-                    var mertexResults = AccountFunctionsUniSQL.AddressBookSearch(loginCheck.tradeDataSourceJson, objSearch);
+                    var mertexResults = new List<MertexPCALookupResult>();
 
-                    mertexResults.ForEach(c =>
+                    if (objSearch.text?.Length > 2)
                     {
-                        var item = countryResults.countryItems.FirstOrDefault(p => p.CountryCode == c.Country);
-                        if (item != null)
-                        {
-                            c.CountryID = item.CountryID;
-                            c.Country = item.CountryCode;
-                        }
-                    });
+                        mertexResults = AccountFunctionsUniSQL.AddressBookSearch(loginCheck.tradeDataSourceJson, objSearch);
 
-                    mertexResults = mertexResults.GroupBy(p => p.MD5Hash).Select(p => p.OrderBy(q => q.DeliveryReference).Last()).ToList();
+                        mertexResults.ForEach(c =>
+                        {
+                            var item = countryResults.countryItems.FirstOrDefault(p => p.CountryCode == c.Country);
+                            if (item != null)
+                            {
+                                c.CountryID = item.CountryID;
+                                c.Country = item.CountryCode;
+                            }
+                        });
+
+                        mertexResults = mertexResults.GroupBy(p => p.MD5Hash).Select(p => p.OrderBy(q => q.DeliveryReference).Last()).ToList();
+                    }
 
                     var removeMarkedAsDeleted = new List<MertexPCALookupResult>();
 
