@@ -3240,24 +3240,26 @@ const checkoutDeliveryAddress = (
                             } else {
 
                                 response($.map(data, function (item) {
-                                    var county = item.Province || item.ProvinceName || item.ProvinceCode || item.AdminAreaName || item.AdminAreaCode;
+                                    if (item) {
+                                        var county = item.Province || item.ProvinceName || item.ProvinceCode || item.AdminAreaName || item.AdminAreaCode;
 
-                                    if (item.City === "London" && self.PCACountry().Code == "GB")
-                                        county = "London";
+                                        if (item.City === "London" && self.PCACountry().Code == "GB")
+                                            county = "London";
 
-                                    return {
-                                        customCatch: true,
-                                        label: item.Label,
-                                        value: item.Id,
-                                        companyName: item.Company,
-                                        addressLine1: item.Line1,
-                                        addressLine2: item.Line2,
-                                        town: item.City,
-                                        county: county,
-                                        postcode: item.PostalCode,
-                                        country: {
-                                            name: item.Country || item.CountryName,
-                                            countryIso2: item.CountryIso2
+                                        return {
+                                            customCatch: true,
+                                            label: item.Label,
+                                            value: item.Id,
+                                            companyName: item.Company,
+                                            addressLine1: item.Line1,
+                                            addressLine2: item.Line2,
+                                            town: item.City,
+                                            county: county,
+                                            postcode: item.PostalCode,
+                                            country: {
+                                                name: item.Country || item.CountryName,
+                                                countryIso2: item.CountryIso2
+                                            }
                                         }
                                     }
                                 }));
@@ -3269,7 +3271,7 @@ const checkoutDeliveryAddress = (
                         self.PCAContainer(null);
 
                         response($.map(data, function (item, index) {
-                            if (item.hasOwnProperty('Type')) {
+                            if (item?.hasOwnProperty('Type')) {
                                 if ((item.Type === "Address") || (item.Type === "Residential")) {
                                     return {
                                         id: item.Id,
@@ -3293,8 +3295,8 @@ const checkoutDeliveryAddress = (
                                 }
                             } else {
                                 return {
-                                    label: item.Label,
-                                    value: item.Id,
+                                    label: item?.Label,
+                                    value: item?.Id,
                                     index: index
                                 }
                             }
