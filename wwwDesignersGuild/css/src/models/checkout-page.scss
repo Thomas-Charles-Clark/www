@@ -377,6 +377,12 @@ body {
             display: block;
             cursor: pointer;
         }
+
+        .basketline-type {
+            display: block;
+            font-weight: $font-weight-bold;
+            margin: $sm-gutter 0;
+        }
     }
 }
 

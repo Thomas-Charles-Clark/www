@@ -232,8 +232,8 @@
                 <!-- /ko -->
             </div>
             <div>
-                @*@if (Model.checkoutMethod != dgCheckoutType.Trade)
-                    {*@
+               @if (Model.checkoutMethod != dgCheckoutType.Trade)
+                {
                 <h6 class="dispatch-estimate-title">
                     @HtmlHelperExtra.Resource((Model.checkoutMethod != dgCheckoutType.Trade ? "DispatchEstimated" : "EstimatedDespatch"), languageId, countryId, contentDate)
                 </h6>
@@ -250,7 +250,7 @@
                     <span data-bind="text: MinDeliveryEstimateWithPartShipDisplay"></span>
                     <!-- /ko -->
                 </div>
-                @*}*@
+                }
                 @if (Model.checkoutMethod == dgCheckoutType.Trade)
                 {
                     <!-- ko if: offerFullDispatch -->
