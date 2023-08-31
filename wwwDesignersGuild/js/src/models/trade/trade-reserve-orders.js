@@ -743,10 +743,10 @@ const tradeReserveOrdersViewModel = ((resources) => {
                     console.log('updateReserveLine returned', data)
                     self.lineUpdateErrored(false);
                     if (data.errorMessage != null) {
-                        $.error(data.errorMessage);
+                        window.showInfo(self.resources.Sorry, data.errorMessage);
                     } else {
                         if (self.isLineQuantityIncrease()) {
-                            $.info(self.resources.ReserveQuantityChangeRequested, self.resources.ReserveQuantityPleaseWaitForCustomerServices)
+                            window.showInfo(self.resources.ReserveQuantityChangeRequested, self.resources.ReserveQuantityPleaseWaitForCustomerServices)
                         }
                         self.lineUnsavedChanges(false);
                         var dataItem = self.reserveOrdersGrid.widget().dataItem(self.reserveOrdersGrid.widget().select());
@@ -790,9 +790,9 @@ const tradeReserveOrdersViewModel = ((resources) => {
             success: function (data) {
                 console.log('resendBatchCutting returned', data)
                 if (data.errorMessage != null) {
-                    $.error(data.errorMessage);
+                    window.showInfo(self.resources.Sorry, data.errorMessage);
                 } else {
-                    $.info(self.resources.RequestSubmitted, self.resources.BatchRequestSubmitted.replace('{0}', line.BatchNumber));
+                    window.showInfo(self.resources.RequestSubmitted, self.resources.BatchRequestSubmitted.replace('{0}', line.BatchNumber), null);
                 }
             },
             error: function (xhr, s, a) {
@@ -821,7 +821,7 @@ const tradeReserveOrdersViewModel = ((resources) => {
                 success: function (data) {
                     console.log('releaseReserveLine returned', data)
                     if (data.errorMessage != null) {
-                        $.error(data.errorMessage);
+                        window.showInfo(self.resources.Sorry, data.errorMessage);
                     } else {
                         self.fetchReserveLines(self.reserveOrdersGrid.widget().dataItem(self.reserveOrdersGrid.widget().select()));
 
