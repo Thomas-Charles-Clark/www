@@ -45,6 +45,10 @@
                     @HtmlHelperExtra.Resource("BasketProductCode", l, c, d):
                     <span class="product-code" data-bind="text: Code"></span>
                 </span>
+               @if (tradeUser)
+                {
+                    <span class="d-block bold" data-bind="text: BasketLineType"></span>
+                }
                 <!-- ko foreach: (StockMessaging ? StockMessaging.BasketQuantityThresholds : []) -->
                 <!-- ko foreach: StockMessages -->
                 <span class="d-block stock-messaging" data-bind="class: Class, html: StockMessage"></span>
@@ -84,7 +88,7 @@
                                     enable: canIncreaseQuantity,
                                     css: {
                                         'disabled': !canIncreaseQuantity(),
-                                        'validation-element': !quantity.isValid() 
+                                        'validation-element': !quantity.isValid()
                                     },
                                     click: increaseQuantity">
                             <i class="bi bi-plus-lg"></i>
@@ -291,7 +295,7 @@
                             </span>
                             @if (tradeUser)
                             {
-                                <span class="d-block">
+                                <span class="d-block bold">
                                     @bi.BasketLineType
                                 </span>
                             }

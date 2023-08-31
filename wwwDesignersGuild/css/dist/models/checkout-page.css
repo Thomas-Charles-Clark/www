@@ -318,6 +318,11 @@ body {
   display: block;
   cursor: pointer;
 }
+#despatch-wrapper form .basketline-type {
+  display: block;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
 
 #gift-voucher-failure-message {
   display: block;
