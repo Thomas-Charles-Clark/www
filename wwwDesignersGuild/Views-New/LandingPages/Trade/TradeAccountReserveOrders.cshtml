@@ -338,7 +338,7 @@ else
                             <div class="d-flex">
                                 <div id="line-quantity" data-bind="css: { 'increase': isLineQuantityIncrease, 'update-error': lineUpdateErrored }, component: { name: 'mdc-text-field-numeric-component', params: lineQuantityParams }"></div>
                                 <!-- ko if: isLineQuantityIncrease -->
-                                <span class="text-warning">
+                                <span class="text-primary">
                                     @HtmlHelperExtra.Resource("QuantityIncreaseWarning", l, c, d)
                                 </span>
                                 <!-- /ko -->
@@ -352,7 +352,7 @@ else
                             <div class="d-flex">
                                 <div id="reserve-date" data-bind="css: { 'increase': isDateExtension }, component: { name: 'mdc-datepicker-component', params: reserveDatePicker }"></div>
                                 <!-- ko if: isDateExtension -->
-                                <span class="text-warning">
+                                <span class="text-primary">
                                     @HtmlHelperExtra.Resource("ExtensionWarning", l, c, d)
                                 </span>
                                 <!-- /ko -->

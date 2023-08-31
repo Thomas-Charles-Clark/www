@@ -999,10 +999,11 @@ namespace wwwDesignersGuild.Controllers
                     var email = JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].email").Value<string>();
 
                     string cc = null;
-#if DEBUG
-                    email = "tclark@designersguild.com";
-                    cc = "mchristie@designersguild.com";
-#endif
+
+//#if DEBUG
+//                    email = "tclark@designersguild.com";
+//                    cc = "mchristie@designersguild.com";
+//#endif
 
                     db.addEmailToQueue(email,
                         cc,
