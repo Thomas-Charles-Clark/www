@@ -41,7 +41,7 @@ ko.extenders.errorPulse = function (target, options) {
 
                     setTimeout(function () {
                         ve.classList.remove('error-pulse');
-                    }, 150);
+                    }, 300);
                 })
             }
         });
