@@ -385,6 +385,10 @@
                 <span id="full-name-error" class="validation-message" data-bind="validationMessage: fullName"></span>
             </div>
         }
+        @if (form.PhoneNumberRequired != null)
+        {
+            <div class="mb-3" id="forms-phone-wrapper" data-bind="component: { name: 'mdc-phone-field-component', params: phoneNumberParams }"></div>
+        }
         @if (form.SourceGroupID == (int)FormSourceGroup.Brochure)
         {
             <span class="d-none" data-bind="init: { convert: parseInt, field: brochureId }, remove">

@@ -1543,6 +1543,7 @@ namespace wwwDesignersGuild.ViewModels
                     "FormsErrorPostCode",
                     "FormsCountryRequired",
                     "FormsLanguageRequired",
+                    "phoneValidation",
                     "FormsErrorPhone",
                     "FormsErrorCaptchaCompare",
                     "MoodboardSave",
