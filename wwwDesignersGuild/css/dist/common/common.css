@@ -699,7 +699,7 @@ input::-webkit-inner-spin-button {
     opacity: 0.5;
   }
   .carousel .carousel-indicators:not(.carousel-thumbnails) {
-    position: absolute;
+    /*position: absolute;*/
     margin: 0;
     bottom: -12px;
     justify-content: flex-end;
