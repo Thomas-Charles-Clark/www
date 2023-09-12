@@ -11,6 +11,7 @@
     let dataSub = self.data.subscribe((newValue) => {
         Object.assign(self, newValue);
         dataSub.dispose();
+        self.phoneNumberRequired(self.Form.PhoneNumberRequired);
         window[`form${self.Form.FormID}`] = self;
         self.init();
     });
@@ -29,6 +30,15 @@
 
     self.thirdPartyId = ko.observable().extend({
         postable: true
+    });
+
+    // null / undefined: not gathered; false: optional; true: mandatory;
+    self.phoneNumberRequired = ko.observable(undefined).extend({
+        postable: false
+    });
+
+    self.phoneNumberRequired.subscribe(nv => {
+        console.log("phoneNumberRequired", nv);
     });
 
     self.addressRequired = ko.observable(false).extend({
@@ -169,6 +179,30 @@
     // This is fed by the marketingPermissionsCheck
     self.userUnsubscribedFromEmailMarketing = ko.observable(false);
 
+    self.phoneNumber = ko.observable().extend({
+        postable: true,
+    });
+
+    self.phoneNumberParams = {
+        label: self.resources.FormsPhoneNumber,
+        observable: self.phoneNumber,
+        useNativeValidation: false,
+        decorateInputElement: false,
+        insertValidationMessages: false,
+        showClear: true,
+        clearFunction: function () {
+            var self = this;
+            self.observable(undefined);
+            $('body').focus();
+        },
+        permitRevert: false,
+        charsRemainingOptions: {
+            maxLength: 20
+        },
+        countryObservable: ko.observable(),
+        preferredCountries: [getCountryCode()]
+    };
+
     //#endregion
 
     //#region Components
@@ -260,16 +294,6 @@
         }
     };
 
-    self.storeEventErrors = new ko.validation.group([
-        self.storeEventLocation,
-        self.storeEventDate,
-        self.storeEvent,
-        self.fullName,
-        self.email,
-        self.emailConfirmation,
-        self.marketingPermissionChecker.havePerformedMarketingPermissionCheck
-    ]);
-
     //#endregion
 
     //#region Retail Appointment Properties
@@ -356,54 +380,59 @@
         postable: true
     });
 
-    self.defaultErrorGroup = new ko.validation.group([
-    ]);
+    //self.defaultErrorGroup = new ko.validation.group([
+    //    self.phoneNumber
+    //]);
 
-    self.appointmentErrorGroup = new ko.validation.group([
-        self.appointmentAgendaId,
-        self.appointmentTypeId,
-        self.appointmentTime,
-        self.appointmentDate,
-        self.appointmentLocation,
-        self.appointmentComments,
-        self.fullName,
-        self.email,
-        self.emailConfirmation,
-        self.marketingPermissionChecker.havePerformedMarketingPermissionCheck
-    ]);
+    //self.appointmentErrorGroup = new ko.validation.group([
+    //    self.appointmentAgendaId,
+    //    self.appointmentTypeId,
+    //    self.appointmentTime,
+    //    self.appointmentDate,
+    //    self.appointmentLocation,
+    //    self.appointmentComments,
+    //    self.fullName,
+    //    self.phoneNumber,
+    //    self.email,
+    //    self.emailConfirmation,
+    //    self.marketingPermissionChecker.havePerformedMarketingPermissionCheck
+    //]);
 
-    self.newsletterErrorGroup = new ko.validation.group([
-        self.fullName,
-        self.email,
-        self.emailConfirmation,
-        self.marketingCountryId,
-        self.marketingLanguageId
-    ]);
+    //self.newsletterErrorGroup = new ko.validation.group([
+    //    self.fullName,
+    //    self.phoneNumber,
+    //    self.email,
+    //    self.emailConfirmation,
+    //    self.marketingCountryId,
+    //    self.marketingLanguageId
+    //]);
 
 
-    self.brochureErrorGroup = new ko.validation.group([
-        self.email,
-        self.emailConfirmation,
-        self.marketingCountryId,
-        self.marketingLanguageId,
-        self.deliveryAddress.name.observable,
-        self.deliveryAddress.companyName.observable,
-        self.deliveryAddress.addressLine1.observable,
-        self.deliveryAddress.addressLine2.observable,
-        self.deliveryAddress.town.observable,
-        self.deliveryAddress.county.observable,
-        self.deliveryAddress.postcode.observable,
-        self.deliveryAddress.country,
-        self.deliveryAddress.countryId,
-    ], {
-        deep: true
-    });
+    //self.brochureErrorGroup = new ko.validation.group([
+    //    self.phoneNumber,
+    //    self.email,
+    //    self.emailConfirmation,
+    //    self.marketingCountryId,
+    //    self.marketingLanguageId,
+    //    self.deliveryAddress.name.observable,
+    //    self.deliveryAddress.companyName.observable,
+    //    self.deliveryAddress.addressLine1.observable,
+    //    self.deliveryAddress.addressLine2.observable,
+    //    self.deliveryAddress.town.observable,
+    //    self.deliveryAddress.county.observable,
+    //    self.deliveryAddress.postcode.observable,
+    //    self.deliveryAddress.country,
+    //    self.deliveryAddress.countryId,
+    //], {
+    //    deep: true
+    //});
 
-    self.competitionErrorGroup = new ko.validation.group([
-        self.email,
-        self.emailConfirmation,
-        self.fullName
-    ]);
+    //self.competitionErrorGroup = new ko.validation.group([
+    //    self.email,
+    //    self.emailConfirmation,
+    //    self.fullName,
+    //    self.phoneNumber,
+    //]);
 
     //#endregion
 
@@ -550,7 +579,91 @@
     //#region General Methods
 
     self.init = () => {
+        // phoneNumberRequired triple state: null === not gathered; false === not required; true === required
+        window.setTimeout(() => {
+            if (self.phoneNumberRequired() != null) {
+                let phoneElement = document.getElementById("forms-phone-wrapper");
+                self.phoneNumber.extend({
+                    required: {
+                        params: self.phoneNumberRequired(),
+                        onlyIf: () => self.validateNow(),
+                        message: self.resources.phoneValidation
+                    },
+                    errorPulse: {}
+                });
+                ko.cleanNode(phoneElement);
+                ko.applyBindings(self, phoneElement);
+            }
+        }, 0);
 
+        self.buildErrorGroups();
+    }
+
+    self.buildErrorGroups = () => {
+
+        self.defaultErrorGroup = new ko.validation.group([
+
+        ]);
+
+        self.appointmentErrorGroup = new ko.validation.group([
+            self.appointmentAgendaId,
+            self.appointmentTypeId,
+            self.appointmentTime,
+            self.appointmentDate,
+            self.appointmentLocation,
+            self.appointmentComments,
+            self.fullName,
+            self.phoneNumber,
+            self.email,
+            self.emailConfirmation,
+            self.marketingPermissionChecker.havePerformedMarketingPermissionCheck
+        ]);
+
+        self.newsletterErrorGroup = new ko.validation.group([
+            self.fullName,
+            self.phoneNumber,
+            self.email,
+            self.emailConfirmation,
+            self.marketingCountryId,
+            self.marketingLanguageId
+        ]);
+
+        self.brochureErrorGroup = new ko.validation.group([
+            self.phoneNumber,
+            self.email,
+            self.emailConfirmation,
+            self.marketingCountryId,
+            self.marketingLanguageId,
+            self.deliveryAddress.name.observable,
+            self.deliveryAddress.companyName.observable,
+            self.deliveryAddress.addressLine1.observable,
+            self.deliveryAddress.addressLine2.observable,
+            self.deliveryAddress.town.observable,
+            self.deliveryAddress.county.observable,
+            self.deliveryAddress.postcode.observable,
+            self.deliveryAddress.country,
+            self.deliveryAddress.countryId,
+        ], {
+            deep: true
+        });
+
+        self.competitionErrorGroup = new ko.validation.group([
+            self.email,
+            self.emailConfirmation,
+            self.fullName,
+            self.phoneNumber,
+        ]);
+
+        self.storeEventErrors = new ko.validation.group([
+            self.storeEventLocation,
+            self.storeEventDate,
+            self.storeEvent,
+            self.fullName,
+            self.phoneNumber,
+            self.email,
+            self.emailConfirmation,
+            self.marketingPermissionChecker.havePerformedMarketingPermissionCheck
+        ]);
     }
 
     self.toJS = () => {
