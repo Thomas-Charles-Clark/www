@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using MertexerV2.Utilities;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -304,7 +306,7 @@ namespace wwwDesignersGuild.Helpers
                         sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
                         if (model.FirstImageID.HasValue)
                         {
-                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/488/{model.FirstImageID}.jpg"" />");
+                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/488/{model.FirstImageID}{Util.Framework.WebpOrJpgExtension}"" />");
                         }
                         break;
                     case "PrimaryProducts":
@@ -317,13 +319,13 @@ namespace wwwDesignersGuild.Helpers
                             sb.AppendLine($@"<meta property=""og:type"" content=""website"" />");
                             sb.AppendLine($@"<meta property=""og:title"" content=""{p.BasketName}"" />");
                             sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
-                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
+                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}{Util.Framework.WebpOrJpgExtension}"" />");
 
                             sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
                             sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
                             sb.AppendLine($@"<meta property=""twitter:title"" content=""{p.BasketName}"" />");
                             sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
-                            sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
+                            sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}{Util.Framework.WebpOrJpgExtension}"" />");
                             sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{p.BasketName}"" />");
                         }
 
