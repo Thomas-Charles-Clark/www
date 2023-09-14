@@ -126,7 +126,7 @@ namespace wwwDesignersGuild.Helpers
     ""@context"": ""http://www.schema.org"",
     ""@type"": ""Product"",
     ""name"": ""{(p.BasketName ?? "").Replace("\"", @"\""")}"",
-    ""image"": ""https://www.designersguild.com/image/1024/{p.Image.imageId}"",
+    ""image"": ""https://www.designersguild.com/image/488/{p.Image.imageId}{Util.Framework.WebpOrJpgExtension}"",
     ""description"": ""{description?.Replace("\"", @"\""") ?? p.BasketName}"",
     ""brand"": {{ 
         ""@type"": ""Brand"", 
