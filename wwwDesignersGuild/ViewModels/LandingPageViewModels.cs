@@ -2206,6 +2206,11 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
+            attributeProductPageIds.ForEach(appid =>
+            {
+                initialProductPageIds = initialProductPageIds.Intersect(appid.ProductPageIDs).ToList();
+            });
+
             result.AttributeGroups.ForEach(ag =>
             {
                 var productPageIdsToConsider = initialProductPageIds;
@@ -2237,7 +2242,7 @@ namespace wwwDesignersGuild.ViewModels
 
                 ag.Attributes.ForEach(a =>
                 {
-                    if (a.FormValue == "pink")
+                    if (a.FormValue == "orange")
                     {
                         int f = 0;
                     }
