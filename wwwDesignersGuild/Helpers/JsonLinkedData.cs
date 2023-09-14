@@ -304,32 +304,27 @@ namespace wwwDesignersGuild.Helpers
                         sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
                         if (model.FirstImageID.HasValue)
                         {
-                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/488/{model.FirstImageID}"" />");
+                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/488/{model.FirstImageID}.jpg"" />");
                         }
                         break;
                     case "PrimaryProducts":
-                        var primaries = objModel as List<OrderFormItemViewModel>;
+                        var p = (objModel as ProductPageViewModel).MainProduct;
 
-                        if (primaries != null)
+                        if (p != null)
                         {
-                            var p = primaries.FirstOrDefault();
+                            // OpenGraph
+                            sb.AppendLine($@"<meta property=""og:url"" content=""{p.Product["url"].Value<string>()}"" />");
+                            sb.AppendLine($@"<meta property=""og:type"" content=""website"" />");
+                            sb.AppendLine($@"<meta property=""og:title"" content=""{p.BasketName}"" />");
+                            sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
+                            sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
 
-                            if (p != null)
-                            {
-                                // OpenGraph
-                                sb.AppendLine($@"<meta property=""og:url"" content=""{p.Product["url"].Value<string>()}"" />");
-                                sb.AppendLine($@"<meta property=""og:type"" content=""website"" />");
-                                sb.AppendLine($@"<meta property=""og:title"" content=""{p.BasketName}"" />");
-                                sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
-                                sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
-
-                                sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
-                                sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
-                                sb.AppendLine($@"<meta property=""twitter:title"" content=""{p.BasketName}"" />");
-                                sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
-                                sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
-                                sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{p.BasketName}"" />");
-                            }
+                            sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
+                            sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
+                            sb.AppendLine($@"<meta property=""twitter:title"" content=""{p.BasketName}"" />");
+                            sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
+                            sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/322/{p.Image.imageId}.jpg"" />");
+                            sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{p.BasketName}"" />");
                         }
 
                         break;
