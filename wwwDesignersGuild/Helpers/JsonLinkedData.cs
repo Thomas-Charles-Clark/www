@@ -308,6 +308,14 @@ namespace wwwDesignersGuild.Helpers
                         {
                             sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/1024/{model.FirstImageID}{Util.Framework.WebpOrJpgExtension}"" />");
                         }
+
+                        sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
+                        sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
+                        sb.AppendLine($@"<meta property=""twitter:title"" content=""{model.MasterDefinition.TitleTag}"" />");
+                        sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
+                        sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/1024/{model.FirstImageID}{Util.Framework.WebpOrJpgExtension}"" />");
+                        sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{model.MasterDefinition.TitleTag}"" />");
+
                         break;
                     case "PrimaryProducts":
                         var p = (objModel as ProductPageViewModel).MainProduct;
