@@ -246,13 +246,19 @@
         document.querySelector('#invoice-address-change-requested').style.display = 'flex';
     }
 
+    self.addressSearch.ready.subscribe(nv => {
+        self.addressSearch.editModal.DOMElement.removeAttribute("data-bs-backdrop");
+    });
+
     return self;
 });
 
 window.tradeAddressModel = tradeAddressManagementViewModel(getPrefetchedResources(), {});
+
 if (document.getElementById("trade-account-contact-details")) {
     ko.applyBindings(window.tradeAddressModel, document.getElementById("trade-account-contact-details"));
 }
+
 window.tradeAddressModel.addressSearch.ready.subscribe(nv => {
     window.tradeAddressModel.addressSearch.addressLookup.clearFunction();
 });
