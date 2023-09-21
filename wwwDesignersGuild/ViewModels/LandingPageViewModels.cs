@@ -2485,7 +2485,11 @@ namespace wwwDesignersGuild.ViewModels
                                     int f = 0;
                                 }
 
-                                if (attributeCombinations.SingleOrDefault(ac => ac.AttributeSignature == $"{currentAttributeSignature}.{attribute.AttributeID}") == null)
+                                if (attributeCombinations.SingleOrDefault(ac =>
+                                    ac.AttributeSignature == (
+                                        String.IsNullOrEmpty(currentAttributeSignature)
+                                            ? $"{attribute.AttributeID}"
+                                            : $"{currentAttributeSignature}.{attribute.AttributeID}")) == null)
                                 {
                                     return null;
                                 }
