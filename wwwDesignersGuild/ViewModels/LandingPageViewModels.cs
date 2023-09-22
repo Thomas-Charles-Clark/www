@@ -2372,6 +2372,11 @@ namespace wwwDesignersGuild.ViewModels
 
         public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
         {
+            if (attribute.FormValue == "blue")
+            {
+                int f = 0;
+            }
+
             // if FilterIndexing is enabled on this grid's containing page
             if (FilterIndexingEnabled && attribute.EnableFilterIndexing)
             {
@@ -2480,16 +2485,11 @@ namespace wwwDesignersGuild.ViewModels
                                     url = url.Substring(0, url.IndexOf("?"));
                                 }
 
-                                if (attribute.FormValue == "outdoor")
-                                {
-                                    int f = 0;
-                                }
-
                                 if (attributeCombinations.SingleOrDefault(ac =>
                                     ac.AttributeSignature == (
                                         String.IsNullOrEmpty(currentAttributeSignature)
                                             ? $"{attribute.AttributeID}"
-                                            : $"{currentAttributeSignature}.{attribute.AttributeID}")) == null)
+                                            : String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
                                 {
                                     return null;
                                 }
