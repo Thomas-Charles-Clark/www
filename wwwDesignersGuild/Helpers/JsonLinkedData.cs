@@ -303,7 +303,7 @@ namespace wwwDesignersGuild.Helpers
                         sb.AppendLine($@"<meta property=""og:url"" content=""{HttpContext.Current.Request.Url}"" />");
                         sb.AppendLine($@"<meta property=""og:type"" content=""website"" />");
                         sb.AppendLine($@"<meta property=""og:title"" content=""{model.MasterDefinition.TitleTag}"" />");
-                        sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
+                        sb.AppendLine($@"<meta property=""og:description"" content=""{model.MasterDefinition.MetaDescription}"" />");
                         if (model.FirstImageID.HasValue)
                         {
                             sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/1024/{model.FirstImageID}{Util.Framework.WebpOrJpgExtension}"" />");
@@ -312,7 +312,7 @@ namespace wwwDesignersGuild.Helpers
                         sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
                         sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
                         sb.AppendLine($@"<meta property=""twitter:title"" content=""{model.MasterDefinition.TitleTag}"" />");
-                        sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
+                        sb.AppendLine($@"<meta property=""twitter:description"" content=""{model.MasterDefinition.MetaDescription}"" />");
                         sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/1024/{model.FirstImageID}{Util.Framework.WebpOrJpgExtension}"" />");
                         sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{model.MasterDefinition.TitleTag}"" />");
 
@@ -326,13 +326,13 @@ namespace wwwDesignersGuild.Helpers
                             sb.AppendLine($@"<meta property=""og:url"" content=""{p.Product["url"].Value<string>()}"" />");
                             sb.AppendLine($@"<meta property=""og:type"" content=""website"" />");
                             sb.AppendLine($@"<meta property=""og:title"" content=""{p.BasketName}"" />");
-                            sb.AppendLine($@"<meta property=""og:description"" content=""{description}"" />");
+                            sb.AppendLine($@"<meta property=""og:description"" content=""{p.MasterDefinition.MetaDescription}"" />");
                             sb.AppendLine($@"<meta property=""og:image"" content=""https://www.designersguild.com/image/1024/{p.Image.imageId}{Util.Framework.WebpOrJpgExtension}"" />");
 
                             sb.AppendLine($@"<meta property=""twitter:card"" content=""summary"" />");
                             sb.AppendLine($@"<meta property=""twitter:site"" content=""@DesignersGuild"" />");
                             sb.AppendLine($@"<meta property=""twitter:title"" content=""{p.BasketName}"" />");
-                            sb.AppendLine($@"<meta property=""twitter:description"" content=""{description}"" />");
+                            sb.AppendLine($@"<meta property=""twitter:description"" content=""{p.MasterDefinition.MetaDescription}"" />");
                             sb.AppendLine($@"<meta property=""twitter:image"" content=""https://www.designersguild.com/image/1024/{p.Image.imageId}{Util.Framework.WebpOrJpgExtension}"" />");
                             sb.AppendLine($@"<meta property=""twitter:image:alt"" content=""{p.BasketName}"" />");
                         }
