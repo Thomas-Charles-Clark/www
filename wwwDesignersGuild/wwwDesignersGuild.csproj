@@ -733,6 +733,7 @@
     <Compile Include="Util\PageSectionClassAttribute.cs" />
     <Compile Include="Util\PageSectionViewModelAttribute.cs" />
     <Compile Include="Util\RequireLoginAttribute.cs" />
+    <Compile Include="Util\SQLCommandDumper.cs" />
     <Compile Include="Util\ViewPathAttribute.cs" />
     <Compile Include="Util\ActionAttribute.cs" />
     <Compile Include="Util\CacheAuthentication.cs" />
