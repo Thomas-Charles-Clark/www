@@ -11,6 +11,8 @@ using System.Reflection;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Form;
 using static DevExpress.Utils.Drawing.Helpers.NativeMethods;
+using SimpleImpersonation;
+using System.Security.Principal;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -76,196 +78,203 @@ namespace wwwDesignersGuild.Models.Database
 
         public long? SaveTradeAccountRequestForm(long visitorId, webapiTradeAccountRequestFormSave objFormDetails, byte[] usSalesTaxExemptionCertificate = null, string usSalesTaxExemptionCertificateFileType = null)
         {
+            var credentials = new UserCredentials("DESIGNERSGUILD\\SQLAgentFileAccess", "34949C02-4677-4711-999C-8E038E26B10F");
+
             long? result = null;
 
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            var token = credentials.LogonUser(LogonType.Interactive);
+
+            WindowsIdentity.RunImpersonated(token, () =>
             {
-                DataTable leadInterestsTableType = new DataTable();
-
-                leadInterestsTableType.Columns.Add("BrandID", typeof(byte));
-                leadInterestsTableType.Columns.Add("ProductTypeGroupID", typeof(byte));
-
-                if (objFormDetails.leadInterests != null)
+                using (SqlConnection conn = new SqlConnection("Data Source=vm-sql1;Initial Catalog=Flock;Integrated Security=SSPI"))
                 {
-                    foreach (var i in objFormDetails.leadInterests)
+                    DataTable leadInterestsTableType = new DataTable();
+
+                    leadInterestsTableType.Columns.Add("BrandID", typeof(byte));
+                    leadInterestsTableType.Columns.Add("ProductTypeGroupID", typeof(byte));
+
+                    if (objFormDetails.leadInterests != null)
                     {
-                        leadInterestsTableType.Rows.Add(i.BrandID, i.ProductTypeGroupID);
+                        foreach (var i in objFormDetails.leadInterests)
+                        {
+                            leadInterestsTableType.Rows.Add(i.BrandID, i.ProductTypeGroupID);
+                        }
                     }
-                }
 
-                SqlCommand cmd = new SqlCommand("pub.TradeAccountRequestForm_Save", conn)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                DateTime? tradingSinceDT = null;
-                DateTime adjust = DateTime.Now;
-                if (objFormDetails.tradingSinceId.HasValue)
-                {
-                    switch (objFormDetails.tradingSinceId.Value)
+                    SqlCommand cmd = new SqlCommand("pub.TradeAccountRequestForm_Save", conn)
                     {
-                        case 0:
-                            adjust = DateTime.Now.AddMonths(3);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 1:
-                            adjust = DateTime.Now.AddMonths(-6);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 2:
-                            adjust = DateTime.Now.AddYears(-1);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 3:
-                            adjust = DateTime.Now.AddYears(-2);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 4:
-                            adjust = DateTime.Now.AddYears(-3);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 5:
-                            adjust = DateTime.Now.AddYears(-4);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
-                        case 6:
-                            adjust = DateTime.Now.AddYears(-5);
-                            tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
-                            break;
+                        CommandType = CommandType.StoredProcedure
+                    };
+
+                    DateTime? tradingSinceDT = null;
+                    DateTime adjust = DateTime.Now;
+                    if (objFormDetails.tradingSinceId.HasValue)
+                    {
+                        switch (objFormDetails.tradingSinceId.Value)
+                        {
+                            case 0:
+                                adjust = DateTime.Now.AddMonths(3);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 1:
+                                adjust = DateTime.Now.AddMonths(-6);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 2:
+                                adjust = DateTime.Now.AddYears(-1);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 3:
+                                adjust = DateTime.Now.AddYears(-2);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 4:
+                                adjust = DateTime.Now.AddYears(-3);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 5:
+                                adjust = DateTime.Now.AddYears(-4);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                            case 6:
+                                adjust = DateTime.Now.AddYears(-5);
+                                tradingSinceDT = new DateTime(adjust.Year, adjust.Month, 1);
+                                break;
+                        }
                     }
-                }
 
-                cmd.Parameters.AddWithValue("@LeadID", objFormDetails.leadId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@VisitorID", visitorId);
-                cmd.Parameters.AddWithValue("@SiteLanguageID", objFormDetails.objMaster.UrlBreakdown.countryDetails.LanguageID);
-                cmd.Parameters.AddWithValue("@SiteCountryID", objFormDetails.objMaster.UrlBreakdown.countryDetails.CountryID);
-                cmd.Parameters.AddWithValue("@CompanyName", objFormDetails.companyName);
-                cmd.Parameters.AddWithValue("@ChannelID", objFormDetails.channelId);
-                cmd.Parameters.AddWithValue("@CompanyNumber", objFormDetails.companyRegistration ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@VATNumber", objFormDetails.companyVATNumber ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@VATNumberDisplay", objFormDetails.vatNumberDisplay ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@VATCountryID", objFormDetails.vatCountryId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@TaxID", objFormDetails.taxId ?? (object)DBNull.Value);
-               
-                if (usSalesTaxExemptionCertificate != null &&
-                    usSalesTaxExemptionCertificate?.Length > 0)
-                {
-                    var salesTaxExemptionCertificateParam = new SqlParameter("@USSalesTaxExemptionCertificate", SqlDbType.VarBinary, usSalesTaxExemptionCertificate?.Length ?? 0);
-                    salesTaxExemptionCertificateParam.Value = usSalesTaxExemptionCertificate;
+                    cmd.Parameters.AddWithValue("@LeadID", objFormDetails.leadId ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@VisitorID", visitorId);
+                    cmd.Parameters.AddWithValue("@SiteLanguageID", objFormDetails.objMaster.UrlBreakdown.countryDetails.LanguageID);
+                    cmd.Parameters.AddWithValue("@SiteCountryID", objFormDetails.objMaster.UrlBreakdown.countryDetails.CountryID);
+                    cmd.Parameters.AddWithValue("@CompanyName", objFormDetails.companyName);
+                    cmd.Parameters.AddWithValue("@ChannelID", objFormDetails.channelId);
+                    cmd.Parameters.AddWithValue("@CompanyNumber", objFormDetails.companyRegistration ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@VATNumber", objFormDetails.companyVATNumber ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@VATNumberDisplay", objFormDetails.vatNumberDisplay ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@VATCountryID", objFormDetails.vatCountryId ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TaxID", objFormDetails.taxId ?? (object)DBNull.Value);
 
-                    cmd.Parameters.Add(salesTaxExemptionCertificateParam);
-                    cmd.Parameters.AddWithValue("@USSalesTaxExemptionCertificateFileType", usSalesTaxExemptionCertificateFileType);
-                }
+                    if (usSalesTaxExemptionCertificate != null &&
+                        usSalesTaxExemptionCertificate?.Length > 0)
+                    {
+                        var salesTaxExemptionCertificateParam = new SqlParameter("@USSalesTaxExemptionCertificate", SqlDbType.VarBinary, usSalesTaxExemptionCertificate?.Length ?? 0);
+                        salesTaxExemptionCertificateParam.Value = usSalesTaxExemptionCertificate;
 
-                cmd.Parameters.AddWithValue("@MertexLanguageCode", objFormDetails.autoCorrespondenceLanguageCode ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@EORINumber", objFormDetails.companyEORINumber ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@CompanyTypeID", objFormDetails.companyTypeId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@TradingSince", tradingSinceDT ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@CountryID", objFormDetails.invoiceAddress.countryId);
-                cmd.Parameters.AddWithValue("@Website", objFormDetails.website ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@LeadContactTypeID", objFormDetails.contactTypeId);
-                cmd.Parameters.AddWithValue("@TitleID", objFormDetails.titleId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@FullName", objFormDetails.fullName);
-                cmd.Parameters.AddWithValue("@Phone", objFormDetails.phone);
-                cmd.Parameters.AddWithValue("@Email", objFormDetails.email);
-                cmd.Parameters.AddWithValue("@OrderConfirmationsEmail", objFormDetails.orderConfirmationsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@InvoiceStatementsEmail", objFormDetails.invoicesStatementsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@PriceListsProductsNewsEventsEmail", objFormDetails.pricelistsProductsNewsEventsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@DeliveryNotificationsEmail", objFormDetails.deliveryNotificationsEmail ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@Notes", objFormDetails.notes ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@WillBuyPatternBooks", objFormDetails.patternBookInterest);
-                cmd.Parameters.AddWithValue("@DistributorDataSharingConsent", objFormDetails.distributorConsent);
-                cmd.Parameters.AddWithValue("@SellOnline", objFormDetails.sellOnline);
-                cmd.Parameters.AddWithValue("@OtherChannel", objFormDetails.businessTypeOther ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@OtherLeadContactType", objFormDetails.positionOther ?? (object)DBNull.Value);
+                        cmd.Parameters.Add(salesTaxExemptionCertificateParam);
+                        cmd.Parameters.AddWithValue("@USSalesTaxExemptionCertificateFileType", usSalesTaxExemptionCertificateFileType);
+                    }
 
-                DataTable leadAddressTableType = new DataTable();
+                    cmd.Parameters.AddWithValue("@MertexLanguageCode", objFormDetails.autoCorrespondenceLanguageCode ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@EORINumber", objFormDetails.companyEORINumber ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CompanyTypeID", objFormDetails.companyTypeId ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TradingSince", tradingSinceDT ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CountryID", objFormDetails.invoiceAddress.countryId);
+                    cmd.Parameters.AddWithValue("@Website", objFormDetails.website ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LeadContactTypeID", objFormDetails.contactTypeId);
+                    cmd.Parameters.AddWithValue("@TitleID", objFormDetails.titleId ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FullName", objFormDetails.fullName);
+                    cmd.Parameters.AddWithValue("@Phone", objFormDetails.phone);
+                    cmd.Parameters.AddWithValue("@Email", objFormDetails.email);
+                    cmd.Parameters.AddWithValue("@OrderConfirmationsEmail", objFormDetails.orderConfirmationsEmail ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@InvoiceStatementsEmail", objFormDetails.invoicesStatementsEmail ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PriceListsProductsNewsEventsEmail", objFormDetails.pricelistsProductsNewsEventsEmail ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DeliveryNotificationsEmail", objFormDetails.deliveryNotificationsEmail ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Notes", objFormDetails.notes ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@WillBuyPatternBooks", objFormDetails.patternBookInterest);
+                    cmd.Parameters.AddWithValue("@DistributorDataSharingConsent", objFormDetails.distributorConsent);
+                    cmd.Parameters.AddWithValue("@SellOnline", objFormDetails.sellOnline);
+                    cmd.Parameters.AddWithValue("@OtherChannel", objFormDetails.businessTypeOther ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@OtherLeadContactType", objFormDetails.positionOther ?? (object)DBNull.Value);
 
-                leadAddressTableType.Columns.Add("LeadAddressID", typeof(long));
-                leadAddressTableType.Columns.Add("Label", typeof(string));
-                leadAddressTableType.Columns.Add("AddressLine1", typeof(string));
-                leadAddressTableType.Columns.Add("AddressLine2", typeof(string));
-                leadAddressTableType.Columns.Add("Town", typeof(string));
-                leadAddressTableType.Columns.Add("County", typeof(string));
-                leadAddressTableType.Columns.Add("Postcode", typeof(string));
-                leadAddressTableType.Columns.Add("CountryID", typeof(short));
-                leadAddressTableType.Columns.Add("DefaultInvoiceAddress", typeof(bool));
-                leadAddressTableType.Columns.Add("DefaultDeliveryAddress", typeof(bool));
-                leadAddressTableType.Columns.Add("DefaultVisitAddress", typeof(bool));
+                    DataTable leadAddressTableType = new DataTable();
 
-                leadAddressTableType.Rows.Add(
-                    (object)DBNull.Value,
-                    (object)DBNull.Value,
-                    objFormDetails.invoiceAddress.addressLine1,
-                    objFormDetails.invoiceAddress.addressLine2 ?? (object)DBNull.Value,
-                    objFormDetails.invoiceAddress.town,
-                    objFormDetails.invoiceAddress.county,
-                    objFormDetails.invoiceAddress.postcode,
-                    objFormDetails.invoiceAddress.countryId,
-                    true,
-                    objFormDetails.deliverySameAsInvoice, 
-                    objFormDetails.visitSameAsInvoice
-                );
+                    leadAddressTableType.Columns.Add("LeadAddressID", typeof(long));
+                    leadAddressTableType.Columns.Add("Label", typeof(string));
+                    leadAddressTableType.Columns.Add("AddressLine1", typeof(string));
+                    leadAddressTableType.Columns.Add("AddressLine2", typeof(string));
+                    leadAddressTableType.Columns.Add("Town", typeof(string));
+                    leadAddressTableType.Columns.Add("County", typeof(string));
+                    leadAddressTableType.Columns.Add("Postcode", typeof(string));
+                    leadAddressTableType.Columns.Add("CountryID", typeof(short));
+                    leadAddressTableType.Columns.Add("DefaultInvoiceAddress", typeof(bool));
+                    leadAddressTableType.Columns.Add("DefaultDeliveryAddress", typeof(bool));
+                    leadAddressTableType.Columns.Add("DefaultVisitAddress", typeof(bool));
 
-                if (!objFormDetails.deliverySameAsInvoice)
-                {
                     leadAddressTableType.Rows.Add(
                         (object)DBNull.Value,
                         (object)DBNull.Value,
-                        objFormDetails.deliveryAddress.addressLine1,
-                        objFormDetails.deliveryAddress.addressLine2 ?? (object)DBNull.Value,
-                        objFormDetails.deliveryAddress.town,
-                        objFormDetails.deliveryAddress.county,
-                        objFormDetails.deliveryAddress.postcode,
-                        objFormDetails.deliveryAddress.countryId,
-                        false,
+                        objFormDetails.invoiceAddress.addressLine1,
+                        objFormDetails.invoiceAddress.addressLine2 ?? (object)DBNull.Value,
+                        objFormDetails.invoiceAddress.town,
+                        objFormDetails.invoiceAddress.county,
+                        objFormDetails.invoiceAddress.postcode,
+                        objFormDetails.invoiceAddress.countryId,
                         true,
-                        false
+                        objFormDetails.deliverySameAsInvoice,
+                        objFormDetails.visitSameAsInvoice
                     );
-                }
 
-                if (!objFormDetails.visitSameAsInvoice)
-                {
-                    leadAddressTableType.Rows.Add(
-                        (object)DBNull.Value,
-                        (object)DBNull.Value,
-                        objFormDetails.visitAddress.addressLine1,
-                        objFormDetails.visitAddress.addressLine2 ?? (object)DBNull.Value,
-                        objFormDetails.visitAddress.town,
-                        objFormDetails.visitAddress.county,
-                        objFormDetails.visitAddress.postcode,
-                        objFormDetails.visitAddress.countryId,
-                        false,
-                        false,
-                        true
-                    );
-                }
+                    if (!objFormDetails.deliverySameAsInvoice)
+                    {
+                        leadAddressTableType.Rows.Add(
+                            (object)DBNull.Value,
+                            (object)DBNull.Value,
+                            objFormDetails.deliveryAddress.addressLine1,
+                            objFormDetails.deliveryAddress.addressLine2 ?? (object)DBNull.Value,
+                            objFormDetails.deliveryAddress.town,
+                            objFormDetails.deliveryAddress.county,
+                            objFormDetails.deliveryAddress.postcode,
+                            objFormDetails.deliveryAddress.countryId,
+                            false,
+                            true,
+                            false
+                        );
+                    }
 
-                SqlParameter leadAddresses = cmd.Parameters.AddWithValue("@LeadAddresses", leadAddressTableType);
-                leadAddresses.SqlDbType = SqlDbType.Structured;
-                leadAddresses.TypeName = "portal.LeadAddressTableType";
+                    if (!objFormDetails.visitSameAsInvoice)
+                    {
+                        leadAddressTableType.Rows.Add(
+                            (object)DBNull.Value,
+                            (object)DBNull.Value,
+                            objFormDetails.visitAddress.addressLine1,
+                            objFormDetails.visitAddress.addressLine2 ?? (object)DBNull.Value,
+                            objFormDetails.visitAddress.town,
+                            objFormDetails.visitAddress.county,
+                            objFormDetails.visitAddress.postcode,
+                            objFormDetails.visitAddress.countryId,
+                            false,
+                            false,
+                            true
+                        );
+                    }
 
-                SqlParameter leadInterests = cmd.Parameters.AddWithValue("@LeadInterests", leadInterestsTableType);
-                leadInterests.SqlDbType = SqlDbType.Structured;
-                leadInterests.TypeName = "BrandIDProductTypeGroupIDTableType";
+                    SqlParameter leadAddresses = cmd.Parameters.AddWithValue("@LeadAddresses", leadAddressTableType);
+                    leadAddresses.SqlDbType = SqlDbType.Structured;
+                    leadAddresses.TypeName = "portal.LeadAddressTableType";
+
+                    SqlParameter leadInterests = cmd.Parameters.AddWithValue("@LeadInterests", leadInterestsTableType);
+                    leadInterests.SqlDbType = SqlDbType.Structured;
+                    leadInterests.TypeName = "BrandIDProductTypeGroupIDTableType";
 
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine(Util.SQLCommandDumper.GetCommandText(cmd));
+                    System.Diagnostics.Debug.WriteLine(Util.SQLCommandDumper.GetCommandText(cmd));
 #endif
 
-                conn.Open();
+                    conn.Open();
 
-                SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-                while (reader.Read())
-                {
-                    result = reader.IsDBNull(0) ? null : (long?)reader.GetInt64(0);
+                    while (reader.Read())
+                    {
+                        result = reader.IsDBNull(0) ? null : (long?)reader.GetInt64(0);
+                    }
+
+                    reader.Close();
+
+                    conn.Close();
                 }
-
-                reader.Close();
-
-                conn.Close();
-            }
+            });
 
             return result;
         }
