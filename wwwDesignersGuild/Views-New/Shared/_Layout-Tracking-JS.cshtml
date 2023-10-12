@@ -151,7 +151,10 @@
                 }
             }
         })
-        .catch(window.catchFetchErrors);
+        .catch(err => {
+            console.log(err);
+            logClientSideError(JSON.stringify(err));
+        });
     }
 </script>
         }

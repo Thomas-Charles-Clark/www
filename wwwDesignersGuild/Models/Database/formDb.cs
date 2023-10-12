@@ -249,6 +249,10 @@ namespace wwwDesignersGuild.Models.Database
                 leadInterests.SqlDbType = SqlDbType.Structured;
                 leadInterests.TypeName = "BrandIDProductTypeGroupIDTableType";
 
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(Util.SQLCommandDumper.GetCommandText(cmd));
+#endif
+
                 conn.Open();
 
                 SqlDataReader reader = cmd.ExecuteReader();
