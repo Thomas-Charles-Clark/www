@@ -256,7 +256,7 @@ namespace wwwDesignersGuild.Models.Database
                     SqlParameter leadInterests = cmd.Parameters.AddWithValue("@LeadInterests", leadInterestsTableType);
                     leadInterests.SqlDbType = SqlDbType.Structured;
                     leadInterests.TypeName = "BrandIDProductTypeGroupIDTableType";
-
+                  
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(Util.SQLCommandDumper.GetCommandText(cmd));
 #endif
