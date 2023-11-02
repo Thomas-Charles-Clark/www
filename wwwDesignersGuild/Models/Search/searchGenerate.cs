@@ -105,13 +105,13 @@ namespace wwwDesignersGuild.Models.Search
             searchJobMainIndex.IndexesToSearch.Add(dtSearchMainIndexPath.Replace(@"\\", @"\"));
             searchJobMainIndex.Request = searchTerm;
             searchJobMainIndex.SearchFlags = SearchFlags.dtsSearchStemming |
-                                    SearchFlags.dtsSearchFuzzy |
+                                    //SearchFlags.dtsSearchFuzzy |          // no longer fuzzy 
                                     SearchFlags.dtsSearchSynonyms |
                                     SearchFlags.dtsSearchUserSynonyms |
                                     SearchFlags.dtsSearchPositionalScoring |
                                     SearchFlags.dtsSearchTypeAllWords;
-            searchJobMainIndex.Fuzziness = 1;
 
+            //searchJobMainIndex.Fuzziness = 1;
             
             searchJobMainIndex.Execute();
 
@@ -151,7 +151,6 @@ namespace wwwDesignersGuild.Models.Search
                 {
                     objSearchResults.Add(objMainResult);
                 }
-
             }
 
             DataTable productPageTable = new DataTable();
@@ -160,7 +159,9 @@ namespace wwwDesignersGuild.Models.Search
 
             foreach (searchResultDefinition searchResult in objSearchResults)
             {
-                productPageTable.Rows.Add(searchResult.productPageID, 0);  
+                productPageTable.Rows.Add(searchResult.productPageID, searchResult.ScorePercent);
+                // replaced 0 with searchResult.ScorePercent: forever and a day the ServerSearchResults_Generate procedure wanted nothing to do with manipulating the relevance scoring
+                // now maybe it does, eh?
             }
 
             int? tradeAccountId = null;
