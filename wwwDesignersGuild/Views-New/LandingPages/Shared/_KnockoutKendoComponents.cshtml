@@ -240,12 +240,12 @@
                 <!-- ko if: $data.hasOwnProperty('displayBlock') -->
                 <div class="pca-search-result">
                     <div class="display-block address-block">
-                        <!-- ko if: deliveryReference() -->
+                        @*<!-- ko if: deliveryReference() -->
                         <label class="delivery-reference-display mb-3">
                             @HtmlHelperExtra.Resource("DeliveryReference", l, c, d):
                             <span data-bind="text: deliveryReference"></span>
                         </label>
-                        <!-- /ko -->
+                        <!-- /ko -->*@
                         <!-- ko if: companyName.observable() -->
                         <label class="mb-3" data-bind="text: companyName.observable()"></label>
                         <!-- /ko -->
@@ -328,7 +328,7 @@
         @*<a data-bind="text: 'Enter Address Manually', attr: { href: 'javascript:;' }, click: function () { reset(true); addressObject.manual(true); showEditModal(); }"></a>*@
         @*<span class="d-none" data-bind="css: { 'ready': ready(true) }, remove"></span>*@
     </div>
-    <div class="modal fade" data-bs-backdrop="false" data-bind="keepElement: editModal">
+    <div class="modal fade" data-bs-backdrop="static" data-bind="keepElement: editModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="page-blocker" style="display: none" data-bind="flexVisible: busy, toggleOpacity: busy">

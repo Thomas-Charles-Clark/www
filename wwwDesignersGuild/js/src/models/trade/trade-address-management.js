@@ -85,99 +85,273 @@
 
     self.invoiceAddressChange.loadPCAResult(getInvoiceAddress());
 
-    self.addresses = ko.observableArray([]);
+    //self.addresses = ko.observableArray([]);
 
-    self.defaultDeliveryReference = ko.observable(getDefaultDeliveryReference())
+    //self.defaultDeliveryReference = ko.observable(getDefaultDeliveryReference())
+
+    //self.addressSearch = addressSearchFactory(
+    //    ko.observable(),
+    //    self.resources.AddressSearch,
+    //    self.resources.SearchYourAddressBook,
+    //    self.resources.MoodboardSave,
+    //    null, // must be set after factory creation, for editModal hooking
+    //    null, // needs its own busy observable
+    //    null, // message probably not required
+    //    function () {
+    //        self.addressSearch.busy(true);
+    //        fetch('/api/tradeapi/saveDeliveryAddress', {
+    //            method: 'POST',
+    //            headers: window.fetchHeaders,
+    //            cache: 'no-store',
+    //            credentials: 'same-origin',
+    //            body: JSON.stringify(this.addressObject.toBasketAddressJS())
+    //        })
+    //            .then(window.handleFetchResponse)
+    //            .then(data => {
+    //                self.addressSearch.closeEditModal();
+    //                self.addressSearch.pcaLookup.clearFunction();
+    //                self.addressSearch.addressLookup.clearFunction();
+    //                self.addressSearch.addressLookup.observable.performSearch();
+    //                let searchResult = this.addressLookup.searchResultsList().find(sr => sr.deliveryReference() == this.addressObject.deliveryReference());
+    //                if (searchResult) {
+    //                    searchResult.loadFromOtherAddressObject(this.addressObject);
+    //                } else {
+    //                    this.addressObject.deliveryReference(data.deliveryReference);
+    //                    self.addressSearch.addressLookup.searchResultsList.unshift(this.addressObject);
+    //                }
+    //                self.addressSearch.busy(false);
+    //            })
+    //            .catch(err => {
+    //                self.addressSearch.busy(false);
+    //                window.catchFetchErrors(err);
+    //            })
+    //    },
+    //    false,
+    //    false,
+    //    self.resources,
+    //    null,
+    //    () => {
+    //        self.ready(true);
+    //    }
+    //);
+
+    //self.currentAddress = addressViewModel({
+    //        labelClass: 'delivery-address-label',
+    //        controlClass: 'form-control mdc-text-field__input',
+    //        phoneIntlMobile: true,
+    //        email: true
+    //    },
+    //    self.resources);
+
+    //self.addressSearch.setAddressObject(self.currentAddress);
+
+    //self.addressSearch.mode.subscribe(function (newValue) {
+    //    self.addressSearch.pcaLookup.searchResultsList([]);
+    //    if (newValue === 'extant') {
+    //        if (self.addressSearch.widget()) {
+    //            self.addressSearch.widget().value(null);
+    //            self.addressSearch.widget().trigger('change');
+    //        }
+    //        self.addressSearch.pcaLookup.label(self.resources.SearchYourAddressBook);
+    //        self.addressSearch.pcaLookup.observable.performSearch();
+    //    } else {
+    //        self.addressSearch.showEditModal();
+    //        self.addressSearch.pcaLookup.label();
+    //    }
+    //});
+
+    //self.makeDefault = function (item) {
+    //    if (self.defaultDeliveryReference()) {
+    //        window.showConfirm(
+    //            self.resources.AreYouSure,
+    //            //`${self.resources.ThisWillMakeDeliveryReference} <strong>${item.deliveryReference()}</strong> ${self.resources.TheDefaultReplacing} <strong>${self.defaultDeliveryReference()}</strong>`,
+    //            `${self.resources.ThisWillChangeTheDefaultDelivery}`,
+    //            () => {
+    //                fetch('/api/tradeapi/SetDefaultDeliveryReference', {
+    //                    method: 'POST',
+    //                    headers: window.fetchHeaders,
+    //                    cache: 'no-store',
+    //                    credentials: 'same-origin',
+    //                    body: JSON.stringify({
+    //                        deliveryReference: item.deliveryReference()
+    //                    })
+    //                })
+    //                    .then(window.handleFetchResponse)
+    //                    .then(data => {
+    //                        self.defaultDeliveryReference(item.deliveryReference());
+    //                        self.addressSearch.pcaLookup.observable.performSearch();
+    //                    })
+    //                    .catch(window.catchFetchErrors)
+    //            },
+    //            null
+    //        )
+    //    }
+    //    else {
+    //        window.showConfirm(
+    //            self.resources.AreYouSure,
+    //            `${self.resources.ThisWillMakeDeliveryReference} <strong>${item.deliveryReference()}</strong> ${self.resources.TheDefaultOnYourAccount}`,
+    //            () => {
+    //                fetch('/api/tradeapi/SetDefaultDeliveryReference', {
+    //                    method: 'POST',
+    //                    headers: window.fetchHeaders,
+    //                    cache: 'no-store',
+    //                    credentials: 'same-origin',
+    //                    body: JSON.stringify({
+    //                        deliveryReference: item.deliveryReference()
+    //                    })
+    //                })
+    //                    .then(window.handleFetchResponse)
+    //                    .then(data => {
+    //                        self.defaultDeliveryReference(item.deliveryReference());
+    //                        self.addressSearch.pcaLookup.observable.performSearch();
+    //                    })
+    //                    .catch(window.catchFetchErrors)
+    //            },
+    //            null
+    //        )
+    //    }
+    //}
+
+    //self.delete = function (item) {
+    //    window.showConfirm(
+    //        self.resources.AreYouSure,
+    //        `${self.resources.ThisWillDeleteDeliveryReference} <strong>${item.deliveryReference()}</strong>`,
+    //        () => {
+    //            fetch('/api/tradeapi/deleteDeliveryReference', {
+    //                method: 'POST',
+    //                headers: window.fetchHeaders,
+    //                cache: 'no-store',
+    //                credentials: 'same-origin',
+    //                body: JSON.stringify({
+    //                    deliveryReference: item.deliveryReference()
+    //                })
+    //            })
+    //                .then(window.handleFetchResponse)
+    //                .then(data => {
+    //                    self.addressSearch.addressLookup.observable.performSearch();
+    //                })
+    //                .catch(window.catchFetchErrors)
+    //        },
+    //        null
+    //    )
+    //}
+
+
+
+    //#region Properties
+
+    self.defaultAddress = addressViewModel({
+        labelClass: 'delivery-address-label',
+        controlClass: 'form-control mdc-text-field__input',
+        phoneIntlMobile: true,
+        email: false,
+        defaultCountry: getCountryId()
+    }, self.resources);
+
+    let dda = getDefaultDeliveryAddress();
+
+    if (dda != null)
+        self.defaultAddress.loadPCAResult(dda);
+
+    self.defaultDeliveryReference = ko.observable(getDefaultMemberAddressId());
+
+    //#endregion
+
+
+    //#region Components
+
+    self.deliveryAddress = addressViewModel({
+        labelClass: 'delivery-address-label',
+        controlClass: 'form-control mdc-text-field__input',
+        phoneIntlMobile: true,
+        email: false,
+        defaultCountry: getCountryId(),
+        phoneValidation: {
+            required: {
+                params: true
+            }
+        }
+    }, self.resources);
 
     self.addressSearch = addressSearchFactory(
-        ko.observable(),
+        ko.observable({
+            CountryID: getCountryId()
+        }),
         self.resources.AddressSearch,
         self.resources.SearchYourAddressBook,
         self.resources.MoodboardSave,
-        null, // must be set after factory creation, for editModal hooking
+        null,
         null, // needs its own busy observable
         null, // message probably not required
-        function () {
+        (onComplete) => {
             self.addressSearch.busy(true);
-            fetch('/api/tradeapi/saveDeliveryAddress', {
+            fetch('/api/member/editAddress', {
                 method: 'POST',
                 headers: window.fetchHeaders,
                 cache: 'no-store',
                 credentials: 'same-origin',
-                body: JSON.stringify(this.addressObject.toBasketAddressJS())
+                body: JSON.stringify(self.addressSearch.addressObject.toMemberAddressJs())
             })
                 .then(window.handleFetchResponse)
                 .then(data => {
-                    self.addressSearch.closeEditModal();
-                    self.addressSearch.pcaLookup.clearFunction();
                     self.addressSearch.addressLookup.clearFunction();
-                    self.addressSearch.addressLookup.observable.performSearch();
-                    let searchResult = this.addressLookup.searchResultsList().find(sr => sr.deliveryReference() == this.addressObject.deliveryReference());
-                    if (searchResult) {
-                        searchResult.loadFromOtherAddressObject(this.addressObject);
-                    } else {
-                        this.addressObject.deliveryReference(data.deliveryReference);
-                        self.addressSearch.addressLookup.searchResultsList.unshift(this.addressObject);
-                    }
+                    self.addressSearch.closeEditModal();
                     self.addressSearch.busy(false);
+                    onComplete();
+                    window.setTimeout(() => {
+                        $(self.addressSearch.addressLookup.observable.DOMElement).autocomplete('search');
+                    }, 0);
                 })
                 .catch(err => {
                     self.addressSearch.busy(false);
-                    window.catchFetchErrors(err);
                 })
         },
         false,
         false,
         self.resources,
-        null,
-        () => {
-            self.ready(true);
-        }
-    );
+        'member');
 
-    self.currentAddress = addressViewModel({
-            labelClass: 'delivery-address-label',
-            controlClass: 'form-control mdc-text-field__input',
-            phoneIntlMobile: true,
-            email: true
-        },
-        self.resources);
+    self.addressSearch.setAddressObject(self.deliveryAddress);
 
-    self.addressSearch.setAddressObject(self.currentAddress);
+    //#endregion
 
-    self.addressSearch.mode.subscribe(function (newValue) {
-        self.addressSearch.pcaLookup.searchResultsList([]);
-        if (newValue === 'extant') {
-            if (self.addressSearch.widget()) {
-                self.addressSearch.widget().value(null);
-                self.addressSearch.widget().trigger('change');
-            }
-            self.addressSearch.pcaLookup.label(self.resources.SearchYourAddressBook);
-            self.addressSearch.pcaLookup.observable.performSearch(); 
-        } else {
-            self.addressSearch.showEditModal();
-            self.addressSearch.pcaLookup.label();
-        }
-    });
 
-    self.makeDefault = function (item) {
+    //#region Subscriptions
+
+
+
+    //#endregion
+
+
+    //#region Computeds
+
+
+
+    //#endregion
+
+
+    //#region Methods
+
+    self.makeDefault = (item) => {
         if (self.defaultDeliveryReference()) {
             window.showConfirm(
                 self.resources.AreYouSure,
                 //`${self.resources.ThisWillMakeDeliveryReference} <strong>${item.deliveryReference()}</strong> ${self.resources.TheDefaultReplacing} <strong>${self.defaultDeliveryReference()}</strong>`,
                 `${self.resources.ThisWillChangeTheDefaultDelivery}`,
                 () => {
-                    fetch('/api/tradeapi/SetDefaultDeliveryReference', {
+                    fetch('/api/member/makeAddressDefault', {
                         method: 'POST',
                         headers: window.fetchHeaders,
                         cache: 'no-store',
                         credentials: 'same-origin',
                         body: JSON.stringify({
-                            deliveryReference: item.deliveryReference()
+                            memberAddressId: item.deliveryReference(),
+                            country: item.country()
                         })
                     })
                         .then(window.handleFetchResponse)
                         .then(data => {
+                            self.defaultAddress.loadPCAResult(item);
                             self.defaultDeliveryReference(item.deliveryReference());
                             self.addressSearch.pcaLookup.observable.performSearch();
                         })
@@ -187,43 +361,38 @@
             )
         }
         else {
-            window.showConfirm(
-                self.resources.AreYouSure,
-                `${self.resources.ThisWillMakeDeliveryReference} <strong>${item.deliveryReference()}</strong> ${self.resources.TheDefaultOnYourAccount}`,
-                () => {
-                    fetch('/api/tradeapi/SetDefaultDeliveryReference', {
-                        method: 'POST',
-                        headers: window.fetchHeaders,
-                        cache: 'no-store',
-                        credentials: 'same-origin',
-                        body: JSON.stringify({
-                            deliveryReference: item.deliveryReference()
-                        })
-                    })
-                        .then(window.handleFetchResponse)
-                        .then(data => {
-                            self.defaultDeliveryReference(item.deliveryReference());
-                            self.addressSearch.pcaLookup.observable.performSearch();
-                        })
-                        .catch(window.catchFetchErrors)
-                },
-                null
-            )
+            fetch('/api/member/makeAddressDefault', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                cache: 'no-store',
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    memberAddressId: item.deliveryReference(),
+                    country: item.country()
+                })
+            })
+                .then(window.handleFetchResponse)
+                .then(data => {
+                    self.defaultDeliveryReference(item.deliveryReference());
+                    self.addressSearch.pcaLookup.observable.performSearch();
+                })
+                .catch(window.catchFetchErrors)
         }
     }
 
-    self.delete = function (item) {
+    self.delete = (item) => {
         window.showConfirm(
             self.resources.AreYouSure,
-            `${self.resources.ThisWillDeleteDeliveryReference} <strong>${item.deliveryReference()}</strong>`,
+            `${self.resources.ThisWillDeleteThisDeliveryAddress}`,
             () => {
-                fetch('/api/tradeapi/deleteDeliveryReference', {
+                fetch('/api/member/deleteAddress', {
                     method: 'POST',
                     headers: window.fetchHeaders,
                     cache: 'no-store',
                     credentials: 'same-origin',
                     body: JSON.stringify({
-                        deliveryReference: item.deliveryReference()
+                        memberAddressId: item.deliveryReference(),
+                        country: item.country()
                     })
                 })
                     .then(window.handleFetchResponse)
@@ -236,6 +405,16 @@
         )
     }
 
+    //#endregion
+
+    self.addressSearch.ready.subscribe(nv => {
+        self.countrySub = self.addressSearch.addressLookup.country.subscribe(nv => {
+            $(self.addressSearch.addressLookup.observable.DOMElement).autocomplete('search');
+            self.countrySub.dispose();
+        });
+    });
+
+
     self.requestInvoiceAddressChange = function (item) {
         console.log('requestInvoiceAddressChange hit');
         document.querySelector('#invoice-address-change-requested').style.display = 'none';
@@ -246,9 +425,9 @@
         document.querySelector('#invoice-address-change-requested').style.display = 'flex';
     }
 
-    self.addressSearch.ready.subscribe(nv => {
-        self.addressSearch.editModal.DOMElement.removeAttribute("data-bs-backdrop");
-    });
+    //self.addressSearch.ready.subscribe(nv => {
+    //    self.addressSearch.editModal.DOMElement.removeAttribute("data-bs-backdrop");
+    //});
 
     return self;
 });

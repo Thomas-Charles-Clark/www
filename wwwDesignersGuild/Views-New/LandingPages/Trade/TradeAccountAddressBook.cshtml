@@ -46,9 +46,9 @@ else
             return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
         }
 
-        function getDefaultDeliveryReference() {
+        @*function getDefaultDeliveryReference() {
             return '@(Model.DefaultDeliveryReference)'
-        }
+        }*@
     </script>
 
     @Render.StylesPreload("~/bundles/css/trade")
@@ -108,7 +108,7 @@ else
                 <div data-bind="component: { name: 'mdc-address-search-component', params: invoiceAddressSearch }"></div>
             </div>
             <!-- /ko -->
-            <div>
+            <div id="account-contact-details" class="mt-5">
                 <div class="d-flex align-items-center mb-3">
                     <h3 class="mb-0 me-3">
                         @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
@@ -118,10 +118,33 @@ else
                     </button>
                 </div>
                 <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
+                <h4 id="no-addresses" style="display: none;" data-bind="visible: addressSearch.addressLookup.searchResultsList().length === 0">
+                    @HtmlHelperExtra.Resource("NoAddressesFound", l, c, d)
+                </h4>
             </div>
+            @*<div>
+                    <div class="d-flex align-items-center mb-3">
+                        <h3 class="mb-0 me-3">
+                            @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
+                        </h3>
+                        <button type="button" class="btn btn-outline-secondary" data-bind="click: function () { addressSearch.showEditModal(true); }">
+                            @HtmlHelperExtra.Resource("ManageAccountTradeAddDeliveryAddress", l, c, d)
+                        </button>
+                    </div>
+                    <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
+                </div>*@
             <!-- ko if: ready(true) --><!-- /ko -->
         </div>
     </div>
+
+    <script type="text/javascript">
+    window.getDefaultDeliveryAddress = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.DefaultMemberAddress));
+    }
+    window.getDefaultMemberAddressId = () => {
+        return @(Model.DefaultMemberAddress?.MemberAddressID);
+    }
+    </script>
 
     @Render.Script("~/bundles/js/trade-address-management")
 }

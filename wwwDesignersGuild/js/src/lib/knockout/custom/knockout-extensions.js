@@ -715,22 +715,22 @@ ko.extenders.pcaPredictList = function (observable, options) {
 
             $(options.elementId || options.element).removeClass('ui-autocomplete-loading');
 
-            options.searchResultsList($.map([{
-                id: '',
-                label: options.resources.PleaseSelectCountryBefore,
-                value: null,
-                type: null,
-                text: options.resources.PleaseSelectCountryBefore
-            }], function (item) {
-                return {
-                    id: item.id,
-                    label: item.label,
-                    value: item.value,
-                    type: item.type,
-                    text: item.text,
-                    obj: item
-                }
-            }));
+            //options.searchResultsList($.map([{
+            //    id: '',
+            //    label: options.resources.PleaseSelectCountryBefore,
+            //    value: null,
+            //    type: null,
+            //    text: options.resources.PleaseSelectCountryBefore
+            //}], function (item) {
+            //    return {
+            //        id: item.id,
+            //        label: item.label,
+            //        value: item.value,
+            //        type: item.type,
+            //        text: item.text,
+            //        obj: item
+            //    }
+            //}));
             response();
 
         },
