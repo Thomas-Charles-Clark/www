@@ -35,7 +35,7 @@ namespace wwwDesignersGuild.ViewModels
 
         }
 
-        private async Task InitialiseAsync()
+        protected async Task InitialiseAsync()
         {
             #region Preamble
 

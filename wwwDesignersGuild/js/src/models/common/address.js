@@ -1797,6 +1797,10 @@ var addressSearchFactory = ((
             self.addressObject.removeCleanseSubscriptions();
             self.addressObject.removeDeliveryReferenceSubscriptions();
 
+            let extantPhone = self.addressObject.phone.observable();
+
+            phone = phone || extantPhone;
+
             self.addressObject.reset();
 
             if (loqateAddress)

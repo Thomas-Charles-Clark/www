@@ -646,11 +646,16 @@ namespace wwwDesignersGuild.Controllers
                 invoiceAddress.CountryID = invoiceCountry.CountryID;
             }
 
-            var viewModel = new TradeAddressBookManagementViewModel(
-                emailsModel,
+            var objDefinition = await new VisitorFactory().getMemberAddresses(objBase.Visitor.visitorDbId,
+                null,
+                objBase.LanguageID,
+                objBase.CountryID,
+                objBase.Date);
+
+            var viewModel = await TradeAddressBookManagementViewModel.CreateAsync(
+                objDefinition,
                 tradeAccountModel,
                 invoiceAddress,
-                AccountFunctionsUniSQL.GetDefaultDeliveryReference(loginCheck.tradeDataSourceJson),
                 tradePermissionAccountAdmin,
                 objBase);
 
