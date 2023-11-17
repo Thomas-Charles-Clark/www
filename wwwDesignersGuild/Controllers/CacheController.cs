@@ -9,6 +9,7 @@ using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models;
+using System.Collections.Generic;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -16,7 +17,7 @@ namespace wwwDesignersGuild.Controllers
     {
         [HttpPost]
         [CacheAuthentication]
-        public HttpResponseMessage Purge([FromBody]PassCachePurge objPurge)
+        public IHttpActionResult Purge([FromBody]PassCachePurge objPurge)
         {
             try
             {
@@ -56,8 +57,9 @@ namespace wwwDesignersGuild.Controllers
                         PurgeResources(objPurge);
                         break;
                     case "landingPage":
-                        PurgeLandingPage(objPurge);
-                        break;
+                        return Ok(new {
+                            productPageGridPurgeDetails = PurgeLandingPage(objPurge)
+                        });
                     case "productPage":
                         PurgeProductPage(objPurge);
                         break;
@@ -71,14 +73,10 @@ namespace wwwDesignersGuild.Controllers
             }
             catch(Exception ex)
             {
-                return new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.InternalServerError,
-                    Content = new StringContent(ex.ToString())
-                };
+                return InternalServerError(ex);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            return Ok(new { });
         }
 
         public void PurgeBanner(PassCachePurge objPurge)
@@ -180,7 +178,7 @@ namespace wwwDesignersGuild.Controllers
             cache.Invalidate(objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
         }
 
-        public void PurgeLandingPage(PassCachePurge objPurge)
+        public IEnumerable<string> PurgeLandingPage(PassCachePurge objPurge)
         {
             var cache = new LandingPageCacheProvider();
 
@@ -199,11 +197,17 @@ namespace wwwDesignersGuild.Controllers
             }
 
             // We must pass all the PageSections belonging to this LandingPage that we wish to purge from the cache
+            var results = new List<string>();
+
             foreach (var ps in objPurge.PageSectionIDs)
             {
-                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
-                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
+                results.Add(productPageGridCache.InvalidateMultiple(ps, objPurge.LanguageID, objPurge.CountryID));
+                
+                //productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
+                //productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
             }
+
+            return results;
         }
 
         public void PurgeProductPage(PassCachePurge objPurge)
