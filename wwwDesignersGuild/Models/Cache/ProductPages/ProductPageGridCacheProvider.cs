@@ -65,6 +65,23 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
             Cache.Remove(key);
         }
 
+        public string InvalidateMultiple(long pageSectionId, byte languageId, short countryId) 
+        {
+            var keys = Cache.Select(x => x.Key);
+
+            var removalCount = 0;
+
+            foreach (var k in keys) 
+            {
+                if (k.StartsWith($"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}")) 
+                {
+                    Cache.Remove(k);
+                    removalCount++;
+                }
+            }
+
+            return $"Removed {removalCount} of {keys.Count()} keys from the cache";
+        }
 
         private string buildKey(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {
