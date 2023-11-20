@@ -2694,3 +2694,10 @@ nav.article-type-nav.article-sub-type-nav {
         left: unset !important;
     }
 }
+
+.pca-failure {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 10;
+}

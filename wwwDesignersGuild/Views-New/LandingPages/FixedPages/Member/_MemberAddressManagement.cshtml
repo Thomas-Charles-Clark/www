@@ -33,7 +33,7 @@
             </button>
         </div>
         <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
-        <h4 id="no-addresses" style="display: none;" data-bind="visible: addressSearch.addressLookup.searchResultsList().length === 0">
+        <h4 id="no-addresses" style="display: none;" data-bind="visible: addressSearch.addressLookup.haveSearched() && addressSearch.addressLookup.searchResultsList().length === 0">
             @HtmlHelperExtra.Resource("NoAddressesFound", l, c, d)
         </h4>
     </div>

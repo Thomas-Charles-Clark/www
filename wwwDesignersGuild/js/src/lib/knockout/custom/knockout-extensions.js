@@ -526,6 +526,10 @@ ko.extenders.pcaPredictList = function (observable, options) {
     observable.searchEndpoint = options.searchEndpoint;
     observable.busy = options.busy;
 
+    observable.subscribe(nv => {
+        observable.currentSearch && observable.currentSearch.abort();
+    });
+
     observable.performSearch = function (response) {
 
         if (!observable.busy()) {
@@ -546,12 +550,13 @@ ko.extenders.pcaPredictList = function (observable, options) {
                 data.countries = null;
             }
 
-            $.ajax({
+            observable.currentSearch = $.ajax({
                 url: observable.searchEndpoint(),//"/Products/Enquiry/PCAPredictFind",
                 type: "POST",
                 dataType: "json",
                 data: data,
                 success: function (data) {
+
                     if (data.error) {
                         window.showError();
                     } else {
@@ -606,6 +611,9 @@ ko.extenders.pcaPredictList = function (observable, options) {
                             options.searchResultsList(results);
 
                             observable.busy(false);
+
+                            if (ko.isObservable(options.haveSearched))
+                                options.haveSearched(true);
 
                             if (typeof options.afterSearch === 'function')
                                 options.afterSearch();
@@ -685,6 +693,9 @@ ko.extenders.pcaPredictList = function (observable, options) {
                         options.searchResultsList(results);
                     }
 
+                    if (ko.isObservable(options.haveSearched))
+                        options.haveSearched(true);
+
                     if (typeof options.afterSearch === 'function')
                         options.afterSearch();
 
@@ -692,10 +703,15 @@ ko.extenders.pcaPredictList = function (observable, options) {
                 },
                 error: function (xhr, textStatus, errorThrown) {
                     observable.busy(false);
-                    console.log('pcaPredict failure', errorThrown);
-                    $(options.elementId || options.element).removeClass('ui-autocomplete-loading');
-                    $(options.elementId || options.element).parent().find('.pca-failure').remove();
-                    $(options.elementId || options.element).parent().append('<span class="pca-failure alert alert-danger">Lookup Failure. Please try again.</span>');
+                    if (errorThrown === 'abort') {
+                        return;
+                    }
+                    else {
+                        console.log('pcaPredict failure', errorThrown);
+                        $(options.elementId || options.element).removeClass('ui-autocomplete-loading');
+                        $(options.elementId || options.element).parent().find('.pca-failure').remove();
+                        $(options.elementId || options.element).parent().append('<span class="pca-failure alert alert-danger">Lookup Failure. Please try again.</span>');
+                    }
                 }
             });
         }
