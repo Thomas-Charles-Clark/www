@@ -2321,4 +2321,11 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   right: 2px !important;
   left: unset !important;
 }
+
+.pca-failure {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+}
 /*# sourceMappingURL=common.css.map */

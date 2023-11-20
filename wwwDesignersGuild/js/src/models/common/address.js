@@ -1776,6 +1776,7 @@ var addressSearchFactory = ((
         busy: self.busy,
         readyNotice: self.ready,
         inputGroup: self.pcaInputGroup,
+        haveSearched: ko.observable(false),
         searchResultsList: ko.observableArray([]),
         searchEndpoint: ko.observable(self.searchEndpoint), // current endpoint to search against; default to Mertex. Only Misc accounts should default to pca.
         afterSearch: self.afterSearch,
@@ -1931,6 +1932,7 @@ var addressSearchFactory = ((
         inputGroup: self.pcaInputGroup,
         searchResultsList: ko.observableArray([]),
         searchEndpoint: ko.observable(self.searchEndpoint), // current endpoint to search against; default to Mertex. Only Misc accounts should default to pca.
+        haveSearched: ko.observable(false),
         afterSearch: self.afterSearch,
         tradeAccount: self.tradeAccount,
         miscTradeAccount: self.isMiscTradeAccount,
