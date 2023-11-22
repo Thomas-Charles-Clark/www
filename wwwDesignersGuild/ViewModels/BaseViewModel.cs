@@ -186,6 +186,14 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public bool IsBot
+        {
+            get
+            {
+                return Convert.ToBoolean(HttpContext.Current.Request.Headers["X-Bot"] ?? "false");
+            }
+        }
+
         public ProductType CategoryPageProductType { get; set; }
 
         // This sucks but is temporarily necessary to get the mobile menu updated throughout
