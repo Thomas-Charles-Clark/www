@@ -157,7 +157,8 @@ namespace wwwDesignersGuild.Controllers
                             DueInQuantity = reader.GetDecimal(15),
                             DueInDate = reader.IsDBNull(16) ? null : (DateTime?)reader.GetDateTime(16),
                             DueInMessage = reader.IsDBNull(17) ? null : reader.GetString(17),
-                            POConfirmed = reader.IsDBNull(18) ? (bool?)null : (bool?)reader.GetBoolean(18)
+                            POConfirmed = reader.IsDBNull(18) ? (bool?)null : (bool?)reader.GetBoolean(18),
+                            POOnCallOff = reader.IsDBNull(19) ? (bool?)null : (bool?)reader.GetBoolean(19)
                         });
                     }
 
@@ -256,6 +257,7 @@ namespace wwwDesignersGuild.Controllers
             public int ProductID { get; set; }
             public string ProductCode { get; set; }
             public bool? POConfirmed { get; set; }
+            public bool? POOnCallOff { get; set; }
         }
 
         public class ProductStockInfoReturn
