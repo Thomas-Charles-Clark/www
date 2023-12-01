@@ -11,7 +11,7 @@ namespace wwwDesignersGuild
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute(".well-known/{*pathInfo}");
+            routes.IgnoreRoute(".well-known/apple-developer-merchantid-domain-association");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("favicon.ico");
             routes.IgnoreRoute("Content/images/moodboards/{*pathInfo}");
