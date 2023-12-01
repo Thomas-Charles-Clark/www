@@ -11,6 +11,7 @@ namespace wwwDesignersGuild
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.IgnoreRoute(".well-known/(.*)");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("favicon.ico");
             routes.IgnoreRoute("Content/images/moodboards/{*pathInfo}");
