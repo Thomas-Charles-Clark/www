@@ -111,7 +111,7 @@ namespace wwwDesignersGuild
 
             routes.MapRoute(
                 name: "SiteSelectorBackgroundImageNonWebP",
-                url: "images/site-selector-background/{platform}/{size}",
+                url: "images-nonwebp/site-selector-background/{platform}/{size}",
                 defaults: new { controller = "Image", action = "CallSiteSelectorImageNonWebP" }
             );
 

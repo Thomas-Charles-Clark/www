@@ -801,6 +801,7 @@
     <Content Include="Content\images\checkout\amazon-pay.webp" />
     <Content Include="Content\images\checkout\american_express.png" />
     <Content Include="Content\images\checkout\american_express.webp" />
+    <Content Include="Content\images\checkout\apple-pay.svg" />
     <Content Include="Content\images\checkout\click-collect.png" />
     <Content Include="Content\images\checkout\click-collect.webp" />
     <Content Include="Content\images\checkout\cvvdemo-amex.png" />
@@ -1640,6 +1641,11 @@
     <Content Include="Content\images\icon\AfercareSymbols\8.webp" />
     <Content Include="Content\images\icon\AfercareSymbols\9.GIF" />
     <Content Include="Content\images\icon\AfercareSymbols\9.webp" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-128.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-256.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-32.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-512.png" />
+    <Content Include="Content\images\icon\apple-touch-icon\dg-icon-64.png" />
     <Content Include="Content\images\icon\Attributes\1.jpg" />
     <Content Include="Content\images\icon\Attributes\1.webp" />
     <Content Include="Content\images\icon\Attributes\10.jpg" />
@@ -2377,6 +2383,7 @@
     <Content Include="css\src\models\trade-document-wrapper.scss" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
+    <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
     <None Include="ExternalDependencies\MertexerV2.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -2769,6 +2776,7 @@
     <Content Include="js\src\models\article-page\article-page.js" />
     <Content Include="js\src\models\basket-page\basket-item.js" />
     <Content Include="js\src\models\basket-page\basket-page.js" />
+    <Content Include="js\src\models\checkout\checkout-apple.js" />
     <Content Include="js\src\models\checkout\checkout-login.js" />
     <Content Include="js\src\models\checkout\checkout-single-page.js" />
     <Content Include="js\src\models\collection\collection-page.js" />
@@ -3020,7 +3028,6 @@
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_CheckoutPart.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_CheckoutAddressClickCollect.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_CheckoutAddressUpsAccessPoint.cshtml" />
-    <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressAmazon.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressCollection.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressMemberComponent.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentAmazon.cshtml" />
@@ -3036,6 +3043,8 @@
     <Content Include="Views-New\Shared\_Snippet.cshtml" />
     <Content Include="Views-New\Shared\_SnippetTextOnly.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_ReturnToBasket.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentApple.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressApple.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
