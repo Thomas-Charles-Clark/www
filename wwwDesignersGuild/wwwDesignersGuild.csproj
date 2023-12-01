@@ -621,6 +621,8 @@
     <Compile Include="Models\ProductReview\ProductReview.cs" />
     <Compile Include="Models\RecentlyViewed\RecentlyViewedProductPage.cs" />
     <Compile Include="Models\ResourceFetch\ResourceFetch.cs" />
+    <Compile Include="Models\Returns\EncryptedOrderIdentifier.cs" />
+    <Compile Include="Models\Returns\Return.cs" />
     <Compile Include="Models\SearchRender\PassSearchRender.cs" />
     <Compile Include="Models\Search\searchCacheProvider.cs" />
     <Compile Include="Models\Snippet\Snippet.cs" />
@@ -755,6 +757,7 @@
     <Compile Include="ViewModels\FixedPageViewModel_Checkout.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_CheckoutConfirm.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_GlobalSiteSelector.cs" />
+    <Compile Include="ViewModels\FixedPageViewModel_ReturnsPaperwork.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberResubscribe.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberUnsubscribe.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberPasswordReset.cs" />
@@ -3036,6 +3039,7 @@
     <Content Include="Views-New\Shared\_Snippet.cshtml" />
     <Content Include="Views-New\Shared\_SnippetTextOnly.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_ReturnToBasket.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Member\_ReturnsPaperwork.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
