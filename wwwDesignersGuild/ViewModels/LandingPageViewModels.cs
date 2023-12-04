@@ -2077,6 +2077,7 @@ namespace wwwDesignersGuild.ViewModels
                         filterText: result.MasterDefinition.MetaDescription ?? "",
                         attributeFilterText: model.AttributeFilterText,
                         productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
+                        attributeSignatureText: model.AttributeSignatureText,
                         useHtml: false);
 
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"filter-text\">", "");
