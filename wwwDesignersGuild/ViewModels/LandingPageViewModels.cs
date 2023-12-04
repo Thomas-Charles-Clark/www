@@ -1968,6 +1968,7 @@ namespace wwwDesignersGuild.ViewModels
                             model
                         );
 
+                    // attempt to force faux change to permit easier merging...
                     result.AttributeCombinations = objFilterIndexCombinations.Combinations;
                 }
             }
