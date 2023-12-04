@@ -277,7 +277,10 @@ namespace wwwDesignersGuild.ViewModels
             passCheckoutPay.isMemberCheckout = passCheckoutPay.checkoutMethod == dgCheckoutType.Member;
 
             var savedCards = new List<CheckoutBraintreeCreditCardDetails>();
-            if (passCheckoutPay.checkoutMethod == dgCheckoutType.Guest || passCheckoutPay.checkoutMethod == dgCheckoutType.Member || passCheckoutPay.checkoutMethod == dgCheckoutType.Paypal)
+            if (passCheckoutPay.checkoutMethod == dgCheckoutType.Guest || 
+                passCheckoutPay.checkoutMethod == dgCheckoutType.Member || 
+                passCheckoutPay.checkoutMethod == dgCheckoutType.Paypal ||
+                passCheckoutPay.checkoutMethod == dgCheckoutType.Apple)
             {
                 var gateway = new BraintreeGateway()
                 {

@@ -11,6 +11,7 @@ namespace wwwDesignersGuild
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.IgnoreRoute(".well-known/{*pathInfo}");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("favicon.ico");
             routes.IgnoreRoute("Content/images/moodboards/{*pathInfo}");
@@ -111,7 +112,7 @@ namespace wwwDesignersGuild
 
             routes.MapRoute(
                 name: "SiteSelectorBackgroundImageNonWebP",
-                url: "images/site-selector-background/{platform}/{size}",
+                url: "images-nonwebp/site-selector-background/{platform}/{size}",
                 defaults: new { controller = "Image", action = "CallSiteSelectorImageNonWebP" }
             );
 

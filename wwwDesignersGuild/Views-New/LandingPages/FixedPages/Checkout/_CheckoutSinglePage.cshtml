@@ -219,9 +219,6 @@
     function getMarketingPermissions() {
         return @Html.Raw(Json.Encode(Model.checkoutPaymentModel.marketingPermissions));
     }
-    function getBalanceNumber() {
-        return Number('@Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalBalance.ToString(nfi)')
-    }
     function getBalance() {
         return Number('@Model.checkoutPaymentModel.checkoutPayments.paymentTotals[0].TotalBalance.ToString().Replace(',', '.')')
     }
@@ -233,7 +230,10 @@
     }
 </script>
 
-@if (Model.checkoutType == dgCheckoutType.Guest || Model.checkoutType == dgCheckoutType.Member || Model.checkoutType == dgCheckoutType.Paypal)
+@if (Model.checkoutType == dgCheckoutType.Guest ||
+    Model.checkoutType == dgCheckoutType.Member ||
+    Model.checkoutType == dgCheckoutType.Paypal ||
+    Model.checkoutType == dgCheckoutType.Apple)
 {
     <script src="https://js.braintreegateway.com/web/3.68.0/js/client.min.js"></script>
 
@@ -247,7 +247,12 @@
         <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
         <script src="https://js.braintreegateway.com/web/3.68.0/js/paypal-checkout.min.js"></script>
     }
+    else if (Model.checkoutType == dgCheckoutType.Apple)
+    {
+        <script src="https://js.braintreegateway.com/web/3.68.0/js/apple-pay.min.js"></script>
+    }
 }
+
 <div data-bind="stopBinding">
     <div id="checkout-wrapper"
          class="checkout-wrapper">
@@ -364,11 +369,11 @@
                                         </p>
                                     }
                                     @*if (!String.IsNullOrEmpty(CustomerServiceWeekendPhone) && !String.IsNullOrEmpty(CustomerServiceWeekendHours))
-                                    {
-                                    <p>
-                                        <a class="summary-help-phone" href="tel:@(CustomerServiceWeekendPhone)">@(CustomerServiceWeekendPhone)</a>&nbsp;@(CustomerServiceWeekendHours)
-                                    </p>
-                                    }*@
+                                        {
+                                        <p>
+                                            <a class="summary-help-phone" href="tel:@(CustomerServiceWeekendPhone)">@(CustomerServiceWeekendPhone)</a>&nbsp;@(CustomerServiceWeekendHours)
+                                        </p>
+                                        }*@
                                 }
                                 @if (DisplayCSEmail)
                                 {
@@ -473,7 +478,7 @@
                         </h5>
                     </div>
                     <div class="modal-body">
-                        <select id="sales-tax-select" class="form-control" data-bind="value: salesTaxAddressFromList, options: salesTaxAddresses, optionsText: 'addressLine', optionsValue: $data"></select>
+                        <select id="sales-tax-select" class="form-select" data-bind="value: salesTaxAddressFromList, options: salesTaxAddresses, optionsText: 'addressLine', optionsValue: $data"></select>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success" data-bind="click: confirmSalesTaxAddress">
@@ -577,7 +582,15 @@
     }
 
     function jumpToSessionExpired() {
-        window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
+        @{
+            @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutSessionExpired, objMaster.UrlBreakdown.countryDetails)';
+        }
+    }
+
+    function jumpToCheckoutProblem() {
+        @{
+            @:window.location.href = '@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutProblem, objMaster.UrlBreakdown.countryDetails)';
+        }
     }
 
 </script>
@@ -588,6 +601,17 @@
     <script type="text/javascript" defer>
         window.addLoadFunction(() => {
             viewModel.paymentMethodFactory.amazonAddressBookRebind();
+        });
+    </script>
+}
+
+@if (Model.checkoutType == dgCheckoutType.Apple)
+{
+    <script type="text/javascript" defer>
+        window.addLoadFunction(() => {
+            viewModel.paymentMethodFactory.initialiseBraintree(() => {
+
+            });
         });
     </script>
 }

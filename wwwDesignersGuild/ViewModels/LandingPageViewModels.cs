@@ -1,19 +1,12 @@
-﻿using Braintree;
-
-using DocumentFormat.OpenXml.Wordprocessing;
-
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 using iTextSharp.text;
-
-using MertexerV2.SQLFunctions;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -533,15 +526,12 @@ namespace wwwDesignersGuild.ViewModels
             }
 
             if (PageSections.Where(ps => ps.Definition is ProductPageGridPageSection ppgps)
-                            .Any(ps => (ps.Definition as ProductPageGridPageSection).MustOverwritePageCanonical) &&
-                            String.IsNullOrEmpty(Definition.PageDetails.CustomCanonical))
+                            .Any(ps => (ps.Definition as ProductPageGridPageSection).MustOverwritePageCanonical))
             {
-                CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
+                Definition.PageDetails.CustomCanonical = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{dgFramework.buildUrl(MasterDefinition.UrlBreakdown.countryDetails, Definition.PageDetails.URLKeywords, ContentType, ContentID)}";
             }
-            else
-            {
-                CustomCanonical = Definition.PageDetails.CustomCanonical;
-            }
+
+            CustomCanonical = Definition.PageDetails.CustomCanonical;
 
             NoFollow = Definition.PageDetails.NoFollow;
 
@@ -748,7 +738,14 @@ namespace wwwDesignersGuild.ViewModels
                         "LoginInvalid",
                         "PaypalInvalidAddress",
                         "PayWithCard",
-                        "CheckoutTradeCheckout"
+                        "CheckoutTradeCheckout",
+                        "CheckoutPaymentSuccessGeneratingOrder",
+                        "ApplePayFailedToLoad",
+                        "ApplePayFailureNotCharged",
+                        "CheckoutAddressZipCodeInvalid",
+                        "CheckoutAddressZipCodeProblem",
+                        "ZipTaxCouldNotDetermine",
+                        "CannotDeliverToThatCountry"
                     });
                     break;
                 case (int)dgFixedPage.checkoutSinglePage:
@@ -857,7 +854,11 @@ namespace wwwDesignersGuild.ViewModels
                         "LiveChatNow",
                         "ThisWillRemoveCardFromVault",
                         "StockDetailNotAvailable",
-                        "Message"
+                        "Message",
+                        "ApplePayDeviceNotSupported",
+                        "ApplePayDeviceNotSupported",
+                        "ApplePayDeviceCannotPay",
+                        "ApplePayFailureNotCharged"
                     });
                     break;
                 case (int)dgFixedPage.stockists:
@@ -928,7 +929,7 @@ namespace wwwDesignersGuild.ViewModels
                         "PleaseSelectCountry",
                         "PleaseSelectCountryBefore",
                         "FormsCompanyName",
-                        "AddAddressBookFullName",
+                        "FormsFullName",
                         "FormsAddressLineOne",
                         "FormsAddressLineTwo",
                         "FormsTown",
@@ -940,8 +941,6 @@ namespace wwwDesignersGuild.ViewModels
                         "FormsCountry",
                         "AreYouVATRegistered",
                         "VATNumber",
-                        "VATCountry",
-                        "VATInvoiceFormat",
                         "DoYouHaveEORI",
                         "EORINumber",
                         "SellOnline",
@@ -954,18 +953,10 @@ namespace wwwDesignersGuild.ViewModels
                         "InvoicesStatements",
                         "ProductsNewsEvents",
                         "Pricelists",
-                        "DeliveryNotifications",
                         "DeliverySameAsInvoiceAddress",
                         "Notes",
                         "WhyWorkWithDG",
                         "TARFIUnderstand",
-                        "TaxID",
-                        "PleaseProvideTaxID",
-                        "WhichLanguageForAutomatedCorrespondence",
-                        "PleaseSelectLanguage",
-                        "USSalesTaxExemptionCertificationRequired",
-                        "USSalesTaxExemptionCertification",
-                        "PleaseProvideExemptionCertificate",
                         "MajorError"
                     });
                     break;
@@ -1033,11 +1024,9 @@ namespace wwwDesignersGuild.ViewModels
                         "DueDate",
                         "FromMustBeDate",
                         "PleaseProvideFromDate",
-                        "PleaseProvideToDate",
                         "PleaseProvideFromToOrBoth",
                         "ToMustBeDate",
                         "FromMustPreceedTo",
-                        "ToMustFollowFrom",
                         "OrderNo.",
                         "YourOrderReference",
                         "CustOrderRef.",
@@ -1094,11 +1083,9 @@ namespace wwwDesignersGuild.ViewModels
                         "DueDate",
                         "FromMustBeDate",
                         "PleaseProvideFromDate",
-                        "PleaseProvideToDate",
                         "PleaseProvideFromToOrBoth",
                         "ToMustBeDate",
                         "FromMustPreceedTo",
-                        "ToMustFollowFrom",
                         "OrderNo.",
                         "YourOrderReference",
                         "CustOrderRef.",
@@ -1152,9 +1139,7 @@ namespace wwwDesignersGuild.ViewModels
                         "FromMustBeDate",
                         "ToMustBeDate",
                         "PleaseProvideFromDate",
-                        "PleaseProvideToDate",
                         "FromMustPreceedTo",
-                        "ToMustFollowFrom",
                         "OrderNo.",
                         "YourOrderReference",
                         "Value",
@@ -1242,11 +1227,9 @@ namespace wwwDesignersGuild.ViewModels
                         "DueDate",
                         "FromMustBeDate",
                         "PleaseProvideFromDate",
-                        "PleaseProvideToDate",
                         "PleaseProvideFromToOrBoth",
                         "ToMustBeDate",
                         "FromMustPreceedTo",
-                        "ToMustFollowFrom",
                         "OrderNo.",
                         "YourOrderReference",
                         "CustOrderRef.",
@@ -1509,12 +1492,6 @@ namespace wwwDesignersGuild.ViewModels
                         "SomeoneSharedAMoodboardWithYou"
                     });
                     break;
-                case (int)dgFixedPage.tradeClearance:
-                    required.AddRange(new string[] { 
-                        "AreYouSure",
-                        "ChangingFiltersClearsSelection"
-                    });
-                    break;
                 default:
                     break;
             }
@@ -1543,7 +1520,6 @@ namespace wwwDesignersGuild.ViewModels
                     "FormsErrorPostCode",
                     "FormsCountryRequired",
                     "FormsLanguageRequired",
-                    "phoneValidation",
                     "FormsErrorPhone",
                     "FormsErrorCaptchaCompare",
                     "MoodboardSave",
@@ -1707,8 +1683,6 @@ namespace wwwDesignersGuild.ViewModels
         public string DeselectedAttributeNames { get; set; }
         public string OriginalURLKeywords { get; set; }
         public bool MustOverwritePageCanonical { get; set; }
-        public string CurrentAttributeSignature { get; set; }
-        public IEnumerable<FilterIndexAttributeCombination> AttributeCombinations { get; set; }
 
         // This for use by search 
         public ProductPageGridPageSection(
@@ -1860,9 +1834,9 @@ namespace wwwDesignersGuild.ViewModels
             var objDb = new databaseDataContext();
 
             var objAttribute = new cmsAttribute();
-            
+
             var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
-            
+
             // Filter index restrictions fn
             var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction().loadFilterIndexingRestrictionsFromCmsAsync(
                     new PassFilterIndexRestrictionCacheFetch() { Date = model.Date },
@@ -1961,7 +1935,7 @@ namespace wwwDesignersGuild.ViewModels
                 if (result.ProductTypes.Count() == 1)
                 {
                     result.ProductType = result.ProductTypes[0].FormValue;
-
+                    
                     // Filter index restrictions fn
                     var objFilterIndexCombinations = await new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
                             new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date),
@@ -2033,7 +2007,9 @@ namespace wwwDesignersGuild.ViewModels
             var url = HttpContext.Current.Request.Url.ToString();
             
             if (!String.IsNullOrEmpty(originalUrlKeywords))
+            {
                 url = url.Replace(originalUrlKeywords, "");
+            }
 
             var matches = result.UrlParsingRegex.Matches(url);
 
@@ -2072,13 +2048,7 @@ namespace wwwDesignersGuild.ViewModels
 
             attributesList = attributesList.OrderBy(al => al.LexicographicalSortOrder).ToList();
 
-            var attributeSignature = String.Join(".", attributesList.Select(a => $"{a.AttributeID}"));
-
-            result.CurrentAttributeSignature = attributeSignature;
-
             model.AttributeFilterText = String.Join(" ", attributesList.Select(al => al.AttributeName));
-
-            model.AttributeSignatureText = result.AttributeCombinations?.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
 
             if (attributesList.Any())
             {
@@ -2119,13 +2089,13 @@ namespace wwwDesignersGuild.ViewModels
                         attributeSignatureText: model.AttributeSignatureText,
                         useHtml: false);
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"filter-text\">", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("</span> ", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("<span class=\"no-filter-text\">", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("</span> ", "");
 
                     completeResultSet.ForEach(crs => 
                     {
@@ -2137,21 +2107,19 @@ namespace wwwDesignersGuild.ViewModels
                 }
                 else
                 {
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{ProductTypeStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{ProductTypeEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{FilterStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{FilterEnd}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{NoFilterStart}", "");
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Replace("{NoFilterEnd}", "");
 
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Trim();
+                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription.Trim();
                 }
             }
 
             var overallSelection = result.AttributeGroups.Where(ag => ag.Selection.Any())
                 .SelectMany(ag => ag.Selection).Distinct().ToList();
-
-            result.InitialisePager();
 
             var initialProductPageIds = completeResultSet
                 .Where(crs => result.ProductType == null || crs.ProductTypeFormValue == result.ProductType)
@@ -2199,11 +2167,13 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
-            if (detectedAttributeGroups.Any() && detectedAttributeGroups.Count == attributesList.Count)
+            if (detectedAttributeGroups.Count == attributesList.Count)
             {
-                if (result.AttributeCombinations.FirstOrDefault(r => r.AttributeSignature == attributeSignature) == null)
+                var attributeGroupSignature = String.Join(".", attributesList.Select(ag => $"{ag.AttributeGroupID}"));
+
+                if (filterIndexRestrictions.Restrictions.SingleOrDefault(r => r.AttributeGroupSignature == attributeGroupSignature) == null)
                 {
-                     result.MustOverwritePageCanonical = true;
+                    result.MustOverwritePageCanonical = true;
                 }
             }
 
@@ -2214,27 +2184,17 @@ namespace wwwDesignersGuild.ViewModels
 
             result.AttributeGroups.ForEach(ag =>
             {
-                var productPageIdsToConsider = initialProductPageIds;
-
-                attributeProductPageIds.ForEach(appid =>
-                {
-                    if (appid.AttributeGroupID != ag.AttributeGroupID)
-                    {
-                        productPageIdsToConsider = productPageIdsToConsider.Intersect(appid.ProductPageIDs).ToList();
-                    }
-                });
-
                 var productPageIdsAffectingThisAttributeGroup = new List<int>();
 
                 switch (ag.LogicalOperator)
                 {
                     case "AND":
-                        productPageIdsAffectingThisAttributeGroup = productPageIdsToConsider.Intersect(
+                        productPageIdsAffectingThisAttributeGroup = initialProductPageIds.Intersect(
                             attributeProductPageIds.SelectMany(appid => appid.ProductPageIDs)
                         ).ToList();
                         break;
                     case "OR":
-                        productPageIdsAffectingThisAttributeGroup = productPageIdsToConsider.Intersect(
+                        productPageIdsAffectingThisAttributeGroup = initialProductPageIds.Intersect(
                             attributeProductPageIds.Where(appid => appid.AttributeGroupID != ag.AttributeGroupID)
                                                    .SelectMany(appid => appid.ProductPageIDs)
                         ).ToList();
@@ -2243,11 +2203,6 @@ namespace wwwDesignersGuild.ViewModels
 
                 ag.Attributes.ForEach(a =>
                 {
-                    if (a.FormValue == "orange")
-                    {
-                        int f = 0;
-                    }
-
                     if (productPageIdsAffectingThisAttributeGroup.Any())
                     {
                         a.AvailableProductPageIDs = a.ProductPageIDs.Intersect(productPageIdsAffectingThisAttributeGroup).ToList();
@@ -2276,9 +2231,9 @@ namespace wwwDesignersGuild.ViewModels
                 result.DeselectedAttributeNames = String.Join(", ", problemAttributes.Select(pa => pa.Name));
 
                 result.FilteredIDs = completeResultSet.Select(p => p.ProductPageID).ToList();
-
-                model.AttributeSignatureText = null;
             }
+
+            result.InitialisePager();
 
             #region Perform Sorting
 
@@ -2293,8 +2248,6 @@ namespace wwwDesignersGuild.ViewModels
                 result.TakeCount = result.Contents.Count();
             else
                 result.TakeCount = result.PageSize;
-
-            result.InitialisePager();
 
             return result;
         }
@@ -2371,13 +2324,8 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
-        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
+        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions)
         {
-            if (attribute.FormValue == "blue")
-            {
-                int f = 0;
-            }
-
             // if FilterIndexing is enabled on this grid's containing page
             if (FilterIndexingEnabled && attribute.EnableFilterIndexing)
             {
@@ -2486,29 +2434,20 @@ namespace wwwDesignersGuild.ViewModels
                                     url = url.Substring(0, url.IndexOf("?"));
                                 }
 
-                                if (attributeCombinations.SingleOrDefault(ac =>
-                                    ac.AttributeSignature == (
-                                        String.IsNullOrEmpty(currentAttributeSignature)
-                                            ? $"{attribute.AttributeID}"
-                                            : String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
-                                {
-                                    return null;
-                                }
-
                                 return url;
                             }
                             else
                             {
-                                return "#";
+                                return null;
                             }
                         }
                     }
                 }
 
-                return "#";
+                return null;
             }
 
-            return "#";
+            return null;
         }
     }
 

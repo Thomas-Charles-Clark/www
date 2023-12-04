@@ -70,7 +70,7 @@ namespace wwwDesignersGuild.ViewModels
                 });
             }
 
-            PrefetchedResources = resourcesResult;
+            PrefetchedResources.AddRange(resourcesResult);
 
             await base.Initialise();
         }

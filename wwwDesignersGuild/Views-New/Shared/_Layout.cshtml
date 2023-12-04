@@ -326,7 +326,7 @@
     @RenderSection("DownloaderScripts", required: false)
     @RenderSection("DownloaderStyles", required: false)
 
-    @Html.JsonLD("Base", null, null)
+    @Html.Raw(Html.JsonLD("Base", null, null))
 
     @* This is for Pingdom *@
     <!-- stillAlive -->
@@ -345,8 +345,18 @@
             }
         </style>
     }
+
+    <link rel="apple-touch-icon" href="~/content/images/icon/apple-touch-icon/dg-icon-32.png">
+    <link rel="apple-touch-icon" sizes="64x64" href="~/content/images/icon/apple-touch-icon/dg-icon-64.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="~/content/images/icon/apple-touch-icon/dg-icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="~/content/images/icon/apple-touch-icon/dg-icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="~/content/images/icon/apple-touch-icon/dg-icon-512.png">
+    <link rel="apple-touch-startup-image" href="~/content/images/icon/apple-touch-icon/dg-icon-512.png">
+
 </head>
     <body>
+        @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
+        @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
         <div id="body-content">
            @if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
             {
@@ -455,8 +465,6 @@
                 </footer>
             }
         </div>
-        @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
-        @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
         @Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
        @if (true)
         {

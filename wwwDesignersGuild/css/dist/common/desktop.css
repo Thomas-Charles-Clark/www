@@ -73,7 +73,7 @@ body {
 html,
 body {
   min-width: 998px;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 h1 {
@@ -118,9 +118,6 @@ a:hover {
 
 #site-selector-background {
   height: 100%;
-  background-image: -webkit-image-set(url("/images/site-selector-background/desktop/2048x1536.jpg?v=SS23") 1x, url("/images/site-selector-background/desktop/4096x3072.jpg?v=SS23") 2x);
-  background-image: image-set(url("/images/site-selector-background/desktop/2048x1536.jpg?v=SS23") 1x, url("/images/site-selector-background/desktop/4096x3072.jpg?v=SS23") 2x);
-  /*background-image: image-set(url("/images/site-selector-background/desktop/512x384.jpg") 1x, url("/images/site-selector-background/desktop/1024x768.jpg") 2x, url("/images/site-selector-background/desktop/2048x1536.jpg") 3x, url("/images/site-selector-background/desktop/4096x3072.jpg") 4x);*/
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

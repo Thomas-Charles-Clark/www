@@ -14,6 +14,7 @@ using wwwDesignersGuild.Models.Helper;
 using Braintree;
 using AmazonPay;
 using wwwDesignersGuild.Models.Checkout;
+using Dapper;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -138,6 +139,17 @@ namespace wwwDesignersGuild.Models.Database
 
     public class checkoutDb
     {
+        public checkoutDeliveryAddress SelectDeliveryAddress(long checkoutId, byte languageId)
+        {
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                return conn.QuerySingle<checkoutDeliveryAddress>("pub.CheckoutAddress_Select", new { 
+                    CheckoutID = checkoutId,
+                    LanguageID = languageId
+                }, null, 10, CommandType.StoredProcedure);
+            }
+        }
+
         public int saveLineTreatments(PassLineTreatment objSave)
         {
             var result = -1;
@@ -788,7 +800,7 @@ namespace wwwDesignersGuild.Models.Database
             }
         }
 
-        public Boolean saveCheckoutAddress(Int64 checkoutId, List<passCheckoutSaveAddressData> CheckoutAddressTableType, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> UPSIDAddressTableType, bool isClickCollect)
+        public Boolean saveCheckoutAddress(Int64 checkoutId, List<passCheckoutSaveAddressData> CheckoutAddressTableType, Int64? UPSAPMemberAddressId, List<passCheckoutSaveAddressData> UPSIDAddressTableType, bool isClickCollect, bool resetDeliveryOptions)
         {
             saveCheckoutAddressCollection addressTable = new saveCheckoutAddressCollection();
             addressTable.Add(CheckoutAddressTableType[0]);
@@ -829,6 +841,7 @@ namespace wwwDesignersGuild.Models.Database
 
                 cmd.Parameters.AddWithValue("@UPSAPMemberAddressID", UPSAPMemberAddressId);
                 cmd.Parameters.AddWithValue("@IsClickCollect", isClickCollect);
+                cmd.Parameters.AddWithValue("@ResetDeliveryOptions", resetDeliveryOptions);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -1015,7 +1028,14 @@ namespace wwwDesignersGuild.Models.Database
             return true;
         }
 
-        public Boolean checkoutPaymentTaken(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null)
+        public Boolean checkoutPaymentTaken(
+            long checkoutId, 
+            string paymentRef, 
+            string paymentType, 
+            string paymentDetails, 
+            List<MarketingPermission> marketingPermissions,
+            string orderReference = null,
+            string email = null)
         {
             var result = false;
 
@@ -1033,6 +1053,7 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@PaymentType", paymentType);
                 cmd.Parameters.AddWithValue("@PaymentDetails", paymentDetails);
                 cmd.Parameters.AddWithValue("@OrderReference", orderReference);
+                cmd.Parameters.AddWithValue("@Email", email);
 
                 var marketingPermission = cmd.CreateParameter();
 
@@ -1364,14 +1385,17 @@ namespace wwwDesignersGuild.Models.Database
     {
 
         [Function(Name = "pub.CheckoutType_Select")]
-        [ResultTypeAttribute(typeof(checkoutType))]
+        [ResultTypeAttribute(typeof(CheckoutType))]
         public IMultipleResults CheckoutType_Select([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryID", DbType = "SmallInt")] System.Nullable<short> countryID,
                                                             [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] System.Nullable<byte> languageID,
                                                             [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Date", DbType = "Date")] System.Nullable<DateTime> date,
-                                                            [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Mobile", DbType = "Bit")] System.Nullable<bool> mobile)
+                                                            [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Mobile", DbType = "Bit")] System.Nullable<bool> mobile,
+                                                            [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "VisitorID", DbType = "BigInt")] System.Nullable<long> visitorId,
+                                                            [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "MemberID", DbType = "Int")] System.Nullable<int> memberId,
+                                                            [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "TradeAccountID", DbType = "Int")] System.Nullable<int> tradeAccountId)
         {
 
-            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), countryID, languageID, date, mobile);
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), countryID, languageID, date, mobile, visitorId, memberId, tradeAccountId);
             return (IMultipleResults)result.ReturnValue;
         }        
 
@@ -1498,6 +1522,7 @@ namespace wwwDesignersGuild.Models.Database
         //[ResultTypeAttribute(typeof(checkoutDispatchStockStatus))]
         [ResultTypeAttribute(typeof(checkoutDispatchPartShipPrice))]
         [ResultTypeAttribute(typeof(checkoutDispatchNotice))]
+        [ResultTypeAttribute(typeof(checkoutDispatchAppleDeliveryOption))]
         public IMultipleResults DispatchOptions_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CheckoutID", DbType = "BigInt")] System.Nullable<Int64> checkoutId)
         {
 

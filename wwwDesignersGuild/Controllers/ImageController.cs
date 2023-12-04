@@ -45,10 +45,10 @@ namespace wwwDesignersGuild.Controllers
 
         [AccessControlAllowOrigin("*")]
         [OutputCache(Duration = 31536000, Location = System.Web.UI.OutputCacheLocation.Downstream)] // Cached for 1 year
-        public ImageResult CallSiteSelectorImageNonWebP(string width, string imageid)
+        public ImageResult CallSiteSelectorImageNonWebP(string platform, string size)
         {
-            return new ImageResult(width,
-                                   imageid,
+            return new ImageResult(platform,
+                                   size,
                                    System.Web.Configuration.WebConfigurationManager.AppSettings["siteSelectorBackgroundImagePath"],
                                    Convert.ToInt16(System.Web.Configuration.WebConfigurationManager.AppSettings["keepCacheInMinutes"]),
                                    false);

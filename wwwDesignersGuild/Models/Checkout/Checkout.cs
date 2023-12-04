@@ -9,7 +9,7 @@ using wwwDesignersGuild.Models.Helper;
 
 namespace wwwDesignersGuild.Models.Checkout
 {
-    public class checkoutType
+    public class CheckoutType
     {
         public byte CheckoutTypeId { get; set; }
         public string Name { get; set; }
@@ -40,14 +40,18 @@ namespace wwwDesignersGuild.Models.Checkout
         public masterDefinition masterDefinition { get; set; }
         public string USCounty { get; set; }
         public bool isClickCollect { get; set; }
+        public bool secondSave { get; set; }
     }
 
     public class webapiCheckoutSalesTaxZipCode
     {
         public Int64? MemberAddressID { get; set; }
-        public String Postcode { get; set; }
-        public String Country { get; set; }
-        public String BasketCountry { get; set; }
+        public string Postcode { get; set; }
+        public string Town { get; set; }
+        public string County { get; set; }
+        public string USCounty { get; set; }
+        public string Country { get; set; }
+        public string BasketCountry { get; set; }
     }
 
     public class webapiGuestCheckoutSalesTaxZipCode
@@ -67,6 +71,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public List<StockStatusSelect> checkoutDispatchStockStatuses { get; set; }
         public List<checkoutDispatchPartShipPrice> checkoutDispatchPartShipPrices { get; set; }
         public checkoutDispatchNotice checkoutDispatchNotice { get; set; }
+        public List<checkoutDispatchAppleDeliveryOption> checkoutDispatchAppleDeliveryOptions { get; set; }
     }
 
 
@@ -156,7 +161,7 @@ namespace wwwDesignersGuild.Models.Checkout
                     return BasketName;
                 }
 
-                return String.Format("{0} - {1}", BasketName, Size);
+                return string.Format("{0} - {1}", BasketName, Size);
             }
             set
             {
@@ -168,7 +173,7 @@ namespace wwwDesignersGuild.Models.Checkout
         {
             get
             {
-                return JsonConvert.DeserializeObject(String.IsNullOrEmpty(stockMessage) ? "{}" : stockMessage);
+                return JsonConvert.DeserializeObject(string.IsNullOrEmpty(stockMessage) ? "{}" : stockMessage);
             }
             set
             {
@@ -254,6 +259,82 @@ namespace wwwDesignersGuild.Models.Checkout
         }
     }
 
+
+    public class checkoutDispatchAppleDeliveryOption
+    {
+        public byte? DispatchID { get; set; }
+        public short DeliveryBandID { get; set; }
+        public string DispatchName { get; set; }
+        public string DisplayName { get; set; }
+        public byte CourierID { get; set; }
+        public decimal? PriceInc { get; set; }
+        public bool PerItem { get; set; }
+        public long? SortOrder { get; set; }
+        public bool DisplayPartShipOption { get; set; }
+        public DateTime MinDeliveryEstimate { get; set; }
+        public DateTime MaxDeliveryEstimate { get; set; }
+        public DateTime? MinDeliveryEstimateWithPartShip { get; set; }
+
+        public string MinDeliveryEstimateDisplay
+        {
+            get
+            {
+                return MinDeliveryEstimate.ToString("dddd dd MMMM yyyy");
+            }
+            set
+            {
+
+            }
+        }
+
+        public string MaxDeliveryEstimateDisplay
+        {
+            get
+            {
+                return MaxDeliveryEstimate.ToString("dddd dd MMMM yyyy");
+            }
+            set
+            {
+
+            }
+        }
+
+        public string MinDeliveryEstimateWithPartShipDisplay
+        {
+            get
+            {
+                return MinDeliveryEstimateWithPartShip?.ToString("dddd dd MMMM yyyy");
+            }
+            set
+            {
+
+            }
+        }
+
+        public string MinDeliveryDate
+        {
+            get
+            {
+                return MinDeliveryEstimate.ToString("yyyy MM dd");
+            }
+            set
+            {
+
+            }
+        }
+
+        public string MaxDeliveryDate
+        {
+            get
+            {
+                return MaxDeliveryEstimate.ToString("yyyy MM dd");
+            }
+            set
+            {
+
+            }
+        }
+    }
 
     public class checkoutDispatchDeliverySelection
     {
@@ -349,12 +430,12 @@ namespace wwwDesignersGuild.Models.Checkout
 
     public class checkoutPayPalCurrency
     {
-        public String PayPalCurrency { get; set; }
-        public String PayPalAPIUsername { get; set; }
-        public String PayPalAPIPassword { get; set; }
-        public String PayPalAPISignature { get; set; }
-        public String PayPalAPIURL { get; set; }
-        public String PayPaliFrameURL { get; set; }
+        public string PayPalCurrency { get; set; }
+        public string PayPalAPIUsername { get; set; }
+        public string PayPalAPIPassword { get; set; }
+        public string PayPalAPISignature { get; set; }
+        public string PayPalAPIURL { get; set; }
+        public string PayPaliFrameURL { get; set; }
     }
 
     public class MerchantInfoSelectResult
@@ -940,6 +1021,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public string basketCountry { get; set; }
         public string payment_method_nonce { get; set; }
         public bool make_default { get; set; }
+        public string email { get; set; }
 
         public masterDefinition masterDefinition { get; set; }
         public List<MarketingPermission> marketingPermissions { get; set; }

@@ -169,7 +169,7 @@
                     @displayItemTotal
                 </span>
             </div>
-           @if ((bool)Session["checkoutDisplayGiftTab"] == true)
+            @if ((bool)Session["checkoutDisplayGiftTab"] == true)
             {
                 <div class="total-detail">
                     <label>
@@ -180,9 +180,9 @@
                     </span>
                 </div>
             }
-           @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+            @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
             {
-                
+
             }
             else
             {
@@ -195,7 +195,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalPromotionDiscount == 0) { }
             else
             {
                 <div class="total-detail">
@@ -207,7 +207,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalVATExemption == 0) { }
             else
             {
                 <div class="total-detail">
@@ -219,7 +219,7 @@
                     </span>
                 </div>
             }
-           @if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
+            @if (objSummary.checkoutTotals[0].TotalUSSalesTax == 0) { }
             else
             {
                 <div class="total-detail">
@@ -231,7 +231,7 @@
                     </span>
                 </div>
             }
-            @{ 
+            @{
                 var grandTotalClass = "total";
 
                 if (hasVouchers)
@@ -248,7 +248,7 @@
                     @displayGrandTotal
                 </span>
             </div>
-           @if (hasVouchers)
+            @if (hasVouchers)
             {
                 <div class="total-detail">
                     <label>
@@ -268,7 +268,7 @@
                     </span>
                 </div>
             }
-           @if (Model.checkoutType == dgCheckoutType.Trade)
+            @if (Model.checkoutType == dgCheckoutType.Trade)
             {
                 <div class="trade-detail">
                     <span>
@@ -324,7 +324,19 @@
 <div id="order-review-phase" style="display: none;"></div>
 
 <script type="text/javascript">
-    if (typeof viewModel != 'undefined') {
+    if (typeof viewModel != 'undefined' && viewModel.hasOwnProperty('balanceNumber')) {
         viewModel.balanceNumber(@(toPay.ToString("F", nfi)));
+    }
+    function getShippingNumber() {
+        return Number('@(objSummary.checkoutTotals[0].TotalPandP?.ToString("N2", nfi) ?? "0")')
+    }
+    function getTaxNumber() {
+        return Number('@((objSummary.checkoutTotals[0].TotalTax ?? objSummary.checkoutTotals[0].TotalUSSalesTax)?.ToString("N2", nfi) ?? "0")')
+    }
+    function getItemSubTotalNumber() {
+        return Number('@(objSummary.checkoutTotals[0].TotalItems?.ToString("N2", nfi) ?? "0")')
+    }
+    function getBalanceNumber() {
+        return Number('@objSummary.checkoutTotals[0].TotalBalance.ToString("N2", nfi)')
     }
 </script>

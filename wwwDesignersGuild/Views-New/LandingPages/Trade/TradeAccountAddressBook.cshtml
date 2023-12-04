@@ -29,37 +29,12 @@
 }
 else
 {
-    <script type="text/javascript">
-        function getResource(resourceKey) {
-            var resourceText = '';
-
-            switch (resourceKey) {
-                case 'majorError':
-                    resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("MajorError", l, c, d))';
-                    break;
-            }
-
-            return resourceText;
-        }
-
-        function getInvoiceAddress() {
-            return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
-        }
-
-        @*function getDefaultDeliveryReference() {
-            return '@(Model.DefaultDeliveryReference)'
-        }*@
-    </script>
-
     @Render.StylesPreload("~/bundles/css/trade")
-
     if (dgFramework.IsMobileDevice())
     {
         @Render.StylesPreload("~/bundles/css/trade-mobile")
     }
-
     @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
-
     <div class="mb-8"
          data-bind="stopBinding">
         <div id="trade-account-contact-details">
@@ -108,7 +83,7 @@ else
                 <div data-bind="component: { name: 'mdc-address-search-component', params: invoiceAddressSearch }"></div>
             </div>
             <!-- /ko -->
-            <div id="account-contact-details" class="mt-5">
+            <div>
                 <div class="d-flex align-items-center mb-3">
                     <h3 class="mb-0 me-3">
                         @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
@@ -118,33 +93,33 @@ else
                     </button>
                 </div>
                 <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
-                <h4 id="no-addresses" style="display: none;" data-bind="visible: addressSearch.addressLookup.haveSearched() && addressSearch.addressLookup.searchResultsList().length === 0">
-                    @HtmlHelperExtra.Resource("NoAddressesFound", l, c, d)
-                </h4>
             </div>
-            @*<div>
-                    <div class="d-flex align-items-center mb-3">
-                        <h3 class="mb-0 me-3">
-                            @HtmlHelperExtra.Resource("ManageAccountTradeDeliveryAddresses", l, c, d)
-                        </h3>
-                        <button type="button" class="btn btn-outline-secondary" data-bind="click: function () { addressSearch.showEditModal(true); }">
-                            @HtmlHelperExtra.Resource("ManageAccountTradeAddDeliveryAddress", l, c, d)
-                        </button>
-                    </div>
-                    <div data-bind="component: { name: 'mdc-address-search-component', params: addressSearch }"></div>
-                </div>*@
-            <!-- ko if: ready(true) --><!-- /ko -->
         </div>
     </div>
 
     <script type="text/javascript">
-    window.getDefaultDeliveryAddress = () => {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.DefaultMemberAddress));
-    }
-    window.getDefaultMemberAddressId = () => {
-        return @(Model.DefaultMemberAddress?.MemberAddressID);
-    }
-    </script>
 
+        function getResource(resourceKey) {
+            var resourceText = '';
+
+            switch (resourceKey) {
+                case 'majorError':
+                    resourceText = '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("MajorError", l, c, d))';
+                    break;
+            }
+
+            return resourceText;
+        }
+
+        function getInvoiceAddress() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
+        }
+
+        function getDefaultDeliveryReference() {
+            return '@(Model.DefaultDeliveryReference)'
+        }
+
+    </script>
+    @Render.Script("/js/dist/lib/intl-tel-input/dist/intl-tel-input-jquery.min.js")
     @Render.Script("~/bundles/js/trade-address-management")
 }
