@@ -1544,6 +1544,7 @@ textarea.form-control-lg {
   border-radius: 0;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   appearance: none;
+  -webkit-appearance: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .form-select {

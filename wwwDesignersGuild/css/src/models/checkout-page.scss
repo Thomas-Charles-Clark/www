@@ -59,6 +59,7 @@ body {
 
     #checkout-option-paypal {
         border-color: $blue-600;
+
         #paypal-button {
             display: flex;
         }
@@ -70,6 +71,7 @@ body {
         #amazon-button {
             height: 54px;
             overflow: hidden;
+
             img {
                 margin-inline-end: 0;
                 width: 340px;
@@ -90,8 +92,61 @@ body {
         }
     }
 
+    #checkout-option-apple {
+        border-color: $black;
+
+        img {
+            width: 84px;
+            height: 54px;
+        }
+
+        apple-pay-button {
+            --apple-pay-button-width: 340px;
+            --apple-pay-button-height: 50px;
+            --apple-pay-border-radius: $border-radius;
+            --apple-pay-button-padding: 0 0;
+            --apple-pay-box-sizing: border-box;
+
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                opacity: 0.65;
+            }
+        }
+    }
+
     .checkout-option + .checkout-option {
         margin-top: $xl-gutter;
+    }
+
+    #checkout-option-alert-message {
+        padding: 0;
+
+        .alert {
+            margin: 0;
+            border: 0;
+            padding: $mxl-gutter $xl-gutter;
+            display: block;
+            flex: 1;
+        }
+    }
+}
+
+#apple-pay-button-wrapper {
+    padding: 0 $l-gutter;
+
+    apple-pay-button {
+        --apple-pay-button-width: 100%;
+        --apple-pay-button-height: 34px;
+        --apple-pay-border-radius: $border-radius;
+        --apple-pay-button-padding: 0 0;
+        --apple-pay-box-sizing: border-box;
+
+        &.disabled {
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.65;
+        }
     }
 }
 
@@ -423,7 +478,18 @@ body {
     }
 }
 
+#totals-wrapper {
+    display: none;
+}
+
 #despatch-items-wrapper {
+    position: relative;
+
+    .page-blocker {
+        /* Necessary here because Apple Pay brings this forward to CheckoutLogin, which doesn't use a #checkout-wrapper div */
+        position: absolute;
+    }
+
     > div:not(.modal) {
         min-height: 250px;
         position: relative;
@@ -738,7 +804,6 @@ body {
 }
 
 ul.address-autocomplete {
-    z-index: 50;
     cursor: pointer;
     display: inline-block;
     padding: 0;
@@ -750,7 +815,9 @@ ul.address-autocomplete {
     min-width: 320px;
 
     li.ui-menu-item {
+
         div.ui-menu-item-wrapper {
+            background: $white;
             font-weight: $font-weight-base;
             color: $gray-dg-body;
             padding: $input-padding-y $input-padding-x;
@@ -921,10 +988,12 @@ ul.address-autocomplete {
 
     .modal-body {
         min-height: 240px;
+        position: relative;
     }
 
     .page-blocker {
         opacity: 1.0;
+        position: absolute;
     }
 
     .page-blocker.success {

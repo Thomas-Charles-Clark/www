@@ -8,11 +8,13 @@ const
     sass = require('gulp-sass')(require('sass')),
     htmlmin = require('gulp-htmlmin'),
     filter = require('gulp-filter'),
+    flatmap = require('gulp-flatmap'),
     terser = require('gulp-terser'),
     sourcemaps = require('gulp-sourcemaps'),
     merge = require('merge-stream'),
     babel = require('gulp-babel'),
     del = require('del'),
+    debug = require('gulp-debug'),
     postcss = require('gulp-postcss'),
     rename = require('gulp-rename'),
     flexGapPolyfill = require('flex-gap-polyfill'),
@@ -128,6 +130,7 @@ function compilesass() {
 function wildcardscss() {
     var tasks = gulp
         .src('css/src/**/*.scss', { since: gulp.lastRun(wildcardscss) })
+        .pipe(debug({ title: 'wildcardscss:' }))
         .pipe(sourcemaps.mapSources(function (sourcePath, file) {
             return '/css/dist/' + sourcePath
         }))
@@ -148,10 +151,28 @@ function wildcardscss() {
     return merge(tasks);
 }
 
+function handleBabelError(error) {
+    console.error(error.toString());
+    this.emit('end');
+}
+
 function wildcardjs() {
     var tasks = gulp
         .src('js/src/**/!(*.min).js', { since: gulp.lastRun(wildcardjs) })
+        .pipe(debug({ title: 'wildcardjs:' }))
         .pipe(sourcemaps.init())
+        .pipe(flatmap((stream, file) => {
+            console.log(file.path);
+            if (file.path.indexOf('models') > -1) {
+                console.log('running babel');
+                return stream.pipe(babel({
+                    presets: ['@babel/preset-env']
+                }))
+            } else {
+                return stream;
+            }
+        }))
+        .on('error', handleBabelError)
         .pipe(terser())
         .pipe(rename({ suffix: '.min' }))
         .pipe(sourcemaps.write(''))
@@ -163,6 +184,7 @@ function wildcardjs() {
 function wildcardfonts() {
     var tasks = gulp
         .src('css/src/**/*.{woff,woff2,ttf}', { since: gulp.lastRun(wildcardfonts) })
+        .pipe(debug({ title: 'wildcardfonts:' }))
         .pipe(gulp.dest('css/dist'));
 
     return merge(tasks);
@@ -171,6 +193,7 @@ function wildcardfonts() {
 function compilerollup() {
     var tasks = getBundlesByInputFileNames(regex.rollup).map((bundle) => {
         return gulp.src(bundle.inputFiles, { since: gulp.lastRun(gulprollup), base: '.' })
+            .pipe(debug({ title: 'compilerollup:' }))
             .pipe(gulprollup({
                 rollup: rollup,
                 plugins: [rollupNodeResolve()]
