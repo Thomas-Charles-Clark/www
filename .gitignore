@@ -369,3 +369,24 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /wwwDesignersGuild/ExcelSpreadsheets
+/wwwDesignersGuild/js/dist/models/stockists/stockists.min.js
+/wwwDesignersGuild/js/dist/models/product-page/coverage-calculator.min.js
+/wwwDesignersGuild/js/dist/models/product-page/product-page.min.js
+/wwwDesignersGuild/js/dist/models/member/member-address-management.min.js
+/wwwDesignersGuild/js/dist/models/member/member-login-details.min.js
+/wwwDesignersGuild/js/dist/models/member/member-moodboards.min.js
+/wwwDesignersGuild/js/dist/models/member/member-order-history.min.js
+/wwwDesignersGuild/js/dist/models/member/member-order-history.min.js.map
+/wwwDesignersGuild/js/dist/models/member/member-password-reset.min.js
+/wwwDesignersGuild/js/dist/models/member/member-unsubscribe.min.js
+/wwwDesignersGuild/js/dist/models/login-page/login-page.min.js
+/wwwDesignersGuild/js/dist/models/login-page/zxcvbn.min.js
+/wwwDesignersGuild/js/dist/models/collection/collection-page.min.js
+/wwwDesignersGuild/js/dist/models/checkout/checkout-apple.min.js
+/wwwDesignersGuild/js/dist/models/checkout/checkout-login.min.js
+/wwwDesignersGuild/js/dist/models/checkout/checkout-single-page.min.js
+/wwwDesignersGuild/js/dist/models/checkout/checkout-single-page.min.js.map
+/wwwDesignersGuild/js/dist/models/basket-page/basket-item.min.js
+/wwwDesignersGuild/js/dist/models/basket-page/basket-page.min.js
+/wwwDesignersGuild/js/dist/models/article-page/article-page.min.js
+/wwwDesignersGuild/js/dist/lib/knockout/custom/knockout-extensions.min.js
