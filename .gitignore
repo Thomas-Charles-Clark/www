@@ -390,3 +390,7 @@ FodyWeavers.xsd
 /wwwDesignersGuild/js/dist/models/basket-page/basket-page.min.js
 /wwwDesignersGuild/js/dist/models/article-page/article-page.min.js
 /wwwDesignersGuild/js/dist/lib/knockout/custom/knockout-extensions.min.js
+/wwwDesignersGuild/css/dist/common/desktop.css
+/wwwDesignersGuild/css/dist/common/desktop.min.css
+/wwwDesignersGuild/css/dist/common/mobile.css
+/wwwDesignersGuild/css/dist/common/mobile.min.css
