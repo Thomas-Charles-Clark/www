@@ -38,6 +38,7 @@
             case dgCheckoutType.Member:
             case dgCheckoutType.Guest:
             case dgCheckoutType.Paypal:
+            case dgCheckoutType.Apple:
             case dgCheckoutType.Trade:
                 @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressMemberComponent.cshtml", Model)
                 break;
@@ -57,7 +58,7 @@
 </div>
 
 @if(Model.checkoutMethod == dgCheckoutType.Amazon)
-{
+            {
     <div class="checkout-error-box" style="display:none;">
         <span class="checkout-error-symbol">!</span>
         <p class="error-message checkout-error-content"></p>

@@ -285,6 +285,9 @@ namespace wwwDesignersGuild.Controllers
                     case dgCheckoutType.Amazon:
                         isValid = !(String.IsNullOrEmpty(objCheckoutType.guestEmail) || String.IsNullOrEmpty(objCheckoutType.token));
                         break;
+                    case dgCheckoutType.Apple:
+                        isValid = true;
+                        break;
                 }
 
                 if (!isValid)
@@ -353,6 +356,10 @@ namespace wwwDesignersGuild.Controllers
                         };
 
                         await objCheckout.checkoutAddressSave(checkoutId, new List<passCheckoutSaveAddressData> { address }, null, null, false);
+                        break;
+                    case dgCheckoutType.Apple:
+                        // We don't yet have the actual email address from Apple.
+                        email = $"{Guid.NewGuid()}@apple-pay-temporary-email.com";
                         break;
                 }
 
@@ -445,7 +452,7 @@ namespace wwwDesignersGuild.Controllers
                 {
                     return new 
                     { 
-                        redirect = dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, objCountryItem)
+                        redirect = dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.checkoutProblem, objCountryItem)
                     };
                 }
             }
@@ -764,6 +771,25 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [System.Web.Http.HttpPost]
+        public async Task<IHttpActionResult> selectCheckoutAddress(byte languageId)
+        {
+            var session = HttpContext.Current.Session;
+
+            if (dgFramework.doesUserHaveACheckoutId(session["checkoutId"]) == false)
+            {
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutNoBasket);
+            }
+            else if (dgFramework.isCheckoutSessionValid(session["checkoutExpiry"]) == false)
+            {
+                return Ok(dgFramework.raiseErrorToHandle(webapiDataError.checkoutBasketExpired));
+            }
+
+            var checkoutId = Convert.ToInt64(session["checkoutId"].ToString());
+
+            return Ok(new checkoutDb().checkoutAddressSelect(checkoutId, languageId));
+        }
+
+        [System.Web.Http.HttpPost]
         public async Task<IHttpActionResult> saveCheckoutAddress(webapiCheckoutSaveAddress objDeliveryAddress)
         {
             var session = HttpContext.Current.Session;
@@ -862,11 +888,11 @@ namespace wwwDesignersGuild.Controllers
 
             var objDeliverableCountries = await objCountry.countrySelectList(objCountryItem.CountryID, objCountryItem.LanguageID);
             
-            var deliveryCountry = objDeliverableCountries.countries.Where(c => c.Code == objDeliveryAddress.CountryCode).SingleOrDefault();
+            var deliveryCountry = objDeliverableCountries.countries.Where(c => c.Code == objDeliveryAddress.CountryCode?.ToUpperInvariant()).SingleOrDefault();
 
             if (deliveryCountry == null)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
+                return Ok(new { state = "FAIL", message = "invalidCountry" });
             }
 
             var raiseInvalidParameters = false;
@@ -1016,13 +1042,13 @@ namespace wwwDesignersGuild.Controllers
                 }
                 else
 
-                    if (salesTaxAddressesToSelectFrom.Count == 0)
+                if (salesTaxAddressesToSelectFrom.Count == 0)
                 {
                     return Ok(dgFramework.raiseErrorToHandle(webapiDataError.zipTaxServiceFailed));
                 }
                 else
                 {
-                    return Ok(new { state = "selectSalesTaxAddress", salesTaxAddressList = salesTaxAddressesToSelectFrom });
+                    return Ok(new { isSalesTaxKnown = false, state = "selectSalesTaxAddress", salesTaxAddressList = salesTaxAddressesToSelectFrom });
                 }
             }
 
@@ -1086,7 +1112,8 @@ namespace wwwDesignersGuild.Controllers
                 new List<passCheckoutSaveAddressData> { address }, 
                 objDeliveryAddress.UPSAPMemberAddressId,
                 upsIdAddressList,
-                objDeliveryAddress.isClickCollect);
+                objDeliveryAddress.isClickCollect,
+                resetDeliveryOptions: objDeliveryAddress.secondSave == true ? false : true);
 
             if (success == false)
             {
@@ -1208,6 +1235,28 @@ namespace wwwDesignersGuild.Controllers
                                                     System.Web.Configuration.WebConfigurationManager.AppSettings["zipTaxKey"],
                                                     Uri.EscapeDataString(postCode));
 
+            if (objDeliveryAddress.County != null && objDeliveryAddress.Town != null)
+            {
+                // don't know why ZipTaxCounty isn't used... probably because Town is sufficiently specific
+                zipTaxApiUrl = String.Format("{0}?key={1}&postalcode={2}&state={3}&city={4}&format=XML",
+                                                WebConfigurationManager.AppSettings["zipTaxUrl"],
+                                                WebConfigurationManager.AppSettings["zipTaxKey"],
+                                                Uri.EscapeDataString(postCode),
+                                                Uri.EscapeDataString(objDeliveryAddress.County), // State != County
+                                                Uri.EscapeDataString(objDeliveryAddress.Town));
+
+                if (objDeliveryAddress.USCounty != null)
+                {
+                    // don't know why ZipTaxCounty isn't used... probably because Town is sufficiently specific
+                    zipTaxApiUrl = String.Format("{0}?key={1}&postalcode={2}&state={3}&city={4}&county={5}&format=XML",
+                                                    WebConfigurationManager.AppSettings["zipTaxUrl"],
+                                                    WebConfigurationManager.AppSettings["zipTaxKey"],
+                                                    Uri.EscapeDataString(postCode),
+                                                    Uri.EscapeDataString(objDeliveryAddress.County), // State != County
+                                                    Uri.EscapeDataString(objDeliveryAddress.Town),
+                                                    Uri.EscapeDataString(objDeliveryAddress.USCounty)); // USCounty == County
+                }
+            }
             try
             {
                 XDocument xmlResponse = XDocument.Load(zipTaxApiUrl);
@@ -2217,6 +2266,10 @@ namespace wwwDesignersGuild.Controllers
                         objCheckoutSubmission.payment_method_nonce = (string)Session["paypal_nonce_" + checkoutId.ToString()];
                     }
                 }
+                else if (checkoutType == dgCheckoutType.Apple) 
+                { 
+                    // must remember to save email
+                }
 
                 if (objCheckoutSubmission.masterDefinition == null)
                 {
@@ -2449,7 +2502,26 @@ namespace wwwDesignersGuild.Controllers
 
                                 try
                                 {
-                                    var paymentTakenStored = await objCheckout.checkoutPaymentTaken(checkoutId, transaction.Id == null ? nullIdMessage : result.Target.Id, paymentType.payWithBraintree.ToString(), XmlResult(result), objCheckoutSubmission.marketingPermissions);
+                                    if (checkoutType != dgCheckoutType.Apple)
+                                    {
+                                        var paymentTakenStored = await objCheckout.checkoutPaymentTaken(
+                                            checkoutId,
+                                            transaction.Id == null ? nullIdMessage : result.Target.Id,
+                                            paymentType.payWithBraintree.ToString(),
+                                            XmlResult(result),
+                                            objCheckoutSubmission.marketingPermissions);
+                                    }
+                                    else
+                                    {
+                                        var paymentTakenStored = await objCheckout.checkoutPaymentTaken(
+                                            checkoutId,
+                                            transaction.Id == null ? nullIdMessage : result.Target.Id,
+                                            paymentType.applePay.ToString(),
+                                            XmlResult(result),
+                                            objCheckoutSubmission.marketingPermissions,
+                                            null,
+                                            objCheckoutSubmission.email);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
@@ -3431,7 +3503,21 @@ namespace wwwDesignersGuild.Controllers
                 dgCheckoutActionId.logInvalidAddress,
                 dgCheckoutActionId.logValidationError,
                 dgCheckoutActionId.logBraintreeBuyNowClick,
-                dgCheckoutActionId.logBraintreeBuyClientSideStep
+                dgCheckoutActionId.logBraintreeBuyClientSideStep,
+                dgCheckoutActionId.logAppleBegin,
+                dgCheckoutActionId.logAppleOnValidateMerchant,
+                dgCheckoutActionId.logAppleOnValidateMerchantError,
+                dgCheckoutActionId.logAppleOnValidateMerchantSuccess,
+                dgCheckoutActionId.logAppleOnShippingContactSelected,
+                dgCheckoutActionId.logAppleCompleteShippingContactSelection,
+                dgCheckoutActionId.logAppleOnShippingMethodSelected,
+                dgCheckoutActionId.logAppleCompleteShippingMethodSelection,
+                dgCheckoutActionId.logAppleOnPaymentAuthorized,
+                dgCheckoutActionId.logApplePaymentTokenizationError,
+                dgCheckoutActionId.logApplePaymentTokenizationSuccess,
+                dgCheckoutActionId.logAppleCompletePayment,
+                dgCheckoutActionId.logAppleOnCancel,
+                dgCheckoutActionId.logAppleAddressError
             };
 
             if (validActions.Contains((dgCheckoutActionId)objLog.action))

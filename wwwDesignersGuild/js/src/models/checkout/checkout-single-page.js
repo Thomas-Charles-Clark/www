@@ -1,5 +1,5 @@
 ﻿var LOG_ACTION_PAY_NOW_CLICK = 136,
-    LOG_ACTION_PAY_NOW_STEP =  138,
+    LOG_ACTION_PAY_NOW_STEP = 138,
     LOG_ACTION_PAY_NOW_VALIDATION_ERROR = 139
 
 const stockInfo = (function (parent) {
@@ -389,7 +389,7 @@ const checkoutSinglePageViewModel = ((resources) => {
             type: "GET",
             dataType: "html",
             success: function (data) {
-                //console.log('singlePageCheckout loadBasketSummary returned');
+                //console.log('singlePageCheckout loadBasketSummary returned', data);
                 var basketSummary = $('#checkout-total-wrapper');
                 ko.cleanNode(basketSummary[0]);
                 basketSummary.html(data);
@@ -413,7 +413,7 @@ const checkoutSinglePageViewModel = ((resources) => {
             type: "GET",
             dataType: "html",
             success: function (data) {
-                //console.log('singlePageCheckout loadDeliveryMethods returned');
+                console.log('singlePageCheckout loadDeliveryMethods returned');
 
                 var deliveryOptions = $('#despatch-items-wrapper');
 
@@ -1303,6 +1303,8 @@ const deliveryAddressFactory = ((parent) => {
 
         var data = {
             MemberAddressID: ko.unwrap(checkoutAddress.memberAddressId),
+            Town: ko.unwrap(checkoutAddress.town),
+            County: ko.unwrap(checkoutAddress.county),
             Postcode: ko.unwrap(checkoutAddress.postcode),
             Country: ko.unwrap(checkoutAddress.country).Code,
             BasketCountry: getSiteCountry()
@@ -1669,7 +1671,6 @@ const deliveryAddressFactory = ((parent) => {
     }
 
     self.invalidDeliveryCountry = function () {
-        $("#paymentSelectionLoading").hide();
 
         var message = self.resources.PaypalInvalidAddress;
 
@@ -1690,50 +1691,6 @@ const deliveryAddressFactory = ((parent) => {
         $('#payment-address-error-text').html(error);
         $("#payment-address-error").modal('show');
     }
-
-    //self.processPayPalAddress = function(address, nonce) {
-    //    hidePaymentAddressError();
-
-    //    //console.log('deliveryAddressFactpry processPayPalAddress called', address, nonce);
-
-    //    $.ajax({
-    //        url: '/api/checkout/isValidDeliveryCountry',
-    //        type: 'POST',
-    //        async: false,
-    //        cache: false,
-    //        data: {
-    //            basketCountry: getCountryDetail(),
-    //            deliveryCountry: address.country,
-    //        },
-    //        success: function (data) {
-    //            hidePaymentAddressError();
-    //            if (data) {
-
-    //                if (address.country == "UM" || address.country == "US") {
-    //                    asyncCheckSalesTaxZipCode(address, false, true);
-    //                } else {
-    //                    asyncSelectCheckoutAddress(address);
-    //                    viewModel.selectedAddress(address);
-    //                    singlePageCheckout.invalidAddressSelected(false);
-    //                    asyncSetPayPalNonce(nonce);
-    //                }
-    //            }
-    //            else {
-    //                var addressLine = [address.line1, address.postalCode, address.countryCode].join(', ');
-    //                asyncCheckoutLog(@Convert.ToInt32(dgCheckoutActionId.logInvalidAddress), addressLine);
-    //                // always display what address was selected, even though it is invalid
-    //                viewModel.selectedAddress(address);
-    //                singlePageCheckout.addressUpdated();
-    //                singlePageCheckout.invalidAddressSelected(true);
-    //                asyncSetPayPalNonce(null);
-    //                displayPaymentAddressError();
-    //            }
-    //        },
-    //        error: function (xhr, s, a) {
-    //
-    //        }
-    //    });
-    //}
 
     // here we're actively clearing out the paypal nonce... why... because if the nonce includes shipping data
     // and we've changed the shipping data or some how failed to arrive at a valid shipping address... then...
@@ -2155,7 +2112,7 @@ const lineMemo = ((r) => {
                     self.savedMemo(true);
                 }
                 $('#line-memo-modal').modal('hide');
-            }, 
+            },
             error: function (xhr, s, a) {
                 alert(self.resources.MajorError);
             }
@@ -2594,8 +2551,8 @@ const dispatchLine = ({
     minDeliveryDate,
     maxDeliveryDate,
     customerRequestsFullDespatch
-} = { }) => {
-    let self = { };
+} = {}) => {
+    let self = {};
 
     self.dispatchId = dispatchId;
     self.deliveryBandId = deliveryBandId;
@@ -2674,7 +2631,7 @@ const checkoutDeliveryAddress = (
     }
 
     self.availableCounties = ko.observable(getAvailableCounties(country.Code));
-    
+
     self.PCASearchId = ko.observable();
 
     self.PCASearchTerm = ko.observable();
@@ -2682,7 +2639,7 @@ const checkoutDeliveryAddress = (
     self.PCAContainer = ko.observable();
 
     self.PCACountry = ko.observable(country);
-    
+
     self.validateNow = ko.observable(false);
 
     // true == list, false == text
@@ -2714,7 +2671,7 @@ const checkoutDeliveryAddress = (
         },
         minLength: {
             params: 2,
-            onlyIf: function () { 
+            onlyIf: function () {
                 return (self.validateNow() && (self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorName
@@ -2808,8 +2765,8 @@ const checkoutDeliveryAddress = (
             onlyIf: function () {
                 return (self.validateNow()) &&
                     ((self.town() !== 'London' && self.town() !== 'london') &&
-                    (self.countyListOrText() == true) &&
-                    (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
+                        (self.countyListOrText() == true) &&
+                        (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorCounty
         },
@@ -2823,8 +2780,8 @@ const checkoutDeliveryAddress = (
             onlyIf: function () {
                 return (self.validateNow()) &&
                     ((self.town() !== 'London' && self.town() !== 'london') &&
-                    (self.countyListOrText() == false) &&
-                    (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
+                        (self.countyListOrText() == false) &&
+                        (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3));
             },
             message: self.resources.addressErrorCounty
         },
@@ -2854,7 +2811,7 @@ const checkoutDeliveryAddress = (
             params: 1,
             onlyIf: function () {
                 return
-                    (self.validateNow()) &&
+                (self.validateNow()) &&
                     (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3);
             },
             message: self.resources.addressErrorPhone
@@ -2863,7 +2820,7 @@ const checkoutDeliveryAddress = (
             params: 60,
             onlyIf: function () {
                 return
-                    (self.validateNow()) &&
+                (self.validateNow()) &&
                     (self.parent.parent.checkoutType != 3 && self.parent.parent.checkoutType != 4 && self.deliveryOptionId() != 3);
             },
             message: self.resources.addressErrorPhone
@@ -2897,7 +2854,7 @@ const checkoutDeliveryAddress = (
             }
         }
     });
-    
+
     self.phoneSave = function () {
         self.validateNow(true);
         window.setTimeout(function () {
@@ -3158,8 +3115,8 @@ const checkoutDeliveryAddress = (
 
     self.initPCAAutocomplete = function () {
         $(self.PCASearchTerm.DOMElement).autocomplete({
-            //appendTo: 'body',
-            //position: { my: "right top", at: "right bottom", of: $('.ui-front'), collision: "none" },
+            appendTo: 'body',
+            position: { my: "right top", at: "right bottom", of: $('.ui-front'), collision: "none" },
             source: function (request, response) {
                 $.ajax({
                     url: "/api/member/addressLookupSearch",
@@ -3221,9 +3178,9 @@ const checkoutDeliveryAddress = (
                                 //    self.county(undefined);
                                 //}
                                 //else {
-                                    self.countyListOrText(false);
-                                    //self.countyFromList(undefined);
-                                    self.county(county);
+                                self.countyListOrText(false);
+                                //self.countyFromList(undefined);
+                                self.county(county);
                                 //}
                                 self.postcode(data[0].PostalCode);
 
@@ -3377,7 +3334,7 @@ const checkoutDeliveryAddress = (
                     $(self.PCASearchTerm.DOMElement).val(undefined);
                     self.PCASearchId(undefined);
                     self.PCAContainer(undefined);
-                    
+
                     $(self.fullName.DOMElement).focus();
 
                 }
@@ -3397,12 +3354,12 @@ const checkoutDeliveryAddress = (
             }
         });
 
-        $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._resizeMenu = function() {
+        $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._resizeMenu = function () {
             this.menu.element.css('width', 'auto');
         }
 
         $(self.PCASearchTerm.DOMElement).data("ui-autocomplete")._renderItem = function (ul, item) {
-            return $('<li class="ui-menu-item">')                
+            return $('<li class="ui-menu-item">')
                 .attr("data-value", item.value)
                 .append('<div class="ui-menu-item-wrapper">' + item.label + '</div>')
                 .appendTo(ul);
@@ -3446,8 +3403,8 @@ const checkoutDeliveryAddress = (
             validation: {
                 validator: function (val, someOtherVal) {
                     // getNumberType
-                     //intlTelInputUtils.numberType.MOBILE
-                     //intlTelInputUtils.numberType.FIXED_LINE_OR_MOBILE
+                    //intlTelInputUtils.numberType.MOBILE
+                    //intlTelInputUtils.numberType.FIXED_LINE_OR_MOBILE
                     if (self.validateNow()) {
                         if (val) {
                             if (!$(self.phone.DOMElement).intlTelInput("isValidNumber")) {
@@ -3484,7 +3441,7 @@ const checkoutDeliveryAddress = (
         self.validateNow(true);
 
         window.setTimeout(function () {
-            
+
 
             if (getCheckoutType() == 3) {
                 //console.log('checkoutDeliveryAddress confirm: skipping address validation (AMAZON) valid address');
@@ -4072,8 +4029,7 @@ const paymentMethodFactory = ((parent) => {
                     self.parent.deliveryAddressFactory.currentAddress().validateNow(true);
 
                     if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid() &&
-                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false)
-                    {
+                        self.parent.deliveryAddressFactory.currentAddress().phoneChanged() == false) {
                         if (self.parent.balanceNumber()) {
                             self.showCompletingMessage();
                             self.submitBraintreeCheckout('paypal');
@@ -4081,7 +4037,7 @@ const paymentMethodFactory = ((parent) => {
                             self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory complete Mark iii: balanceNumber was false, calling asyncPlaceOrderNow');
                             self.asyncPlaceOrderNow();
                         }
-                     } else {
+                    } else {
                         if (self.parent.deliveryAddressFactory.currentAddress().phone.isValid()) {
                             // you can get here by not having a mobile number, providing one and then not saving the number.
                             // in which case you're left with no red visual prompt to action, just the "You have unsaved changes" dialog.
@@ -4098,20 +4054,153 @@ const paymentMethodFactory = ((parent) => {
                             window.scrollTo(0, 0);
                         }
                     }
-
                     break;
+                //case 5:
+                //    self.showCompletingMessage();
+
+                //    self.applePaymentRequest = self.applePayInstance.createPaymentRequest({
+                //        total: {
+                //            label: 'Designers Guild',
+                //            type: 'pending',
+                //            amount: getBalanceNumber(),
+                //            lineItems: [{
+                //                label: 'Sub Total',
+                //                type: 'final',
+                //                amount: getItemSubTotalNumber()
+                //            }, {
+                //                label: 'Delivery',
+                //                type: 'final',
+                //                amount: getShippingNumber()
+                //            }, {
+                //                label: 'Tax',
+                //                type: 'final',
+                //                amount: getTaxNumber()
+                //            }]
+                //        },
+
+                //        // We recommend collecting billing address information, at minimum
+                //        // billing postal code, and passing that billing postal code with
+                //        // all Apple Pay transactions as a best practice.
+                //        applePayShippingType: 'delivery',
+                //        requiredBillingContactFields: ["postalAddress"],
+                //        requiredShippingContactFields: [
+                //            "email"
+                //        ]
+                //    });
+
+                //    //self.beginApplePay = () => {
+
+                //    console.log('applePay window.beginApplePay called', self.applePaymentRequest);
+
+                //    self.activeApplePaySession = new ApplePaySession(3, self.applePaymentRequest);
+
+                //    self.activeApplePaySession.onvalidatemerchant = (e) => {
+                //        console.log('applePay onvalidatemerchant', e);
+                //        self.applePayInstance.performValidation({
+                //            validationURL: e.validationURL,
+                //            displayName: 'Designers Guild'
+                //        }, function (err, merchantSession) {
+                //            if (err) {
+                //                self.hideCompletingMessage();
+                //                window.showError(self.resources.ApplePayFailedToLoad);
+                //                // You should show an error to the user, e.g. 'Apple Pay failed to load.'
+                //                return;
+                //            }
+                //            console.log('applePay validatedmerchant', merchantSession);
+                //            self.activeApplePaySession.completeMerchantValidation(merchantSession);
+                //        });
+                //    };
+
+                //    self.activeApplePaySession.onshippingcontactselected = (e) => {
+                //        console.log('applePay onshippingcontactselected', e);
+
+                //        let errors = [];
+
+                //        if (!self.parent.errors().length) {
+                //            self.parent.errors().map(e => {
+                //                errors.push(new ApplePayError('addressUnserviceable', null, e));
+                //            })
+                //        }
+
+                //        self.paymentMethodFactory.activeApplePaySession.completeShippingContactSelection({
+                //            newTotal: {
+                //                type: 'final',
+                //                label: 'Designers Guild',
+                //                amount: getBalanceNumber()
+                //            },
+                //            newLineItems: [{
+                //                label: 'Sub Total',
+                //                type: 'pending',
+                //                amount: getItemSubTotalNumber()
+
+                //            }, {
+                //                label: 'Delivery',
+                //                type: 'pending',
+                //                amount: getShippingNumber()
+
+                //            }, {
+                //                label: 'Tax',
+                //                type: 'pending',
+                //                amount: getTaxNumber()
+                //            }],
+                //            errors: errors
+                //        });
+                //    }
+
+                //    self.activeApplePaySession.onpaymentauthorized = (e) => {
+                //        console.log('applePay onpaymentauthorized', e);
+
+                //        self.applePayInstance.tokenize({
+                //            token: e.payment.token
+                //        }, function (tokenizeErr, payload) {
+                //            if (tokenizeErr) {
+                //                self.hideCompletingMessage();
+                //                console.error('applePay Error tokenizing:', tokenizeErr);
+                //                self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, JSON.stringify(tokenizeErr));
+                //                window.showError(self.resources.ApplePayFailureNotCharged);
+                //                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
+                //                return;
+                //            }
+
+                //            console.log('applePay tokenized', payload);
+
+                //            // Send payload.nonce to your server.
+                //            self.submitBraintreeCheckout('apple', payload.nonce, e.payment.shippingContact.emailAddress);
+
+                //            // If requested, address information is accessible in event.payment
+                //            // and may also be sent to your server.
+                //            console.log('applyPay billingPostalCode:', e.payment.billingContact.postalCode);
+
+                //            // After you have transacted with the payload.nonce,
+                //            // call `completePayment` to dismiss the Apple Pay sheet.
+
+                //            self.endApple = () => {
+                //                self.activeApplePaySession.completePayment(ApplePaySession.STATUS_SUCCESS);
+                //            }
+                //        });
+                //    };
+
+                //    self.activeApplePaySession.oncancel = function (event) {
+                //        self.hideCompletingMessage();
+                //    }
+
+                //    self.activeApplePaySession.begin();
+
+                //    break;
             }
         }
         catch (ex) {
             window.setTimeout(() => {
-                self.hideCompletingMessage();
+                window.onErrorModalHide.push(() => {
+                    self.hideCompletingMessage();
+                });
+                window.showError();
             }, 300);
             window.logClientSideError(JSON.stringify({
                 message: e.toString(),
                 source: e.stack,
                 url: window.location.href
             }));
-            window.showError();
         }
     }
 
@@ -4329,13 +4418,12 @@ const paymentMethodFactory = ((parent) => {
         }
     }
 
-    self.submitBraintreeCheckout = function (method) {
+    self.submitBraintreeCheckout = function (method, nonce, email) {
 
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout called');
 
         self.showCompletingMessage();
 
-        var nonce = null;
         var defaultCard = false;
 
         if (method === 'card') {
@@ -4348,8 +4436,11 @@ const paymentMethodFactory = ((parent) => {
             }
             defaultCard = card.defaultCard();
         }
-        else
+        else if (method === 'apple') {
+
+        } else {
             nonce = "paypal";
+        }
 
         var data = JSON.stringify({
             device_data: null,
@@ -4357,7 +4448,8 @@ const paymentMethodFactory = ((parent) => {
             masterDefinition: getMasterDefinition(),
             basketCountry: self.siteCountry,
             marketingPermissions: ko.toJS(self.parent.marketingPermissions()),
-            make_default: defaultCard
+            make_default: defaultCard,
+            email: email
         });
 
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout submitting: ' + data);
@@ -4371,6 +4463,7 @@ const paymentMethodFactory = ((parent) => {
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
 
+                console.log('paymentMethodFactory submitBraintreeCheckout returned', data);
                 self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'paymentMethodFactory submitBraintreeCheckout returned: ' + JSON.stringify(data));
 
                 if (data != null) {
@@ -4382,6 +4475,9 @@ const paymentMethodFactory = ((parent) => {
                             $('#checkout-complete-waiting .page-blocker').addClass('success');
                             $('#checkout-complete-waiting p').html(self.resources.CheckoutPaymentSuccessGeneratingOrder);
                             self.showCompletingMessage();
+                            if (typeof self.endApple === 'function') {
+                                self.endApple();
+                            }
                             $.ajax({
                                 url: '/api/checkout/checkoutOrderGenerate',
                                 type: 'POST',
@@ -4615,13 +4711,14 @@ const paymentMethodFactory = ((parent) => {
     }
 
     self.showCompletingMessage = function () {
-        //console.log('paymentMethodFactory showCompletingMessage');
-        $("#checkout-complete-waiting").modal('show');
+        console.log('paymentMethodFactory showCompletingMessage');
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).show();
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message shown');
     }
 
     self.hideCompletingMessage = function () {
-        $("#checkout-complete-waiting").modal('hide');
+        console.log('paymentMethodFactory hideCompletingMessage');
+        bootstrap.Modal.getOrCreateInstance(document.querySelector("#checkout-complete-waiting")).hide();
         self.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'completing message hidden');
     }
 
@@ -4743,6 +4840,30 @@ const paymentMethodFactory = ((parent) => {
                                     },
                                     '#paypal-button');
                             });
+                    } else if (self.parent.checkoutType == 5) { // Apple
+                        //if (!window.ApplePaySession) {
+                        //    let errorString = self.resources.ApplePayDeviceNotSupported;
+                        //    console.log(errorString);
+                        //    notifyApplePayError(errorString);
+                        //} else {
+                        //    if (!ApplePaySession.canMakePayments()) {
+                        //        let errorString = self.resources.ApplePayDeviceCannotPay;
+                        //        console.log(errorString);
+                        //        notifyApplePayError(errorString);
+                        //    } else {
+                        //        braintree.applePay.create({
+                        //            client: clientInstance
+                        //        }, function (applePayErr, applePayInstance) {
+                        //            if (applePayErr) {
+                        //                console.error('applePay error', applePayErr);
+                        //                notifyApplePayError(applePayErr);
+                        //                return;
+                        //            }
+
+                        //            self.applePayInstance = applePayInstance;
+                        //        });
+                        //    }
+                        //}
                     }
                     else {
                         braintree.threeDSecure.create({
@@ -5882,7 +6003,7 @@ const giftCardFactory = ((parent) => {
     self.serverModel.subscribe(sv => {
         self.giftCards(sv.map(gc => giftCard(gc, self)));
     })
-    
+
     self.save = () => {
         self.busy(true);
 
@@ -5921,7 +6042,7 @@ const giftCard = ((record, parent) => {
         parent: parent,
         resources: parent.resources
     });
-    
+
     self.message = ko.observable(self.GiftVoucherMessage).extend({
         charsRemainingOptions: {
             maxLength: 300
@@ -6300,18 +6421,18 @@ function upsApMarker({
     map,
     parent
 } = {
-    upsLocatorResult: {
-        geocodeField: {
-            latitudeField: 0,
-            longitudeField: 0
+        upsLocatorResult: {
+            geocodeField: {
+                latitudeField: 0,
+                longitudeField: 0
+            },
+            addressKeyFormatField: {
+                consigneeNameField: 'error'
+            }
         },
-        addressKeyFormatField: {
-            consigneeNameField: 'error'
-        }
-    },
-    map: null,
-    parent: null
-}) {
+        map: null,
+        parent: null
+    }) {
     var self = $.extend(upsLocatorResult, {});
 
     self.parent = parent;

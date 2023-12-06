@@ -101,6 +101,18 @@
   width: 100%;
   max-width: 298px;
 }
+#checkout-option-wrapper #checkout-option-apple img {
+  width: 84px;
+  height: 54px;
+  max-width: 84px;
+}
+#checkout-option-wrapper #checkout-option-apple apple-pay-button {
+  --apple-pay-button-width: 100%;
+  --apple-pay-button-height: 50px;
+  --apple-pay-border-radius: $border-radius;
+  --apple-pay-button-padding: 0 0;
+  --apple-pay-box-sizing: border-box;
+}
 
 #collection-accordion .accordion-button > span {
   margin-inline-end: var --l-gutter;

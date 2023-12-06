@@ -1,0 +1,38 @@
+﻿@model passCheckoutPayment
+@{
+    Layout = null;
+
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = DateTime.Now;
+
+    var nfi = new System.Globalization.CultureInfo(Model.masterDefinition.UrlBreakdown.countryDetails.DotNetCulture).NumberFormat;
+}
+
+@if (HtmlHelperExtra.Debug)
+{
+    <script>
+        //if (!window.ApplePaySession) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //} else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
+        //    window.ApplePaySession = {
+        //        canMakePayments: () => true
+        //    }
+        //}
+    </script>
+}
+
+<script type="text/javascript">
+    window.notifyApplePayError = (error) => {
+        window.onInfoModalHide.push(() => {
+            jumpToCheckoutProblem();
+        });
+        window.showInfo('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Sorry", l, c, d))', error);
+    }
+</script>
+
+<script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js"></script>
+
+@* Apple Pay button replaces our own Buy Now button in _CheckoutTotal.cshtml *@

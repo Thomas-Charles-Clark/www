@@ -150,9 +150,6 @@ namespace wwwDesignersGuild.Models.Helper
             {
                 //  Ignore error
             }
-
-           
         }
-
     }
 }

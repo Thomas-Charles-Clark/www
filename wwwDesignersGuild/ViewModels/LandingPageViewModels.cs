@@ -749,7 +749,14 @@ namespace wwwDesignersGuild.ViewModels
                         "LoginInvalid",
                         "PaypalInvalidAddress",
                         "PayWithCard",
-                        "CheckoutTradeCheckout"
+                        "CheckoutTradeCheckout",
+                        "CheckoutPaymentSuccessGeneratingOrder",
+                        "ApplePayFailedToLoad",
+                        "ApplePayFailureNotCharged",
+                        "CheckoutAddressZipCodeInvalid",
+                        "CheckoutAddressZipCodeProblem",
+                        "ZipTaxCouldNotDetermine",
+                        "CannotDeliverToThatCountry"
                     });
                     break;
                 case (int)dgFixedPage.checkoutSinglePage:
@@ -858,7 +865,11 @@ namespace wwwDesignersGuild.ViewModels
                         "LiveChatNow",
                         "ThisWillRemoveCardFromVault",
                         "StockDetailNotAvailable",
-                        "Message"
+                        "Message",
+                        "ApplePayDeviceNotSupported",
+                        "ApplePayDeviceNotSupported",
+                        "ApplePayDeviceCannotPay",
+                        "ApplePayFailureNotCharged"
                     });
                     break;
                 case (int)dgFixedPage.stockists:

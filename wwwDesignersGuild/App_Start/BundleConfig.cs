@@ -309,6 +309,9 @@ namespace wwwDesignersGuild
                 .Include($"{jsPrefix}/lib/jquery-ui/dist/jquery-ui-extensions{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/checkout/checkout-single-page{jsSuffix}", sourceMapTransform));
 
+            bundles.Add(new ScriptBundle("~/bundles/js/checkout-apple")
+                .Include($"{jsPrefix}/models/checkout/checkout-apple{jsSuffix}", sourceMapTransform));
+
             bundles.Add(new ScriptBundle("~/bundles/js/checkout-login-page")
                 .Include($"{jsPrefix}/models/checkout/checkout-login{jsSuffix}", sourceMapTransform));
 

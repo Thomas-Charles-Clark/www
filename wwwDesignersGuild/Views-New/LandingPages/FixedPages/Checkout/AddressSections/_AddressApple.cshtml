@@ -1,0 +1,11 @@
+﻿@model passCheckoutAddress
+@{
+    Layout = null;
+
+    var l = Model.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+    var c = Model.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+    var d = Model.masterDefinition.UrlBreakdown.ContentDate;
+}
+<h3>
+   @HtmlHelperExtra.Resource("ApplePayDeliveryAddressRequested", l, c, d)
+</h3>
