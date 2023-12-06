@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Careers;
@@ -17,6 +18,8 @@ using wwwDesignersGuild.Models.UnsubscribePage;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
+
+using wwwDesignersGuild.Models.Returns;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -351,6 +354,13 @@ namespace wwwDesignersGuild.Controllers
             }
         }
 
+        public async Task<ActionResult> ReturnsPaperwork(BaseViewModel objBase, [FromUri]EncryptedOrderIdentifier orderIdentifier) 
+        {
+            var viewModel = await FixedPageViewModel_ReturnsPaperwork.CreateAsync(orderIdentifier.OrderID, objBase);
+
+            return PartialView("~/Views-New/LandingPages/FixedPages/Member/_ReturnsPaperwork.cshtml", viewModel);
+        }
+        
         public async Task<ActionResult> CheckoutProblem(BaseViewModel objBase)
         {
             return PartialView("~/Views-New/LandingPages/FixedPages/Checkout/_ReturnToBasket.cshtml", objBase);

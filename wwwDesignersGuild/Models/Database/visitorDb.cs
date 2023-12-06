@@ -1488,7 +1488,6 @@ namespace wwwDesignersGuild.Models.Database
 
                 conn.Open();
 
-
                 cmd.ExecuteNonQuery();
 
                 return Convert.ToInt32(retval.Value.ToString());
@@ -2878,10 +2877,11 @@ namespace wwwDesignersGuild.Models.Database
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] System.Nullable<byte> languageID,
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "SearchString", DbType = "NVarChar(20)")] string searchString,
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "HistoryDays", DbType = "SmallInt")] System.Nullable<short> historyDays,
-                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "OrderStatusID", DbType = "TinyInt")] System.Nullable<byte> orderStatusId)
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "OrderStatusID", DbType = "TinyInt")] System.Nullable<byte> orderStatusId,
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "OrderHeadID", DbType = "Int")] System.Nullable<int> orderHeadId = null)
         {
 
-            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), visitorDbId, countryID, languageID, searchString, historyDays, orderStatusId);
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), visitorDbId, countryID, languageID, searchString, historyDays, orderStatusId, orderHeadId);
             return (IMultipleResults)result.ReturnValue;
 
         }
