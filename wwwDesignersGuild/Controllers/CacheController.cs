@@ -201,10 +201,10 @@ namespace wwwDesignersGuild.Controllers
 
             foreach (var ps in objPurge.PageSectionIDs)
             {
-                results.Add(productPageGridCache.InvalidateMultiple(ps, objPurge.LanguageID, objPurge.CountryID));
-                
-                //productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
-                //productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
+                //results.Add(productPageGridCache.InvalidateMultiple(ps, objPurge.LanguageID, objPurge.CountryID));
+
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
             }
 
             return results;

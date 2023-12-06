@@ -33,7 +33,7 @@ namespace wwwDesignersGuild.Models.Interface
         Task<Boolean> updateMemberDetail(Int64 visitorDbId, String fullName);
         Task<Boolean> passwordResetRequest(PassPasswordResetRequest objRequest);
         Task<Boolean> resetPassword(String token, String newPasswordEnc);
-        Task<OrderHistory> getOrderHistory(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, Byte? OrderStatusId, String RequestDateOverride);
+        Task<OrderHistory> getOrderHistory(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, Byte? OrderStatusId, String RequestDateOverride, int? orderHeadId);
         Task<memberReturnPaperworkGenerate> getReturnPaperwork(Int32 returnHeadId, Byte languageId, Int64 visitorDbId);
         Task<Int32> saveReturn(Int64 visitorDbId, Int32 orderHeadId, DataTable returnTableType);
         Task<List<ScrapbookImage>> getVisitorScrapbook(Int64 visitorDbId, Int32? memberId, Byte? productTypeId, Byte? brandId, Boolean? isNew, Int16 countryID, Byte languageID, DateTime contentDate);

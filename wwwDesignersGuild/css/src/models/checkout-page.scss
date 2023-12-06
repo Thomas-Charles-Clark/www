@@ -562,6 +562,12 @@ body {
         .dispatch-estimates {
             margin-bottom: $l-gutter;
         }
+
+        & + h5 {
+            padding-top: var(--xl-gutter);
+            margin-top: var(--xl-gutter);
+            border-top: 1px solid $gray-300;
+        }
     }
 }
 

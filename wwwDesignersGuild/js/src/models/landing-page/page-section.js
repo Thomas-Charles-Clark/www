@@ -83,6 +83,7 @@
             self.memberLoginModel = memberLoginDetailsViewModel(self);
             break;
         case 'MemberOrderHistory':
+        case 'ReturnsPaperwork':
             self.memberOrderHistoryModel = memberOrderHistoryViewModel(self);
             break;
         case 'SearchResults': {

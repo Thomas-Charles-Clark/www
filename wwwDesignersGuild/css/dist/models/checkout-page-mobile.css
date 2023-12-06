@@ -196,6 +196,11 @@
   padding: 0;
   margin-bottom: var(--l-gutter);
 }
+#despatch-items-wrapper .dispatch-group-wrapper + h5 {
+  padding-top: var(--xl-gutter);
+  margin-top: var(--xl-gutter);
+  border-top: 1px solid #dee2e6;
+}
 #despatch-items-wrapper .dispatch-group-wrapper + h5.my-3 {
   padding-top: var(--xl-gutter);
   margin-top: var(--xl-gutter);
