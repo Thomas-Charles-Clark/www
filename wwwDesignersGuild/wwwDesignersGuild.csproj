@@ -2829,7 +2829,6 @@
     <Content Include="js\src\models\product-page\coverage-calculator.js" />
     <Content Include="js\src\models\product-page\product-page.js" />
     <Content Include="js\src\models\stockists\stockists.js" />
-    <Content Include="js\src\models\test.js" />
     <Content Include="js\src\models\trade\trade-account-request.js" />
     <Content Include="js\src\models\trade\trade-address-management.js" />
     <Content Include="js\src\models\trade\trade-contact-details.js" />
