@@ -2023,6 +2023,8 @@ namespace wwwDesignersGuild.Controllers
                 if (objDispatchOptions.checkoutDispatchDeliveryOptions.Count == 0)
                 {
                     objReturn.dispatchOptionsAvailable = false;
+
+                    objReturn.checkoutMethod = await objCheckout.GetCheckoutType(checkoutId);
                 }
                 else
                 {

@@ -660,6 +660,7 @@ namespace wwwDesignersGuild.ViewModels
                         "Cancel",
                     });
                     break;
+                case (int)dgFixedPage.returnsPaperwork:
                 case (int)dgFixedPage.memberOrderHistory:
                     required.AddRange(new string[] { "AreYouSure",
                         "AddressSearch",

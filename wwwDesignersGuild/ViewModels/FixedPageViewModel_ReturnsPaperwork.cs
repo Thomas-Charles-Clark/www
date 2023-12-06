@@ -13,8 +13,10 @@ namespace wwwDesignersGuild.ViewModels
     public class FixedPageViewModel_ReturnsPaperwork : FixedPageViewModel<int?>
     {
         // can't think why I'd need these: remove them if they're extraneous
+        public int? OrderID { get; set; }
         public List<Country> Countries { get; set; }
         public List<CountyItem> Counties { get; set; }
+        public OrderHistory OrderHistory { get; set; }
 
         public static async Task<FixedPageViewModel_ReturnsPaperwork> CreateAsync(
             int? orderId,
@@ -33,12 +35,20 @@ namespace wwwDesignersGuild.ViewModels
             BaseViewModel objBase)
             : base(orderId, objBase)
         {
-
+            OrderID = orderId;
         }
 
         private async Task InitialiseAsync()
         {
             #region Preamble
+
+            var orderHistoryTask = new VisitorFactory().getOrderHistory(Visitor.visitorDbId,
+                MasterDefinition.UrlBreakdown.countryDetails,
+                null,
+                null,
+                null,
+                null,
+                OrderID);
 
             var db = new cmsCountry();
 
@@ -48,7 +58,7 @@ namespace wwwDesignersGuild.ViewModels
 
             var countryTask =  db.countrySelectList(CountryID, LanguageID);
 
-            await Task.WhenAll(countryTask);
+            await Task.WhenAll(countryTask, orderHistoryTask);
 
             #endregion
 
@@ -59,6 +69,8 @@ namespace wwwDesignersGuild.ViewModels
             Countries = countryResults.countries;
 
             Counties = countryResults.counties;
+
+            OrderHistory = await orderHistoryTask;
 
             #endregion
         }

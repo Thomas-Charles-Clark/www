@@ -2713,7 +2713,7 @@ const checkoutDeliveryAddress = (
             message: self.resources.addressErrorName
         },
         minLength: {
-            params: 1,
+            params: 2,
             onlyIf: function () { 
                 return (self.validateNow() && (self.deliveryOptionId() != 3));
             },
@@ -2875,8 +2875,7 @@ const checkoutDeliveryAddress = (
                     return self.validateNow();
                 } else {
                     return (self.validateNow()) &&
-                            (self.parent.parent.checkoutType != 2 &&
-                             self.deliveryOptionId() != 3);
+                            (self.deliveryOptionId() != 3);
                 }
             },
             message: self.resources.phoneValidation
@@ -3108,7 +3107,7 @@ const checkoutDeliveryAddress = (
             result.push(ko.unwrap(self.postcode));
         if (ko.unwrap(self.country))
             result.push(ko.unwrap(self.country).Name);
-        if (ko.unwrap(self.phone) && !self.phoneChanged()) {
+        if (ko.unwrap(self.phone)) { // && !self.phoneChanged()) {
             result.push('<span style="display: block; margin-top: -1em;"></span>');
             result.push(self.resources.Tel + ': ' + ko.unwrap(self.phone));
         }
@@ -3482,6 +3481,8 @@ const checkoutDeliveryAddress = (
         self.confirmed(false);
         self.parent.parent.busy(false);
 
+        self.validateNow(true);
+
         window.setTimeout(function () {
             
 
@@ -3490,7 +3491,6 @@ const checkoutDeliveryAddress = (
                 self.parent.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'checkoutDeliveryAddress confirm: skipping address validation (AMAZON) valid address');
                 self.confirmed(true);
             } else {
-                self.validateNow(true);
 
                 self.errors.showAllMessages(false);
 

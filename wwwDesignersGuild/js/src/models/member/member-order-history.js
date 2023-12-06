@@ -184,17 +184,24 @@
                             if (data.error) {
                                 window.showError();
                             } else {
-                                self.displayReturnPdf(data);
-                                self.searchTerm(undefined);
-                                self.selectedDateRange(self.displayDateRanges().find(x => x.NumberOfDays == 365));
-                                self.selectedStatus(self.displayStatuses().find(x => x.OrderStatusID == 99));
-                                self.fetchOrderHistory();
-                                window.showInfo(self.resources.Info, self.resources.orderHistoryReturnGenerated);
+                                if (getContentId() != 164) {
+                                    self.displayReturnPdf(data);
+                                    self.searchTerm(undefined);
+                                    self.selectedDateRange(self.displayDateRanges().find(x => x.NumberOfDays == 365));
+                                    self.selectedStatus(self.displayStatuses().find(x => x.OrderStatusID == 99));
+                                    self.fetchOrderHistory();
+                                    window.showInfo(self.resources.Info, self.resources.orderHistoryReturnGenerated);
+                                } else {
+                                    self.displayReturnPdf(data);
+                                    window.showInfo(self.resources.Info, self.resources.orderHistoryReturnGenerated, () => {
+                                        window.location.reload();
+                                    });
+                                }
                             }
                         },
                         error: function (xhr, textStatus, errorThrown) {
                             console.log(xhr);
-                            alert(getResource('majorError'))
+                            alert(self.resources.MajorError)
                         }
                     });
                 }

@@ -170,6 +170,12 @@
         }
 
         flex-wrap: wrap-reverse;
+
+        & + h5 {
+            padding-top: var(--xl-gutter);
+            margin-top: var(--xl-gutter);
+            border-top: 1px solid $gray-300;
+        }
     }
 
     .dispatch-group-wrapper + h5.my-3 {

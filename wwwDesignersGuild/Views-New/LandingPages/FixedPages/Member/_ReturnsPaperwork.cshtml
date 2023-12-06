@@ -29,9 +29,9 @@
             </h4>
         </div>
         <h4 class="mb-3">
-            @HtmlHelperExtra.Resource("ManageOrderHistorySubHeading", l, c, d)
+            @HtmlHelperExtra.Resource("GenerateReturnsPaperwork", l, c, d)
         </h4>
-        <div class="search-controls">
+        @*<div class="search-controls">
             <div>
                 <div class="select-group">
                     <select id="statuses" class="form-select" data-bind="options: displayStatuses, optionsText: 'Name', value: selectedStatus"></select>
@@ -50,7 +50,7 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </div>*@
         <!-- ko if: orders().length == 0 -->
         <h4 class="mt-3">
             @HtmlHelperExtra.Resource("orderHistoryNoOrdersFound", l, c, d)
@@ -130,9 +130,9 @@
                     <button class="btn btn-dark" data-bind="click: $parent.showReturnModal">
                         @HtmlHelperExtra.Resource("orderHistoryReturnReplaceItems", l, c, d)
                     </button>
-                    <button class="btn btn-secondary" data-bind="click: $parent.displayReceiptPdf">
+                    @*<button class="btn btn-secondary" data-bind="click: $parent.displayReceiptPdf">
                         @HtmlHelperExtra.Resource("orderHistoryViewReceipt", l, c, d)
-                    </button>
+                    </button>*@
                 </div>
             </div>
             <!-- /ko -->
@@ -333,27 +333,27 @@
 </div>
 <script type="text/javascript">
     function getOrderHeads() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.OrderHeads));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.OrderHeads));
     }
     function getOrderLines() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.OrderLines));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.OrderLines));
     }
     function getReturnedItems() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.PreviousReturns));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.PreviousReturns));
     }
     function getTrackingLines() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.OrderLineTracking));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.OrderLineTracking));
     }
     function getStatuses() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.OrderStatuses));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.OrderStatuses));
     }
     function getReturnReasons() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.ReturnReasons));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.ReturnReasons));
     }
     function getDisplayStatuses() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.OrderStatusList.Where(p => p.OrderStatusID != 5).ToList())); @* Excludes "Dispatched - Invoiced" *@
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.OrderStatusList.Where(p => p.OrderStatusID != 5).ToList())); @* Excludes "Dispatched - Invoiced" *@
     }
     function getDisplayDateRanges() {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.Definition.DateRangeList));
+        return @Html.Raw(JsonConvert.SerializeObject(Model.OrderHistory.DateRangeList));
     }
 </script>

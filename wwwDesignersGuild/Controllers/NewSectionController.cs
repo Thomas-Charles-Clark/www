@@ -358,7 +358,7 @@ namespace wwwDesignersGuild.Controllers
         {
             var viewModel = await FixedPageViewModel_ReturnsPaperwork.CreateAsync(orderIdentifier.OrderID, objBase);
 
-            return PartialView("~/Views-New/LandingPage/FixedPages/Member/ReturnsPaperwork.cshtml", viewModel);
+            return PartialView("~/Views-New/LandingPages/FixedPages/Member/_ReturnsPaperwork.cshtml", viewModel);
         }
     }
 }
