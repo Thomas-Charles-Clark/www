@@ -469,6 +469,11 @@ body {
 #despatch-items-wrapper .dispatch-group-wrapper .dispatch-estimates {
   margin-bottom: 1rem;
 }
+#despatch-items-wrapper .dispatch-group-wrapper + h5 {
+  padding-top: var(--xl-gutter);
+  margin-top: var(--xl-gutter);
+  border-top: 1px solid #dee2e6;
+}
 
 #line-treatments-modal .label-wrapper .form-check + .form-check {
   margin-top: 0.5rem;

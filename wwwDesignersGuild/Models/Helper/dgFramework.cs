@@ -307,6 +307,11 @@ namespace wwwDesignersGuild.Models.Helper
         resubscribe = 161,
 
         [LoginRequired(false)]
+        [Action("ReturnsPaperwork", "NewSection")]
+        [PageSectionViewModel("ReturnsPaperwork")]
+        returnsPaperwork = 164,
+
+        [LoginRequired(false)]
         [Action("MemberResetPassword", "NewSection")]
         [PageSectionViewModel("MemberPasswordReset")]
         memberPasswordReset = 181,
