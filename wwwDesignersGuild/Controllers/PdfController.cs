@@ -22,10 +22,11 @@ namespace wwwDesignersGuild.Controllers
         public async Task<FileStreamResult> GenerateReturn(string countryCode, string returnIdentifier)
         {
             //  Must be logged in
-            if (dgFramework.isUserLoggedIn(Session["loginStatus"]) == false)
-            {
-                return null;
-            }
+            // Not anymore! Tom 06/12/2023 = Returns from Order Confirmations! Brilliant.
+            //if (dgFramework.isUserLoggedIn(Session["loginStatus"]) == false)
+            //{
+            //    return null;
+            //}
 
             //  Get the basket country details
             var objCountry = new cmsCountry();
@@ -143,7 +144,7 @@ namespace wwwDesignersGuild.Controllers
                 PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
                 doc.Open();
 
-                BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+                BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
                 Font font28 = new Font(gillSansMT, 28, Font.NORMAL);
                 Font font18 = new Font(gillSansMT, 16, Font.NORMAL);
                 Font font20BoldUnderline = new Font(gillSansMT, 20, Font.BOLD | Font.UNDERLINE);
@@ -154,7 +155,7 @@ namespace wwwDesignersGuild.Controllers
                 PdfPTable page2 = new PdfPTable(1);
                 PdfPTable page2a = new PdfPTable(1);
 
-                Image logo = Image.GetInstance(rootPath + "\\Content\\images\\logo\\DESIGNERS_GUILD_BLACK_BIG.tif");
+                Image logo = Image.GetInstance(rootPath + "Content\\images\\logo\\DESIGNERS_GUILD_BLACK_BIG.tif");
                 logo.ScalePercent(10);
                 PdfPCell header = new PdfPCell(logo)
                 {
@@ -348,7 +349,7 @@ namespace wwwDesignersGuild.Controllers
 
         public static PdfPTable createTable(List<memberReturnItem> items, String rootPath, countryItem objCountryItem)
         {
-            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
             Font font12 = new Font(gillSansMT, 12);
             Font font12Bold = new Font(gillSansMT, 12, Font.BOLD);
 

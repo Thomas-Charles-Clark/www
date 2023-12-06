@@ -207,7 +207,7 @@ document.addEventListener('show.bs.modal', function (event) {
         var adj = 0;
 
         document.querySelectorAll('.modal.fade.show').forEach(function (i, ele) {
-            if (+ele.style.zIndex >= zIndex) {
+            if (+ele?.style?.zIndex >= zIndex) {
                 adj++;
             }
         });

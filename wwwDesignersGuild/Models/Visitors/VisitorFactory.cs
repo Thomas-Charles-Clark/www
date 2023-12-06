@@ -1066,7 +1066,7 @@ namespace wwwDesignersGuild.Models.Visitor
         #region Order History
 
 
-        public async Task<OrderHistory> getOrderHistory(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, byte? OrderStatusId, String RequestDateOverride)
+        public async Task<OrderHistory> getOrderHistory(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, byte? OrderStatusId, String RequestDateOverride, int? orderHeadId = null)
         {
 
             if (OrderStatusId == 99)
@@ -1091,13 +1091,13 @@ namespace wwwDesignersGuild.Models.Visitor
             }
 
 
-            OrderHistory storeResults = await Task.FromResult<OrderHistory>(getOrderHistoryAsync(visitorDbId, objCountryItem, searchString, historyDays, OrderStatusId, RequestDateOverride));
+            OrderHistory storeResults = await Task.FromResult<OrderHistory>(getOrderHistoryAsync(visitorDbId, objCountryItem, searchString, historyDays, OrderStatusId, RequestDateOverride, orderHeadId));
             return storeResults;
 
         }
 
 
-        private OrderHistory getOrderHistoryAsync(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, byte? OrderStatusId, String RequestDateOverride)
+        private OrderHistory getOrderHistoryAsync(Int64 visitorDbId, countryItem objCountryItem, String searchString, Int16? historyDays, byte? OrderStatusId, String RequestDateOverride, int? orderHeadId = null)
         {
 
             var dataContext = new databaseDataContext();
@@ -1110,7 +1110,7 @@ namespace wwwDesignersGuild.Models.Visitor
             if (useDate == DateTime.MinValue)
                 useDate = DateTime.Now;
 
-            IMultipleResults results = dataContext.OrderHistory_GenerateMultiple(visitorDbId, objCountryItem.CountryID, objCountryItem.LanguageID, searchString, historyDays, OrderStatusId);
+            IMultipleResults results = dataContext.OrderHistory_GenerateMultiple(visitorDbId, objCountryItem.CountryID, objCountryItem.LanguageID, searchString, historyDays, OrderStatusId, orderHeadId);
 
 
             //  Convert from IEnumerable to a List so a query can be run multiple times

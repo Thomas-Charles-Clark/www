@@ -1564,13 +1564,23 @@ namespace wwwDesignersGuild.Controllers
                 dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters);
             }
 
+            var session = HttpContext.Current.Session;
 
             //  Must be logged in
-            var session = HttpContext.Current.Session;
-            if (dgFramework.isUserLoggedIn(session["loginStatus"]) == false)
-            {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.SecurityFail);
-            }
+            //
+            // Tom 04/12/2023 - not anymore you mustn't! 
+            // they wanted me to add pregenerated returns paperwork to the order confirmation email
+            // no, seriously, that's what they said
+            // it wasn't too difficult to convince them that this was a bad idea, and so here we are compromising
+            // you can now click a "Return" link in your order confirmation email to be taken to L164 to be able to generate a return without being signed in, or even a member.
+            //
+            // Super.
+            // 
+            //var session = HttpContext.Current.Session;
+            //if (dgFramework.isUserLoggedIn(session["loginStatus"]) == false)
+            //{
+            //    dgFramework.raiseErrorNotHandled(webapiUnhandledError.SecurityFail);
+            //}
 
 
             //  Get the visitor id

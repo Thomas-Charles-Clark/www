@@ -1654,13 +1654,13 @@
                 self.phone('01234 567 890');
                 self.email('primary@example.com');
                 self.orderConfirmationsSameAsPrimary(false);
-                self.orderConfirmationsEmail('order.confirmations@example.com');
+                self.orderConfirmationsEmail('order.confirmations@designersguild.com');
                 self.invoicesStatementsSameAsPrimary(false);
-                self.invoicesStatementsEmail('invoice.statements@example.com');
+                self.invoicesStatementsEmail('invoice.statements@designersguild.com');
                 self.pricelistsProductsNewsEventsSameAsPrimary(false);
-                self.pricelistsProductsNewsEventsEmail('pricelists.products.news.events@example.com');
+                self.pricelistsProductsNewsEventsEmail('pricelists.products.news.events@designersguild.com');
                 self.deliveryNotificationsSameAsPrimary(false);
-                self.deliveryNotificationsEmail('delivery.notifications@example.com');
+                self.deliveryNotificationsEmail('delivery.notifications@designersguild.com');
                 self.invoiceAddress.name.observable('Full Name');
                 self.invoiceAddress.companyName.observable('Company Name');
                 self.invoiceAddress.addressLine1.observable('Address Line 1');

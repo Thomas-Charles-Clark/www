@@ -621,6 +621,8 @@
     <Compile Include="Models\ProductReview\ProductReview.cs" />
     <Compile Include="Models\RecentlyViewed\RecentlyViewedProductPage.cs" />
     <Compile Include="Models\ResourceFetch\ResourceFetch.cs" />
+    <Compile Include="Models\Returns\EncryptedOrderIdentifier.cs" />
+    <Compile Include="Models\Returns\Return.cs" />
     <Compile Include="Models\SearchRender\PassSearchRender.cs" />
     <Compile Include="Models\Search\searchCacheProvider.cs" />
     <Compile Include="Models\Snippet\Snippet.cs" />
@@ -755,6 +757,7 @@
     <Compile Include="ViewModels\FixedPageViewModel_Checkout.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_CheckoutConfirm.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_GlobalSiteSelector.cs" />
+    <Compile Include="ViewModels\FixedPageViewModel_ReturnsPaperwork.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberResubscribe.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberUnsubscribe.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_MemberPasswordReset.cs" />
@@ -2826,7 +2829,6 @@
     <Content Include="js\src\models\product-page\coverage-calculator.js" />
     <Content Include="js\src\models\product-page\product-page.js" />
     <Content Include="js\src\models\stockists\stockists.js" />
-    <Content Include="js\src\models\test.js" />
     <Content Include="js\src\models\trade\trade-account-request.js" />
     <Content Include="js\src\models\trade\trade-address-management.js" />
     <Content Include="js\src\models\trade\trade-contact-details.js" />
@@ -3043,6 +3045,7 @@
     <Content Include="Views-New\Shared\_Snippet.cshtml" />
     <Content Include="Views-New\Shared\_SnippetTextOnly.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\_ReturnToBasket.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Member\_ReturnsPaperwork.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentApple.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressApple.cshtml" />
     <None Include="Web.Debug.config">
@@ -3158,7 +3161,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>61257</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44302/</IISUrl>
+          <IISUrl>https://localhost:44302</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
