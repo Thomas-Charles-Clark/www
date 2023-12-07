@@ -365,3 +365,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /wwwDesignersGuild/ExcelSpreadsheets
+/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap-mobile.css
+/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap-mobile.min.css
+/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap.css
+/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap.min.css
+/wwwDesignersGuild/css/dist/common/desktop.css
+/wwwDesignersGuild/css/dist/common/desktop.min.css
+/wwwDesignersGuild/css/dist/common/mobile.css
+/wwwDesignersGuild/css/dist/common/mobile.min.css
