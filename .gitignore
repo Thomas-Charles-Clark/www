@@ -33,8 +33,12 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-wwwDesignersGuild/css/dist/*
-wwwDesignersGuild/js/dist/*
+wwwDesignersGuild/css/dist/common/*
+wwwDesignersGuild/css/dist/lib/*
+wwwDesignersGuild/css/dist/models/*
+wwwDesignersGuild/js/dist/lib/*
+wwwDesignersGuild/js/dist/models/*
+wwwDesignersGuild/js/dist/util/*
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -365,11 +369,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /wwwDesignersGuild/ExcelSpreadsheets
-/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap-mobile.css
-/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap-mobile.min.css
-/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap.css
-/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap.min.css
-/wwwDesignersGuild/css/dist/common/desktop.css
-/wwwDesignersGuild/css/dist/common/desktop.min.css
-/wwwDesignersGuild/css/dist/common/mobile.css
-/wwwDesignersGuild/css/dist/common/mobile.min.css
