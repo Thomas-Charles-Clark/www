@@ -2878,10 +2878,10 @@ namespace wwwDesignersGuild.Models.Database
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "SearchString", DbType = "NVarChar(20)")] string searchString,
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "HistoryDays", DbType = "SmallInt")] System.Nullable<short> historyDays,
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "OrderStatusID", DbType = "TinyInt")] System.Nullable<byte> orderStatusId,
-                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "OrderHeadID", DbType = "Int")] System.Nullable<int> orderHeadId = null)
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "TransactionID", DbType = "Int")] System.Nullable<int> transactionId = null)
         {
 
-            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), visitorDbId, countryID, languageID, searchString, historyDays, orderStatusId, orderHeadId);
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), visitorDbId, countryID, languageID, searchString, historyDays, orderStatusId, transactionId);
             return (IMultipleResults)result.ReturnValue;
 
         }
