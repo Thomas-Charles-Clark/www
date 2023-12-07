@@ -97,8 +97,13 @@
                             <div class="order-item-body">
                                 <span class="display-block text-bold" data-bind="text: Name"></span>
                                 <span class="display-block text-bold" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Quantity", l, c, d)): ' + Quantity"></span>
+                                <!-- ko ifnot: AllowReturns -->
+                                <span class="display-block text-bold previous-return-orange">
+                                    @HtmlHelperExtra.Resource("orderHistoryNotPossibleToReturn", l, c, d)
+                                </span>
+                                <!-- /ko -->
                                 <!-- ko if: returnedQuantity() -->
-                                <span class="display-block text-bold" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("orderHistoryPreviouslyReturned", l, c, d)): ' + returnedQuantity()"></span>
+                                <span class="display-block text-bold previous-return-orange" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("orderHistoryPreviouslyReturned", l, c, d)): ' + returnedQuantity()"></span>
                                 <!-- /ko -->
                                 <span class="display-block" data-bind="text: Code"></span>
                                 <!-- ko if: trackingInfo().length == 0 -->
@@ -230,14 +235,14 @@
                                                     <span class="display-block text-bold" data-bind="text: Name"></span>
                                                     <span class="display-block text-bold" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Quantity", l, c, d)): ' + Quantity"></span>
                                                     <!-- ko if: returnedQuantity() -->
-                                                    <span class="display-block text-bold" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("orderHistoryPreviouslyReturned", l, c, d)): ' + returnedQuantity()"></span>
+                                                    <span class="display-block text-bold previous-return-orange" data-bind="text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("orderHistoryPreviouslyReturned", l, c, d)): ' + returnedQuantity()"></span>
                                                     <!-- /ko -->
                                                     <span class="display-block" data-bind="text: Code"></span>
                                                     <span class="display-block orderStat" data-bind="text: displayStatus"></span>
                                                 </div>
                                                 <div class="order-item-return">
                                                     <!-- ko ifnot: AllowReturns -->
-                                                    <h4>
+                                                    <h4 class="previous-return-orange">
                                                         @HtmlHelperExtra.Resource("orderHistoryNotPossibleToReturn", l, c, d)
                                                     </h4>
                                                     <!-- /ko -->
