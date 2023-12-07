@@ -113,6 +113,7 @@
         .nav-item {
             border: 1px solid $gray-300;
             flex-grow: 1;
+
             .nav-link {
                 width: 100%;
             }
@@ -125,6 +126,18 @@
         .order {
             border-top: 0;
         }
+
+        #return-items {
+            .d-flex.justify-content-end {
+                .btn.btn-secondary {
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    .modal-body {
+        min-height: 105vh;
     }
 }
 
