@@ -19,11 +19,11 @@
     </span>
     <div class="my-3">
         <div class="order-form-details">
-           @if (!Model.Solitary)
-           {
-               if (Model.ImageLinkToProductPage)
-               {
-                   <a href="@dgFramework.buildUrl(dgContentType.productPage, (int)Model.ProductPageID, cd, null, null, null, Model.URLKeywords)">
+            @if (!Model.Solitary)
+            {
+                if (Model.ImageLinkToProductPage)
+                {
+                    <a href="@dgFramework.buildUrl(dgContentType.productPage, (int)Model.ProductPageID, cd, null, null, null, Model.URLKeywords)">
                         <img class="order-form-image"
                              src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(imageSize)/@Model.Image.imageId"
                              width="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
@@ -31,12 +31,11 @@
                              alt="@Model.Image.altText"
                              title="@Model.Image.titleText"
                              @HtmlHelperExtra.ImageSourceSetSizes(Model.Image.imageId, imageSize)
-                             loading="lazy"
-                             />
-                   </a>
-               }
-               else
-               {
+                             loading="lazy" />
+                    </a>
+                }
+                else
+                {
                     <img class="order-form-image"
                          src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(imageSize)/@Model.Image.imageId"
                          width="@HtmlHelperExtra.InitialImageFolderSize(imageSize)"
@@ -45,56 +44,39 @@
                          title="@Model.Image.titleText"
                          data-bind="click: (data, event) => { showLargeImage(data, event); }"
                          @HtmlHelperExtra.ImageSourceSetSizes(Model.Image.imageId, imageSize)
-                         loading="lazy"
-                         />
-               }
-           }
+                         loading="lazy" />
+                }
+            }
             <div class="order-form-item-properties">
-              @foreach (var kvp in Model.OrderFormProperties)
-              {
-                   <span>
-                       @(kvp.Key)
-                   </span>
-                   <span>
-                       @(kvp.Value)
-                   </span>
-              }
+                @foreach (var kvp in Model.OrderFormProperties)
+                {
+                    <span>
+                        @(kvp.Key)
+                    </span>
+                    <span>
+                        @(kvp.Value)
+                    </span>
+                }
             </div>
             <div class="flex-grow-0 text-end product-price">
                 @Html.Raw(JObject.FromObject(Model.Product).SelectToken("priceMessage"))
-               @if (JObject.FromObject(Model.Product).SelectToken("priceMessage")?.Value<string>() != null && 
-                     JObject.FromObject(Model.Product).SelectToken("rRPMessage")?.Value<string>() != null)
+                @if (JObject.FromObject(Model.Product).SelectToken("priceMessage")?.Value<string>() != null &&
+                      JObject.FromObject(Model.Product).SelectToken("rRPMessage")?.Value<string>() != null)
                 {
-                    <br/>
+                    <br />
                 }
                 @Html.Raw(JObject.FromObject(Model.Product).SelectToken("rRPMessage"))
             </div>
         </div>
         <div class="d-none" data-bind="init: { field: products, value: [@(Model.ClientProductViewModels)] }, remove"></div>
         <div class="d-none" data-bind="remove">
-           @{
-               if (Model.AllowSample)
-                {
-                    <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
-                        @JsonConvert.SerializeObject(Model.Product["sample"])
-                    </span>
-                    <!-- /ko -->
-                }
-                if (Model.AllowLargeSample)
-                {
-                    <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
-                        @JsonConvert.SerializeObject(Model.Product["largeSample"])
-                    </span>
-                    <!-- /ko -->
-                }
+            @{
                 if (Model.AllowOrder)
                 {
                     <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
                     <span data-bind="remove, init: { convert: JSON.parse }, text: data">
                         @JsonConvert.SerializeObject(Model.Product)
-                    </span> 
+                    </span>
                     <!-- /ko -->
                 }
                 if (Model.AllowReserve)
@@ -113,30 +95,26 @@
                     </span>
                     <!-- /ko -->
                 }
+                if (Model.AllowSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["sample"])
+                    </span>
+                    <!-- /ko -->
+                }
+                if (Model.AllowLargeSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["largeSample"])
+                    </span>
+                    <!-- /ko -->
+                }
             }
         </div>
-       @if (!Model.IsLifestyle)
+        @if (!Model.IsLifestyle)
         {
-            if (Model.AllowSample)
-            {
-                <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                @OrderFormItemHelper(Model.MasterDefinition,
-                                     Model.Product["sample"],
-                                     OrderFormItemType.Sample,
-                                     OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
-                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
-                <!-- /ko -->
-            }
-            if (Model.AllowLargeSample)
-            {
-                <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                @OrderFormItemHelper(Model.MasterDefinition,
-                                     Model.Product["largeSample"],
-                                     OrderFormItemType.LargeSample,
-                                     OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
-                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
-                <!-- /ko -->
-            }
             if (Model.AllowOrder)
             {
                 <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
@@ -167,6 +145,26 @@
                                      Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
                 <!-- /ko -->
             }
+            if (Model.AllowSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["sample"],
+                                     OrderFormItemType.Sample,
+                                     OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowLargeSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["largeSample"],
+                                     OrderFormItemType.LargeSample,
+                                     OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                <!-- /ko -->
+            }
             if (!Model.IsHotspot && Model.ProductTypeID == 18 && c == 81 && l == 1)
             {
                 <div class="order-form-item mt-3">
@@ -175,8 +173,8 @@
                             &nbsp;
                         </span>
                         <button type="button" class="btn btn-light"
-                           data-bs-target="#coverage-calculator-modal"
-                           data-bs-toggle="modal">
+                                data-bs-target="#coverage-calculator-modal"
+                                data-bs-toggle="modal">
                             @HtmlHelperExtra.Resource("CoverageCalculator", l, c, d)
                         </button>
                     </div>
@@ -206,8 +204,8 @@
                             &nbsp;
                         </span>
                         <button type="button" class="btn btn-light"
-                           data-bs-target="#coverage-calculator-modal"
-                           data-bs-toggle="modal">
+                                data-bs-target="#coverage-calculator-modal"
+                                data-bs-toggle="modal">
                             @HtmlHelperExtra.Resource("CoverageCalculator", l, c, d)
                         </button>
                     </div>
