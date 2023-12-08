@@ -2701,3 +2701,11 @@ nav.article-type-nav.article-sub-type-nav {
     top: 100%;
     z-index: 10;
 }
+
+.searcher {
+    .ui-front {
+        position: absolute;
+        z-index: 1000;
+        top: 4px;
+    }
+}
