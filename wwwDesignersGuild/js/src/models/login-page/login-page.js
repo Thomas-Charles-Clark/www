@@ -11,6 +11,10 @@
 
     self.registrationMode = ko.observable(false);
 
+    self.tradeRegistrationMode = ko.observable(0); // 0 == I have already authenticated my Trade Account
+                                                   // 1 == I have not yet authenticated my Trade Account
+                                                   // 2 == I would like to request a Trade Account
+
     self.redirect = ko.observable();
 
     self.validateLoginNow = ko.observable(false);
@@ -203,9 +207,15 @@
     self.loginEmailAddress.subscribe(nv => self.invalidLogin(false));
 
     self.registrationMode.subscribe(nv => {
-        let carouselElement = document.querySelector('#login-form-carousel');
+        let carouselElement = document.querySelector('#retail-login-form-carousel');
         let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
         carousel.to(nv ? 1 : 0);
+    });
+
+    self.tradeRegistrationMode.subscribe(nv => {
+        let carouselElement = document.querySelector('#trade-login-form-carousel');
+        let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
+        carousel.to(nv);
     });
 
     self.registrationAllCountries.subscribe(nvs => {
