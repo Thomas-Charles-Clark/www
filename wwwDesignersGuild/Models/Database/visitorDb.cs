@@ -32,6 +32,45 @@ namespace wwwDesignersGuild.Models.Database
 
     public class visitorDb
     {
+        public DatabaseJSONResponse callTradeAccountRequestAccess(long visitorId, PassTradeAccessRequest objRequest)
+        {
+            var result = new DatabaseJSONResponse();
+
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                SqlCommand cmd = new SqlCommand("[pub].[TradeAccount_RequestAccess]", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                var parameters = new SqlParameter[] 
+                {
+                    new SqlParameter("@VisitorID", visitorId),
+                    new SqlParameter("@TradeAccountName", objRequest.tradeAccountName ?? (object)DBNull.Value),
+                    new SqlParameter("@TradeAccountCode", objRequest.tradeAccountCode ?? (object)DBNull.Value),
+                    new SqlParameter("@TradeAccountLabel", objRequest.tradeAccountLabel ?? (object)DBNull.Value),
+                    new SqlParameter("@UserName", objRequest.userName ?? (object)DBNull.Value),
+                    new SqlParameter("@UserEmail", objRequest.userEmail ?? (object)DBNull.Value),
+                    new SqlParameter("@UserPhone", objRequest.userPhone ?? (object)DBNull.Value)
+                };
+
+                cmd.Parameters.AddRange(parameters);
+
+                conn.Open();
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    result.JSON = reader.GetString(0);
+                }
+
+                conn.Close();
+            }
+
+            return result;
+        }
+
         public DatabaseJSONResponse fetchTradeAccountSalesRepresentative(PassTradeAccessRequest objRequest)
         {
             var result = new DatabaseJSONResponse();
