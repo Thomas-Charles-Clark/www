@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='beforeBuildJS, beforeBuildSCSS' ProjectOpened='watch' />
+/// <binding ProjectOpened='watch' />
 'use strict';
 
 const
@@ -222,10 +222,6 @@ gulp.task('fonts', gulp.series([wildcardfonts]));
 gulp.task('all', gulp.series(['sass', 'css', 'js']));
 
 gulp.task('rollup', gulp.series([compilerollup]));
-
-gulp.task('beforeBuildSCSS', gulp.series([wildcardscss]));
-
-gulp.task('beforeBuildJS', gulp.series([wildcardjs]));
 
 gulp.task('watch', function () {
     getBundles(regex.js).forEach(function (bundle) {

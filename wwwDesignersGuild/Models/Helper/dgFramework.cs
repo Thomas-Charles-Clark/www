@@ -1741,6 +1741,18 @@ namespace wwwDesignersGuild.Models.Helper
             }
         }
 
+        public static bool doesCountryExistFromLanguageCulture(string culture, cmsCountryDefinition objCountryData)
+        {
+            if (objCountryData.countryItems.Where(p => p.LanguageDotNetCulture.ToUpper() == culture.ToUpper()).Count() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public static countryItem getCountryFromText(string text,
                                                                 cmsCountryDefinition objCountryData)
         {
@@ -1752,6 +1764,13 @@ namespace wwwDesignersGuild.Models.Helper
                                                                 cmsCountryDefinition objCountryData)
         {
             return objCountryData.countryItems.Where(p => p.CountryCode.ToUpper() == code.ToUpper()).First();
+        }
+
+
+        public static countryItem getCountryFromLanguageCulture(string culture,
+                                                                cmsCountryDefinition objCountryData)
+        {
+            return objCountryData.countryItems.Where(p => p.LanguageDotNetCulture.ToUpper() == culture.ToUpper()).First();
         }
 
         public static async Task<countryAwarenessCheckReturn> isCountryAwarenessPromptRequired(Int64 visitorDbId, short countryId, DateTime contentDate, short? countryIdOverride)

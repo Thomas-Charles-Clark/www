@@ -13,6 +13,8 @@ using wwwDesignersGuild.Models.Visitor;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Threading;
+using wwwDesignersGuild.Models.Checkout;
+using wwwDesignersGuild.Models;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -119,6 +121,34 @@ namespace wwwDesignersGuild.Controllers
 
             //  Generate the "Receipt" PDF
             BuildReceiptPDF(countryCode, objCountryItem, receiptData, Request.MapPath("~"), Response);
+
+            return null;
+        }
+
+        public async Task<FileStreamResult> GenerateGiftVoucher(string culture, string id)
+        {
+            var objCountry = new cmsCountry();
+            var objCountryData = await objCountry.countryLanguageSelect(DateTime.Now);
+
+            if (dgFramework.doesCountryExistFromLanguageCulture(culture, objCountryData)) { }
+            else
+            {
+                return null;
+            }
+
+            var objCountryItem = dgFramework.getCountryFromLanguageCulture(culture, objCountryData);
+
+            //  Set the resource file language
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(objCountryItem.DotNetCulture);
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+
+            var db = new checkoutDb();
+
+            var giftVoucherCode = dgCrypto.Decrypt(HttpUtility.UrlDecode(id));
+
+            var result = await db.getGiftVoucherForPDF(giftVoucherCode);
+
+            BuildGiftVoucherPDF(result, objCountryItem, Request.MapPath("~"), Response);
 
             return null;
         }
@@ -407,7 +437,7 @@ namespace wwwDesignersGuild.Controllers
                 PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
                 doc.Open();
 
-                BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+                BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
                 Font font28 = new Font(gillSansMT, 28, Font.NORMAL);
                 Font font18 = new Font(gillSansMT, 16, Font.NORMAL);
                 Font font14Bold = new Font(gillSansMT, 14, Font.BOLD);
@@ -486,7 +516,7 @@ namespace wwwDesignersGuild.Controllers
 
         public static PdfPTable createReceiptSummaryTable(receiptSummary item, String rootPath, countryItem objCountryItem)
         {
-            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
             Font font12 = new Font(gillSansMT, 12);
             Font font12Bold = new Font(gillSansMT, 12, Font.BOLD);
 
@@ -584,7 +614,7 @@ namespace wwwDesignersGuild.Controllers
 
         public static PdfPTable createReceiptOrderInformationBlock(receiptHeader order, String rootPath, countryItem objCountryItem)
         {
-            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
 
             PdfPTable orderSection = new PdfPTable(1);
             Font font14Bold = new Font(gillSansMT, 14, Font.BOLD);
@@ -640,7 +670,7 @@ namespace wwwDesignersGuild.Controllers
 
         public static PdfPTable createReceiptItemTable(IEnumerable<receiptLine> items, String rootPath, countryItem objCountryItem)
         {
-            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "\\css\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
             Font font12 = new Font(gillSansMT, 12);
             Font font12Bold = new Font(gillSansMT, 12, Font.BOLD);
 
@@ -674,6 +704,230 @@ namespace wwwDesignersGuild.Controllers
             }
 
             return table;
+        }
+
+        #endregion
+
+        #region Build Gift Voucher PDF
+
+
+
+        public static void BuildGiftVoucherPDF(
+            GiftVoucherPDF objGiftVoucher,
+            countryItem objCountryItem,
+            string rootPath,
+            HttpResponseBase response)
+        {
+            
+            MemoryStream fs = new MemoryStream();
+            Document doc = new Document(PageSize.A6.Rotate(), 0, 0, 20, 0);
+
+            PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
+            doc.Open();
+
+            iTextSharp.text.Image background = iTextSharp.text.Image.GetInstance(rootPath + "Content\\images\\general\\gift-voucher-background.png");
+
+            //Resize image depend upon your need
+            //For give the size to image
+            background.ScaleToFit(420, 300);
+
+            //If you want to choose image as background then,
+
+            background.Alignment = iTextSharp.text.Image.UNDERLYING;
+
+            //If you want to give absolute/specified fix position to image.
+            background.SetAbsolutePosition(0, 0);
+
+            doc.Add(background);
+
+            var fontColour = new BaseColor(255, 255, 255);
+
+            BaseFont gillSansMT = BaseFont.CreateFont(rootPath + "css\\dist\\fonts\\src\\gill-sans-mt-custom.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            var font64 = new Font(gillSansMT, 60, Font.NORMAL, fontColour);
+            var font32 = new Font(gillSansMT, 32, Font.NORMAL, fontColour);
+            var font28 = new Font(gillSansMT, 28, Font.NORMAL, fontColour);
+            var font18 = new Font(gillSansMT, 16, Font.NORMAL, fontColour);
+            var font14= new Font(gillSansMT, 14, Font.NORMAL, fontColour);
+            var font8= new Font(gillSansMT, 8, Font.NORMAL, fontColour);
+            var font14Bold = new Font(gillSansMT, 14, Font.BOLD, fontColour);
+            var font14Blue = FontFactory.GetFont("Arial", 12, Font.BOLD, BaseColor.BLUE);
+            var font20BoldUnderline = new Font(gillSansMT, 20, Font.BOLD | Font.UNDERLINE, fontColour);
+            var font20Bold = new Font(gillSansMT, 20, Font.BOLD, fontColour);
+            var font20 = new Font(gillSansMT, 20, Font.NORMAL, fontColour);
+
+            var headTable = new PdfPTable(1);
+            var bodyTable = new PdfPTable(2);
+
+            bodyTable.WidthPercentage = 90;
+
+            var footTable = new PdfPTable(1);
+
+            footTable.WidthPercentage = 98;
+
+            headTable.SpacingBefore = 20.0f;
+
+            headTable.DefaultCell.Border = Rectangle.NO_BORDER;
+
+            bodyTable.DefaultCell.Border = Rectangle.NO_BORDER;
+
+            footTable.DefaultCell.Border = Rectangle.NO_BORDER;
+
+            bodyTable.SpacingBefore = 25.0f;
+
+            bodyTable.SpacingAfter = 25.0f;
+
+            bodyTable.SetWidths(new float[] { 40.0f, 60.0f });
+
+            var logo = Image.GetInstance(rootPath + "\\Content\\images\\logo\\dg-logo-512-37.png");
+            logo.ScalePercent(50);
+
+            var headerCell = new PdfPCell(logo)
+            {
+                Border = Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                PaddingTop = 20,
+                PaddingBottom = 20
+            };
+
+            headTable.AddCell(headerCell);
+
+            var anchor = new Anchor("www.designersguild.com", font14) 
+            { 
+                Leading = 12
+            };
+
+            anchor.Reference = "https://www.designersguild.com/";
+
+            var anchorParagraph = new Paragraph(anchor)
+            {
+                Leading = 14,
+                SpacingBefore = 20,
+                SpacingAfter = 24,
+                Alignment = Element.ALIGN_CENTER,
+            };
+
+            var tcsChunk = new Chunk($"{HtmlHelperExtra.Resource("GiftVoucherTCsApply", objCountryItem.LanguageID, objCountryItem.CountryID, DateTime.Now)}", font8);
+
+            var tcsParagraph = new Paragraph(tcsChunk) 
+            {
+                Alignment = Element.ALIGN_CENTER
+            };
+
+            var footerCell = new PdfPCell()
+            {
+                Border = Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                PaddingTop = 0
+            };
+
+            footerCell.AddElement(anchorParagraph);
+
+            footerCell.AddElement(tcsParagraph);
+
+            footTable.AddCell(footerCell);
+
+            var giftVoucherValueChunk = new Chunk($"{objGiftVoucher.CurrencySymbol}{objGiftVoucher.ValueInc:N0}", font64);
+            
+            var giftVoucherChunk = new Chunk($"{HtmlHelperExtra.Resource("GiftVoucher", objCountryItem.LanguageID, objCountryItem.CountryID, DateTime.Now)}", font20);
+            
+            var expiryDateChunk = new Chunk($"{HtmlHelperExtra.Resource("CheckoutPayGiftExpiry", objCountryItem.LanguageID, objCountryItem.CountryID, DateTime.Now)} {objGiftVoucher.ExpiryDT.Day.convertIntToOrdinal()} {objGiftVoucher.ExpiryDT:MMMM} {objGiftVoucher.ExpiryDT:yyyy}", font14);
+
+            var giftVoucherValuePhrase = new Phrase(64, giftVoucherValueChunk);
+
+            var giftVoucherValueParagraph = new Paragraph(giftVoucherValuePhrase)
+            {
+                Leading = 42.0f
+            };
+
+            var giftVoucherParagraph = new Paragraph(giftVoucherChunk)
+            {
+
+            };
+
+            var expiryDateParagraph = new Paragraph(expiryDateChunk) 
+            {
+                Leading = 16
+            };
+
+            var giftVoucherCell = new PdfPCell()
+            {
+                Border = Rectangle.NO_BORDER,
+                VerticalAlignment = Element.ALIGN_TOP,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+            };
+
+            giftVoucherCell.AddElement(giftVoucherValueParagraph);
+            giftVoucherCell.AddElement(giftVoucherParagraph);
+
+            var expiryCell = new PdfPCell()
+            {
+                Border = Rectangle.NO_BORDER,
+                Colspan = 2
+            };
+
+            expiryCell.AddElement(expiryDateParagraph);
+
+            //var giftVoucherParagraph2 = new Paragraph(giftVoucherChunk);
+
+            //giftVoucherCell.AddElement(giftVoucherParagraph2);
+
+            var pleaseEnterChunk = new Chunk(HtmlHelperExtra.Resource("PleaseEnter", objCountryItem.LanguageID, objCountryItem.CountryID, DateTime.Now).ToString() + System.Environment.NewLine, font20);
+
+            var codeChunk = new Chunk(objGiftVoucher.Code + System.Environment.NewLine, font20);
+
+            var atCheckoutChunk = new Chunk(HtmlHelperExtra.Resource("AtCheckout", objCountryItem.LanguageID, objCountryItem.CountryID, DateTime.Now).ToString() + System.Environment.NewLine, font20);
+
+            var giftVoucherCodeCell = new PdfPCell()
+            {
+                Border = Rectangle.NO_BORDER,
+                VerticalAlignment = Element.ALIGN_TOP,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                PaddingLeft = 4
+            };
+
+            var pleaseEnterParagraph = new Paragraph(pleaseEnterChunk)
+            {
+                Leading = 14
+            };
+
+            var codeParagraph = new Paragraph(codeChunk)
+            {
+                Leading = 20,
+                SpacingBefore = 6,
+                SpacingAfter = 4
+            };
+
+            var atCheckoutParagraph = new Paragraph(atCheckoutChunk)
+            {
+                Leading = 20
+            };
+
+            giftVoucherCodeCell.AddElement(pleaseEnterParagraph);
+            giftVoucherCodeCell.AddElement(codeParagraph);
+            giftVoucherCodeCell.AddElement(atCheckoutParagraph);
+
+            //table.AddCell(header);
+            bodyTable.AddCell(giftVoucherCell);
+            bodyTable.AddCell(giftVoucherCodeCell);
+            bodyTable.AddCell(expiryCell);
+
+            doc.Add(headTable);
+
+            doc.Add(bodyTable);
+
+            doc.Add(footTable);
+
+            doc.Close();
+
+            pdfWriter.Close();
+
+            response.ContentType = "application/pdf";
+            response.Buffer = true;
+            response.Clear();
+            response.OutputStream.Write(fs.GetBuffer(), 0, fs.GetBuffer().Length);
+            response.OutputStream.Flush();
+            response.End();
+            fs.Close();
         }
 
         #endregion
