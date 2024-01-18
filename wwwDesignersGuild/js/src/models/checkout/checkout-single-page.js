@@ -1535,7 +1535,7 @@ const deliveryAddressFactory = ((parent) => {
                                 self.upsLocatorResults(results);
                             },
                             error: function (xhr, s, a) {
-                                alert(getDGECResource('majorError'));
+                                alert(self.resources.MajorError);
                             }
                         });
 

@@ -84,14 +84,14 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .share {
-        background-image: url(../../Content/images/svg/share-std.svg);
+        background-image: url(/Content/images/svg/share-std.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
     }
 
     .email {
-        background-image: url(../../Content/images/svg/email-circular.svg);
+        background-image: url(/Content/images/svg/email-circular.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -99,7 +99,7 @@ h1, h2, h3, h4, h5, h6 {
 
     .pinterest {
         /*background-image: url(../../Content/images/svg/pinterest-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-pinterest.png);
+        background-image: url(/Content/images/social/icon-pinterest.png);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -107,7 +107,7 @@ h1, h2, h3, h4, h5, h6 {
 
     .facebook {
         /*background-image: url(../../Content/images/svg/facebook-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-facebook.png);
+        background-image: url(/Content/images/social/icon-facebook.png);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -115,14 +115,14 @@ h1, h2, h3, h4, h5, h6 {
 
     .twitter {
         /*background-image: url(../../Content/images/svg/twitter-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-twitter.png);
+        background-image: url(/Content/images/social/icon-twitter.png);
         background-size: cover;
         width: 24px;
         height: 24px;
     }
 
     .copy {
-        background-image: url(../../Content/images/svg/link-circular.svg);
+        background-image: url(/Content/images/svg/link-circular.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -520,8 +520,8 @@ footer {
 
             a {
                 span:first-of-type {
-                    width: 25px;
-                    height: 25px;
+                    width: 18px;
+                    height: 18px;
                 }
             }
         }
