@@ -476,6 +476,7 @@
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombinationCacheProvider.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexRestrictionCacheProvider.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexRestriction.cs" />
+    <Compile Include="Models\GiftVoucher\GiftVoucher.cs" />
     <Compile Include="Models\Hotspot\Hotspot.cs" />
     <Compile Include="Models\Hotspot\ImageHotspot.cs" />
     <Compile Include="Models\Hotspot\PassHotspotFetch.cs" />
@@ -1454,6 +1455,7 @@
     <Content Include="Content\images\general\facebook-icon-over.webp" />
     <Content Include="Content\images\general\facebook-icon.png" />
     <Content Include="Content\images\general\facebook-icon.webp" />
+    <Content Include="Content\images\general\gift-voucher-background.png" />
     <Content Include="Content\images\general\indicator-active.png" />
     <Content Include="Content\images\general\indicator-active.webp" />
     <Content Include="Content\images\general\indicator.png" />
@@ -2387,6 +2389,7 @@
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
     <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
+    <Content Include="css\dist\fonts\src\gill-sans-mt-custom.ttf" />
     <None Include="ExternalDependencies\MertexerV2.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

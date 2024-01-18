@@ -15,6 +15,7 @@ using Braintree;
 using AmazonPay;
 using wwwDesignersGuild.Models.Checkout;
 using Dapper;
+using wwwDesignersGuild.Models.BasketClasses;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -1406,6 +1407,16 @@ namespace wwwDesignersGuild.Models.Database
 
             IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), checkoutId);
             return (IMultipleResults)result.ReturnValue;
+        }
+
+
+        [Function(Name = "[pub].[GiftVoucher_PDF_Select]")]
+        [ResultTypeAttribute(typeof(GiftVoucherPDF))]
+        public ISingleResult<GiftVoucherPDF> GetGiftVoucherForPDF([Parameter(Name = "GiftVoucherCode", DbType = "NVarChar(20)")] string giftVoucherCode)
+        {
+
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), giftVoucherCode);
+            return (ISingleResult<GiftVoucherPDF>)result.ReturnValue;
         }
 
 

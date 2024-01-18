@@ -17,19 +17,19 @@
         width: 100%;
         max-width: 520px;
         position: relative;
-        border: 1px solid $gray-400;
         border-radius: $border-radius;
 
         h5 {
             text-transform: uppercase;
-            border-bottom: 1px solid $gray-400;
+            border: 1px solid $gray-400;
+            margin-bottom: 0;
         }
 
         .form-check {
             margin-bottom: var(--m-gutter);
         }
 
-        #login-form-carousel {
+        .login-form-carousel {
             .carousel-item {
                 background-color: white;
 
@@ -106,4 +106,22 @@
 .valid-login-alert {
     display: flex;
     align-items: center;
+}
+
+#signin-type-tabs {
+    padding: $l-gutter $l-gutter 0;
+
+    li {
+        flex: 1;
+
+        .nav-link {
+            width: 100%;
+        }
+    }
+}
+
+#signin-type-tab-container {
+    padding: $l-gutter;
+    border: 1px solid $gray-300;
+    border-top: 0;
 }
