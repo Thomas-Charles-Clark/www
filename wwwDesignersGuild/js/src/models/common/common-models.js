@@ -56,6 +56,10 @@
             }
         });
 
+        if (newValue.stockMessage.quantityMaximum === 0) {
+            self.enabled(false);
+        }
+
         dataSub.dispose();
     });
 
