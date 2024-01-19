@@ -369,6 +369,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /wwwDesignersGuild/ExcelSpreadsheets
-/wwwDesignersGuild/css/dist/models/login-page.css
-/wwwDesignersGuild/css/dist/models/login-page.min.css
-/wwwDesignersGuild/js/dist/models/common/common-models.min.js.map

@@ -1203,65 +1203,53 @@ namespace wwwDesignersGuild.Controllers
         {
             var db = new visitorDb();
 
-            Int64 visitorId = -1;
-            if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
-            {
-            }
-            else
-            {
-                visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
-            }
-            var result = db.callTradeAccountRequestAccess(visitorId, objRequest);
+            var contactResult = db.fetchTradeAccountSalesRepresentative(objRequest);
 
-            return Ok(result?.json);
+            var body = $@"<p>Hello {JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].contactName").Value<string>()},</p><p>&nbsp;</p>
+<p><strong>{objRequest.tradeAccountLabel}</strong> has requested a login for our new & improved B2B Trade Site.</p>";
 
-            //var contactResult = db.fetchTradeAccountSalesRepresentative(objRequest);
+            body += $@"<p>The person requesting a B2B login on {DateTime.Now:ddd dd MMMM yyyy} was:</p>";
+
+            body += $@"<p>&nbsp;</p>";
+
+            body += $@"<p>{objRequest.userName}</p>";
             
-            //            var body = $@"<p>Hello {JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].contactName").Value<string>()},</p><p>&nbsp;</p>
-            //<p><strong>{objRequest.tradeAccountLabel}</strong> has requested a login for our new & improved B2B Trade Site.</p>";
+            body += $@"<p><a href=""mailto:{objRequest.userEmail}"">{objRequest.userEmail}</a></p>";
 
-            //            body += $@"<p>The person requesting a B2B login on {DateTime.Now:ddd dd MMMM yyyy} was:</p>";
+            if (!String.IsNullOrEmpty(objRequest.userPhone))
+            {
+                body += $@"<p><a href=""mailto:{objRequest.userPhone}"">{objRequest.userPhone}</a></p>";
+            }
 
-            //            body += $@"<p>&nbsp;</p>";
+            body += $@"<p>&nbsp;</p>";
 
-            //            body += $@"<p>{objRequest.userName}</p>";
+            body += $"<p><strong>THIS PERSON MAY NOT BE THE ACCOUNT OWNER. WE CAN ONLY SEND A B2B TRADE REGISTRATION LINK TO THE MAIN EMAIL ADDRESS WE HOLD ON {objRequest.tradeAccountLabel}</strong></p>";
 
-            //            body += $@"<p><a href=""mailto:{objRequest.userEmail}"">{objRequest.userEmail}</a></p>";
+            body += $@"<p>Please use the <a href=""https://portal.designersguild.com/customers/invite"">""Send Trade Admin Invites"" Portal App</a> to view the registered email address we hold and to see if this account has been registered previously.</p>";
 
-            //            if (!String.IsNullOrEmpty(objRequest.userPhone))
-            //            {
-            //                body += $@"<p><a href=""mailto:{objRequest.userPhone}"">{objRequest.userPhone}</a></p>";
-            //            }
+            body += @"<p>Once registered, the account holder is responsible for the creation and management of their own users.</p>";
 
-            //            body += $@"<p>&nbsp;</p>";
+            body += @"<p>If the email address above is not the registered account email address, please reply to them and ask that they get the owner of the account to create them as a user.</p>";
 
-            //            body += $"<p><strong>THIS PERSON MAY NOT BE THE ACCOUNT OWNER. WE CAN ONLY SEND A B2B TRADE REGISTRATION LINK TO THE MAIN EMAIL ADDRESS WE HOLD ON {objRequest.tradeAccountLabel}</strong></p>";
+            body += "<p>&nbsp;</p><p>Thank you</p>";
 
-            //            body += $@"<p>Please use the <a href=""https://portal.designersguild.com/customers/invite"">""Send Trade Admin Invites"" Portal App</a> to view the registered email address we hold and to see if this account has been registered previously.</p>";
+            var email = JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].email").Value<string>();
 
-            //            body += @"<p>Once registered, the account holder is responsible for the creation and management of their own users.</p>";
+            string cc = null;
 
-            //            body += @"<p>If the email address above is not the registered account email address, please reply to them and ask that they get the owner of the account to create them as a user.</p>";
+#if DEBUG
+            email = "tclark@designersguild.com";
+            cc = "mchristie@designersguild.com";
+#endif
 
-            //            body += "<p>&nbsp;</p><p>Thank you</p>";
+            var emailId = db.addEmailToQueue(
+                email,
+                cc,
+                "itsupport@designersguild.com",
+                $"Trade Admin Invite Requested - {objRequest.tradeAccountLabel}",
+                body);
 
-            //            var email = JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].email").Value<string>();
-
-            //            string cc = null;
-
-            //#if DEBUG
-            //            email = "tclark@designersguild.com";
-            //            cc = "mchristie@designersguild.com";
-            //#endif
-
-            //            var emailId = db.addEmailToQueue(
-            //                email,
-            //                cc,
-            //                "itsupport@designersguild.com",
-            //                $"Trade Admin Invite Requested - {objRequest.tradeAccountLabel}",
-            //                body);
-
-            //            return Ok(new { emailId });
+            return Ok(new { emailId });
         }
 
         [HttpPost]

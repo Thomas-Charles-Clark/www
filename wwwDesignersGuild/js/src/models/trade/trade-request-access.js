@@ -7,15 +7,7 @@
 
     self.busy = ko.observable(false);
 
-    if (window.loginModel) {
-        self.busy = window.loginModel.busy;
-    }
-
-    self.success = ko.observable(false);
-
-    self.notification = ko.observable();
-
-    self.resultClass = ko.observable();
+    self.showSuccess = ko.observable(false);
 
     self.validateNow = ko.observable(false);
 
@@ -248,19 +240,7 @@
                     data: data,
                     success: function (data) {
                         self.busy(false);
-
-                        if (data.success) {
-                            self.success(true);
-                        }
-
-                        if (data.notification) {
-                            self.notification(data.notification);
-                        }
-
-                        if (data.resultClass) {
-                            self.resultClass(data.resultClass);
-                        }
-
+                        self.showSuccess(true);
                         //window.setTimeout(function () {
                         //    self.showSuccess(false);
                         //}, 10000);
@@ -268,7 +248,7 @@
                     },
                     error: function (xhr, s, a) {
                         self.busy(false);
-                        alert(self.resources.MajorError);
+                        alert(getDGECResource('majorError'));
                     }
                 });
             }

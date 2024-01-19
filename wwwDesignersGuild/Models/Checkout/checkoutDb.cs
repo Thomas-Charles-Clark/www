@@ -548,22 +548,6 @@ namespace wwwDesignersGuild.Models.Checkout
             return objGiftVoucherData;
         }
 
-        public async Task<GiftVoucherPDF> getGiftVoucherForPDF(string code)
-        {
-            var objGiftVoucherData = await Task.FromResult<GiftVoucherPDF>(getGiftVoucherForPDFAsync(code));
-            return objGiftVoucherData;
-        }
-
-
-        private GiftVoucherPDF getGiftVoucherForPDFAsync(string code)
-        {
-            var dataContext = new databaseDataContext();
-
-            var result = dataContext.GetGiftVoucherForPDF(code).SingleOrDefault();
-
-            return result;
-        }
-
 
         #endregion
 

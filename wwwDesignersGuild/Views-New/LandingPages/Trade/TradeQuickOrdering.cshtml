@@ -46,6 +46,16 @@
                 </div>
                 <div class="flex-grow-0 text-end product-price" data-bind="html: priceMessage"></div>
             </div>
+            <!-- ko if: controls.allowSample -->
+            <!-- ko with: getProductByBasketLineType(sample.productId, @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: controls.allowLargeSample -->
+            <!-- ko with: getProductByBasketLineType(largeSample.productId, @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
             <!-- ko if: controls.allowOrder -->
             <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
             <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
@@ -61,52 +71,37 @@
             <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: controls.allowSample -->
-            <!-- ko with: getProductByBasketLineType(sample.productId, @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
-            <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko if: controls.allowLargeSample -->
-            <!-- ko with: getProductByBasketLineType(largeSample.productId, @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template' } --><!-- /ko -->
-            <!-- /ko -->
-            <!-- /ko -->
             @*<!-- ko ifnot: controls.allowOrder -->
-        <div class="order-form-item">
-            <div class="order-form-controls">
-                <span class="order-form-controls-spacer">
-                    &nbsp;
-                </span>
-                <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)" class="btn btn-dark">
-                    @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
-                </a>
-            </div>
-        </div>
-        <!-- /ko -->*@
+                <div class="order-form-item">
+                    <div class="order-form-controls">
+                        <span class="order-form-controls-spacer">
+                            &nbsp;
+                        </span>
+                        <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)" class="btn btn-dark">
+                            @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
+                        </a>
+                    </div>
+                </div>
+                <!-- /ko -->*@
         </div>
     </div>
 </script>
 <script id="ko-order-form-item-button-template" type="text/html">
-    <div class="order-form-item trade" data-bind="css: { 'mt-0': [2,3].indexOf(basketLineTypeId) > -1 }">
-        <div class="messaging-container" style="display: none" data-bind="visible: [1,2,3].indexOf(basketLineTypeId) > -1">
-            <div class="price-messages">
-                <span data-bind="html: priceMessage"></span>
-                <!-- ko if: stockMessage.allowBackInStockReminder -->
-                <div class="back-in-stock-wrapper">
-                    <a href="javascript:;" data-bind="click: window.basketModel.backInStockReminder">
-                        @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
-                    </a>
-                </div>
-                <!-- /ko -->
-            </div>
-            <div class="stock-messages">
-                <!-- ko foreach: stockMessage.basketQuantityThresholds -->
-                <!-- ko foreach: stockMessages -->
-                <h6 class="order-form-stock-message" data-bind="class: $data.class, html: stockMessage, css: { 'pointer' : $parentContext.$parent.stockMessage.allowStockCheck }, click: () => { $parentContext.$parent.stockMessage.allowStockCheck ? window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 0) : null }"></h6>
-                <!-- /ko -->
-                <!-- /ko -->
-            </div>
+    <div class="order-form-item">
+        <!-- ko if: basketLineTypeId < 2 -->
+        <div class="stock-messages">
+            <!-- ko foreach: stockMessage.basketQuantityThresholds -->
+            <!-- ko foreach: stockMessages -->
+            <h6 class="order-form-stock-message" data-bind="class: $data.class,
+                html: stockMessage,
+                css: { 'pointer' : $parentContext.$parent.stockMessage.allowStockCheck },
+                click: ()=>
+                { $parentContext.$parent.stockMessage.allowStockCheck ? window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 0) : null }">
+            </h6>
+            <!-- /ko -->
+            <!-- /ko -->
         </div>
+        <!-- /ko -->
         <div class="order-form-controls">
             <label for="-quantity" data-bind="attr: {  for: `product-${productId}-order-form-type-${basketLineTypeId}-qty` }">
                 @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
@@ -131,10 +126,12 @@
                 <span data-bind="text: orderButtonText"></span>
                 <!-- /ko -->
                 <!-- ko if: orderFormTypeId == 1 -->
-                <span data-bind="text: orderButtonText"></span>
+                <span data-bind="text: orderButtonText" class="me-2"></span>
+                <span data-bind="html: priceMessage"></span>
                 <!-- /ko -->
                 <!-- ko if: orderFormTypeId == 2 -->
-                <span data-bind="text: orderButtonText"></span>
+                <span data-bind="text: orderButtonText" class="me-2"></span>
+                <span data-bind="html: priceMessage"></span>
                 <!-- /ko -->
                 <!-- ko if: orderFormTypeId == 3 -->
                 <span data-bind="text: reserveButtonText"></span>
@@ -145,6 +142,13 @@
             </button>
         </div>
         <span style="display: none;" class="validation-message" data-bind="validationMessage: quantity"></span>
+        <!-- ko if: stockMessage.allowBackInStockReminder -->
+        <div class="back-in-stock-wrapper mt-2 text-right">
+            <a href="javascript:;" data-bind="click: window.basketModel.backInStockReminder">
+                @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+            </a>
+        </div>
+        <!-- /ko -->
     </div>
 </script>
 

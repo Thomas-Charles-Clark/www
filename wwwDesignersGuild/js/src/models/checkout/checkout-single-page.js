@@ -1535,7 +1535,7 @@ const deliveryAddressFactory = ((parent) => {
                                 self.upsLocatorResults(results);
                             },
                             error: function (xhr, s, a) {
-                                alert(self.resources.MajorError);
+                                alert(getDGECResource('majorError'));
                             }
                         });
 
@@ -3115,8 +3115,8 @@ const checkoutDeliveryAddress = (
 
     self.initPCAAutocomplete = function () {
         $(self.PCASearchTerm.DOMElement).autocomplete({
-            appendTo: $(self.PCASearchTerm.DOMElement).parent(),
-            //position: { my: "right top", at: "right bottom", of: $(self.PCASearchTerm.DOMElement), collision: "none" },
+            appendTo: 'body',
+            position: { my: "right top", at: "right bottom", of: $('.ui-front'), collision: "none" },
             source: function (request, response) {
                 $.ajax({
                     url: "/api/member/addressLookupSearch",
@@ -3376,7 +3376,6 @@ const checkoutDeliveryAddress = (
     };
 
     self.initLateExtenders = function (data) {
-
         //console.log('checkoutDeliveryAddress initLateExtenders', data);
         if (self.PCASearchTerm.DOMElement) {
             //console.log('address.PCASearchTerm had DOMElement: initialising PCA');

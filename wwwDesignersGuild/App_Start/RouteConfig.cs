@@ -51,12 +51,6 @@ namespace wwwDesignersGuild
             );
 
             routes.MapRoute(
-                name: "PdfGiftVoucherRoutine",
-                url: "pdf/gift-voucher",
-                defaults: new { controller = "pdf", action = "GenerateGiftVoucher" }
-            );
-
-            routes.MapRoute(
                 name: "BundleNoticeRoutine",
                 url: "section/loadBundleNotice",
                 defaults: new { controller = "section", action = "LoadBundleNotice" }

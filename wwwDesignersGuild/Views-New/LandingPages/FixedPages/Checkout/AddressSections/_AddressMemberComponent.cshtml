@@ -446,7 +446,9 @@
             </div>
         </form>
     </div>
-    <!-- ko if: window.setTimeout(() => { initLateExtenders() }, 0) --><!-- /ko -->
+    <!-- ko if: ko.ignoreDependencies(() => { initLateExtenders() }) -->
+    <div class="clearfix"></div>
+    <!-- /ko -->
 </script>
 
 <div style="display: none;" data-bind="with: deliveryAddressFactory, visible: true">

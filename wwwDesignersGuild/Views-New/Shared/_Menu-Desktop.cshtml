@@ -24,28 +24,12 @@
         }
         @if (objMaster.LoginStatus == dgLoginStatus.notLoggedIn)
         {
-            <li id="signin-menu">
+            <li>
                 <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd)"
                    rel="nofollow"
-                   class="btn navbar-btn">
+                    class="btn navbar-btn">
                     @HtmlHelperExtra.Resource("SignIn", l, c, d) / @HtmlHelperExtra.Resource("Register", l, c, d)
                 </a>
-                <ul class="dropdown" aria-label="submenu">
-                    <li>
-                        <a class="btn btn-link"
-                           rel="nofollow"
-                           href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd)">
-                            @HtmlHelperExtra.Resource("Retail", l, c, d)
-                        </a>
-                    </li>
-                    <li>
-                        <a class="btn btn-link"
-                           rel="nofollow"
-                           href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd, null, null, new [] { new KeyValuePair<string, string>("t", "1") })">
-                            @HtmlHelperExtra.Resource("Trade", l, c, d)
-                        </a>
-                    </li>
-                </ul>
             </li>
         }
         else
