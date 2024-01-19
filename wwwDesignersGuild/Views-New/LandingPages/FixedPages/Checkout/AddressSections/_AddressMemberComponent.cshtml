@@ -293,7 +293,7 @@
             <select class="form-select" data-bind="value: PCACountry, options: availableCountries, optionsText: 'Name', optionsValue: $data" autocomplete="off"></select>
             <input type="text" class="form-control" name="address-search" data-bind="keepElement: PCASearchTerm, textInput: PCASearchTerm" autocomplete="autofill-blocker" placeholder="@HtmlHelperExtra.Resource("FindAddressSearchForAddress", l, c, d)" />
         </div>
-        <hr/>
+        <hr />
         <form>
             <div class="grid mb-3">
                 <label for="delivery-name"
@@ -438,17 +438,15 @@
                     <button type="button" class="btn btn-secondary address-confirm w-100" data-bind="text: useThisAddressText, click: confirm"></button>
                     @if (isMemberCheckout)
                     {
-                        <button type="button" class="btn btn-secondary mt-3 address-confirm w-100" data-bs-toggle="modal" data-bs-target="#address-book-modal">
-                            @HtmlHelperExtra.Resource("CheckoutSelectFromAddressBook", l, c, d)
-                        </button>
+                    <button type="button" class="btn btn-secondary mt-3 address-confirm w-100" data-bs-toggle="modal" data-bs-target="#address-book-modal">
+                        @HtmlHelperExtra.Resource("CheckoutSelectFromAddressBook", l, c, d)
+                    </button>
                     }
                 </div>
             </div>
         </form>
     </div>
-    <!-- ko if: ko.ignoreDependencies(() => { initLateExtenders() }) -->
-    <div class="clearfix"></div>
-    <!-- /ko -->
+    <!-- ko if: window.setTimeout(() => { initLateExtenders() }, 0) --><!-- /ko -->
 </script>
 
 <div style="display: none;" data-bind="with: deliveryAddressFactory, visible: true">

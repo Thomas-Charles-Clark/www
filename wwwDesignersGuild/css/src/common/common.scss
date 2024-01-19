@@ -72,7 +72,6 @@ h1, h2, h3, h4, h5, h6 {
                 display: flex;
                 align-items: center;
                 @include flex-gap($m-gutter, 0);
-
                 cursor: pointer;
 
                 span {
@@ -84,14 +83,14 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .share {
-        background-image: url(../../Content/images/svg/share-std.svg);
+        background-image: url(/Content/images/svg/share-std.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
     }
 
     .email {
-        background-image: url(../../Content/images/svg/email-circular.svg);
+        background-image: url(/Content/images/svg/email-circular.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -99,7 +98,7 @@ h1, h2, h3, h4, h5, h6 {
 
     .pinterest {
         /*background-image: url(../../Content/images/svg/pinterest-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-pinterest.png);
+        background-image: url(/Content/images/social/icon-pinterest.png);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -107,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 
     .facebook {
         /*background-image: url(../../Content/images/svg/facebook-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-facebook.png);
+        background-image: url(/Content/images/social/icon-facebook.png);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -115,14 +114,14 @@ h1, h2, h3, h4, h5, h6 {
 
     .twitter {
         /*background-image: url(../../Content/images/svg/twitter-circular.svg);*/
-        background-image: url(../../Content/images/social/icon-twitter.png);
+        background-image: url(/Content/images/social/icon-twitter.png);
         background-size: cover;
         width: 24px;
         height: 24px;
     }
 
     .copy {
-        background-image: url(../../Content/images/svg/link-circular.svg);
+        background-image: url(/Content/images/svg/link-circular.svg);
         background-size: cover;
         width: 24px;
         height: 24px;
@@ -257,15 +256,16 @@ h1, h2, h3, h4, h5, h6 {
 #article-main {
     --bs-columns: 12;
     gap: $xl-gutter;
+
     > article {
         grid-column: auto/span 9;
     }
+
     > div {
         grid-column: auto/span 3;
     }
 
     #related-articles {
-
     }
 }
 
@@ -307,7 +307,7 @@ ul.undotted-list {
 #product-page-accordion {
     .accordion-header {
         button {
-            text-transform: uppercase;    
+            text-transform: uppercase;
         }
     }
 }
@@ -344,6 +344,7 @@ ul.undotted-list {
                     color: $white;
                 }
             }
+
             .select-a-size {
                 line-height: 1;
             }
@@ -367,6 +368,7 @@ ul.undotted-list {
 
 .grid.features {
     --bs-columns: 1;
+
     .alert-title {
         margin-bottom: 0;
     }
@@ -387,6 +389,7 @@ ul.undotted-list {
             word-break: break-all;
         }
     }
+
     .card + .card {
         margin-top: var(--m-gutter);
     }
@@ -414,6 +417,7 @@ footer {
 
     ul {
         padding-left: 0;
+
         li {
             border: none;
             list-style-type: none;
@@ -520,8 +524,8 @@ footer {
 
             a {
                 span:first-of-type {
-                    width: 25px;
-                    height: 25px;
+                    width: 18px;
+                    height: 18px;
                 }
             }
         }
@@ -715,13 +719,14 @@ input::-webkit-inner-spin-button {
     button {
         padding: 0;
         position: relative;
+
         img {
             width: 100%;
             height: auto;
         }
     }
 
-    button.active::after { 
+    button.active::after {
         content: ' ';
         position: absolute;
         left: 0;
@@ -766,6 +771,7 @@ input::-webkit-inner-spin-button {
             }
         }
     }
+
     .carousel-thumbnails {
         grid-template-columns: repeat(8, minmax(10px, 1fr));
     }
@@ -1056,7 +1062,6 @@ input::-webkit-inner-spin-button {
 
 #debug-navbar {
     color: var(--bs-light);
-
     border-bottom: 1px solid var(--bs-gray-400);
     /*box-shadow: 0 0 3px 1px var(--bs-gray-400);*/
     padding: 0;
@@ -1074,12 +1079,15 @@ input::-webkit-inner-spin-button {
     label:not(.form-check-label) {
         margin-inline-start: var(--l-gutter);
     }
+
     .form-check {
         padding-left: 1em;
+
         .form-check-input {
             margin-left: -1.5em;
             cursor: pointer;
         }
+
         .form-check-label {
             cursor: pointer;
         }
@@ -1780,7 +1788,7 @@ input::-webkit-inner-spin-button {
 .article-grid,
 .page-grid {
     gap: $l-gutter;
-    
+
     .card-img-top {
         width: 100%;
         height: auto;
@@ -1790,7 +1798,7 @@ input::-webkit-inner-spin-button {
 }
 
 .collection-grid {
-    gap: $l-gutter;    
+    gap: $l-gutter;
 }
 
 .alternate-colourway-grid {
@@ -1992,10 +2000,12 @@ nav.article-type-nav.article-sub-type-nav {
             align-items: center;
             padding: var(--sm-gutter);
             opacity: 0.85;
+
             span {
                 position: relative;
                 top: 1px;
             }
+
             i.material-icons {
                 position: relative;
                 top: 1px;
@@ -2197,6 +2207,7 @@ nav.article-type-nav.article-sub-type-nav {
 #large-image-modal {
     .carousel {
         width: 100%;
+
         .carousel-inner {
             img {
                 width: 100%;
@@ -2204,6 +2215,7 @@ nav.article-type-nav.article-sub-type-nav {
             }
         }
     }
+
     .carousel-thumbnails {
         position: static;
 
@@ -2228,11 +2240,12 @@ nav.article-type-nav.article-sub-type-nav {
 
 
 #more-colourways-btn:hover {
-    text-decoration: underline;    
+    text-decoration: underline;
 }
 
 .back-in-stock-wrapper {
     text-align: right;
+
     a {
         color: $gray-dg-body;
     }
@@ -2285,8 +2298,8 @@ nav.article-type-nav.article-sub-type-nav {
 
         tr {
             border-top: 0;
-            td {
 
+            td {
             }
         }
     }
@@ -2466,7 +2479,7 @@ nav.article-type-nav.article-sub-type-nav {
 .standardtext.panel.multi-column {
     .grid {
         --bs-columns: 1;
-    } 
+    }
 }
 
 #film-grid {
@@ -2689,7 +2702,7 @@ nav.article-type-nav.article-sub-type-nav {
     list-style-type: none;
     text-indent: 0;
 
-    &.address-autocomplete{
+    &.address-autocomplete {
         right: 2px !important;
         left: unset !important;
     }
@@ -2700,4 +2713,12 @@ nav.article-type-nav.article-sub-type-nav {
     right: 0;
     top: 100%;
     z-index: 10;
+}
+
+.searcher {
+    .ui-front {
+        position: absolute;
+        z-index: 1000;
+        top: 4px;
+    }
 }
