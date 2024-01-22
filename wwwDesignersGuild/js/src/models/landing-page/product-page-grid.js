@@ -552,6 +552,9 @@
         self.offcanvas.DOMElement.addEventListener('touchstart', self.offcanvasTouchStart, { passive: true });
         self.offcanvas.DOMElement.addEventListener('touchmove', self.offcanvasTouchMove, { passive: true });
         self.offcanvas.DOMElement.addEventListener('touchend', self.offcanvasTouchEnd, { passive: true });
+
+        self.offcanvas.DOMElement.remove();
+        document.body.appendChild(self.offcanvas.DOMElement);
     });
 
     //#endregion
