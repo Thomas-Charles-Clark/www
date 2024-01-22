@@ -157,7 +157,7 @@
                     <!-- ko if: newPassword.observable() -->
                     <!-- ko if: passwordErrors.isAnyMessageShown() == false && newPassword.observable.zxcvbn().score >= 2 -->
                     <span class="mt-3 d-flex justify-content-end">
-                        <button class="btn btn-success" data-bind="click: () => { save(null, [observable]); }, text: resources.Save"></button>
+                        <button class="btn btn-success" data-bind="click: () => { save(null, [newPassword.observable]); }, text: resources.Save"></button>
                     </span>
                     <!-- /ko -->
                     <!-- /ko -->
