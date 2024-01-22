@@ -552,6 +552,12 @@
         self.offcanvas.DOMElement.addEventListener('touchstart', self.offcanvasTouchStart, { passive: true });
         self.offcanvas.DOMElement.addEventListener('touchmove', self.offcanvasTouchMove, { passive: true });
         self.offcanvas.DOMElement.addEventListener('touchend', self.offcanvasTouchEnd, { passive: true });
+
+        // This is necessary because of z-indexing issues: a previous animation / slideshow page section will have greater z-indexing
+        // because of the potential for hotspots to be present and the need for them to be on top
+        // this left the offcanvas coming in underneath the carousel which wasn't good
+        self.offcanvas.DOMElement.remove();
+        document.body.appendChild(self.offcanvas.DOMElement);
     });
 
     //#endregion
@@ -994,6 +1000,7 @@
 
     self.allProductPagesInitialised = (changes) => {
         self.allProductPagesReady(true);
+
         return true;
     }
 
