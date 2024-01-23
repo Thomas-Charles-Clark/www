@@ -31,7 +31,7 @@
     self.searchable.subscribe(nv => {
         console.log('searchable subscribe hit', nv);
     });
-        
+
     // Not in use by the search results product page grid.+
     self.allProductPages = ko.observableArray([]);
 
@@ -242,6 +242,23 @@
                         obj[kvp[0]] = kvp[1];
                     }
                     console.log(kvp);
+                }
+
+                if (self.offcanvas.DOMElement && document.getElementById(`${self.offcanvas.DOMElement.id}-form`)) {
+                    // and from the grid filters (this is now necessary because I've had to detach the filters and reattach them to body... because page section z-indexing, argh)
+                    let f = new FormData(document.querySelector(`#${self.offcanvas.DOMElement.id}-form`));
+
+                    console.log(`updateUrl #${self.offcanvas.DOMElement.id}-form FormData.entries():`);
+
+                    for (const kvp of f.entries()) {
+                        if (obj.hasOwnProperty(kvp[0])) {
+                            obj[kvp[0]] = [obj[kvp[0]]];
+                            obj[kvp[0]].push(kvp[1]);
+                        } else {
+                            obj[kvp[0]] = kvp[1];
+                        }
+                        console.log(kvp);
+                    }
                 }
 
                 let qs = new URLSearchParams(obj);
@@ -554,7 +571,10 @@
         self.offcanvas.DOMElement.addEventListener('touchend', self.offcanvasTouchEnd, { passive: true });
 
         self.offcanvas.DOMElement.remove();
-        document.body.appendChild(self.offcanvas.DOMElement);
+        let form = document.createElement("form");
+        form.id = `${self.offcanvas.DOMElement.id}-form`;
+        form.appendChild(self.offcanvas.DOMElement);
+        document.body.appendChild(form);
     });
 
     //#endregion
@@ -746,7 +766,7 @@
     self.skipProductPageRenderer.subscribe(nv => {
         console.log('skipProductPageRenderer subscribe hit',)
     });
-    
+
     self.productPageRenderer = ko.computed({
         read: () => {
 
