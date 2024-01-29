@@ -330,7 +330,7 @@
                    section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
                    section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
                 {
-                    <div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass)">
+                    <div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
                         <!-- ko with: pageSections[@(index)] -->
                         @if ((section.PageSection.TradeSwitch == null) ||
                          (section.PageSection.TradeSwitch == false && !tradeUser) ||
