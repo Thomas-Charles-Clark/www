@@ -86,6 +86,7 @@ namespace wwwDesignersGuild.Models.Classes
         public bool IsLifestyleGallery { get; set; }
         public bool IsShop { get; set; }
         public byte ProductTypeID { get; set; }
+        public bool ViewportWidth { get; set; }
     }
 
     public class pageSectionHtml
