@@ -1764,7 +1764,7 @@ namespace wwwDesignersGuild.Controllers
                 }
             }
 
-            if (correctString == currentString)
+            if (correctString == HttpUtility.UrlDecode(currentString))
             {
                 return false;
             }
