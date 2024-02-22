@@ -61,38 +61,25 @@ else
                     <div>
                         <p class="trade-check-result-text" data-bind="html: resources.TradeLoginHeadingText"></p>
                         <div class="summary-help" data-bind="visible: !tradeComplete()">
-                            @if (Model.Data?.CustomerServicesPhoneNumber != null)
-                            {
-                                <p class="summary-help-title">
-                                    @HtmlHelperExtra.Resource("CheckoutCustomerServicesTitle", l, c, d)
-                                </p>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <th>
-                                                @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d):
-                                            </th>
-                                            <td>
-                                                <a class="summary-help-phone" href="tel:@(Model.Data?.CustomerServicesPhoneNumber)">@(Model.Data?.CustomerServicesPhoneNumber)</a>
-                                            </td>
-                                        </tr>
-                                        @if (Model.Data?.SalesRepresentativeEmail != null)
-                                        {
-                                            <tr>
-                                                <th>
-                                                    @HtmlHelperExtra.Resource("MemberEditYourSalesRep", l, c, d):
-                                                </th>
-                                                <td>
-                                                    <span>
-                                                        @(Model.Data?.SalesRepresentativeName)
-                                                    </span>
-                                                    <a class="summary-help-email" href="mailto:@(Model.Data?.SalesRepresentativeEmail)">@(Model.Data?.SalesRepresentativeEmail)</a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d):
+                                        </th>
+                                        <td>
+                                            @if (Model.Data?.CustomerServicesPhoneNumber != null)
+                                            {
+                                                <a class="summary-help-phone me-5" href="tel:@(Model.Data?.CustomerServicesPhoneNumber)">@(Model.Data?.CustomerServicesPhoneNumber)</a>
+                                            }
+                                            @if (Model.Data?.CustomerServicesEmail != null)
+                                            {
+                                                <a class="summary-help-email" href="mailto:@(Model.Data?.CustomerServicesEmail)">@(Model.Data?.CustomerServicesEmail)</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
