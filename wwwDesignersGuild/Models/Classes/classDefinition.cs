@@ -848,6 +848,7 @@ namespace wwwDesignersGuild.Models.Classes
         public string FormType { get; set; }
         public string Email { get; set; }
         public string CustomerServicesPhoneNumber { get; set; }
+        public string CustomerServicesEmail { get; set; }
         public string SalesRepresentativeName { get; set; }
         public string SalesRepresentativeEmail { get; set; }
     }
