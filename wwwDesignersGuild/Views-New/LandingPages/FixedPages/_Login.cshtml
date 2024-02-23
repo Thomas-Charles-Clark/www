@@ -9,7 +9,7 @@
 
     var tradeUser = objMaster.TradeAllowed;
 }
-@Render.Script("~/bundles/js/login-page")
+
 @if (Model.BaseViewModel.ContentID == (int)dgFixedPage.checkoutLogin)
 {
     <script type="text/javascript">
@@ -334,7 +334,7 @@
                 </div>
             </div>
         </form>
-        <div id="forgotten-password-modal" class="modal fade">
+        <div id="forgotten-password-modal" class="modal">
             <div class="modal-dialog">
                 <div class="page-blocker" data-bind="toggleOpacity: forgotBusy">
                     <div class="spinner-border" role="status"></div>
@@ -454,3 +454,11 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    window.getLoginResources = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel.PrefetchedResources))
+    }
+</script>
+
+@Render.Script("~/bundles/js/login-page")

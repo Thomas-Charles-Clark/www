@@ -44,8 +44,6 @@
     </script>
 }
 
-@Render.Script("~/bundles/js/checkout-login-page")
-
 <div class="container my-4">
     <div id="first-blocker"
          class="page-blocker"
@@ -147,11 +145,11 @@
             }
         }
         @if (!String.IsNullOrEmpty(Model.CheckoutTypeNotice.AlertMessage))
-         {
+        {
             <div id="checkout-option-alert-message" class="checkout-option" style="display: none" data-bind="visible: window.ApplePaySession">
                 @Html.Raw(Model.CheckoutTypeNotice.AlertMessage)
             </div>
-         }
+        }
     </div>
     <p class="text-center mt-8">
         @HtmlHelperExtra.Resource("IfYouHaveAGiftVoucher", l, c, d)
@@ -274,6 +272,25 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    window.getLoginResources = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel.PrefetchedResources))
+    }
+</script>
+
+@Render.Script("~/bundles/js/checkout-login-page")
+
+<script type="text/javascript">
+    window.addLoadFunction(() => {
+        let fpm = document.querySelector("#forgotten-password-modal");
+        let phm = document.querySelector("#password-hint-modal");
+        fpm.remove();
+        document.body.appendChild(fpm);
+        phm.remove();
+        document.body.appendChild(phm);
+    });
+</script>
 
 @if (Model.PermitApple)
 {

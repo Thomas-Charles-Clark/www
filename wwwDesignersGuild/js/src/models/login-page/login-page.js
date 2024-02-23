@@ -565,26 +565,26 @@
 
     return self;
 });
-fetchResources(['FormsErrorEmailFormat',
-    'nameValidation',
-    'emailValidation',
-    'PleaseProvideYourPassword',
-    'ManageAccountErrorPassword',
-    'ManageAccountPasswordStrength0',
-    'ManageAccountPasswordStrength1',
-    'ManageAccountPasswordStrength2',
-    'ManageAccountPasswordStrength3',
-    'ManageAccountPasswordStrength4',
-    'FormsErrorEmailCompare',
-    'RegistrationDuplicateText',
-    'LoginInvalid',
-    'PaypalInvalidAddress',
-    'PayWithCard',
-    'CheckoutTradeCheckout'
-])
-.then(window.handleResourcesArray)
-.then(resources => {
-    window.loginModel = loginViewModel(resources);
+//fetchResources(['FormsErrorEmailFormat',
+//    'nameValidation',
+//    'emailValidation',
+//    'PleaseProvideYourPassword',
+//    'ManageAccountErrorPassword',
+//    'ManageAccountPasswordStrength0',
+//    'ManageAccountPasswordStrength1',
+//    'ManageAccountPasswordStrength2',
+//    'ManageAccountPasswordStrength3',
+//    'ManageAccountPasswordStrength4',
+//    'FormsErrorEmailCompare',
+//    'RegistrationDuplicateText',
+//    'LoginInvalid',
+//    'PaypalInvalidAddress',
+//    'PayWithCard',
+//    'CheckoutTradeCheckout'
+//])
+//.then(window.handleResourcesArray)
+//.then(resources => {
+    window.loginModel = loginViewModel(window.getLoginResources());
     ko.applyBindings(window.loginModel, document.querySelector('#login-wrapper'));
     document.querySelector('#body-content').dispatchEvent(new Event('memberGuestLoginReady'));
-});
+//});
