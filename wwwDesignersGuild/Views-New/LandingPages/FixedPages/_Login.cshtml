@@ -457,7 +457,7 @@
 
 <script type="text/javascript">
     window.getLoginResources = () => {
-        return @Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel.PrefetchedResources))
+        return window.handleResourcesArray(@Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel.PrefetchedResources)))
     }
 </script>
 
