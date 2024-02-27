@@ -590,6 +590,29 @@ namespace wwwDesignersGuild.ViewModels
                             "WeHaveDeselectedTheFollowing"
                         });
                     break;
+                case (int)dgFixedPage.memberLogin:
+                    required.AddRange(new string[] {
+                    "FormsErrorEmailFormat",
+                    "nameValidation",
+                    "emailValidation",
+                    "PleaseProvideYourPassword",
+                    "ManageAccountErrorPassword",
+                    "ManageAccountPasswordStrength0",
+                    "ManageAccountPasswordStrength1",
+                    "ManageAccountPasswordStrength2",
+                    "ManageAccountPasswordStrength3",
+                    "ManageAccountPasswordStrength4",
+                    "FormsErrorEmailCompare",
+                    "PleaseProvideTradeAccountNumber",
+                    "TradeLoginPleaseCheckYourEmail",
+                    "TradeLoginIfProblemsPersist",
+                    "RegistrationDuplicateText",
+                    "LoginInvalid",
+                    "PaypalInvalidAddress",
+                    "PayWithCard",
+                    "CheckoutTradeCheckout"
+                    });
+                    break;
                 case (int)dgFixedPage.memberAddress:
                     required.AddRange(new string[] {
                         "AreYouSure",

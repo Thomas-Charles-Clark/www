@@ -21,6 +21,7 @@ using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Util;
 using SimpleImpersonation;
+using Braintree;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -3070,6 +3071,17 @@ namespace wwwDesignersGuild.Models.Database
             }
 
             return result;
+        }
+
+        public async Task<int> TradeLogin_Unregistered(PassTradeLoginUnregisteredRequest obj, long visitorId)
+        {
+            _ = await this.Connection.QueryAsync("pub.TradeMember_Authentication_UnregisteredLoginSubmit", new { 
+                TradeAccountCode = obj.TradeAccountCode,
+                Email = obj.Email,
+                VisitorID = visitorId
+            }, null, null, CommandType.StoredProcedure);
+
+            return 0;
         }
     }
 

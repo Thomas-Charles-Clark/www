@@ -14,15 +14,6 @@
     var isMemberLoginPage = Model.BaseViewModel.ContentID == (int)dgFixedPage.memberLogin;
 }
 @* Don't go shuffling this around for aesthetics, it's important that the components come first *@
-@if (isMemberLoginPage)
-{
-    @Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
-}
-@Render.Script("~/bundles/js/login-page")
-@if (isMemberLoginPage)
-{
-    @Render.Script("~/bundles/js/trade-request-access")
-}
 @if (Model.BaseViewModel.ContentID == (int)dgFixedPage.checkoutLogin)
 {
     <script type="text/javascript">
@@ -85,7 +76,7 @@
                                     role="tab"
                                     aria-controls="signin-retail-tab"
                                     aria-selected="true">
-                                @HtmlHelperExtra.Resource("Retail", l, c, d)
+                                @HtmlHelperExtra.Resource("Login", l, c, d)
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -97,7 +88,7 @@
                                     role="tab"
                                     aria-controls="signin-trade-tab"
                                     aria-selected="false">
-                                @HtmlHelperExtra.Resource("Trade", l, c, d)
+                                @HtmlHelperExtra.Resource("TradeLogin", l, c, d)
                             </button>
                         </li>
                     </ul>
@@ -386,28 +377,30 @@
                              role="tabpanel"
                              aria-labelledby="signin-trade-tab-anchor">
                             <p>
-                                @HtmlHelperExtra.Resource("TradeLoginPreamble", l, c, d)
+                                @HtmlHelperExtra.Resource("ToSignInWithDG", l, c, d)
                             </p>
                             <div class="form-check">
-                                <input id="trade-already-authenticated" class="form-check-input" type="radio" name="trade-state" value="0" checked data-bind="checked: tradeRegistrationMode, checkedValue: 0" />
+                                <input id="trade-already-authenticated"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="trade-state"
+                                       data-bind="checked: tradeRegistrationMode, checkedValue: 0" />
                                 <label class="form-check-label" for="trade-already-authenticated">
-                                    @HtmlHelperExtra.Resource("AlreadyAuthenticatedTradeAccount", l, c, d)
+                                    @HtmlHelperExtra.Resource("ImAlreadyRegistered", l, c, d)
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input id="trade-not-yet-authenticated" class="form-check-input" type="radio" name="trade-state" value="1" data-bind="checked: tradeRegistrationMode, checkedValue: 1" />
-                                <label class="form-check-label" for="trade-not-yet-authenticated">
-                                    @HtmlHelperExtra.Resource("NotYetAuthenticatedTradeAccount", l, c, d)
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input id="trade-request-account" class="form-check-input" type="radio" name="trade-state" value="2" data-bind="checked: tradeRegistrationMode, checkedValue: 2" />
+                                <input id="trade-request-account"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="trade-state"
+                                       data-bind="checked: tradeRegistrationMode, checkedValue: 1" />
                                 <label class="form-check-label" for="trade-request-account">
-                                    @HtmlHelperExtra.Resource("LikeToRequestTradeAccount", l, c, d)
+                                    @HtmlHelperExtra.Resource("ImNew", l, c, d)
                                 </label>
                             </div>
                             <div id="trade-login-form-carousel"
-                                 class="login-form-carousel carousel slide carousel-fade carousel-dark pt-2"
+                                 class="login-form-carousel carousel slide carousel-fade carousel-dark"
                                  data-bs-ride="carousel"
                                  data-bs-interval="false">
                                 <div class="carousel-item @(Model.BeginRegistration ? "" : "active")">
@@ -476,36 +469,83 @@
                                         </a>
                                     </p>
                                 </div>
-                                <div class="carousel-item" data-bind="stopBinding">
+                                <div class="carousel-item">
                                     <div id="trade-wrapper">
                                         <div id="trade-request-access" style="display: none" data-bind="visible: true">
-                                            <p class="mb-3">
-                                                @HtmlHelperExtra.Resource("PleaseCompleteDetailsForTradeLink", l, c, d)
-                                            </p>
-                                            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNumberParams }"></div>
-                                            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: tradeAccountNameParams }"></div>
-                                            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: userNameParams }"></div>
-                                            <div class="mb-3" data-bind="component: { name: 'mdc-text-field-component', params: emailParams }"></div>
-                                            <div class="mb-3" data-bind="component: { name: 'mdc-phone-field-component', params: phoneParams }"></div>
-                                            <ul class="mb-3 list-group" data-bind="foreach: [...new Set(errors())]">
-                                                <li class="list-group-item text-danger" data-bind="text: $data"></li>
-                                            </ul>
-                                            <button class="btn btn-secondary w-100" type="button" data-bind="enable: !notification(), click: submit">
-                                                @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
-                                            </button>
-                                            <div id="trade-access-request-result" class="save-message justify-content-center align-items-center gap-3 mt-3" data-bind="class: resultClass, flexVisible: notification() != null, toggleOpacity: notification() != null">
-                                                <span data-bind="html: notification"></span>
-                                                <span class="material-icons" data-bind="text: success() ? 'check' : 'close'"></span>
+                                            <div class="px-3">
+                                                <div class="form-check">
+                                                    <input id="trade-have-account"
+                                                           class="form-check-input"
+                                                           type="radio"
+                                                           name="trade-account-state"
+                                                           checked="checked"
+                                                           data-bind="checked: tradeAccountState, checkedValue: 0">
+                                                    <label class="form-check-label" for="trade-have-account">
+                                                        @HtmlHelperExtra.Resource("IHaveATradeAccount", l, c, d)
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input id="trade-no-account"
+                                                           class="form-check-input"
+                                                           type="radio"
+                                                           name="trade-account-state"
+                                                           data-bind="checked: tradeAccountState, checkedValue: 1">
+                                                    <label class="form-check-label" for="trade-no-account">
+                                                        @HtmlHelperExtra.Resource("IDontHaveATradeAccount", l, c, d)
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div id="trade-account-state-carousel"
+                                                    class="login-form-carousel carousel slide carousel-fade carousel-dark"
+                                                    data-bs-ride="carousel"
+                                                    data-bs-interval="false">
+                                                <div class="carousel-item active">
+                                                    <div>
+                                                        <div class="mb-3">
+                                                            <label for="trade-account-number" class="form-label">
+                                                                @HtmlHelperExtra.Resource("ManageAccountTradeAccountNumber", l, c, d)
+                                                            </label>
+                                                            <input type="text"
+                                                                   id="trade-account-number"
+                                                                   class="form-control"
+                                                                   data-bind="keepElement: tradeAccountNumber, textInput: tradeAccountNumber"
+                                                                   autocomplete="name">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="trade-account-email" class="form-label">
+                                                                @HtmlHelperExtra.Resource("RegistrationEmailLabel", l, c, d)
+                                                            </label>
+                                                            <input type="text"
+                                                                   id="trade-account-email"
+                                                                   class="form-control"
+                                                                   data-bind="keepElement: tradeEmail, textInput: tradeEmail">
+                                                        </div>
+                                                        <div class="mb-3" style="display: none;" data-bind="visible: tradeLoginUnregisteredSubmitted">
+                                                            <div class="alert alert-success">
+                                                                <p>
+                                                                    @HtmlHelperExtra.Resource("TradeLoginPleaseCheckYourEmail", l, c, d)
+                                                                </p>
+                                                                <p class="mb-0">
+                                                                    @HtmlHelperExtra.Resource("TradeLoginIfProblemsPersist", l, c, d)
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-secondary w-100" type="button" data-bind="enable: enableTradeSubmit, click: submitTrade">
+                                                            @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <p class="mb-0">
+                                                        <a href="@Framework.URLFixup(dgFramework.buildUrl(ci, "apply-for-a-trade-account", dgContentType.landingPage, (int?)dgFixedPage.tradeAccountRequest))" rel="nofollow">
+                                                            @HtmlHelperExtra.Resource("PleaseClickForTradeAccountRequestForm", l, c, d)
+                                                        </a>
+                                                    </p>
+                                                </div>
+                                                <div class="clearfix"></div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="carousel-item">
-                                    <p class="mb-0">
-                                        <a href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeAccountRequest, ci))">
-                                            @HtmlHelperExtra.Resource("PleaseClickHereToRequestTradeAccount", l, c, d)
-                                        </a>
-                                    </p>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
@@ -621,3 +661,11 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    window.getLoginResources = () => {
+        return window.handleResourcesArray(@Html.Raw(JsonConvert.SerializeObject(Model.BaseViewModel.PrefetchedResources)))
+    }
+</script>
+
+@Render.Script("~/bundles/js/login-page")

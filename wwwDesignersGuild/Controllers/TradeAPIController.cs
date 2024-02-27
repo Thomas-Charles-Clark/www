@@ -1356,5 +1356,20 @@ namespace wwwDesignersGuild.Controllers
 
             return new System.Web.Http.Results.ResponseMessageResult(result);
         }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> TradeLoginUnregistered([FromBody]PassTradeLoginUnregisteredRequest obj)
+        {
+            Int64 visitorId = -1;
+
+            if (HttpContext.Current.Session["visitorIdFromDatabase"] != null) 
+            { 
+                visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+            }
+
+            _ = await new databaseDataContext().TradeLogin_Unregistered(obj, visitorId);
+
+            return Ok(new { });
+        }
     }
 }
