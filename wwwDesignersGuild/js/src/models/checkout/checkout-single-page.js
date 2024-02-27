@@ -1834,7 +1834,7 @@ const deliveryAddressFactory = ((parent) => {
                     null,
                     null,
                     "Designers Guild Distribution Centre",
-                    "Unit 10 Matrix Park",
+                    "Unit 10 Segro Park",
                     "900 Coronation Road",
                     "Park Royal",
                     "London",
