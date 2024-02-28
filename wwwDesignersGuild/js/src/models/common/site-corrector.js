@@ -101,6 +101,16 @@
         return true;
     }
 
+    self.transitionEnd = function (e) {
+        var element = self.siteSelection.DOMElement;
+
+        // remove this event listener so it only gets triggered once
+        element.removeEventListener('transitionend', self.transitionEnd);
+
+        // remove "height" from the element's inline styles, so it can return to its initial value
+        element.style.height = 'auto';
+    }
+
     self.show = function () {
         self.siteSelection.DOMElement.classList.add('open');
 
@@ -113,13 +123,7 @@
         element.style.height = sectionHeight + 'px';
 
         // when the next css transition finishes (which should be the one we just triggered)
-        element.addEventListener('transitionend', function (e) {
-            // remove this event listener so it only gets triggered once
-            element.removeEventListener('transitionend', arguments.callee);
-
-            // remove "height" from the element's inline styles, so it can return to its initial value
-            element.style.height = 'auto';
-        });
+        element.addEventListener('transitionend', self.transitionEnd);
 
         // mark the section as "currently not collapsed"
         element.setAttribute('data-collapsed', 'false');

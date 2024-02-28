@@ -508,8 +508,17 @@
                                                             <input type="text"
                                                                    id="trade-account-number"
                                                                    class="form-control"
-                                                                   data-bind="keepElement: tradeAccountNumber, textInput: tradeAccountNumber"
-                                                                   autocomplete="name">
+                                                                   maxlength="50"
+                                                                   data-bind="keepElement: tradeAccountNumber, textInput: tradeAccountNumber">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="trade-account-fullname" class="form-label">
+                                                                @HtmlHelperExtra.Resource("ManageAccountTradeAccountNumber", l, c, d)
+                                                            </label>
+                                                            <input type="text"
+                                                                   id="trade-account-fullname"
+                                                                   class="form-control"
+                                                                   data-bind="keepElement: tradeAccountFullName, textInput: tradeAccountFullName">
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="trade-account-email" class="form-label">

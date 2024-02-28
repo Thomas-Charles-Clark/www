@@ -230,7 +230,20 @@
         errorPulse: {}
     });
 
+    self.tradeFullName = ko.observable().extend({
+        maxLength: 50,
+        required: {
+            params: true,
+            onlyIf: () => {
+                return self.validateTradeNow() && self.registrationMode() == false
+            },
+            message: self.resources.PleaseProvideTradeAccountNumber
+        },
+        errorPulse: {}
+    });
+
     self.tradeAccountNumber = ko.observable().extend({
+        maxLength: 50,
         required: {
             params: true,
             onlyIf: () => {
@@ -393,6 +406,7 @@
 
     self.tradeErrors = new ko.validation.group([
         self.tradeEmail,
+        self.tradeFullName,
         self.tradeAccountNumber
     ]);
 
@@ -655,6 +669,7 @@
                 headers: window.fetchHeaders,
                 body: JSON.stringify({
                     tradeAccountCode: self.tradeAccountNumber(),
+                    fullName: self.tradefullName,
                     email: self.tradeEmail()
                 })
             }).then(window.handleFetchResponse)

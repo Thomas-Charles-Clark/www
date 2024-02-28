@@ -3076,8 +3076,9 @@ namespace wwwDesignersGuild.Models.Database
         public async Task<int> TradeLogin_Unregistered(PassTradeLoginUnregisteredRequest obj, long visitorId)
         {
             _ = await this.Connection.QueryAsync("pub.TradeMember_Authentication_UnregisteredLoginSubmit", new { 
-                TradeAccountCode = obj.TradeAccountCode,
-                Email = obj.Email,
+                obj.TradeAccountCode,
+                FullName = obj.FullName,
+                EmailAddress = obj.Email,
                 VisitorID = visitorId
             }, null, null, CommandType.StoredProcedure);
 
