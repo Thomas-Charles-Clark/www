@@ -237,7 +237,7 @@
             onlyIf: () => {
                 return self.validateTradeNow() && self.registrationMode() == false
             },
-            message: self.resources.PleaseProvideTradeAccountNumber
+            message: self.resources.nameValidation
         },
         errorPulse: {}
     });
@@ -669,7 +669,7 @@
                 headers: window.fetchHeaders,
                 body: JSON.stringify({
                     tradeAccountCode: self.tradeAccountNumber(),
-                    fullName: self.tradefullName,
+                    fullName: self.tradeFullName(),
                     email: self.tradeEmail()
                 })
             }).then(window.handleFetchResponse)

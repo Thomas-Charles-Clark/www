@@ -509,16 +509,17 @@
                                                                    id="trade-account-number"
                                                                    class="form-control"
                                                                    maxlength="50"
-                                                                   data-bind="keepElement: tradeAccountNumber, textInput: tradeAccountNumber">
+                                                                   data-bind="keepElement: tradeAccountNumber, textInput: tradeAccountNumber, enable: enableTradeSubmit">
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="trade-account-fullname" class="form-label">
-                                                                @HtmlHelperExtra.Resource("ManageAccountTradeAccountNumber", l, c, d)
+                                                                @HtmlHelperExtra.Resource("TradeRegistrationNameLabel", l, c, d)
                                                             </label>
                                                             <input type="text"
                                                                    id="trade-account-fullname"
                                                                    class="form-control"
-                                                                   data-bind="keepElement: tradeAccountFullName, textInput: tradeAccountFullName">
+                                                                   maxlength="50"
+                                                                   data-bind="keepElement: tradeFullName, textInput: tradeFullName, enable: enableTradeSubmit">
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="trade-account-email" class="form-label">
@@ -527,7 +528,8 @@
                                                             <input type="text"
                                                                    id="trade-account-email"
                                                                    class="form-control"
-                                                                   data-bind="keepElement: tradeEmail, textInput: tradeEmail">
+                                                                   maxlength="254"
+                                                                   data-bind="keepElement: tradeEmail, textInput: tradeEmail, enable: enableTradeSubmit">
                                                         </div>
                                                         <div class="mb-3" style="display: none;" data-bind="visible: tradeLoginUnregisteredSubmitted">
                                                             <div class="alert alert-success">

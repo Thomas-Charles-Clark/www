@@ -1,5 +1,5 @@
 ﻿@model BaseViewModel
-@{ 
+@{
     var objMaster = Model.MasterDefinition;
     var cd = objMaster.UrlBreakdown.countryDetails;
     var contentId = objMaster.UrlBreakdown.ContentId;
@@ -9,41 +9,82 @@
 
     var tradeUser = false;
 
+    var tradeMode = false;
+
     if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
         Convert.ToBoolean(Session["tradeOrderingAllowed"]))
     {
         tradeUser = true;
     }
+
+    if (Session["memberTradeCorrectSiteCulture"] != null &&
+        Session["loginStatus"]?.ToString() == dgLoginStatus.currentLogin.ToString())
+    {
+        tradeMode = true;
+    }
 }
 @if (!Model.IsBot && !Model.UserInCorrectSite && !Model.CountryCorrectorDismissed && String.IsNullOrEmpty(Model.Partial))
 {
-    <div id="site-corrector"
-         class="alert alert-primary p-0 mb-0">
-        <div class="container">
-            <p class="d-flex align-items-center justify-content-center px-1 py-3 gap-3 mb-0">
-                <span class="d-block">
-                    @HtmlHelperExtra.Resource("SiteCorrectorNoticeOne", l, c, d)
-                </span>
-                <select class="form-select"
-                        data-bind="init: { convert: parseString }, value: siteSelection">
-                   @foreach(var item in Model.CorrectSitesForUser.Select((s, i) => new { site = s, index = i }))
-                    {
-                        <option value="@item.site.URL" @(item.index == 0 ? "selected" : "")>
-                            @item.site.Name - @item.site.LanguageCode.ToUpperInvariant()
+    if (tradeMode == false)
+    {
+        <div id="site-corrector"
+             class="alert alert-primary p-0 mb-0">
+            <div class="container">
+                <p class="d-flex align-items-center justify-content-center px-1 py-3 gap-3 mb-0">
+                    <span class="d-block">
+                        @HtmlHelperExtra.Resource("SiteCorrectorNoticeOne", l, c, d)
+                    </span>
+                    <select class="form-select"
+                            data-bind="init: { convert: parseString }, value: siteSelection">
+                        @foreach (var item in Model.CorrectSitesForUser.Select((s, i) => new { site = s, index = i }))
+                        {
+                            <option value="@item.site.URL" @(item.index == 0 ? "selected" : "")>
+                                @item.site.Name - @item.site.LanguageCode.ToUpperInvariant()
+                            </option>
+                        }
+                        <option value="country-picker">
+                            @HtmlHelperExtra.Resource("OtherCountryOrRegion", l, c, d)
                         </option>
-                    }
-                    <option value="country-picker">
-                        @HtmlHelperExtra.Resource("OtherCountryOrRegion", l, c, d)
-                    </option>
-                </select>
-                <button class="btn btn-secondary" data-bind="click: changeSite">
-                    @HtmlHelperExtra.Resource("ContinueProperCase", l, c, d)
-                </button>
-                <button class="btn-close"
-                        data-bind="click: hide">
-                </button>
-            </p>
+                    </select>
+                    <button class="btn btn-secondary" data-bind="click: changeSite">
+                        @HtmlHelperExtra.Resource("ContinueProperCase", l, c, d)
+                    </button>
+                    <button class="btn-close"
+                            data-bind="click: hide">
+                    </button>
+                </p>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        var correctSite = (countryItem)Session["memberTradeCorrectSiteCulture"];
+
+        <div id="site-corrector"
+             class="alert alert-trade p-0 mb-0">
+            <div class="container">
+                <p class="d-flex align-items-center justify-content-center px-1 py-3 gap-3 mb-0">
+                    <span class="d-block">
+                        @HtmlHelperExtra.Resource("SiteCorrectorNoticeTrade", l, c, d)
+                    </span>
+                    <select class="form-select"
+                            data-bind="init: { convert: parseString }, value: siteSelection">
+                        <option value="@correctSite.URL" selected>
+                            @correctSite.Name - @correctSite.LanguageCode.ToUpperInvariant()
+                        </option>
+                        <option value="country-picker">
+                            @HtmlHelperExtra.Resource("OtherCountryOrRegion", l, c, d)
+                        </option>
+                    </select>
+                    <button class="btn btn-secondary" data-bind="click: changeSite">
+                        @HtmlHelperExtra.Resource("ContinueProperCase", l, c, d)
+                    </button>
+                    <button class="btn-close btn-close-white"
+                            data-bind="click: hideTrade">
+                    </button>
+                </p>
+            </div>
+        </div>
+    }
     @Render.Script("~/bundles/js/site-corrector")
 }

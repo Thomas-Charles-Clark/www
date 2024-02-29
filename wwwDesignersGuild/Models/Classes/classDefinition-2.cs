@@ -48,7 +48,7 @@ namespace wwwDesignersGuild.Models.Classes
         public byte SortOrder { get; set; }
     }
 
-
+    [Serializable]
     public class countryItem
     {
         public byte CountryLanguageID { get; set; }

@@ -89,6 +89,35 @@
         self.dismiss();
     }
 
+    self.hideTrade = function () {
+        self.siteSelection.DOMElement.classList.remove('open');
+
+        // get the height of the element's inner content, regardless of its actual size
+        let sectionHeight = self.siteSelection.DOMElement.scrollHeight;
+
+        // temporarily disable all css transitions
+        let elementTransition = self.siteSelection.DOMElement.style.transition;
+        self.siteSelection.DOMElement.style.transition = '';
+
+        // on the next frame (as soon as the previous style change has taken effect),
+        // explicitly set the element's height to its current pixel height, so we 
+        // aren't transitioning out of 'auto'
+        requestAnimationFrame(function () {
+            self.siteSelection.DOMElement.style.height = sectionHeight + 'px';
+            self.siteSelection.DOMElement.style.transition = elementTransition;
+
+            // on the next frame (as soon as the previous style change has taken effect),
+            // have the element transition to height: 0
+            requestAnimationFrame(function () {
+                self.siteSelection.DOMElement.style.height = 0 + 'px';
+            });
+        });
+
+        // mark the section as "currently collapsed"
+        self.siteSelection.DOMElement.setAttribute('data-collapsed', 'true');
+
+    }
+
     self.toggle = function (ev) {
 
         if (self.siteSelection.DOMElement.classList.contains('open'))
