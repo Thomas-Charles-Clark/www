@@ -92,6 +92,7 @@ class ApplePayViewModel {
             requiredBillingContactFields: ["postalAddress"],
             requiredShippingContactFields: [
                 "postalAddress",
+                "phone",
                 "email"
             ]
         }
@@ -491,7 +492,7 @@ class ApplePayViewModel {
             masterDefinition: getMasterDefinition(),
             secondSave: true
         }, (result) => {
-            this.submit(payload.nonce, this.paymentAuthorization.shippingContact.emailAddress);
+            this.submit(payload.nonce, this.paymentAuthorization.shippingContact.emailAddress, this.paymentAuthorization.shippingContact.phoneNumber);
         });
     }
 
@@ -806,7 +807,7 @@ class ApplePayViewModel {
         });
     }
 
-    submit(nonce, email) {
+    submit(nonce, email, phone) {
 
         this.showCompletingMessage();
 
@@ -819,7 +820,8 @@ class ApplePayViewModel {
             basketCountry: getSiteCountry(),
             marketingPermissions: [],
             make_default: defaultCard,
-            email: email
+            email: email,
+            phone: phone
         });
 
         this.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'applePayViewModel submit calling with', data);

@@ -824,17 +824,17 @@ namespace wwwDesignersGuild.Models.Checkout
 
         #region Checkout Payment Taken
         
-        public async Task<Boolean> checkoutPaymentTaken(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null, string email = null)
+        public async Task<Boolean> checkoutPaymentTaken(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference = null, string email = null, string phone = null)
         {
-            Boolean deliveryOptions = await Task.FromResult<Boolean>(checkoutPaymentTakenAsync(checkoutId, paymentRef, paymentType, paymentDetails, marketingPermissions, orderReference, email));
+            Boolean deliveryOptions = await Task.FromResult<Boolean>(checkoutPaymentTakenAsync(checkoutId, paymentRef, paymentType, paymentDetails, marketingPermissions, orderReference, email, phone));
             return deliveryOptions;
         }
 
 
-        private Boolean checkoutPaymentTakenAsync(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference, string email)
+        private Boolean checkoutPaymentTakenAsync(long checkoutId, string paymentRef, string paymentType, string paymentDetails, List<MarketingPermission> marketingPermissions, string orderReference, string email, string phone = null)
         {
             var objDbCheckout = new Database.checkoutDb();
-            return objDbCheckout.checkoutPaymentTaken(checkoutId, paymentRef, paymentType, paymentDetails, marketingPermissions, orderReference, email);
+            return objDbCheckout.checkoutPaymentTaken(checkoutId, paymentRef, paymentType, paymentDetails, marketingPermissions, orderReference, email, phone);
         }
 
         #endregion

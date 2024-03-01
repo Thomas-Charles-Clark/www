@@ -1035,7 +1035,8 @@ namespace wwwDesignersGuild.Models.Database
             string paymentDetails, 
             List<MarketingPermission> marketingPermissions,
             string orderReference = null,
-            string email = null)
+            string email = null,
+            string phone = null)
         {
             var result = false;
 
@@ -1054,6 +1055,7 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@PaymentDetails", paymentDetails);
                 cmd.Parameters.AddWithValue("@OrderReference", orderReference);
                 cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@Phone", phone);
 
                 var marketingPermission = cmd.CreateParameter();
 

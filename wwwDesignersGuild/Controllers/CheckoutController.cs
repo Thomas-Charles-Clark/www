@@ -2520,7 +2520,7 @@ namespace wwwDesignersGuild.Controllers
                                             XmlResult(result),
                                             objCheckoutSubmission.marketingPermissions,
                                             null,
-                                            objCheckoutSubmission.email);
+                                            objCheckoutSubmission.email, objCheckoutSubmission.phone);
                                     }
                                 }
                                 catch (Exception ex)

@@ -1022,6 +1022,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public string payment_method_nonce { get; set; }
         public bool make_default { get; set; }
         public string email { get; set; }
+        public string phone { get; set; }
 
         public masterDefinition masterDefinition { get; set; }
         public List<MarketingPermission> marketingPermissions { get; set; }
