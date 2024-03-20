@@ -6,6 +6,8 @@
 
     self.attributeGroupId = ko.observable();
 
+    self.attributeGroupGroupId = ko.observable();
+
     self.singular = ko.observable();
 
     self.logicalOperator = ko.observable();

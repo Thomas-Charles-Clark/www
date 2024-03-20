@@ -1329,11 +1329,20 @@ footer {
             border: 1px solid white;
             border-radius: $border-radius;
 
+            &:focus-within {
+                box-shadow: $input-focus-box-shadow
+            }
+
+            > .input-group {
+                flex-wrap: nowrap;
+            }
+
             button[type=submit] {
                 border-radius: $border-radius;
                 border-left: 0;
                 clip-path: inset(-6px -6px -6px 1px);
                 border: none;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0 ease-in-out;
             }
 
             #product-type-select {
@@ -1342,14 +1351,24 @@ footer {
             }
 
             #product-search-control {
+                position: relative;
+                right: -1px;
+                clip-path: inset(-6px 1px -6px -1px);
+            }
+
+            #product-search-control,
+            .dots-wrapper {
                 border-right: 0;
                 border-left: 0;
                 clip-path: inset(-6px 0 -6px 0);
             }
 
-            #product-type-select,
-            #product-search-control {
-                transition: width 300ms ease-in-out, flex 300ms ease-in-out, opacity 300ms ease-in-out;
+            .dots-wrapper {
+                clip-path: inset(-6px 0 -6px 1px);
+            }
+
+            #product-type-select, #product-search-control, .dots-wrapper {
+                transition: width 150ms ease-in-out, flex 150ms ease-in-out, opacity 150ms ease-in-out, color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
                 width: 0;
                 flex: 0 1 0%;
                 padding: 0;
@@ -1444,7 +1463,7 @@ footer {
         #product-search-form:focus,
         #product-search-form:focus-within {
             width: 100%;
-            border: 1px solid $gray-300;
+            border: 1px solid shade-color($gray-300, 15%);
 
             button[type=submit] {
                 border-top-left-radius: 0;
@@ -1465,6 +1484,18 @@ footer {
                 opacity: 1.0;
             }
 
+            .search-button-label {
+                width: auto;
+                position: relative;
+                top: -1px;
+            }
+
+            .dots-wrapper {
+                width: auto;
+                flex: 0 1 40px;
+                opacity: 1.0;
+            }
+
             #predictive-search-hints-dropdown {
                 opacity: 1.0;
             }
@@ -1482,8 +1513,10 @@ footer {
         #product-search-form:not(.predicting):focus-within {
             #product-type-select,
             #product-search-control,
+            .form-control,
+            .dots-wrapper,
             button[type=submit] {
-                box-shadow: $input-focus-box-shadow;
+                box-shadow: none; //$input-focus-box-shadow;
             }
         }
 
@@ -1494,6 +1527,7 @@ footer {
         #product-search-form.predicting:focus-within {
             #product-type-select,
             #product-search-control,
+            .dots,
             button[type=submit] {
                 box-shadow: none;
             }

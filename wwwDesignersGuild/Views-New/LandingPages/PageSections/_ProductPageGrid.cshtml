@@ -16,6 +16,12 @@
         return $"attributeGroupViewModel('{name}', productPageGrid)";
     });
 
+    var attributeGroupGroupViewModels = grid.AttributeGroupGroups.OrderBy(p => p.AttributeGroupGroupID).Select(p =>
+    {
+        var name = p.Name.Replace("'", "’");
+        return $"attributeGroupGroupViewModel({{ AttributeGroupGroupID: {p.AttributeGroupGroupID}, Name: '{name}' }}, productPageGrid)";
+    });
+
     if (grid.FilterIndexingEnabled)
     {
         grid.AttributeGroups.ForEach(ag =>
@@ -40,6 +46,8 @@
     var attributeCombinations = grid.AttributeCombinations;
 
     var currentAttributeSignature = grid.CurrentAttributeSignature;
+
+    var attributeGroupsWithoutAdditionalGroupingCount = grid.AttributeGroups.Where(ag => ag.AttributeGroupGroupID == null).Count();
 }
 <script type="text/javascript">
     //history.scrollRestoration = 'manual';
@@ -119,7 +127,8 @@
             <div class="offcanvas-body filters d-none" data-bind="css: { 'd-none': false }">
                 <div>
                     <span class="d-none" data-bind="init: { field: productPageGrid.attributeGroups, value: [@Html.Raw(String.Join(",", attributeGroupViewModels))] }, remove"></span>
-                   @{
+                    <span class="d-none" data-bind="init: { field: productPageGrid.attributeGroupGroups, value: [@Html.Raw(String.Join(",", attributeGroupGroupViewModels))] }, remove"></span>
+                    @{
                         var productTypeViewModels = grid.ProductTypes.OrderBy(p => p.SortOrder).Select(p => $"productTypeViewModel(productPageGrid, {Html.Raw(JsonConvert.SerializeObject(p.ProductPageIDs))})");
                         <span class="d-none" data-bind="init: { field: productPageGrid.productTypes, value: [@Html.Raw(String.Join(", ", productTypeViewModels))] }, remove"></span>
                         foreach (var ptObj in grid.ProductTypes.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
@@ -135,10 +144,10 @@
                         <div class="attribute-group mb-3"
                              data-bind="validationOptions: { insertMessages: false }">
                             <h6 class="d-flex justify-content-between @(grid.ProductType != null ? "" : "collapsed")"
-                                    aria-expanded="true"
-                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)"
+                                aria-expanded="true"
+                                aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)"
                                 data-bind="text: productPageGrid.productTypeId() === 0 ? '@HtmlHelperExtra.Resource("PleaseSelectProductType", l, c, d)' : '@HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)'">
-                                    @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)
+                                @HtmlHelperExtra.Resource("MoodboardProductType", l, c, d)
                             </h6>
                             <div id="product-type-collapse" class="collapse show">
                                 <div class="attribute-group-inner">
@@ -201,249 +210,39 @@
                             </div>
                         </div>
                     }
-                   <!-- ko if: productPageGrid.productTypeId() -->
-                   @foreach (var attributeGroup in grid.AttributeGroups.OrderBy(p => p.SortOrder).Select((value, index) => new { value, index }))
-                   {
-                       var index = attributeGroup.index;
-                       var ag = attributeGroup.value;
-                       var attributeViewModels = ag.Attributes.OrderBy(p => p.SortOrder).Select(p => $"attributeViewModel($data, {Html.Raw(Json.Encode(p.ProductPageIDs))})");
-                        <!-- ko with: productPageGrid.attributeGroups()[@index] -->
-                        <span class="d-none" data-bind="init: { field: attributeGroupId, value: @ag.AttributeGroupID }, remove"></span>
-                        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productTypes, remove">
-                            @Html.Raw(JsonConvert.SerializeObject(ag.ProductTypes))
-                        </span>
-                        <span class="d-none" data-bind="init: { field: singular, value: @((!ag.MultipleSelect).ToString().ToLowerInvariant()) }, remove"></span>
-                        if (ag.MultipleSelect)
-                        {
-                            <span class="d-none" data-bind="init: { field: selection, value: [@Html.Raw(String.Join(", ", ag.Selection.Select(p => $"'{p}'")))] }, remove"></span>
-                        }
-                        else
-                        {
-                            <span class="d-none" data-bind="init: { field: selection, value: '@(ag.Selection.FirstOrDefault())' }, remove"></span>
-                        }
-                        <span class="d-none" data-bind="init: { field: attributes, value: [@Html.Raw(String.Join(", ", attributeViewModels))] }, remove"></span>
-                       if (ag.AttributeGroupID == 1)
-                       {
-                            <div class="attribute-group my-3" data-bind="visible: visible">
-                                <span class="d-none" data-bind="init: { convert: parseBool }, text: singular, remove">
-                                    @($"{!ag.MultipleSelect}".ToLowerInvariant())
-                                </span>
-                                <span class="d-none" data-bind="init: { convert: parseString }, text: logicalOperator, remove">
-                                    @ag.LogicalOperator
-                                </span>
-                                <h6 class="d-flex justify-content-between"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#attribute-group-@(ag.AttributeGroupID)-collapse"
-                                    aria-expanded="true"
-                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @(ag.Name)">
-                                    @ag.Name
-                                    <i class="fa fa-chevron-down"></i>
-                                </h6>
-                                <div id="attribute-group-@(ag.AttributeGroupID)-collapse" class="collapse show">
-                                    <div class="attribute-group-inner">
-                                       @{ 
-                                            var selectedAttributeIds = ag.Attributes.Where(a => ag.Selection.Contains(a.FormValue)).Select(a => a.AttributeID.ToString()).ToList();
-
-                                            var currentAttributeSplit = currentAttributeSignature?.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
-
-                                            selectedAttributeIds.ForEach(said =>
-                                            {
-                                                currentAttributeSplit.Remove(said);
-                                            });
-
-                                            var attributeSignature = String.Join(".", currentAttributeSplit);
-                                        }
-                                       @foreach (var attribute in ag.Attributes.OrderBy(p => p.SortOrder).Select((value, attributeIndex) => new { value, attributeIndex }))
-                                       {
-                                           var a = attribute.value;
-
-                                           if (a.FormValue == "pink")
-                                           {
-                                               int f = 0;
-                                           }
-
-                                           var attributeIndex = attribute.attributeIndex;
-                                            <!-- ko with: attributes()[@attributeIndex]-->
-                                           var selected = ag.Selection.Contains(a.FormValue);
-                                           var unavailable = ag.MultipleSelect == false && ag.Selection.Count > 0 && !selected;
-                                            <div class="form-check attribute colour d-flex">
-                                                <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
-                                                    @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
-                                                </span>
-                                                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-                                                    @Html.Raw(JsonConvert.SerializeObject(a))
-                                                </span>
-                                               @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
-                                               {
-                                                    <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
-                                                            for="attribute-@(a.AttributeID)-check"
-                                                            data-bind="css: { 'unavailable': disabled }">
-                                                        <img width="783" height="153" src="/Content/images/icon/Attributes/@(a.AttributeID)@(Framework.WebpOrJpgExtension)" alt="@(a.Name)" loading="lazy" />
-                                                        <span>
-                                                            @a.Name
-                                                            <span data-bind="text: availableProductPagesDisplay">
-                                                                (@(a.ProductPageIDs.Count))
-                                                            </span>
-                                                        </span>
-                                                        <i class="bi bi-check-circle-fill text-secondary visually-hidden" data-bind="css: { 'visually-hidden': !selected() }"></i>
-                                                        <span class="visually-hidden">
-                                                            <!-- ko if: disabled() -->
-                                                            <span>
-                                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
-                                                            </span>
-                                                            <!-- /ko -->
-                                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                                                    data-bind="checked: $parent.selection,
-                                                                                checkedValue: '@(a.FormValue)',
-                                                                                attr: { disabled: disabled }" />
-                                                        </span>
-                                                        <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                                    </label>
-                                               }
-                                               else
-                                               {
-                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions, attributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
-                                                        <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
-                                                    for="attribute-@(a.AttributeID)-check"
-                                                    data-bind="css: { 'unavailable': disabled }">
-                                                        <img width="783" height="153" src="/Content/images/icon/Attributes/@(a.AttributeID)@(Framework.WebpOrJpgExtension)" alt="@(a.Name)" loading="lazy" />
-                                                        <span>
-                                                            @a.Name
-                                                            <span data-bind="text: availableProductPagesDisplay">
-                                                                (@(a.ProductPageIDs.Count))
-                                                            </span>
-                                                        </span>
-                                                        <i class="bi bi-check-circle-fill text-secondary visually-hidden" data-bind="css: { 'visually-hidden': !selected() }"></i>
-                                                        <span class="visually-hidden">
-                                                            <!-- ko if: disabled() -->
-                                                            <span>
-                                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
-                                                            </span>
-                                                            <!-- /ko -->
-                                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                                                    data-bind="checked: $parent.selection,
-                                                                                checkedValue: '@(a.FormValue)',
-                                                                                attr: { disabled: disabled }" />
-                                                        </span>
-                                                        <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                                    </label>
-                                                    </a>
-                                               }
-                                            </div>
-                                            <!-- /ko -->
-                                       }
-                                    </div>
-                                </div>
-                                <script type="text/javascript">
-                                    document.querySelector('#attribute-group-@(ag.AttributeGroupID)-collapse').addEventListener('show.bs.collapse', window.lazyImages);
-                                </script>
-                            </div>
-                       }
-                       else
-                       {
-                            <div class="attribute-group my-3" data-bind="visible: visible">
-                                <span class="d-none" data-bind="init: { convert: parseBool }, text: singular, remove">
-                                    @($"{!ag.MultipleSelect}".ToLowerInvariant())
-                                </span>
-                                <span class="d-none" data-bind="init: { convert: parseString }, text: logicalOperator, remove">
-                                    @ag.LogicalOperator
-                                </span>
-                                <h6 class="d-flex justify-content-between @(ag.InUse ? "" : "collapsed")"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#attribute-group-@(ag.AttributeGroupID)-collapse"
-                                    aria-expanded="false"
-                                    aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @(ag.Name)">
-                                    @ag.Name
-                                    <span data-bind="text: selectionDisplay"></span>
-                                    <i class="fa fa-chevron-down"></i>
-                                </h6>
-                                <div id="attribute-group-@(ag.AttributeGroupID)-collapse" class="collapse @(ag.InUse ? "show" : "")">
-                                    <div class="attribute-group-inner">
-                                       @{
-                                           var selectedAttributeIds = ag.Attributes.Where(a => ag.Selection.Contains(a.FormValue)).Select(a => a.AttributeID.ToString()).ToList();
-
-                                           var currentAttributeSplit = currentAttributeSignature?.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
-
-                                           selectedAttributeIds.ForEach(said =>
-                                           {
-                                               currentAttributeSplit.Remove(said);
-                                           });
-
-                                           var attributeSignature = String.Join(".", currentAttributeSplit);
-                                       }
-                                       @foreach (var attribute in ag.Attributes.OrderBy(p => p.SortOrder).Select((value, attributeIndex) => new { value, attributeIndex }))
-                                        {
-                                            var a = attribute.value;
-                                            var attributeIndex = attribute.attributeIndex;
-                                            <!-- ko with: attributes()[@attributeIndex]-->
-                                            var selected = ag.Selection.Contains(a.FormValue);
-                                            var unavailable = ag.MultipleSelect == false && ag.Selection.Count > 0 && !selected;
-                                            <div class="form-check attribute">
-                                                <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
-                                                    @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
-                                                </span>
-                                                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-                                                    @Html.Raw(JsonConvert.SerializeObject(a))
-                                                </span>
-                                               @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
-                                                {
-                                                    <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
-                                                           for="attribute-@(a.AttributeID)-check"
-                                                           data-bind="css: { 'unavailable': disabled }">
-                                                        <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                                                data-bind="checked: $parent.selection,
-                                                                           checkedValue: '@(a.FormValue)',
-                                                                           attr: { disabled: disabled }"/>
-                                                        @a.Name
-                                                        <span data-bind="text: availableProductPagesDisplay">
-                                                            (@(a.ProductPageIDs.Count))
-                                                        </span>
-                                                        <!-- ko if: disabled() -->
-                                                        <span class="visually-hidden">
-                                                            @HtmlHelperExtra.Resource("Unavailable", l, c, d)
-                                                        </span>
-                                                        <!-- /ko -->
-                                                       @if (!ag.MultipleSelect)
-                                                        {
-                                                           <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                                        } 
-                                                    </label>
-                                               }
-                                               else
-                                               {
-                                                    <a href="@grid.BuildAttributeURL(ag, a, filterIndexRestrictions, attributeSignature, attributeCombinations)" target="self" onclick="(event) => { event.preventDefault(); }">
-                                                        <label class="form-check-label pointer page-section-@(Model.PageSection.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
-                                                               for="attribute-@(a.AttributeID)-check"
-                                                               data-bind="css: { 'unavailable': disabled }">
-                                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                                                    data-bind="checked: $parent.selection,
-                                                                               checkedValue: '@(a.FormValue)',
-                                                                               attr: { disabled: disabled }"/>
-                                                            @a.Name
-                                                            <span data-bind="text: availableProductPagesDisplay">
-                                                                (@(a.ProductPageIDs.Count))
-                                                            </span>
-                                                            <!-- ko if: disabled() -->
-                                                            <span class="visually-hidden">
-                                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
-                                                            </span>
-                                                            <!-- /ko -->
-                                                           @if (!ag.MultipleSelect)
-                                                            {
-                                                               <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                                            } 
-                                                        </label>
-                                                    </a>
-                                                }
-                                            </div>
-                                            <!-- /ko -->
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        <!-- /ko -->
+                    <!-- ko if: productPageGrid.productTypeId() -->
+                    @foreach (var item in grid.AttributeGroups.Where(ag => ag.AttributeGroupGroupID == null).OrderBy(p => p.SortOrder).Select((value, index) => new AttributeGroupViewModel(grid, value, index, Model.Base)))
+                    {
+                        @Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", item)
                     }
+                    @foreach (var pair in grid.AttributeGroupGroups.Select((item, index) => new { item, index }))
+                    {
+                        var item = pair.item;
+                        var index = pair.index;
+                        <div class="attribute-group-group my-3">
+                            <!-- ko with: productPageGrid.attributeGroupGroups()[@index] -->
+                            <h6 class="d-flex justify-content-between collapsed"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#attribute-group-group-@(item.AttributeGroupGroupID)-collapse" aria-expanded="false"
+                                aria-label="@HtmlHelperExtra.Resource("ProductPageGridFilters", l, c, d) - @(item.Name)">
+                                @(item.Name)
+                                <span data-bind="text: selectionDisplay"></span>
+                                <i class="fa fa-chevron-down"></i>
+                            </h6>
+                            <!-- /ko -->
+                            <div id="attribute-group-group-@(item.AttributeGroupGroupID)-collapse" class="collapse">
+                                <div class="attribute-group-group-inner">
+                                    @foreach (var ag in grid.AttributeGroups
+                                        .Where(ag => ag.AttributeGroupGroupID == item.AttributeGroupGroupID)
+                                        .OrderBy(p => p.SortOrder)
+                                        .Select((value, index) => new AttributeGroupViewModel(grid, value, index + attributeGroupsWithoutAdditionalGroupingCount, Model.Base)))
+                                    {
+                                        @Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", ag)
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    } 
                     <!-- /ko -->
                 </div>
             </div>
@@ -453,7 +252,7 @@
         </script>
     }
     else
-                                               {
+    {
         <span data-bind="init: { field: productPageGrid.productType, value: '@(String.IsNullOrEmpty(grid.ProductType) ? grid.ProductTypes.FirstOrDefault()?.FormValue : grid.ProductType)' }, remove"></span>
         <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.productTypes, remove">
             @Html.Raw(JsonConvert.SerializeObject(grid.ProductTypes))

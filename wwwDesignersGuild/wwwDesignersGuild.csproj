@@ -498,7 +498,9 @@
     <Compile Include="Models\Moodboard\Moodboard.cs" />
     <Compile Include="Models\OrderForm\OrderFormCacheProvider.cs" />
     <Compile Include="Models\OrderHistory\OrderHistory.cs" />
+    <Compile Include="Models\ProductPage\AttributeGroupGroup.cs" />
     <Compile Include="Models\ProductPage\AttributeGroupProductPage.cs" />
+    <Compile Include="Models\ProductPage\AttributeGroupViewModel.cs" />
     <Compile Include="Models\ProductPage\AttributeGroup_ProductType.cs" />
     <Compile Include="Models\ProductPage\AttributeDetail.cs" />
     <Compile Include="Models\ProductPage\AttributeId.cs" />
@@ -1983,6 +1985,7 @@
     <Content Include="Content\images\social\icon-instagram.png" />
     <Content Include="Content\images\social\icon-pinterest-light.png" />
     <Content Include="Content\images\social\icon-pinterest.png" />
+    <Content Include="Content\images\social\icon-tiktok.png" />
     <Content Include="Content\images\social\icon-twitter-light.png" />
     <Content Include="Content\images\social\icon-twitter.png" />
     <Content Include="Content\images\social\icon-youtube-light.png" />
@@ -2387,9 +2390,10 @@
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
     <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
-    <None Include="ExternalDependencies\MertexerV2.pdb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="Content\images\social\icon-tiktok.webp" />
+    <Content Include="ExternalDependencies\MertexerV2.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.min.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap.css" />
@@ -2717,7 +2721,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ExternalDependencies\MertexerV2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ExternalDependencies\MertexerV2SQL.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -2802,6 +2806,7 @@
     <Content Include="js\src\models\common\stock-info.js" />
     <Content Include="js\src\models\landing-page\article-grid.js" />
     <Content Include="js\src\models\landing-page\article-pod.js" />
+    <Content Include="js\src\models\landing-page\attribute-group-group.js" />
     <Content Include="js\src\models\landing-page\attribute-group.js" />
     <Content Include="js\src\models\landing-page\attribute.js" />
     <Content Include="js\src\models\landing-page\banner-grid.js" />
@@ -3048,6 +3053,7 @@
     <Content Include="Views-New\LandingPages\FixedPages\Member\_ReturnsPaperwork.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentApple.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressApple.cshtml" />
+    <Content Include="Views-New\LandingPages\PageSections\_ProductPageGrid_AttributeGroup.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

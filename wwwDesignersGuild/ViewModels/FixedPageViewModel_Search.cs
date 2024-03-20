@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Braintree;
+
+using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -195,6 +197,8 @@ namespace wwwDesignersGuild.ViewModels
 
             foreach (var objGroup in attributeData.attributeGroups)
             {
+                objGroup.AttributeGroupGroup = attributeData.attributeGroupGroups.SingleOrDefault(agg => agg.AttributeGroupGroupID == objGroup.AttributeGroupGroupID);
+
                 objGroup.ProductTypes = attributeData.attributeGroupProductTypes
                     .Where(agpt => agpt.AttributeGroupID == objGroup.AttributeGroupID)
                     .Select(agpt => new AttributeGroupProductType(attributeData.productTypes.Single(pt => pt.ProductTypeID == agpt.ProductTypeID), null))
@@ -223,7 +227,9 @@ namespace wwwDesignersGuild.ViewModels
 
             ProductPageGrid.CommonAttributeGroups = attributeData.attributeGroups
                 .Where(ag => commonAttributeGroupIds.Contains(ag.AttributeGroupID))
-                .ToList();
+            .ToList();
+
+            ProductPageGrid.AttributeGroupGroups = attributeData.attributeGroupGroups;
 
             ProductPageGrid.AttributeGroups = attributeData.attributeGroups
                 .Where(p => attributeGroupIdsFromSearchResults.Contains(p.AttributeGroupID))
@@ -233,6 +239,8 @@ namespace wwwDesignersGuild.ViewModels
             {
                 ag.Attributes = attributes.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
             });
+
+            var check = ProductPageGrid.AttributeGroups.Where(ag => ag.Attributes.Count <= 1);
 
             if (!MasterDefinition.TradeAllowed) /* If you're not trade and trade-allowed */
             {
@@ -472,6 +480,7 @@ namespace wwwDesignersGuild.ViewModels
                 // Probably deliver a polite error message to the client.
                 // In fact this could all do with wrapping in a try catch, falling back to delivering a polite message.
                 completeResultSet = new List<ProductPageFilterablePod>();
+                ProductPageGrid.AttributeGroupGroups = new List<AttributeGroupGroup>();
                 ProductPageGrid.AttributeGroups = new List<AttributeGroup>();
                 ProductPageGrid.CommonAttributeGroups = new List<AttributeGroup>();
                 ProductPageGrid.Contents = completeResultSet.Cast<object>().ToList();

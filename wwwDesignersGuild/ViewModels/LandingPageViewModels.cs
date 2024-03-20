@@ -2020,6 +2020,8 @@ namespace wwwDesignersGuild.ViewModels
 
             var attributeGroupIds = attributes.Select(p => p.AttributeGroupID).Distinct();
 
+            result.AttributeGroupGroups = attributeData.attributeGroupGroups;
+
             result.AttributeGroups = attributeData.attributeGroups
                                                .Where(p => attributeGroupIds.Contains(p.AttributeGroupID))
                                                .ToList();
@@ -2027,6 +2029,8 @@ namespace wwwDesignersGuild.ViewModels
             result.AttributeGroups.ForEach(ag =>
             {
                 ag.Attributes = attributes.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
+
+                ag.AttributeGroupGroup = attributeData.attributeGroupGroups.SingleOrDefault(agg => agg.AttributeGroupGroupID == ag.AttributeGroupGroupID);
 
                 ag.ProductTypes = attributeData.attributeGroupProductTypes
                     .Where(agpt => agpt.AttributeGroupID == ag.AttributeGroupID)

@@ -221,7 +221,7 @@
                 <span class="d-none" data-bind="init: { convert: JSON.parse }, text: availableProductTypes, remove">
                     @Html.Raw(JsonConvert.SerializeObject(Model.MasterDefinition.ProductTypeDropDown.ProductTypes))
                 </span>
-               @if (!String.IsNullOrEmpty(Model.ProductType))
+                @if (!String.IsNullOrEmpty(Model.ProductType))
                 {
                     <span class="d-none" data-bind="init: { convert: parseString }, text: productType, remove">
                         @Model.ProductType
@@ -231,14 +231,14 @@
                     <option value="" selected>
                         @HtmlHelperExtra.Resource("All", l, c, d)
                     </option>
-                    @foreach(var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
+                    @foreach (var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
                     {
                         <option value="@(pt.FormValue)" @((pt.FormValue == Model.ProductType) ? "selected" : "")>
                             @(pt.Name)
                         </option>
                     }
                 </select>
-               @if (HtmlHelperExtra.IsNonProductionVersion)
+                @if (HtmlHelperExtra.IsNonProductionVersion)
                 {
                     if (!String.IsNullOrEmpty(Request.QueryString["dateOverride"]))
                     {
@@ -247,53 +247,59 @@
                     if (!String.IsNullOrEmpty(Request.QueryString["countryOverride"]))
                     {
                         <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
-                    }   
+                    }
                 }
                 <input id="product-search-control"
-                       name="search-term" 
+                       name="search-term"
                        type="text"
                        class="form-control"
                        aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
                        value="@Model.SearchTerm"
-                       data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem"/>
+                       data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem,
+                       attr: {
+                            placeholder: placeholder
+                       }" />
+                <div class="dots-wrapper">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
                 <button class="btn btn-outline-secondary"
                         type="submit"
                         aria-label="@HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)">
                     <span class="visually-hidden">
                         @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
                     </span>
+                    <span class="search-button-label me-2" data-bind="text: searchButtonLabel"></span>
                     <i class="bi bi-search"></i>
                 </button>
                 @*<ul id="predictive-search-hints-dropdown"
-                    class="dropdown-menu"
-                    aria-labelledby="predictive-search-hints"
-                    data-bind="visible: anyPredictiveHints()">
-                    
-                    <!-- ko foreach: predictiveSearchDiscontinueds -->
-                    <li>
-                        <a class="dropdown-item hint hint-discontinued" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.discontinuedsIndexOffset() + $index() }">
-                            <span data-bind="text: Heading"></span>
-                            <span class="hint-type">
-                                @HtmlHelperExtra.Resource("ScrapbookDiscontinued", l, c, d)
-                                <span data-bind="text: ProductType"></span>
-                            </span>
-                        </a>
-                    </li>
-                    <!-- /ko -->
-                    <!-- ko foreach: predictiveSearchProducts -->
-                    <li>
-                        <a class="dropdown-item hint hint-product" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.productsIndexOffset() + $index() }">
-                            <span data-bind="text: Heading"></span>
-                            <span class="hint-type" data-bind="text: Code"></span>
-                        </a>
-                    </li>
-                    <!-- /ko -->
-                </ul>*@
-                <div class="dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+            class="dropdown-menu"
+            aria-labelledby="predictive-search-hints"
+            data-bind="visible: anyPredictiveHints()">
+
+            <!-- ko foreach: predictiveSearchDiscontinueds -->
+            <li>
+                <a class="dropdown-item hint hint-discontinued" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.discontinuedsIndexOffset() + $index() }">
+                    <span data-bind="text: Heading"></span>
+                    <span class="hint-type">
+                        @HtmlHelperExtra.Resource("ScrapbookDiscontinued", l, c, d)
+                        <span data-bind="text: ProductType"></span>
+                    </span>
+                </a>
+            </li>
+            <!-- /ko -->
+            <!-- ko foreach: predictiveSearchProducts -->
+            <li>
+                <a class="dropdown-item hint hint-product" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.productsIndexOffset() + $index() }">
+                    <span data-bind="text: Heading"></span>
+                    <span class="hint-type" data-bind="text: Code"></span>
+                </a>
+            </li>
+            <!-- /ko -->
+        </ul>*@
             </div>
         </form>
         <div id="search-keeper"></div>

@@ -124,7 +124,7 @@ namespace wwwDesignersGuild.ViewModels
         {
             get
             {
-                return HttpContext.Current.Request.QueryString["product-type"];
+                return HttpContext.Current.Request.QueryString["product-type"] ?? MasterDefinition?.ProductTypeDropDown?.ProductTypes.FirstOrDefault(pt => pt.ProductTypeID == 15)?.FormValue;
             }
         }
 
@@ -354,7 +354,11 @@ namespace wwwDesignersGuild.ViewModels
                 "Quantity",
                 "QuantityRequired",
                 "pleaseGreaterThanEqualTo",
-                "pleaseLessThanEqualTo"
+                "pleaseLessThanEqualTo",
+                "SearchTerm",
+                "SearchTermOptional",
+                "SearchFiltersShowAll",
+                "EnterSearch"
             };
 
             foreach (var r in requiredResources)

@@ -1,5 +1,4 @@
 ﻿using MertexerV2.Models.Accounts;
-using MertexerV2.Models.Address;
 
 using MertexerV2SQL.Models.Accounts;
 using System;

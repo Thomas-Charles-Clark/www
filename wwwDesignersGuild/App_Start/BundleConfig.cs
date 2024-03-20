@@ -215,6 +215,7 @@ namespace wwwDesignersGuild
                 .Include($"{jsPrefix}/models/landing-page/article-pod{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/landing-page/attribute{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/landing-page/attribute-group{jsSuffix}", sourceMapTransform)
+                .Include($"{jsPrefix}/models/landing-page/attribute-group-group{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/landing-page/product-type{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/landing-page/page-section{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/landing-page/pager{jsSuffix}", sourceMapTransform)

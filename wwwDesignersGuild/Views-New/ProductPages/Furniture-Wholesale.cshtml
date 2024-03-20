@@ -27,7 +27,7 @@
     <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
         @JsonConvert.SerializeObject(Model)
     </div>
-    <div id="product-page-carousel-wrapper">
+    <div id="product-page-carousel-wrapper" style="position: relative; z-index: 1">
         <div class="mb-3">
             @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
         </div>

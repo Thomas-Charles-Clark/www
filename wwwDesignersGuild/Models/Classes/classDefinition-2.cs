@@ -1108,6 +1108,7 @@ namespace wwwDesignersGuild.Models.Classes
 
     public class cmsAttributeDefinition
     {
+        public List<AttributeGroupGroup> attributeGroupGroups { get; set; }
         public List<AttributeGroup> attributeGroups { get; set; }
         public List<AttributeGroup_ProductType> attributeGroupProductTypes { get; set; }
         public List<AttributeDetail> attributeDetails { get; set; }

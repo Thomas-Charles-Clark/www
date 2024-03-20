@@ -162,18 +162,18 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     a.btn-sm {
-        padding: var(--sm-gutter) var(--l-gutter);
+        padding: $sm-gutter $l-gutter;
         border-radius: 0;
     }
 
     a.btn {
-        padding: var(--m-gutter) var(--xl-gutter);
+        padding: $m-gutter $xl-gutter;
         border-radius: 0;
         letter-spacing: $letter-spacing-slight;
     }
 
     a.btn-lg {
-        padding: var(--l-gutter) var(--xxl-gutter);
+        padding: $l-gutter $xxl-gutter;
         border-radius: 0;
     }
 
@@ -189,12 +189,12 @@ h1, h2, h3, h4, h5, h6 {
         > h4,
         > h5,
         > h6 {
-            padding: var(--l-gutter);
+            padding: $l-gutter;
             margin-bottom: 0;
         }
 
         .section-body {
-            padding: var(--l-gutter);
+            padding: $l-gutter;
 
             p:last-of-type {
                 margin-bottom: 0;
@@ -230,7 +230,7 @@ h1, h2, h3, h4, h5, h6 {
 
     ul, ol {
         li:not(.nav-item) + li:not(.nav-item) {
-            margin-top: var(--vsm-gutter);
+            margin-top: $vsm-gutter;
         }
     }
 
@@ -238,7 +238,7 @@ h1, h2, h3, h4, h5, h6 {
         display: grid;
         gap: $l-gutter;
         grid-template-columns: repeat(3, 1fr);
-        margin-bottom: var(--xl-gutter);
+        margin-bottom: $xl-gutter;
         --bs-columns: 3;
 
         .addendum-video {
@@ -248,7 +248,7 @@ h1, h2, h3, h4, h5, h6 {
 
         .addendum-video-links {
             display: block;
-            margin-bottom: var(--xl-gutter);
+            margin-bottom: $xl-gutter;
         }
     }
 }
@@ -273,7 +273,7 @@ ul.dotted-list {
     list-style-position: outside;
 
     li + li {
-        margin-top: var(--l-gutter);
+        margin-top: $l-gutter;
     }
 }
 
@@ -282,7 +282,7 @@ ul.undotted-list {
     list-style-position: outside;
 
     li + li {
-        margin-top: var(--l-gutter);
+        margin-top: $l-gutter;
     }
 }
 
@@ -391,7 +391,7 @@ ul.undotted-list {
     }
 
     .card + .card {
-        margin-top: var(--m-gutter);
+        margin-top: $m-gutter;
     }
 }
 
@@ -406,7 +406,7 @@ img.lazy-loaded {
 
 footer {
     background-color: $gray-100;
-    padding-top: var(--m-gutter);
+    padding-top: $m-gutter;
     font-size: $small-font-size;
 
     #feefo {
@@ -421,13 +421,13 @@ footer {
         li {
             border: none;
             list-style-type: none;
-            padding: var(--m-gutter);
+            padding: $m-gutter;
         }
     }
 
     .footer-copy {
         text-align: center;
-        padding-bottom: var(--m-gutter);
+        padding-bottom: $m-gutter;
     }
 }
 
@@ -454,7 +454,7 @@ footer {
 
     h1, h2, h3, h4, h5, h6 {
         color: $white;
-        margin: var(--l-gutter);
+        margin: $l-gutter;
         position: relative;
     }
 
@@ -514,7 +514,7 @@ footer {
                 width: 18px;
                 height: 18px;
                 margin-inline-end: 0;
-                margin-inline-start: var(--sm-gutter);
+                margin-inline-start: $sm-gutter;
                 text-decoration: none;
             }
         }
@@ -591,7 +591,7 @@ input::-webkit-inner-spin-button {
             font-size: 2.0rem;
             line-height: 1;
             position: relative;
-            top: calc(var(--vsm-gutter) * 0.5);
+            top: calc($vsm-gutter * 0.5);
         }
     }
 
@@ -642,7 +642,7 @@ input::-webkit-inner-spin-button {
                 }
 
                 .call-to-action::after {
-                    margin-inline-start: var(--sm-gutter);
+                    margin-inline-start: $sm-gutter;
                     font-family: 'bootstrap-icons';
                     content: '\f285';
                 }
@@ -659,7 +659,7 @@ input::-webkit-inner-spin-button {
 
         .carousel-overlay {
             position: absolute;
-            padding: var(--m-gutter) var(--l-gutter);
+            padding: $m-gutter $l-gutter;
 
             h1, h2, h3, h4, h5, h6 {
                 margin-bottom: 0;
@@ -668,7 +668,7 @@ input::-webkit-inner-spin-button {
 
                 small {
                     display: inline;
-                    margin-top: var(--vsm-gutter);
+                    margin-top: $vsm-gutter;
                 }
             }
 
@@ -712,7 +712,7 @@ input::-webkit-inner-spin-button {
 
 .carousel-thumbnails {
     display: grid;
-    margin-top: var(--sm-gutter);
+    margin-top: $sm-gutter;
     grid-template-columns: repeat(4, minmax(10px, 1fr));
     grid-gap: $sm-gutter;
 
@@ -815,7 +815,7 @@ input::-webkit-inner-spin-button {
 
     a.link::after,
     a.btn-link::after {
-        margin-inline-start: var(--sm-gutter);
+        margin-inline-start: $sm-gutter;
         font-family: bootstrap-icons;
         content: "\f285";
     }
@@ -839,14 +839,14 @@ input::-webkit-inner-spin-button {
 
         .card-new {
             float: right;
-            margin-left: var(--vsm-gutter);
+            margin-left: $vsm-gutter;
             color: var(--bs-gray-800);
             text-transform: uppercase;
             font-weight: bold;
         }
 
         .card-body {
-            padding: var(--sm-gutter);
+            padding: $sm-gutter;
         }
     }
 }
@@ -908,8 +908,8 @@ input::-webkit-inner-spin-button {
 
     .navbar-toggler {
         margin-inline-start: 0;
-        margin-top: var(--sm-gutter);
-        margin-bottom: var(--sm-gutter);
+        margin-top: $sm-gutter;
+        margin-bottom: $sm-gutter;
         padding: $btn-padding-y $m-gutter;
         border: 0;
     }
@@ -923,7 +923,7 @@ input::-webkit-inner-spin-button {
     }
 
     .navbar-btns {
-        margin-inline-end: var(--m-gutter);
+        margin-inline-end: $m-gutter;
         margin-left: auto;
     }
 
@@ -933,11 +933,11 @@ input::-webkit-inner-spin-button {
         display: flex;
         align-items: center;
         margin-right: auto;
-        -webkit-margin-end: var(--sm-gutter);
-        margin-inline-end: var(--sm-gutter);
-        -webkit-padding-start: var(--m-gutter);
-        padding-inline-start: var(--m-gutter);
-        padding: var(--m-gutter);
+        -webkit-margin-end: $sm-gutter;
+        margin-inline-end: $sm-gutter;
+        -webkit-padding-start: $m-gutter;
+        padding-inline-start: $m-gutter;
+        padding: $m-gutter;
 
         #navbar-logo {
             display: block;
@@ -979,7 +979,7 @@ input::-webkit-inner-spin-button {
     .navbar-btn {
         position: relative;
         cursor: pointer;
-        padding: 0 var(--sm-gutter);
+        padding: 0 $sm-gutter;
 
         .bi {
             color: var(--bs-gray-800);
@@ -999,14 +999,14 @@ input::-webkit-inner-spin-button {
         .navbar {
             padding-top: 0;
             padding-bottom: 0;
-            text-indent: var(--m-gutter);
+            text-indent: $m-gutter;
 
             i {
                 text-indent: 0;
             }
 
             .navbar {
-                text-indent: calc(var(--m-gutter) * 2);
+                text-indent: calc($m-gutter * 2);
             }
         }
     }
@@ -1017,13 +1017,13 @@ input::-webkit-inner-spin-button {
         align-items: center;
 
         span.badge {
-            margin-inline-start: var(--sm-gutter);
+            margin-inline-start: $sm-gutter;
             background-color: var(--bs-blue-600);
         }
     }
 
     .nav-link {
-        /*padding: 0 var(--m-gutter);*/
+        /*padding: 0 $m-gutter;*/
         border-top: 1px solid var(--bs-gray-300);
         display: flex;
         justify-content: space-between;
@@ -1041,7 +1041,7 @@ input::-webkit-inner-spin-button {
 
         img.country-list {
             margin-left: 0;
-            margin-inline-end: var(--l-gutter);
+            margin-inline-end: $l-gutter;
         }
     }
 
@@ -1067,9 +1067,9 @@ input::-webkit-inner-spin-button {
     padding: 0;
 
     .navbar-toggler {
-        margin-inline-start: var(--m-gutter);
-        margin-top: var(--sm-gutter);
-        margin-bottom: var(--sm-gutter);
+        margin-inline-start: $m-gutter;
+        margin-top: $sm-gutter;
+        margin-bottom: $sm-gutter;
     }
 
     .navbar-container {
@@ -1077,7 +1077,7 @@ input::-webkit-inner-spin-button {
     }
 
     label:not(.form-check-label) {
-        margin-inline-start: var(--l-gutter);
+        margin-inline-start: $l-gutter;
     }
 
     .form-check {
@@ -1107,7 +1107,7 @@ input::-webkit-inner-spin-button {
 }
 
 #main-navbar > .navbar-container > .navbar-collapse > .navbar-nav {
-    margin-top: var(--sm-gutter);
+    margin-top: $sm-gutter;
 }
 
 #main-navbar > .navbar-container > .navbar-collapse > .navbar-nav > :last-child {
@@ -1121,8 +1121,12 @@ input::-webkit-inner-spin-button {
 .dots {
     opacity: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+    padding-left: 4px;
+    margin-right: 8px;
+    height: 100%;
 
     > span {
         background-color: $blue-800;
@@ -1159,7 +1163,7 @@ input::-webkit-inner-spin-button {
 
     form {
         display: block;
-        padding: var(--m-gutter);
+        padding: $m-gutter;
 
         .input-group {
             background-color: $white;
@@ -1187,14 +1191,15 @@ input::-webkit-inner-spin-button {
 
             #product-search-control {
                 background-color: transparent;
+
+                &::placeholder {
+                    color: $gray-500;
+                }
                 /*background-image: linear-gradient(90deg, white 55%, transparent);*/
             }
 
-            .dots {
-                position: absolute;
-                right: 48px;
-                top: 0;
-                bottom: 0;
+            .dots-wrapper {
+                padding: 0 $l-gutter;
             }
         }
 
@@ -1248,7 +1253,7 @@ input::-webkit-inner-spin-button {
                 }
 
                 > span.hint-type {
-                    padding-left: var(--xxl-gutter);
+                    padding-left: $xxl-gutter;
                 }
             }
 
@@ -1368,7 +1373,7 @@ input::-webkit-inner-spin-button {
         > div,
         > a,
         > img {
-            margin-inline-end: var(--l-gutter);
+            margin-inline-end: $l-gutter;
         }
 
         img {
@@ -1390,7 +1395,7 @@ input::-webkit-inner-spin-button {
         .order-form-stock-message {
             text-align: right;
             display: block;
-            margin-bottom: var(--vsm-gutter);
+            margin-bottom: $vsm-gutter;
         }
 
         .order-form-stock-message.text-warning {
@@ -1421,7 +1426,7 @@ input::-webkit-inner-spin-button {
             input,
             button,
             a {
-                margin-inline-start: var(--sm-gutter);
+                margin-inline-start: $sm-gutter;
             }
 
             button,
@@ -1487,12 +1492,12 @@ input::-webkit-inner-spin-button {
     }
 
     .order-form-item + .order-form-item {
-        margin-top: var(--l-gutter);
+        margin-top: $l-gutter;
     }
 }
 
 .order-form-product.paint {
-    padding: var(--m-gutter);
+    padding: $m-gutter;
     border-radius: $border-radius;
     background-color: $gray-200;
 }
@@ -1516,13 +1521,13 @@ input::-webkit-inner-spin-button {
     border-top: 1px solid $gray-300;
     border-bottom: 1px solid $gray-300;
     border-radius: $border-radius;
-    padding: var(--vsm-gutter) var(--m-gutter);
+    padding: $vsm-gutter $m-gutter;
 
     .d-flex {
 
         label.sort {
             span {
-                margin-inline-start: var(--l-gutter);
+                margin-inline-start: $l-gutter;
             }
         }
 
@@ -1531,7 +1536,7 @@ input::-webkit-inner-spin-button {
             white-space: nowrap;
 
             span {
-                margin-inline-end: var(--m-gutter);
+                margin-inline-end: $m-gutter;
             }
         }
     }
@@ -1650,18 +1655,19 @@ input::-webkit-inner-spin-button {
     }
 }
 
+.attribute-group-group,
 .attribute-group {
 
     h6 {
         color: var(--bs-gray-700);
         text-transform: uppercase;
-        padding: var(--sm-gutter);
+        padding: $sm-gutter;
         margin: 0;
         cursor: pointer;
 
         span {
             margin-right: auto;
-            margin-inline-start: var(--sm-gutter);
+            margin-inline-start: $sm-gutter;
         }
     }
 
@@ -1689,7 +1695,7 @@ input::-webkit-inner-spin-button {
         }
 
         .bi {
-            margin-inline-start: var(--sm-gutter);
+            margin-inline-start: $sm-gutter;
         }
 
         .bi.bi-x {
@@ -1710,7 +1716,7 @@ input::-webkit-inner-spin-button {
             position: relative;
 
             > span:not(.visually-hidden) {
-                margin-inline-start: var(--sm-gutter);
+                margin-inline-start: $sm-gutter;
             }
         }
     }
@@ -1726,7 +1732,7 @@ input::-webkit-inner-spin-button {
             }
 
             .bi {
-                margin-inline-start: var(--sm-gutter);
+                margin-inline-start: $sm-gutter;
             }
 
             .bi.bi-x {
@@ -1740,18 +1746,26 @@ input::-webkit-inner-spin-button {
     }
 
     .attribute:not(.colour) + .attribute {
-        margin-top: var(--l-gutter);
+        margin-top: $l-gutter;
     }
 
-    .collapsed .bi {
-        -webkit-transform: rotate(-90deg);
-        -ms-transform: rotate(-90deg);
-        transform: rotate(-90deg);
+    .collapsed .fa {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+        text-indent: 0;
+    }
+
+    .fa {
+        transition: transform 150ms linear;
+        -webkit-transform: rotate(-180deg);
+        -ms-transform: rotate(-180deg);
+        transform: rotate(-180deg);
         text-indent: 0;
     }
 
     .attribute-group-inner {
-        padding: var(--l-gutter) 0 var(--l-gutter) var(--l-gutter);
+        padding: $l-gutter 0 $l-gutter $l-gutter;
 
         .form-check.colour {
             padding-left: 0;
@@ -1776,10 +1790,17 @@ input::-webkit-inner-spin-button {
         }
     }
 }
+
+.attribute-group-group {
+    .attribute-group-group-inner {
+        padding-left: $xl-gutter;
+    }
+}
+
 /* End of Product Page Grid Section Filters */
 
 .page-section-grid.grid {
-    gap: var(--mxl-gutter);
+    gap: $mxl-gutter;
 }
 
 .product-page-grid,
@@ -1810,7 +1831,7 @@ input::-webkit-inner-spin-button {
     }
 
     > div {
-        padding-bottom: var(--vsm-gutter);
+        padding-bottom: $vsm-gutter;
         border-bottom: 2px solid white;
         transition: border-bottom-color 300ms ease-in-out;
     }
@@ -1870,8 +1891,8 @@ input::-webkit-inner-spin-button {
 
         .page-item.bookend {
             .page-link {
-                padding-left: var(--sm-gutter);
-                padding-right: var(--sm-gutter);
+                padding-left: $sm-gutter;
+                padding-right: $sm-gutter;
 
                 .material-icons {
                     vertical-align: bottom;
@@ -1998,7 +2019,7 @@ nav.article-type-nav.article-sub-type-nav {
             display: flex;
             align-content: center;
             align-items: center;
-            padding: var(--sm-gutter);
+            padding: $sm-gutter;
             opacity: 0.85;
 
             span {
@@ -2023,7 +2044,7 @@ nav.article-type-nav.article-sub-type-nav {
     margin: 0;
     display: flex;
     align-content: center;
-    padding: var(--sm-gutter);
+    padding: $sm-gutter;
     opacity: 0.85;
 
     i.material-icons {
@@ -2066,10 +2087,10 @@ nav.article-type-nav.article-sub-type-nav {
         text-align: center;
 
         .card-body {
-            padding: var(--sm-gutter);
+            padding: $sm-gutter;
 
             .card-text {
-                margin-bottom: var(--vsm-gutter);
+                margin-bottom: $vsm-gutter;
 
                 .pricing-info {
                     font-size: $font-size-base;
@@ -2127,10 +2148,10 @@ nav.article-type-nav.article-sub-type-nav {
     .related-articles {
         .pod-card {
             .card-body {
-                padding: var(--sm-gutter);
+                padding: $sm-gutter;
 
                 .card-text {
-                    margin-bottom: var(--vsm-gutter);
+                    margin-bottom: $vsm-gutter;
                 }
 
                 .card-new {
@@ -2186,7 +2207,7 @@ nav.article-type-nav.article-sub-type-nav {
     color: $gray-dg;
     font-size: $small-font-size;
     text-transform: uppercase;
-    margin-bottom: var(--sm-gutter);
+    margin-bottom: $sm-gutter;
 
     a {
         color: $gray-dg;
@@ -2201,7 +2222,7 @@ nav.article-type-nav.article-sub-type-nav {
 .paint-order-form {
     background-color: $gray-100;
     border-radius: $border-radius;
-    padding: var(--l-gutter);
+    padding: $l-gutter;
 }
 
 #large-image-modal {
@@ -2262,7 +2283,7 @@ nav.article-type-nav.article-sub-type-nav {
         }
 
         .basket-item-error + .basket-item-error {
-            margin-top: var(--l-gutter);
+            margin-top: $l-gutter;
         }
     }
 }
@@ -2324,7 +2345,7 @@ nav.article-type-nav.article-sub-type-nav {
 
         .tab-content {
             background-color: $gray-100;
-            padding: var(--l-gutter);
+            padding: $l-gutter;
             border: 1px solid $gray-300;
             border-top: 0;
         }
@@ -2349,8 +2370,8 @@ nav.article-type-nav.article-sub-type-nav {
                 }
 
                 div.mb-8 {
-                    padding-bottom: var(--xl-gutter) !important;
-                    margin-bottom: var(--xl-gutter) !important;
+                    padding-bottom: $xl-gutter !important;
+                    margin-bottom: $xl-gutter !important;
                     border-bottom: 1px solid $gray-300;
                 }
             }

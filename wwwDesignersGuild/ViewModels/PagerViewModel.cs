@@ -74,6 +74,8 @@ namespace wwwDesignersGuild.ViewModels
 
         public List<AttributeGroup> AttributeGroups { get; set; }
 
+        public List<AttributeGroupGroup> AttributeGroupGroups { get; set; }
+
         public bool AnyFiltersSelected
         {
             get
@@ -136,6 +138,7 @@ namespace wwwDesignersGuild.ViewModels
             IsShop = isShop;
             MasterDefinition = objMaster;
             Contents = new List<object>();
+            AttributeGroupGroups = new List<AttributeGroupGroup>();
             AttributeGroups = new List<AttributeGroup>();
 
             Ajax = ajax;

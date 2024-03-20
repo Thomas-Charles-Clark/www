@@ -1331,8 +1331,6 @@
     //#region Methods
 
     self.setImmediateOrderRequest = function () {
-        bootstrap.Modal.getOrCreateInstance(self.thankYouModalElement).show();
-        return;
         $.ajax({
             url: '/api/form/SaveTradeAccountImmediateOrderFlag',
             type: 'POST',
@@ -1341,6 +1339,7 @@
             },
             success: function () {
                 self.immediateOrderRequested(true);
+                bootstrap.Modal.getOrCreateInstance(self.thankYouModalElement).show();
             }
         });
     }

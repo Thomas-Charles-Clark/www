@@ -1,4 +1,6 @@
-﻿using System;
+﻿using iText.IO.Font;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,6 +11,7 @@ namespace wwwDesignersGuild.Models.Classes
     public class AttributeGroup
     {
         public byte AttributeGroupID { get; set; }
+        public byte? AttributeGroupGroupID { get; set; }
         public string Name { get; set; }
         public Boolean UseIcons { get; set; }
         public byte SortOrder { get; set; }
@@ -47,6 +50,8 @@ namespace wwwDesignersGuild.Models.Classes
         }
 
         public List<AttributeGroupProductType> ProductTypes { get; set; }
+
+        public AttributeGroupGroup AttributeGroupGroup { get; set; }
 
         public bool InvolveInFilterIndexing(string productType)
         {

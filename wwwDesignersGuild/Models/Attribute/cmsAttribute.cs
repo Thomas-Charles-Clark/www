@@ -51,7 +51,8 @@ namespace wwwDesignersGuild.Models.Attribute
                 attributeGroups = results.GetResult<AttributeGroup>().ToList(),
                 attributeGroupProductTypes = results.GetResult<AttributeGroup_ProductType>().ToList(),
                 attributeDetails = results.GetResult<AttributeDetail>().ToList(),
-                productTypes = results.GetResult<ProductType>().ToList()
+                productTypes = results.GetResult<ProductType>().ToList(),
+                attributeGroupGroups = results.GetResult<AttributeGroupGroup>().ToList(),
             };
 
 

@@ -408,7 +408,7 @@
                                  data-bs-target="#navbar-content"
                                  onclick="this.classList.remove('show')"></div>
                             @RenderBody()
-                            @if (!ViewBag.Partial)
+                            @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
                             {
                                 if (!Request.IsLocal && Model.ShowRecentlyViewed)
                                 {

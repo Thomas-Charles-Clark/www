@@ -352,53 +352,55 @@
             <button id="product-@(objProduct["productId"])-@(orderFormItemType.ToString().ToLowerInvariant())-btn"
                     type="button"
                     class="btn btn-secondary" disabled data-bind="class: 'loaded', enable: enabled, click: basketModel.addToBasket" @(enabled ? "" : "disabled")>
-               @switch (orderFormItemType)
-               {
-                   case OrderFormItemType.Order:
-                            <text>
+                @switch (orderFormItemType)
+                {
+                    case OrderFormItemType.Order:
+                        <text>
+                            @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                        </text>
+                        break;
+                    case OrderFormItemType.Sample:
+                        <text>
+                            <span class="me-2">
                                 @Html.Raw(objProduct.SelectToken("orderButtonText"))
-                            </text>
-                       break;
-                   case OrderFormItemType.Sample:
-                            <text>
-                                <span class="me-2">
-                                    @Html.Raw(objProduct.SelectToken("orderButtonText"))
-                                </span>
-                                <span>
-                                    @Html.Raw(objProduct.SelectToken("priceMessage"))
-                                </span>
-                            </text>
-                       break;
-                   case OrderFormItemType.LargeSample:
-                            <text>
-                                <span class="me-2">
-                                    @Html.Raw(objProduct.SelectToken("orderButtonText"))
-                                </span>
-                                <span>
-                                    @Html.Raw(objProduct.SelectToken("priceMessage"))
-                                </span>
-                            </text>
-                       break;
-                   case OrderFormItemType.Reserve:
-                            <text>
-                                @Html.Raw(objProduct.SelectToken("reserveButtonText"))
-                            </text>
-                       break;
-                   case OrderFormItemType.ReserveWithBatchCutting:
-                            <text>
-                                @Html.Raw(objProduct.SelectToken("reserveWithBatchSampleButtonText"))
-                            </text>
-                       break;
-                   default:
-                            <text>
+                            </span>
+                            <span>
+                                @Html.Raw(objProduct.SelectToken("priceMessage"))
+                            </span>
+                        </text>
+                        break;
+                    case OrderFormItemType.LargeSample:
+                        <text>
+                            <span class="me-2">
                                 @Html.Raw(objProduct.SelectToken("orderButtonText"))
-                            </text>
-                       break;
-               }
-                <div class="dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                            </span>
+                            <span>
+                                @Html.Raw(objProduct.SelectToken("priceMessage"))
+                            </span>
+                        </text>
+                        break;
+                    case OrderFormItemType.Reserve:
+                        <text>
+                            @Html.Raw(objProduct.SelectToken("reserveButtonText"))
+                        </text>
+                        break;
+                    case OrderFormItemType.ReserveWithBatchCutting:
+                        <text>
+                            @Html.Raw(objProduct.SelectToken("reserveWithBatchSampleButtonText"))
+                        </text>
+                        break;
+                    default:
+                        <text>
+                            @Html.Raw(objProduct.SelectToken("orderButtonText"))
+                        </text>
+                        break;
+                }
+                <div class="dots-wrapper">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
             </button>
         </div>

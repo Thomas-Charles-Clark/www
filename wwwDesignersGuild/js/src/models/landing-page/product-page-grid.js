@@ -14,6 +14,8 @@
 
     self.productTypes = ko.observableArray([]);
 
+    self.attributeGroupGroups = ko.observableArray([]);
+
     self.attributeGroups = ko.observableArray([]);
 
     self.attributes = ko.observableArray([]);

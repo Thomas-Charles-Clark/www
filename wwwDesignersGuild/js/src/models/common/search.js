@@ -1,6 +1,6 @@
-﻿const searchBoxViewModel = ((searchTerm, productType) => {
+﻿const searchBoxViewModel = ((searchTerm, productType, resources) => {
     let self = {
-
+        resources: resources
     };
 
     //#region Properties
@@ -132,7 +132,7 @@
         console.log('search.js productType subscribe hit', nv);
 
         if (nv && window.getContentId() == 76) {
-            if (window.elementPercentInViewport(document.querySelector('#search-overlay')) > 0) {
+            if (document.querySelector('#search-overlay') && window.elementPercentInViewport(document.querySelector('#search-overlay')) > 0) {
                 document.querySelector('#product-search-control').focus();
             }
         }
@@ -229,6 +229,41 @@
             self.predictiveSearchResults().length;
     }, self);
 
+    self.placeholder = ko.computed({
+        read: () => {
+            let productType = self.productType();
+
+            if (productType) {
+                return self.resources.SearchTermOptional;
+            } else {
+                return self.resources.SearchTerm;
+            }
+        },
+        write: () => {
+
+        }
+    }, self);
+
+    self.searchButtonLabel = ko.computed({
+        read: () => {
+            let productType = self.productType();
+            let searchTerm = self.searchTerm();
+
+            if (productType) {
+                if (searchTerm) {
+                    return self.resources.EnterSearch;
+                } else {
+                    return self.resources.SearchFiltersShowAll;
+                }
+            } else {
+                return self.resources.EnterSearch;
+            }
+        },
+        write: () => {
+
+        }
+    }, self);
+
     //#endregion
 
 
@@ -319,7 +354,8 @@
 if (document.querySelector('#product-search-content')) {
     window.searchBoxModel = searchBoxViewModel(
         typeof window.getSearchTerm === 'function' ? window.getSearchTerm() : undefined,
-        typeof window.getProductType === 'function' ? window.getProductType() : undefined
+        typeof window.getProductType === 'function' ? window.getProductType() : undefined,
+        window.getPrefetchedResources()
     );
 
     ko.applyBindings(window.searchBoxModel, document.querySelector('#product-search-content'));

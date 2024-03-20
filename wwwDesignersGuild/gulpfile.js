@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='beforeBuildJS, beforeBuildSCSS' ProjectOpened='watch' />
+/// <binding ProjectOpened='watch' />
 'use strict';
 
 const
