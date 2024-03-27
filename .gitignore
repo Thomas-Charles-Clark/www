@@ -370,3 +370,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /wwwDesignersGuild/ExcelSpreadsheets
 /wwwDesignersGuild/js/dist/models/common/common-models.min.js.map
+/wwwDesignersGuild/css/dist/lib/bootstrap/scss/bootstrap.css.map
