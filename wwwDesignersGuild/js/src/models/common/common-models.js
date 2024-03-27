@@ -28,7 +28,18 @@
         self.quantity(self.stockMessage?.quantityMinimum ?? 1);
 
         self.quantity.extend({
-            roundedNumeric: countDecimals(self.stockMessage?.quantityIncrement ?? 1)
+            numberFormatted: {
+                digits: countDecimals(self.stockMessage?.quantityIncrement),
+                currency: {
+                    FormattingCulture: getCulture()
+                },
+                minValue: self.stockMessage?.quantityMinimum,
+                maxValue: self.stockMessage?.quantityMaximum
+            },
+            roundedNumeric: {
+                precision: countDecimals(self.stockMessage?.quantityIncrement ?? 1)
+            },
+            units: self.stockMessage?.units
         });
 
         self.quantity.extend({

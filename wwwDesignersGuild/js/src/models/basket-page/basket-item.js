@@ -43,12 +43,16 @@
         Object.assign(self, d);
         self.dataSub.dispose();
         self.quantity.extend({
-            roundedNumeric: {
-                precision: countDecimals(self.StockMessaging.QuantityIncrement)
+            numberFormatted: {
+                digits: countDecimals(self.StockMessaging.QuantityIncrement),
+                currency: {
+                    FormattingCulture: getCulture()
+                },
+                minValue: 0,
+                maxValue: self.StockMessaging.QuantityMaximum,
+                units: self.StockMessaging.Units
             },
-            min: {
-                params: self.StockMessaging.QuantityMinimum
-            }
+            min: 0
         });
 
         self.saveForLater(self.SaveForLater);

@@ -127,11 +127,13 @@
                         window.setTimeout(() => {
                             self.results(results);
                             self.busy(false);
+                            self.haveSearched(true);
                         }, 0);
                     } else {
                         window.setTimeout(() => {
                             self.results([]);
                             self.busy(false);
+                            self.haveSearched(true);
                         }, 0);
                     }
                 })

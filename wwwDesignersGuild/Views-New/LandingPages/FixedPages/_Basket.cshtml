@@ -75,7 +75,7 @@
                                            validationOptions: { insertMessages: false },
                                            validationElement: quantity,
                                            numeric: quantity,
-                                           value: quantity,
+                                           value: quantity.formatted,
                                            attr: {
                                                 'aria-invalid': !quantity.isValid(),
                                                 'aria-errormessage': `quantity-${ProductID}-error`,
@@ -346,7 +346,7 @@
                                                     validationOptions: { insertMessages: false },
                                                     validationElement: quantity,
                                                     numeric: quantity,
-                                                    value: quantity,
+                                                    textInput: quantity.formatted,
                                                     attr: {
                                                         'aria-invalid': !quantity.isValid()
                                                     }" />
