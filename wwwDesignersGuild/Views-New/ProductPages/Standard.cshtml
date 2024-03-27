@@ -19,7 +19,7 @@
 }
 @Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
 <div id="ko-wrapper">
-   @if (Model.AllProductsUnavailable)
+    @if (Model.AllProductsUnavailable)
     {
         <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
             @JsonConvert.SerializeObject(new ProductPageViewModel_Empty())
@@ -241,15 +241,18 @@
         </div>
     </div>
 </div>
-@if (Model.RelatedProductPages.Any())
+@if (!ViewBag.Partial)
 {
-    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
-}
-@if (Model.ShowRecentlyViewed)
-{
-    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-}
-@if (Model.RelatedSearches.Any())
-{
-    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml", Model)
+    if (Model.RelatedProductPages.Any())
+    {
+        @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
+    }
+    if (Model.ShowRecentlyViewed)
+    {
+        @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+    }
+    if (Model.RelatedSearches.Any())
+    {
+        @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml")
+    }
 }

@@ -196,7 +196,7 @@ namespace wwwDesignersGuild.Util
 
                             if (imageUrl.Contains("localhost"))
                             {
-                                filePath = $"\\\\vm-web1\\d$\\wwwroot\\flock\\imagelibrary\\156\\{imageId}.jpeg";
+                                filePath = $"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\flock\\imagelibrary\\156\\{imageId}.jpeg";
                             }
 
                             var jpg = Image.GetInstance(filePath);// (new Uri(imageUrl));
@@ -825,7 +825,7 @@ namespace wwwDesignersGuild.Util
 
                             if (imageUrl.Contains("localhost"))
                             {
-                                filePath = $"\\\\vm-web1\\d$\\wwwroot\\flock\\imagelibrary\\156\\{imageId}.jpeg";
+                                filePath = $"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\flock\\imagelibrary\\156\\{imageId}.jpeg";
                             }
 
                             var jpg = Image.GetInstance(filePath);// (new Uri(imageUrl));

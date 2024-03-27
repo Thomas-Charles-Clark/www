@@ -239,7 +239,7 @@
         </div>
     </div>
 </div>
-@if (Model.RelatedProductPages.Any())
+@if (!ViewBag.Partial && Model.RelatedProductPages.Any())
 {
     @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
 }

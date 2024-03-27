@@ -1172,7 +1172,7 @@ input::-webkit-inner-spin-button {
             background-size: 200% 200%;
             animation: dots 5s linear reverse infinite;
 
-            #product-search-control,
+            #product-search-input,
             #product-type-select,
             button.btn-outline-secondary {
                 border-color: var(--bs-gray-400);
@@ -1189,7 +1189,7 @@ input::-webkit-inner-spin-button {
                 outline: 0;
             }
 
-            #product-search-control {
+            #product-search-input {
                 background-color: transparent;
 
                 &::placeholder {
@@ -1285,7 +1285,7 @@ input::-webkit-inner-spin-button {
 
     #product-search-form:focus-within {
         #product-type-select,
-        #product-search-control,
+        #product-search-input,
         button[type=submit] {
             /*box-shadow: $input-focus-box-shadow;*/
         }
@@ -2745,6 +2745,6 @@ nav.article-type-nav.article-sub-type-nav {
 }
 
 .viewport-width {
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    margin-left: calc(50% - 50vw + 15px);
+    margin-right: calc(50% - 50vw + 15px);
 }

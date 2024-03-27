@@ -28,6 +28,7 @@ using MertexerV2SQL.Accounts;
 using MertexerV2SQL.Models.Accounts;
 using System.Net.Http.Headers;
 using System.Xml.Linq;
+using MertexerV2.Utilities;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -343,7 +344,7 @@ namespace wwwDesignersGuild.Controllers
                     conn.Close();
                 }
 
-                System.IO.File.WriteAllBytes($"\\\\vm-web1\\d$\\wwwroot\\portal\\uploads\\orderimport\\{loginCheck.tradeAccountNumber}_{DateTime.Now:dd-MM-yyyy}_{tradeAccountType}_{fileName}_{Guid.NewGuid()}.csv", buffer);
+                System.IO.File.WriteAllBytes($"\\\\{wwwDesignersGuild.Util.Framework.WebServerHostname}\\d$\\wwwroot\\portal\\uploads\\orderimport\\{loginCheck.tradeAccountNumber}_{DateTime.Now:dd-MM-yyyy}_{tradeAccountType}_{fileName}_{Guid.NewGuid()}.csv", buffer);
             }
 
             return Ok(new { });

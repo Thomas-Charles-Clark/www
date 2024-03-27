@@ -26,5 +26,17 @@
         }
     }, self);
 
+    self.visible = ko.pureComputed(() => {
+        if (self.parent.productTypes().length) {
+            if (self.parent.productType() == 'all') {
+                return self.attributeGroups().find(ag => self.parent.parent.Definition.CommonAttributeGroups.flatMap(cag => [cag.AttributeGroupID]).includes(ag.attributeGroupId()));
+            } else {
+                return self.attributeGroups().flatMap(ag => ag.productTypes()).flatMap(pt => [pt.FormValue]).includes(self.parent.productType());
+            }
+        } else {
+            return true;
+        }
+    }, self);
+
     return self;
 });

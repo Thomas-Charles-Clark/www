@@ -209,101 +209,97 @@
     <div id="product-search-content"
          class="@((Model.ContentID == 76 ? "open" : ""))"
          data-bind="keepElement: searchTerm"> @* hold this guy open if on Search page *@
-        <form id="product-search-form"
-              method="get"
-              action="/@(cd.URL)/@(dgFramework.getUrlKeywordsForFixedPage(76, cd))/l76"
-              autocomplete="off"
-              aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
-              class="@((Model.ContentID == 76 ? "open" : ""))" @* this guy too *@
-              data-bind="submit: formSubmit">
-            <div class="input-group"
-                 data-bind="css: { 'busy': busy }">
-                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: availableProductTypes, remove">
-                    @Html.Raw(JsonConvert.SerializeObject(Model.MasterDefinition.ProductTypeDropDown.ProductTypes))
-                </span>
-                @if (!String.IsNullOrEmpty(Model.ProductType))
-                {
-                    <span class="d-none" data-bind="init: { convert: parseString }, text: productType, remove">
-                        @Model.ProductType
-                    </span>
-                }
-                <select id="product-type-select" name="product-type" class="form-select" data-bind="value: productType">
-                    <option value="" selected>
-                        @HtmlHelperExtra.Resource("All", l, c, d)
-                    </option>
-                    @foreach (var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
-                    {
-                        <option value="@(pt.FormValue)" @((pt.FormValue == Model.ProductType) ? "selected" : "")>
-                            @(pt.Name)
-                        </option>
-                    }
-                </select>
-                @if (HtmlHelperExtra.IsNonProductionVersion)
-                {
-                    if (!String.IsNullOrEmpty(Request.QueryString["dateOverride"]))
-                    {
-                        <input type="hidden" name="dateOverride" value="@(Request.QueryString["dateOverride"])" />
-                    }
-                    if (!String.IsNullOrEmpty(Request.QueryString["countryOverride"]))
-                    {
-                        <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
-                    }
-                }
-                <input id="product-search-control"
-                       name="search-term"
-                       type="text"
-                       class="form-control"
-                       aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
-                       value="@Model.SearchTerm"
-                       data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem,
-                       attr: {
-                            placeholder: placeholder
-                       }" />
-                <div class="dots-wrapper">
-                    <div class="dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <button class="btn btn-outline-secondary"
-                        type="submit"
-                        aria-label="@HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)">
-                    <span class="visually-hidden">
-                        @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
-                    </span>
-                    <span class="search-button-label me-2" data-bind="text: searchButtonLabel"></span>
-                    <i class="bi bi-search"></i>
+        <div id="product-search-form-wrapper">
+            <div id="product-search-advanced-dropdown" class="dropdown">
+                <button id="product-search-advanced-btn"
+                        type="button"
+                        class="btn btn-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Advanced Search
                 </button>
-                @*<ul id="predictive-search-hints-dropdown"
-            class="dropdown-menu"
-            aria-labelledby="predictive-search-hints"
-            data-bind="visible: anyPredictiveHints()">
-
-            <!-- ko foreach: predictiveSearchDiscontinueds -->
-            <li>
-                <a class="dropdown-item hint hint-discontinued" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.discontinuedsIndexOffset() + $index() }">
-                    <span data-bind="text: Heading"></span>
-                    <span class="hint-type">
-                        @HtmlHelperExtra.Resource("ScrapbookDiscontinued", l, c, d)
-                        <span data-bind="text: ProductType"></span>
-                    </span>
-                </a>
-            </li>
-            <!-- /ko -->
-            <!-- ko foreach: predictiveSearchProducts -->
-            <li>
-                <a class="dropdown-item hint hint-product" href="#" data-bind="attr: { href: URLKeywords, tabindex: $parent.productsIndexOffset() + $index() }">
-                    <span data-bind="text: Heading"></span>
-                    <span class="hint-type" data-bind="text: Code"></span>
-                </a>
-            </li>
-            <!-- /ko -->
-        </ul>*@
+                <ul id="product-search-advanced-dropdown"
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton1">
+                   @foreach (var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
+                    {
+                        <li>
+                            <a class="dropdown-item" href="/@(dgFramework.getUrlKeywordsForFixedPage(76, cd))/l76?product-type=@(pt.FormValue)">
+                                @(pt.Name)
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
-        </form>
-        <div id="search-keeper"></div>
-        <div id="search-overlay" onclick="document.querySelector('#product-search-control').focus()">
+            <form id="product-search-form"
+                  method="get"
+                  action="/@(cd.URL)/@(dgFramework.getUrlKeywordsForFixedPage(76, cd))/l76"
+                  autocomplete="off"
+                  aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
+                  class="@((Model.ContentID == 76 ? "open" : ""))" @* this guy too *@
+                  data-bind="submit: formSubmit">
+                <div class="input-group"
+                     data-bind="css: { 'busy': busy }">
+                    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: availableProductTypes, remove">
+                        @Html.Raw(JsonConvert.SerializeObject(Model.MasterDefinition.ProductTypeDropDown.ProductTypes))
+                    </span>
+                   @if (!String.IsNullOrEmpty(Model.ProductType))
+                    {
+                        <span class="d-none" data-bind="init: { convert: parseString }, text: productType, remove">
+                            @Model.ProductType
+                        </span>
+                    }
+                    <select id="product-type-select" name="product-type" class="form-select" data-bind="value: productType">
+                        <option value="" selected>
+                            @HtmlHelperExtra.Resource("All", l, c, d)
+                        </option>
+                       @foreach (var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
+                        {
+                            <option value="@(pt.FormValue)" @((pt.FormValue == Model.ProductType) ? "selected" : "")>
+                                @(pt.Name)
+                            </option>
+                        }
+                    </select>
+                   @if (HtmlHelperExtra.IsNonProductionVersion)
+                    {
+                        if (!String.IsNullOrEmpty(Request.QueryString["dateOverride"]))
+                        {
+                            <input type="hidden" name="dateOverride" value="@(Request.QueryString["dateOverride"])" />
+                        }
+                        if (!String.IsNullOrEmpty(Request.QueryString["countryOverride"]))
+                        {
+                            <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
+                        }
+                    }
+                    <input id="product-search-input"
+                        name="search-term"
+                        type="text"
+                        class="form-control"
+                        aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
+                        value="@Model.SearchTerm"
+                        data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem, attr: {
+                            placeholder: placeholder
+                        }" />
+                    <div class="dots-wrapper">
+                        <div class="dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <button id="search-box-submit"
+                            class="btn btn-outline-secondary"
+                            type="submit"
+                            aria-label="@HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)">
+                        @*<span class="visually-hidden">
+                            @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
+                        </span>*@
+                        <span class="search-button-label" data-bind="text: searchButtonLabel"></span>
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div id="search-overlay" onclick="document.querySelector('#product-search-input').focus()">
             <span>
                 @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
             </span>

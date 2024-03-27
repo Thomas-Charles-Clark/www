@@ -11,6 +11,9 @@ namespace wwwDesignersGuild.Util
 {
     public static class Framework
     {
+        public static readonly string InkyEndpoint = "https://vm-web2:8091/inkyUpdated/inkyUpdated.s";
+        public static readonly string WebServerHostname = "vm-web2";
+
         public readonly static char[] SemicolonDelimiter = new char[] { ';' };
         public readonly static char[] CommaDelimiter = new char[] { ',' };
         public readonly static char[] HyphenDelimiter = new char[] { '-' };

@@ -2188,7 +2188,7 @@ namespace wwwDesignersGuild.Models.Database
             {
                 var content = new StringContent(inkyMarkup);
 
-                var r = await client.PostAsync("http://vm-web1:8090/inky/inky.js", content);
+                var r = await client.PostAsync(Framework.InkyEndpoint, content);
 
                 inkyMarkup = await r.Content.ReadAsStringAsync();
             }

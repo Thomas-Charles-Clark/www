@@ -1,5 +1,7 @@
 ﻿using Braintree;
 
+using DocumentFormat.OpenXml.EMMA;
+
 using Newtonsoft.Json.Linq;
 
 using System;
@@ -22,6 +24,11 @@ namespace wwwDesignersGuild.ViewModels
 {
     public class FixedPageViewModel_Search : FixedPageViewModel<serverSearchDatabase>
     {
+        public bool NoResultsPageShowLink(byte productTypeId)
+        {
+            return ((ProductPageGridPageSection)ProductPageGridPageSection.Definition)?.DropDownProductTypeIDs.Contains(productTypeId) == true;
+        }
+
         public bool Ajax
         {
             get
@@ -125,6 +132,7 @@ namespace wwwDesignersGuild.ViewModels
             var commonAttributeGroupIds = new List<byte>();
 
             // Instantiate ProductPageGridPageSection : PagerViewModel
+
             ProductPageGrid = new ProductPageGridPageSection(MasterDefinition.UrlBreakdown.SemanticString, MasterDefinition, false, Ajax, AjaxEndpoint);
 
             ProductPageGrid.Searchable = true;
@@ -224,6 +232,11 @@ namespace wwwDesignersGuild.ViewModels
             }
 
             ProductPageGrid.ProductTypes = searchResultProductTypes.Select(pt => ProductTypes.Single(a => a.ProductTypeID == pt)).ToList();
+
+            if (ProductPageGrid.ProductTypes.Count() == 1)
+            {
+                ProductPageGrid.ProductType = ProductPageGrid.ProductTypes.First().FormValue;
+            }
 
             ProductPageGrid.CommonAttributeGroups = attributeData.attributeGroups
                 .Where(ag => commonAttributeGroupIds.Contains(ag.AttributeGroupID))

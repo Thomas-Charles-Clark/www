@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+
+using Tweetinvi.Parameters;
+
 using wwwDesignersGuild.Models.Classes;
 
 namespace wwwDesignersGuild.ViewModels
@@ -67,6 +70,14 @@ namespace wwwDesignersGuild.ViewModels
         public int TakeCount { get; set; }
 
         public string ProductType { get; set; }
+
+        public IEnumerable<byte> DropDownProductTypeIDs 
+        { 
+            get
+            {
+                return MasterDefinition?.ProductTypeDropDown?.ProductTypes?.Select(pt => pt.ProductTypeID);
+            }
+        }
 
         public List<Models.ProductPage.ProductType> ProductTypes { get; set; }
 

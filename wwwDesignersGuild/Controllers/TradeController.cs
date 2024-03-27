@@ -298,7 +298,7 @@ namespace wwwDesignersGuild.Controllers
 
             var viewModel = await TradeDownloadsViewModel.CreateAsync(
                 permission,
-                $"\\\\vm-web1\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\",
+                $"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\",
                 tradeAccountModel,
                 objBase);
 
@@ -327,7 +327,7 @@ namespace wwwDesignersGuild.Controllers
 
             var viewModel = await TradeDownloadsViewModel.CreateAsync(
                 permission,
-                $"\\\\vm-web1\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\",
+                $"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\",
                 tradeAccountModel,
                 objMaster);
 
@@ -358,7 +358,7 @@ namespace wwwDesignersGuild.Controllers
 
             var tradeAccountId = Convert.ToInt32(Session["memberTradeAccountID"]);
 
-            var settings = new TradeDownloadFileManagerSettings($"\\\\vm-web1\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\");
+            var settings = new TradeDownloadFileManagerSettings($"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\");
 
             return FileManagerExtension.DownloadFiles(TradeDownloadFileManagerSettings.CreateFileManagerDownloadSettings(), settings.RootFolder);
 

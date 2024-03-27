@@ -219,7 +219,7 @@
                     {
                         var item = pair.item;
                         var index = pair.index;
-                        <div class="attribute-group-group my-3">
+                        <div class="attribute-group-group my-3" style="display: none" data-bind="visible: productPageGrid.attributeGroupGroups()[@index].visible()">
                             <!-- ko with: productPageGrid.attributeGroupGroups()[@index] -->
                             <h6 class="d-flex justify-content-between collapsed"
                                 data-bs-toggle="collapse"

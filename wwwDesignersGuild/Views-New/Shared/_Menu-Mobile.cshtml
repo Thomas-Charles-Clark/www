@@ -131,7 +131,7 @@
                             <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
                         }
                     }
-                    <input id="product-search-control"
+                    <input id="product-search-input"
                            name="search-term"
                            type="text"
                            class="form-control"
@@ -139,10 +139,10 @@
                            aria-label="@HtmlHelperExtra.Resource("ProductSearch", l, c, d)"
                            value="@(Model.SearchTerm)"
                            @*form="@(Model.ContentID == (int)dgFixedPage.serverSearch ? "page-section--1-form" : "product-search-form")"*@
-                           data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem,
+                           data-bind="init: { convert: parseString }, textInput: searchTerm, downArrowKey: focusFirstDropdownItem" /> @*,
                                attr: {
                                     placeholder: placeholder
-                               }" />
+                               }*@
                     <button class="btn btn-outline-secondary"
                             type="submit"
                             aria-label="@HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)"
@@ -150,7 +150,7 @@
                         <span class="visually-hidden">
                             @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
                         </span>
-                        <span class="search-button-label me-2" data-bind="text: searchButtonLabel"></span>
+                        @*<span class="search-button-label me-2" data-bind="text: searchButtonLabel"></span>*@
                         <i class="bi bi-search"></i>
                     </button>
                     <div class="dots-wrapper">
@@ -362,7 +362,7 @@
 </nav>
 <script type="text/javascript">
     document.querySelector('#product-search-content').addEventListener('shown.bs.collapse', function () {
-        document.querySelector('#product-search-control').focus();
+        document.querySelector('#product-search-input').focus();
     });
 </script>
 @helper BuildMenuGroup(BaseViewModel model, menuGroup menu)

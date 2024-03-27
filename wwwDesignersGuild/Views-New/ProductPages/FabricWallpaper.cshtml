@@ -128,15 +128,18 @@
         @Html.Partial("~/Views-New/ProductPages/Shared/_CoverageCalculatorModal.cshtml", Model)
     }
 </div>
-@if (Model.RelatedProductPages.Any())
+@if (!ViewBag.Partial)
 {
-    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml", Model)
-}
-@if (Model.ShowRecentlyViewed)
-{
-    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-}
-@if (Model.RelatedSearches.Any())
-{
-    @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml", Model)
+    if (Model.RelatedProductPages.Any())
+    {
+        @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedProductPages.cshtml")
+    }
+    if (Model.ShowRecentlyViewed)
+    {
+        @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+    }
+    if (Model.RelatedSearches.Any())
+    {
+        @Html.Partial("~/Views-New/ProductPages/Shared/_RelatedSearches.cshtml")
+    }
 }

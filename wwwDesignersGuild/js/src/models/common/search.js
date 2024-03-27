@@ -29,7 +29,7 @@
     self.productSearchForm = document.querySelector('#product-search-form');
 
     // The search form
-    self.productSearchInput = document.querySelector('#product-search-control');
+    self.productSearchInput = document.querySelector('#product-search-input');
 
     self.productSearchInput.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -133,7 +133,7 @@
 
         if (nv && window.getContentId() == 76) {
             if (document.querySelector('#search-overlay') && window.elementPercentInViewport(document.querySelector('#search-overlay')) > 0) {
-                document.querySelector('#product-search-control').focus();
+                document.querySelector('#product-search-input').focus();
             }
         }
     });
@@ -305,7 +305,7 @@
     // Appropriately enough, this one uses the result selected by the user to search with.
     self.useResult = (result) => {
         self.formSubmit();
-        document.querySelector('#product-search-control').value = result.Keyword;
+        document.querySelector('#product-search-input').value = result.Keyword;
         self.searchTerm(result.Keyword);
         window.setTimeout(() => {
             self.submit();
