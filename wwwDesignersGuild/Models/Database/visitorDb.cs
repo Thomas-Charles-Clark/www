@@ -21,6 +21,7 @@ using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Util;
 using SimpleImpersonation;
+using Braintree;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -32,6 +33,45 @@ namespace wwwDesignersGuild.Models.Database
 
     public class visitorDb
     {
+        public DatabaseJSONResponse callTradeAccountRequestAccess(long visitorId, PassTradeAccessRequest objRequest)
+        {
+            var result = new DatabaseJSONResponse();
+
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                SqlCommand cmd = new SqlCommand("[pub].[TradeAccount_RequestAccess]", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                var parameters = new SqlParameter[] 
+                {
+                    new SqlParameter("@VisitorID", visitorId),
+                    new SqlParameter("@TradeAccountName", objRequest.tradeAccountName ?? (object)DBNull.Value),
+                    new SqlParameter("@TradeAccountCode", objRequest.tradeAccountCode ?? (object)DBNull.Value),
+                    new SqlParameter("@TradeAccountLabel", objRequest.tradeAccountLabel ?? (object)DBNull.Value),
+                    new SqlParameter("@UserName", objRequest.userName ?? (object)DBNull.Value),
+                    new SqlParameter("@UserEmail", objRequest.userEmail ?? (object)DBNull.Value),
+                    new SqlParameter("@UserPhone", objRequest.userPhone ?? (object)DBNull.Value)
+                };
+
+                cmd.Parameters.AddRange(parameters);
+
+                conn.Open();
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    result.JSON = reader.GetString(0);
+                }
+
+                conn.Close();
+            }
+
+            return result;
+        }
+
         public DatabaseJSONResponse fetchTradeAccountSalesRepresentative(PassTradeAccessRequest objRequest)
         {
             var result = new DatabaseJSONResponse();
@@ -3031,6 +3071,18 @@ namespace wwwDesignersGuild.Models.Database
             }
 
             return result;
+        }
+
+        public async Task<int> TradeLogin_Unregistered(PassTradeLoginUnregisteredRequest obj, long visitorId)
+        {
+            _ = await this.Connection.QueryAsync("pub.TradeMember_Authentication_UnregisteredLoginSubmit", new { 
+                obj.TradeAccountCode,
+                FullName = obj.FullName,
+                EmailAddress = obj.Email,
+                VisitorID = visitorId
+            }, null, null, CommandType.StoredProcedure);
+
+            return 0;
         }
     }
 

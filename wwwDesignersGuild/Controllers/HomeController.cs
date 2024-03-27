@@ -1822,6 +1822,7 @@ namespace wwwDesignersGuild.Controllers
                     ).ToList();
 
                 Session["memberTradeChecksPassed"] = false;
+
                 if (thisCountryTradePriceLists.Count > 0)
                 {
                     if (objVisitorSelect.memberTradeAccountNumber != null)
@@ -1837,6 +1838,19 @@ namespace wwwDesignersGuild.Controllers
                                 {
                                     Session["memberTradeChecksPassed"] = true;
                                 }
+                            }
+                            else 
+                            {
+                                // This user is not permitted to trade order in this market
+                                // Are they permitted to trade order in any other market?
+                                // If so, set a Session variable, look for it when rendering the site corrector, and
+                                // advise them that in order to use the B2B Site they must change site culture?
+
+                                var correctTradePriceList = objCountryData.countryTradePriceLists.SingleOrDefault(tpl => tpl.TradePriceListID == objVisitorSelect.tradePriceListId);
+
+                                var correctSiteCulture = objCountryData.countryItems.SingleOrDefault(ci => ci.PriceListID == correctTradePriceList?.PriceListID);
+
+                                Session["memberTradeCorrectSiteCulture"] = correctSiteCulture;
                             }
                         }
                     }

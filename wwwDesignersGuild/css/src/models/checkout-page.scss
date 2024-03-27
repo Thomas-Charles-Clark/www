@@ -1221,3 +1221,10 @@ ul.address-autocomplete {
         margin-top: $xl-gutter;
     }
 }
+
+#login-form-body {
+    #signin-type-tab-container {
+        padding: 0;
+        border: 0;
+    }
+}

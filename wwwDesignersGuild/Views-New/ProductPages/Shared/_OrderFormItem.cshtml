@@ -71,22 +71,6 @@
         <div class="d-none" data-bind="init: { field: products, value: [@(Model.ClientProductViewModels)] }, remove"></div>
         <div class="d-none" data-bind="remove">
             @{
-                if (Model.AllowSample)
-                {
-                    <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
-                        @JsonConvert.SerializeObject(Model.Product["sample"])
-                    </span>
-                    <!-- /ko -->
-                }
-                if (Model.AllowLargeSample)
-                {
-                    <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
-                        @JsonConvert.SerializeObject(Model.Product["largeSample"])
-                    </span>
-                    <!-- /ko -->
-                }
                 if (Model.AllowOrder)
                 {
                     <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
@@ -111,30 +95,26 @@
                     </span>
                     <!-- /ko -->
                 }
+                if (Model.AllowSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["sample"])
+                    </span>
+                    <!-- /ko -->
+                }
+                if (Model.AllowLargeSample)
+                {
+                    <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                    <span data-bind="remove, init: { convert: JSON.parse }, text: data">
+                        @JsonConvert.SerializeObject(Model.Product["largeSample"])
+                    </span>
+                    <!-- /ko -->
+                }
             }
         </div>
         @if (!Model.IsLifestyle)
         {
-            if (Model.AllowSample)
-            {
-                <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                @OrderFormItemHelper(Model.MasterDefinition,
-                                     Model.Product["sample"],
-                                     OrderFormItemType.Sample,
-                                     OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
-                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
-                <!-- /ko -->
-            }
-            if (Model.AllowLargeSample)
-            {
-                <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-                @OrderFormItemHelper(Model.MasterDefinition,
-                                     Model.Product["largeSample"],
-                                     OrderFormItemType.LargeSample,
-                                     OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
-                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
-                <!-- /ko -->
-            }
             if (Model.AllowOrder)
             {
                 <!-- ko with: getProductByBasketLineType(@(Model.Product["productId"]), @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
@@ -163,6 +143,26 @@
                                      OrderFormItemType.ReserveWithBatchCutting,
                                      OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
                                      Convert.ToBoolean(Model.Product["controls"]["disableOrder"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["sample"].SelectToken("productId")), @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["sample"],
+                                     OrderFormItemType.Sample,
+                                     OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                <!-- /ko -->
+            }
+            if (Model.AllowLargeSample)
+            {
+                <!-- ko with: getProductByBasketLineType(@(Model.Product["largeSample"].SelectToken("productId")), @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
+                @OrderFormItemHelper(Model.MasterDefinition,
+                                     Model.Product["largeSample"],
+                                     OrderFormItemType.LargeSample,
+                                     OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
+                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
                 <!-- /ko -->
             }
             if (!Model.IsHotspot && Model.ProductTypeID == 18 && c == 81 && l == 1)

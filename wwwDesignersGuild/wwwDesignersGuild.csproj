@@ -650,6 +650,7 @@
     <Compile Include="Models\Trade\cmsTradeAccountContactDetails.cs" />
     <Compile Include="Models\Trade\cmsTradeAccountRequestForm.cs" />
     <Compile Include="Models\Trade\PassTradeClearanceFetch.cs" />
+    <Compile Include="Models\Trade\PassTradeLoginUnregisteredRequest.cs" />
     <Compile Include="Models\Trade\TradeDownloadFile.cs" />
     <Compile Include="Models\Trade\Trade.cs" />
     <Compile Include="Models\Trade\TradeMyAccountViewModel.cs" />

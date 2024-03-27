@@ -1094,3 +1094,34 @@ textarea.mdc-text-field__input:focus-within {
         }
     }
 }
+
+.order-form-item.trade {
+    margin-top: $l-gutter;
+    padding: $m-gutter;
+    background-color: #dddddd;
+    .messaging-container {
+        margin-bottom: $sm-gutter;
+        display: flex;
+        justify-content: space-between;
+
+        .price-messages {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stock-messages {
+            display: flex;
+            flex-direction: column;
+            gap: $xs-gutter;
+
+            .order-form-stock-message {
+                margin-bottom: 0; 
+                line-height: normal;
+            }
+        }
+    }
+    +.order-form-item.trade.mt-0 {
+        border-top: 3px dashed white;
+    }
+}

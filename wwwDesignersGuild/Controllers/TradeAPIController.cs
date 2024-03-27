@@ -1204,53 +1204,65 @@ namespace wwwDesignersGuild.Controllers
         {
             var db = new visitorDb();
 
-            var contactResult = db.fetchTradeAccountSalesRepresentative(objRequest);
-
-            var body = $@"<p>Hello {JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].contactName").Value<string>()},</p><p>&nbsp;</p>
-<p><strong>{objRequest.tradeAccountLabel}</strong> has requested a login for our new & improved B2B Trade Site.</p>";
-
-            body += $@"<p>The person requesting a B2B login on {DateTime.Now:ddd dd MMMM yyyy} was:</p>";
-
-            body += $@"<p>&nbsp;</p>";
-
-            body += $@"<p>{objRequest.userName}</p>";
-            
-            body += $@"<p><a href=""mailto:{objRequest.userEmail}"">{objRequest.userEmail}</a></p>";
-
-            if (!String.IsNullOrEmpty(objRequest.userPhone))
+            Int64 visitorId = -1;
+            if (HttpContext.Current.Session["visitorIdFromDatabase"] == null)
             {
-                body += $@"<p><a href=""mailto:{objRequest.userPhone}"">{objRequest.userPhone}</a></p>";
             }
+            else
+            {
+                visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+            }
+            var result = db.callTradeAccountRequestAccess(visitorId, objRequest);
 
-            body += $@"<p>&nbsp;</p>";
+            return Ok(result?.json);
 
-            body += $"<p><strong>THIS PERSON MAY NOT BE THE ACCOUNT OWNER. WE CAN ONLY SEND A B2B TRADE REGISTRATION LINK TO THE MAIN EMAIL ADDRESS WE HOLD ON {objRequest.tradeAccountLabel}</strong></p>";
+            //var contactResult = db.fetchTradeAccountSalesRepresentative(objRequest);
+            
+            //            var body = $@"<p>Hello {JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].contactName").Value<string>()},</p><p>&nbsp;</p>
+            //<p><strong>{objRequest.tradeAccountLabel}</strong> has requested a login for our new & improved B2B Trade Site.</p>";
 
-            body += $@"<p>Please use the <a href=""https://portal.designersguild.com/customers/invite"">""Send Trade Admin Invites"" Portal App</a> to view the registered email address we hold and to see if this account has been registered previously.</p>";
+            //            body += $@"<p>The person requesting a B2B login on {DateTime.Now:ddd dd MMMM yyyy} was:</p>";
 
-            body += @"<p>Once registered, the account holder is responsible for the creation and management of their own users.</p>";
+            //            body += $@"<p>&nbsp;</p>";
 
-            body += @"<p>If the email address above is not the registered account email address, please reply to them and ask that they get the owner of the account to create them as a user.</p>";
+            //            body += $@"<p>{objRequest.userName}</p>";
 
-            body += "<p>&nbsp;</p><p>Thank you</p>";
+            //            body += $@"<p><a href=""mailto:{objRequest.userEmail}"">{objRequest.userEmail}</a></p>";
 
-            var email = JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].email").Value<string>();
+            //            if (!String.IsNullOrEmpty(objRequest.userPhone))
+            //            {
+            //                body += $@"<p><a href=""mailto:{objRequest.userPhone}"">{objRequest.userPhone}</a></p>";
+            //            }
 
-            string cc = null;
+            //            body += $@"<p>&nbsp;</p>";
 
-#if DEBUG
-            email = "tclark@designersguild.com";
-            cc = "mchristie@designersguild.com";
-#endif
+            //            body += $"<p><strong>THIS PERSON MAY NOT BE THE ACCOUNT OWNER. WE CAN ONLY SEND A B2B TRADE REGISTRATION LINK TO THE MAIN EMAIL ADDRESS WE HOLD ON {objRequest.tradeAccountLabel}</strong></p>";
 
-            var emailId = db.addEmailToQueue(
-                email,
-                cc,
-                "itsupport@designersguild.com",
-                $"Trade Admin Invite Requested - {objRequest.tradeAccountLabel}",
-                body);
+            //            body += $@"<p>Please use the <a href=""https://portal.designersguild.com/customers/invite"">""Send Trade Admin Invites"" Portal App</a> to view the registered email address we hold and to see if this account has been registered previously.</p>";
 
-            return Ok(new { emailId });
+            //            body += @"<p>Once registered, the account holder is responsible for the creation and management of their own users.</p>";
+
+            //            body += @"<p>If the email address above is not the registered account email address, please reply to them and ask that they get the owner of the account to create them as a user.</p>";
+
+            //            body += "<p>&nbsp;</p><p>Thank you</p>";
+
+            //            var email = JObject.FromObject(contactResult.json).SelectToken("$.contactDetails[0].email").Value<string>();
+
+            //            string cc = null;
+
+            //#if DEBUG
+            //            email = "tclark@designersguild.com";
+            //            cc = "mchristie@designersguild.com";
+            //#endif
+
+            //            var emailId = db.addEmailToQueue(
+            //                email,
+            //                cc,
+            //                "itsupport@designersguild.com",
+            //                $"Trade Admin Invite Requested - {objRequest.tradeAccountLabel}",
+            //                body);
+
+            //            return Ok(new { emailId });
         }
 
         [HttpPost]
@@ -1344,6 +1356,21 @@ namespace wwwDesignersGuild.Controllers
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
             return new System.Web.Http.Results.ResponseMessageResult(result);
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> TradeLoginUnregistered([FromBody]PassTradeLoginUnregisteredRequest obj)
+        {
+            Int64 visitorId = -1;
+
+            if (HttpContext.Current.Session["visitorIdFromDatabase"] != null) 
+            { 
+                visitorId = Convert.ToInt64(HttpContext.Current.Session["visitorIdFromDatabase"].ToString());
+            }
+
+            _ = await new databaseDataContext().TradeLogin_Unregistered(obj, visitorId);
+
+            return Ok(new { });
         }
     }
 }

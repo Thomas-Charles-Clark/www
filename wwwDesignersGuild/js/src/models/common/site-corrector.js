@@ -89,6 +89,35 @@
         self.dismiss();
     }
 
+    self.hideTrade = function () {
+        self.siteSelection.DOMElement.classList.remove('open');
+
+        // get the height of the element's inner content, regardless of its actual size
+        let sectionHeight = self.siteSelection.DOMElement.scrollHeight;
+
+        // temporarily disable all css transitions
+        let elementTransition = self.siteSelection.DOMElement.style.transition;
+        self.siteSelection.DOMElement.style.transition = '';
+
+        // on the next frame (as soon as the previous style change has taken effect),
+        // explicitly set the element's height to its current pixel height, so we 
+        // aren't transitioning out of 'auto'
+        requestAnimationFrame(function () {
+            self.siteSelection.DOMElement.style.height = sectionHeight + 'px';
+            self.siteSelection.DOMElement.style.transition = elementTransition;
+
+            // on the next frame (as soon as the previous style change has taken effect),
+            // have the element transition to height: 0
+            requestAnimationFrame(function () {
+                self.siteSelection.DOMElement.style.height = 0 + 'px';
+            });
+        });
+
+        // mark the section as "currently collapsed"
+        self.siteSelection.DOMElement.setAttribute('data-collapsed', 'true');
+
+    }
+
     self.toggle = function (ev) {
 
         if (self.siteSelection.DOMElement.classList.contains('open'))
@@ -99,6 +128,16 @@
         ev.stopPropagation();
 
         return true;
+    }
+
+    self.transitionEnd = function (e) {
+        var element = self.siteSelection.DOMElement;
+
+        // remove this event listener so it only gets triggered once
+        element.removeEventListener('transitionend', self.transitionEnd);
+
+        // remove "height" from the element's inline styles, so it can return to its initial value
+        element.style.height = 'auto';
     }
 
     self.show = function () {
@@ -113,13 +152,7 @@
         element.style.height = sectionHeight + 'px';
 
         // when the next css transition finishes (which should be the one we just triggered)
-        element.addEventListener('transitionend', function (e) {
-            // remove this event listener so it only gets triggered once
-            element.removeEventListener('transitionend', arguments.callee);
-
-            // remove "height" from the element's inline styles, so it can return to its initial value
-            element.style.height = 'auto';
-        });
+        element.addEventListener('transitionend', self.transitionEnd);
 
         // mark the section as "currently not collapsed"
         element.setAttribute('data-collapsed', 'false');

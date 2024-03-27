@@ -11,6 +11,19 @@
 
     self.registrationMode = ko.observable(false);
 
+    self.tradeRegistrationMode = ko.observable(0); // 0 == I'm already registered
+                                                   // 1 == I'm new
+
+    self.tradeAccountState = ko.observable(0);  // 0 == I DO have a trade account
+                                                // 1 == I DO NOT have a trade account
+    // I don't love this: I added it because navigating using the browser BACK button causes the form to load in the previous state
+    // but that's in direct conflict with the fact that we don't want it to load in the previous state
+    // but we can't use autocomplete="off" because we DO want it to autocomplete from credentials stored by the browser
+    window.addLoadFunction(() => {
+        self.tradeRegistrationMode(0);
+        self.tradeAccountState(0);
+    });
+
     self.redirect = ko.observable();
 
     self.validateLoginNow = ko.observable(false);
@@ -19,7 +32,11 @@
 
     self.validateRegistrationNow = ko.observable(false);
 
+    self.validateTradeNow = ko.observable(false);
+
     self.validLogin = ko.observable(false);
+
+    self.tradeLoginUnregisteredSubmitted = ko.observable(false);
 
     //#region Login-Specific Stuff
 
@@ -193,6 +210,52 @@
     // This is fed by the marketingPermissionsCheck
     self.userUnsubscribedFromEmailMarketing = ko.observable(false);
 
+    //#region Trade related stuff
+
+    self.tradeEmail = ko.observable().extend({
+        email: {
+            params: true,
+            onlyIf: () => {
+                return self.validateTradeNow() && self.registrationMode() == false
+            },
+            message: self.resources.FormsErrorEmailFormat
+        },
+        required: {
+            params: true,
+            onlyIf: () => {
+                return self.validateTradeNow() && self.registrationMode() == false
+            },
+            message: self.resources.emailValidation
+        },
+        errorPulse: {}
+    });
+
+    self.tradeFullName = ko.observable().extend({
+        maxLength: 50,
+        required: {
+            params: true,
+            onlyIf: () => {
+                return self.validateTradeNow() && self.registrationMode() == false
+            },
+            message: self.resources.nameValidation
+        },
+        errorPulse: {}
+    });
+
+    self.tradeAccountNumber = ko.observable().extend({
+        maxLength: 50,
+        required: {
+            params: true,
+            onlyIf: () => {
+                return self.validateTradeNow() && self.registrationMode() == false
+            },
+            message: self.resources.PleaseProvideTradeAccountNumber
+        },
+        errorPulse: {}
+    });
+
+    //#endregion
+
     //#endregion
 
     //#endregion
@@ -202,10 +265,28 @@
 
     self.loginEmailAddress.subscribe(nv => self.invalidLogin(false));
 
-    self.registrationMode.subscribe(nv => {
-        let carouselElement = document.querySelector('#login-form-carousel');
-        let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
-        carousel.to(nv ? 1 : 0);
+    window.addBootstrapLoadFunction(() => {
+        self.registrationMode.subscribe(nv => {
+            let carouselElement = document.querySelector('#retail-login-form-carousel');
+            let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
+            carousel.to(nv ? 1 : 0);
+        });
+    });
+
+    window.addBootstrapLoadFunction(() => {
+        self.tradeRegistrationMode.subscribe(nv => {
+            let carouselElement = document.querySelector('#trade-login-form-carousel');
+            let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
+            carousel.to(nv);
+        });
+    });
+
+    window.addBootstrapLoadFunction(() => {
+        self.tradeAccountState.subscribe(nv => {
+            let carouselElement = document.querySelector('#trade-account-state-carousel');
+            let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
+            carousel.to(nv);
+        });
     });
 
     self.registrationAllCountries.subscribe(nvs => {
@@ -294,6 +375,10 @@
         }
     });
 
+    self.enableTradeSubmit = ko.computed(() => {
+        return self.tradeAccountState() == 0 && self.tradeLoginUnregisteredSubmitted() == false;
+    }, self);
+
     //#endregion
 
     //#region Components -- Necessarily bumped down because marketingCountryId must exist before the permission checker
@@ -317,6 +402,12 @@
         self.registrationLanguage,
         self.marketingPermissionChecker.havePerformedMarketingPermissionCheck,
         self.registrationExtantEmailCheckPassed
+    ]);
+
+    self.tradeErrors = new ko.validation.group([
+        self.tradeEmail,
+        self.tradeFullName,
+        self.tradeAccountNumber
     ]);
 
     //#endregion
@@ -559,32 +650,46 @@
         }, 0);
     }
 
+    self.submitTrade = () => {
+        self.validateTradeNow(true);
+
+        self.tradeErrors.showAllMessages(false);
+
+        if (self.tradeErrors().length) {
+            self.tradeErrors.showAllMessages(true);
+
+            self.tradeErrors.filter(x => {
+                x.isValid.notifySubscribers(x.isValid());
+            });
+        } else {
+            self.busy(true);
+
+            fetch("/api/tradeapi/TradeLoginUnregistered", {
+                method: "POST",
+                headers: window.fetchHeaders,
+                body: JSON.stringify({
+                    tradeAccountCode: self.tradeAccountNumber(),
+                    fullName: self.tradeFullName(),
+                    email: self.tradeEmail()
+                })
+            }).then(window.handleFetchResponse)
+                .then(data => {
+                    self.busy(false);
+                    self.tradeLoginUnregisteredSubmitted(true);
+                })
+                .catch(err => {
+                    self.busy(false);
+                    window.catchFetchErrors(err);
+                })
+        }
+    }
+
     //#endregion
 
     window._lg = self;
 
     return self;
 });
-//fetchResources(['FormsErrorEmailFormat',
-//    'nameValidation',
-//    'emailValidation',
-//    'PleaseProvideYourPassword',
-//    'ManageAccountErrorPassword',
-//    'ManageAccountPasswordStrength0',
-//    'ManageAccountPasswordStrength1',
-//    'ManageAccountPasswordStrength2',
-//    'ManageAccountPasswordStrength3',
-//    'ManageAccountPasswordStrength4',
-//    'FormsErrorEmailCompare',
-//    'RegistrationDuplicateText',
-//    'LoginInvalid',
-//    'PaypalInvalidAddress',
-//    'PayWithCard',
-//    'CheckoutTradeCheckout'
-//])
-//.then(window.handleResourcesArray)
-//.then(resources => {
-    window.loginModel = loginViewModel(window.getLoginResources());
-    ko.applyBindings(window.loginModel, document.querySelector('#login-wrapper'));
-    document.querySelector('#body-content').dispatchEvent(new Event('memberGuestLoginReady'));
-//});
+window.loginModel = loginViewModel(window.getLoginResources());
+ko.applyBindings(window.loginModel, document.querySelector('#login-wrapper'));
+document.querySelector('#body-content').dispatchEvent(new Event('memberGuestLoginReady'));
