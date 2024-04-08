@@ -301,7 +301,7 @@
        @if (orderFormItemType != OrderFormItemType.Reserve &&
   orderFormItemType != OrderFormItemType.ReserveWithBatchCutting)
        {
-            <div class="stock-messages">
+            <div class="stock-messages gap-1 mb-1">
            @foreach (var stockMessage in objProduct.SelectToken("stockMessage")?
                                       .SelectToken("basketQuantityThresholds")?
                                       .Children()
@@ -325,7 +325,7 @@
             <label for="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity">
                 @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
             </label>
-            <input type="number" id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity" class="form-control"
+            <input type="text" id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity" class="form-control"
                                                 value="@(initialQuantity)"
                                                 min="@(quantityMinimum)"
                                                 max="@(quantityMaximum)"
@@ -334,6 +334,7 @@
                                                 aria-errormessage="quantity-@(objProduct.SelectToken("productId"))-error"
                                                 autocomplete="off"
                                                 data-bind="init: { convert: parseFloat },
+                                                            selectOnFocus,
                                                             keepElement: quantity, 
                                                             validationOptions: { insertMessages: false },
                                                             validationElement: quantity,

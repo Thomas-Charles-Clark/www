@@ -48,7 +48,6 @@ namespace wwwDesignersGuild.Models.Classes
         public byte SortOrder { get; set; }
     }
 
-    [Serializable]
     public class countryItem
     {
         public byte CountryLanguageID { get; set; }
@@ -1196,6 +1195,18 @@ namespace wwwDesignersGuild.Models.Classes
             get
             {
                 return JObject.FromObject(json).SelectToken("heading").Value<string>();
+            }
+        }
+
+        public string aka
+        {
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectToken("akaHeading")?.Value<string>();
             }
         }
 

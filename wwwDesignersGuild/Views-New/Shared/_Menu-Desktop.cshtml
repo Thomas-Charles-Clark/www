@@ -28,21 +28,21 @@
                 <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd)"
                    rel="nofollow"
                    class="btn navbar-btn">
-                    @HtmlHelperExtra.Resource("SignIn", l, c, d) / @HtmlHelperExtra.Resource("Register", l, c, d)
+                    @HtmlHelperExtra.Resource("Login", l, c, d) / @HtmlHelperExtra.Resource("Register", l, c, d)
                 </a>
                 <ul class="dropdown" aria-label="submenu">
                     <li>
                         <a class="btn btn-link"
                            rel="nofollow"
                            href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd)">
-                            @HtmlHelperExtra.Resource("Retail", l, c, d)
+                            @HtmlHelperExtra.Resource("Login", l, c, d)
                         </a>
                     </li>
                     <li>
                         <a class="btn btn-link"
                            rel="nofollow"
                            href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd, null, null, new [] { new KeyValuePair<string, string>("t", "1") })">
-                            @HtmlHelperExtra.Resource("Trade", l, c, d)
+                            @HtmlHelperExtra.Resource("TradeLogin", l, c, d)
                         </a>
                     </li>
                 </ul>
@@ -231,10 +231,9 @@
                         type="button"
                         class="btn btn-secondary dropdown-toggle"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                    Advanced Search
+                    @HtmlHelperExtra.Resource("AdvancedSearch", l, c, d)
                 </button>
-                <ul id="product-search-advanced-dropdown"
-                    class="dropdown-menu"
+                <ul class="dropdown-menu"
                     aria-labelledby="dropdownMenuButton1">
                    @foreach (var pt in Model.MasterDefinition.ProductTypeDropDown.ProductTypes)
                     {

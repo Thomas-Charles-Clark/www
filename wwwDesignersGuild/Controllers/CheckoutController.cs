@@ -2693,7 +2693,7 @@ namespace wwwDesignersGuild.Controllers
                                         liabilityShifted = false;
                                         liabilityShiftPossible = false;
                                     }
-                                    gatewayRejectionReason = result.Target.GatewayRejectionReason == null ? "" : result.Target.GatewayRejectionReason.ToString();
+                                    gatewayRejectionReason = result.Target.GatewayRejectionReason.ToString();
 
                                     processorAuthCode = result.Target.ProcessorAuthorizationCode;
                                     processorResponseCode = result.Target.ProcessorResponseCode;
@@ -2750,7 +2750,7 @@ namespace wwwDesignersGuild.Controllers
                                             liabilityShiftPossible = false;
                                         }
 
-                                        gatewayRejectionReason = result.Transaction.GatewayRejectionReason == null ? "" : result.Transaction.GatewayRejectionReason.ToString();
+                                        gatewayRejectionReason = result.Transaction.GatewayRejectionReason.ToString();
                                         processorAuthCode = result.Transaction.ProcessorAuthorizationCode;
                                         processorResponseCode = result.Transaction.ProcessorResponseCode;
                                         processorResponseText = result.Transaction.ProcessorResponseText;
@@ -2774,7 +2774,7 @@ namespace wwwDesignersGuild.Controllers
                                             liabilityShiftPossible = false;
                                         }
 
-                                        gatewayRejectionReason = result.Target.GatewayRejectionReason == null ? "" : result.Target.GatewayRejectionReason.ToString();
+                                        gatewayRejectionReason = result.Target.GatewayRejectionReason.ToString();
                                         processorAuthCode = result.Target.ProcessorAuthorizationCode;
                                         processorResponseCode = result.Target.ProcessorResponseCode;
                                         processorResponseText = result.Target.ProcessorResponseText;

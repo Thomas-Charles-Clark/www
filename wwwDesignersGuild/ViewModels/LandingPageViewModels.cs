@@ -2281,10 +2281,10 @@ namespace wwwDesignersGuild.ViewModels
 
                 ag.Attributes.ForEach(a =>
                 {
-                    if (a.FormValue == "orange")
-                    {
-                        int f = 0;
-                    }
+                    //if (a.FormValue == "orange")
+                    //{
+                    //    int f = 0;
+                    //}
 
                     if (productPageIdsAffectingThisAttributeGroup.Any())
                     {
@@ -2411,10 +2411,10 @@ namespace wwwDesignersGuild.ViewModels
 
         public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
         {
-            if (attribute.FormValue == "blue")
-            {
-                int f = 0;
-            }
+            //if (attribute.FormValue == "blue")
+            //{
+            //    int f = 0;
+            //}
 
             // if FilterIndexing is enabled on this grid's containing page
             if (FilterIndexingEnabled && attribute.EnableFilterIndexing)

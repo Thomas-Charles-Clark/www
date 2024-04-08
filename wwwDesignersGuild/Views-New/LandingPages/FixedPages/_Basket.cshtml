@@ -66,7 +66,7 @@
                                     click: decreaseQuantity">
                             <i class="bi bi-dash-lg"></i>
                         </button>
-                        <input type="number"
+                        <input type="text"
                                class="form-control progress-btn"
                                aria-invalid="false"
                                autocomplete="off"
@@ -287,6 +287,12 @@
                                     <sup class="heading-new">@HtmlHelperExtra.Resource("PodNew", l, c, d)</sup>
                                 }
                             </h5>
+                            @if (!String.IsNullOrEmpty(bi.BasketAKAName))
+                            {
+                                <h6>
+                                    @bi.BasketAKAName
+                                </h6>
+                            }
                             <span class="d-block">
                                 @HtmlHelperExtra.Resource("BasketProductCode", l, c, d):
                                 <span class="product-code">
@@ -331,7 +337,7 @@
                                                        click: decreaseQuantity">
                                         <i class="bi bi-dash-lg"></i>
                                     </button>
-                                    <input type="number"
+                                    <input type="text"
                                            class="form-control progress-btn"
                                            value="@(String.Format(cultureInfo, "{0:#.##}", bi.Quantity))"
                                            min="@(String.Format(cultureInfo, "{0:#.##}", bi.StockMessaging?.QuantityMinimum))"
@@ -555,6 +561,12 @@
                                 <p class="card-text">
                                     @Html.Raw(bi.DisplayLine)
                                 </p>
+                                @if (!String.IsNullOrEmpty(bi.BasketAKAName))
+                                {
+                                    <p class="card-text">
+                                        @Html.Raw(bi.BasketAKAName)
+                                    </p>
+                                }
                                 @if (!String.IsNullOrEmpty(bi.PriceMessage))
                                 {
                                     <p class="card-text">
@@ -716,7 +728,7 @@
                         </text>
                     }
                 ],
-                'value': @($"{Model.Definition.BasketItems.Select(bi => bi.Price * bi.Quantity).Sum():F}")
+                'value': @($"{Model.Definition.BasketItems.Select(bi => bi.Price * bi.Quantity).Sum():F}"),
             };
 
             console.log('gtag is pushing view_cart with', data);

@@ -469,6 +469,7 @@ namespace wwwDesignersGuild.Models.Classes
     {
         public int ProductPageID { get; set; }
         public string Heading { get; set; }
+        public string AKAHeading { get; set; }
         public string SubHeading { get; set; }
         public bool New { get; set; }
         public byte ProductTypeID { get; set; }
@@ -677,6 +678,7 @@ namespace wwwDesignersGuild.Models.Classes
         {
             Heading = patch.Heading ?? Heading;
             SubHeading = patch.SubHeading ?? SubHeading;
+            AKAHeading = patch.AKAHeading ?? AKAHeading;
             URLKeywords = patch.URLSemantics ?? patch.URLKeywords ?? URLKeywords;
             URL = patch.URL ?? URL;
             ImageID = patch.ImageID;

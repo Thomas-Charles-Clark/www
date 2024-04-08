@@ -34,12 +34,12 @@
                     FormattingCulture: getCulture()
                 },
                 minValue: self.stockMessage?.quantityMinimum,
-                maxValue: self.stockMessage?.quantityMaximum
+                maxValue: self.stockMessage?.quantityMaximum,
+                unit: self.stockMessage?.unit
             },
             roundedNumeric: {
                 precision: countDecimals(self.stockMessage?.quantityIncrement ?? 1)
-            },
-            units: self.stockMessage?.units
+            }
         });
 
         self.quantity.extend({

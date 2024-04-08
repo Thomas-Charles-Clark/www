@@ -11,5 +11,17 @@
 }
 <h5 class="hotspot-heading bg-light">
     @Model.BasketName
+    @if (!String.IsNullOrEmpty(Model.AKAName))
+    {
+        <span class="fs-6 d-block mt-2">
+            @(Model.AKAName)
+        </span>
+    }
+    else
+    {
+        <span class="fs-6 d-block mt-2">
+            Previously: @(Model.BasketName)
+        </span>
+    }
 </h5>
 @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", Model)

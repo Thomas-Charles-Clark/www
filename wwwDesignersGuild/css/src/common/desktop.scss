@@ -657,7 +657,7 @@ ul.breadcrumb {
     border-bottom: 1px solid $gray-200;
     position: static;
 
-    &:hover, 
+    &:hover,
     &:focus,
     &:focus-within {
         & ~ #logo-search-container {
@@ -706,10 +706,6 @@ ul.breadcrumb {
         li#trade-menu {
             position: relative;
 
-            a:not(.btn-dark):not(.btn-secondary) {
-                white-space: nowrap;
-            }
-
             ul.dropdown {
                 border-top: 1px solid $gray-400;
 
@@ -718,8 +714,27 @@ ul.breadcrumb {
                 }
 
                 li {
+                    a:not(.btn-dark):not(.btn-secondary) {
+                        white-space: nowrap;
+                        line-height: $line-height-base;
+                    }
+
                     a:hover {
                         text-decoration: underline;
+                    }
+                }
+            }
+        }
+
+        li#signin-menu {
+            min-width: 135px;
+
+            ul.dropdown {
+                width: 135px;
+
+                li {
+                    a {
+                        white-space: normal;
                     }
                 }
             }

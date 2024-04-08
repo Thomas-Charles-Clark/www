@@ -177,7 +177,7 @@ namespace wwwDesignersGuild.Controllers
                 {
                     accountSummary = AccountFunctions.AccountSummary(loginCheck.tradeDataSourceJson);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     retryCount++;
                 }
@@ -191,7 +191,7 @@ namespace wwwDesignersGuild.Controllers
                 {
                     outstandingInvoices = AccountFunctions.OutstandingInvoices(loginCheck.tradeDataSourceJson);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     retryCount++;
                 }
@@ -205,7 +205,7 @@ namespace wwwDesignersGuild.Controllers
                 {
                     recentPayments = AccountFunctions.RecentPayments(loginCheck.tradeDataSourceJson);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     retryCount++;
                 }

@@ -50,7 +50,7 @@
                 },
                 minValue: 0,
                 maxValue: self.StockMessaging.QuantityMaximum,
-                units: self.StockMessaging.Units
+                unit: self.StockMessaging.Unit
             },
             min: 0
         });

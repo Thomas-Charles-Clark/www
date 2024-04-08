@@ -63,6 +63,7 @@ namespace wwwDesignersGuild.Models.BasketClasses
         public int ProductID { get; set; }
         public decimal Quantity { get; set; }
         public string BasketName { get; set; }
+        public string BasketAKAName { get; set; }
         public string Brand { get; set; }
         public string Code { get; set; }
         public long ImageID { get; set; }

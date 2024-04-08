@@ -85,8 +85,13 @@
                     margin-top: var(--sm-gutter);
                 }
 
-                > h5 {
+                > h5,
+                > h6 {
                     padding-left: 0.5rem;
+                }
+
+                > h6 {
+                    font-weight: 300;
                 }
 
                 .basket-item-controls {

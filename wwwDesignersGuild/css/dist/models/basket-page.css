@@ -85,8 +85,12 @@
   padding-left: 0.5rem;
   margin-top: var(--sm-gutter);
 }
-.basket-contents .basket-item .basket-item-inner .basket-item-details > h5 {
+.basket-contents .basket-item .basket-item-inner .basket-item-details > h5,
+.basket-contents .basket-item .basket-item-inner .basket-item-details > h6 {
   padding-left: 0.5rem;
+}
+.basket-contents .basket-item .basket-item-inner .basket-item-details > h6 {
+  font-weight: 300;
 }
 .basket-contents .basket-item .basket-item-inner .basket-item-details .basket-item-controls {
   padding-left: 0;

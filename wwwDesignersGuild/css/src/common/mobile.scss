@@ -197,6 +197,7 @@ ul.breadcrumb {
         .navbar-container {
             justify-content: normal;
             background-color: $gray-100;
+            overflow-x: hidden;
         }
 
         .nav-link {
@@ -210,7 +211,9 @@ ul.breadcrumb {
         }
 
         .navbar-collapse {
-            padding-bottom: 25%;
+            #navbar-content-padding-inner {
+                padding-bottom: 25%;
+            }
         }
 
         .nav-link.collapsed > .bi:not(.bi-search) {
@@ -344,6 +347,44 @@ ul.breadcrumb {
         margin-left: 0;
     }
 
+    #product-search-form {
+        .input-group {
+            background-color: $gray-100;
+
+            #product-search-input,
+            .btn {
+                background-color: $white;
+            }
+        }
+    }
+
+    #product-search-advanced-btn {
+        padding: $btn-padding-y $btn-padding-x;
+        border: 1px solid $gray-400;
+        margin-bottom: 0;
+        background-image: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &::after {
+            position: relative;
+            right: 2px;
+            content: '';
+            width: 12px;
+            height: 12px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            transition: transform 150ms ease-in-out;
+            transform: rotate(0);
+        }
+
+        &:not(.collapsed) {
+            &::after {
+                transform: rotate(-180deg);
+            }
+        }
+    }
+
     #product-search-form.shake {
         animation: product-search-shake 300ms ease;
     }
@@ -363,6 +404,7 @@ ul.breadcrumb {
                 height: 100%;
                 display: flex;
                 align-items: flex-end;
+                z-index: 10;
 
                 .dots {
                     display: flex;

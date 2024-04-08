@@ -169,6 +169,10 @@
     }
 
     window.getMasterDefinition = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(objMaster));
+    }
+
+    window.getUrlBreakdown = () => {
         return {
             urlBreakdown: @Html.Raw(JsonConvert.SerializeObject(objMaster.UrlBreakdown)),
         }

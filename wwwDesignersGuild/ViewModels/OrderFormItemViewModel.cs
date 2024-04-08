@@ -136,6 +136,21 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public string AKAName
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(Product.SelectToken("akaName")?.Value<string>()))
+                {
+                    return Regex.Replace(Product.SelectToken("akaName")?.Value<string>(), "(.)\\/(.)", "$1 / $2");
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         public int SortOrder
         {
             get

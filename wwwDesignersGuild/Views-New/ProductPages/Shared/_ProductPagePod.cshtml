@@ -78,6 +78,12 @@
                     <h6 class="card-title text-uppercase">
                         @Html.Raw(Model.ProductPage.Heading)
                     </h6>
+                    @if (!String.IsNullOrEmpty(Model.ProductPage.AKAHeading))
+                    {
+                        <h6 class="card-title text-uppercase aka-heading">
+                            @Html.Raw(Model.ProductPage.AKAHeading)
+                        </h6>
+                    }
                     @if (!String.IsNullOrEmpty(Model.ProductPage.SubHeading))
                     {
                         <h5 class="card-title">
@@ -180,34 +186,40 @@
                     <h6 class="card-title text-uppercase">
                         @Html.Raw(Model.ProductPage.Heading)
                     </h6>
-                   @if (!String.IsNullOrEmpty(Model.ProductPage.SubHeading))
+                    @if (!String.IsNullOrEmpty(Model.ProductPage.AKAHeading))
+                    {
+                        <h6 class="card-title text-uppercase aka-heading">
+                            @Html.Raw(Model.ProductPage.AKAHeading)
+                        </h6>
+                    }
+                    @if (!String.IsNullOrEmpty(Model.ProductPage.SubHeading))
                     {
                         <h5 class="card-title">
                             @Html.Raw(Model.ProductPage.SubHeading)
                         </h5>
                     }
-                   @if (Model.DisplayParagraph)
+                    @if (Model.DisplayParagraph)
                     {
                         <p class="card-text mb-0">
-                           @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.CodeMessage))
+                            @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.CodeMessage))
                             {
                                 <span class="d-block">
                                     @Html.Raw(Model.ProductPage.ProductPagePrice.CodeMessage)
                                 </span>
                             }
-                           @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.DiscountMessage))
+                            @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.DiscountMessage))
                             {
                                 <span class="d-block discount pricing-info">
                                     @Html.Raw(Model.ProductPage.ProductPagePrice.DiscountMessage)
                                 </span>
                             }
-                           @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.PriceMessage))
+                            @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.PriceMessage))
                             {
                                 <span class="d-block pricing-info">
                                     @Html.Raw(Model.ProductPage.ProductPagePrice.PriceMessage)
                                 </span>
                             }
-                           @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.RRPMessage))
+                            @if (!String.IsNullOrEmpty(Model.ProductPage.ProductPagePrice.RRPMessage))
                             {
                                 <span class="d-block pricing-info">
                                     @Html.Raw(Model.ProductPage.ProductPagePrice.RRPMessage)

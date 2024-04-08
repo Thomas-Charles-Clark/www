@@ -976,6 +976,9 @@ ko.extenders.numberFormatted = function (target, options) {
             if (ko.unwrap(options.currency)) {
                 var formattedValue = formatNumber(val, options.digits, ko.unwrap(options.currency).FormattingCulture);
 
+                if (options.unit)
+                    formattedValue = `${formattedValue} ${options.unit}`;
+
                 return formattedValue;
             }
             else {

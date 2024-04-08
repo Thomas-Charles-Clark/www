@@ -72,7 +72,7 @@ namespace wwwDesignersGuild.Controllers
                     {
                         File.Delete(result.FileData[0].LocalFileName);
                     }
-                    catch (Exception _)
+                    catch (Exception)
                     {
 
                     }

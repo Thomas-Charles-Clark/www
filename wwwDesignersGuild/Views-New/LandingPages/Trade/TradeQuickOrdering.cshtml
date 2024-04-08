@@ -33,20 +33,24 @@
                          src="/image@(Framework.WebPFallback)/156/117989"
                          loading="lazy"
                          data-bind="attr: {
-                                src: `/image@(Framework.WebPFallback)/156/${imageId}`,
-                                alt: imageAltText,
-                                title: imageTitleText,
-                                srcset: window.imageAttributeSourceSet(imageId, imageSizeXS),
-                                sizes: window.imageAttributeSizes(imageId, imageSizeXS)
-                            }" />
+                            src: `/image@(Framework.WebPFallback)/156/${imageId}`,
+                            alt: imageAltText,
+                            title: imageTitleText,
+                            srcset: window.imageAttributeSourceSet(imageId, imageSizeXS),
+                            sizes: window.imageAttributeSizes(imageId, imageSizeXS)
+                        }" />
                 </a>
                 <div class="order-form-detail-text">
+                    <h5 data-bind="text: orderFormName"></h5>
+                    <!-- ko if: AKA -->
+                    <h6 class="previously-known-as mb-2" data-bind="text: AKA"></h6>
+                    <!-- /ko -->
                     <div class="order-form-item-properties" data-bind="foreach: orderFormProperties">
                         <span data-bind="text: key"></span>
                         <span data-bind="text: value"></span>
                     </div>
                     <div class="messaging-container">
-                        <div class="stock-messages">
+                        <div class="stock-messages gap-1 mb-1">
                             <!-- ko foreach: stockMessage.basketQuantityThresholds -->
                             <!-- ko foreach: stockMessages -->
                             <a class="order-form-stock-message" href="javascript:;" data-bind="html: stockMessage, css: { 'pointer' : $parentContext.$parent.stockMessage.allowStockCheck }, click: () => { $parentContext.$parent.stockMessage.allowStockCheck ? window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 0) : null }"></a>
@@ -113,9 +117,10 @@
             <label for="-quantity" data-bind="attr: {  for: `product-${productId}-order-form-type-${basketLineTypeId}-qty` }">
                 @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
             </label>
-            <input type="number" class="form-control"
+            <input type="text" class="form-control"
                    autocomplete="off"
                    data-bind="keepElement: quantity,
+                                            selectOnFocus,
                                             validationOptions: { insertMessages: false },
                                             validationElement: quantity,
                                             numeric: quantity,
@@ -187,9 +192,6 @@ else
                         <h1 class="text-uppercase">
                             @HtmlHelperExtra.Resource("tradeQuickOrder", l, c, d)
                         </h1>
-                        <span class="btn">
-                            &nbsp;
-                        </span>
                     </div>
                     <div class="product-search-content">
                         <div class="input-group">

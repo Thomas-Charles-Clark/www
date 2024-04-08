@@ -109,20 +109,25 @@
             }
 
             .order-form-details {
-                > .order-form-detail-text {
+                .order-form-detail-text {
                     display: flex;
                     flex-direction: column;
-                    margin-left: 0;
+                    align-items: stretch;
+                    justify-content: space-between;
+                    line-height: normal;
+                    position: static;
                     width: 100%;
+                    margin-left: 0;
                 }
             }
 
             .order-form-image {
-                width: 104px;
+                width: 136px;
                 height: auto;
             }
 
             .order-form-item-properties {
+                row-gap: $vsm-gutter;
                 width: auto;
                 margin-left: 0;
                 line-height: normal;
@@ -134,7 +139,6 @@
             }
 
             .messaging-container {
-                margin-top: calc($l-gutter * -1);
                 margin-bottom: 0;
                 text-align: right;
 
@@ -147,7 +151,7 @@
                 }
 
                 .stock-messages {
-                    display: flex;
+                    display: inline-flex;
                     flex-direction: column;
                     gap: $xs-gutter;
 
@@ -164,6 +168,12 @@
                 margin-top: $m-gutter !important;
                 padding: 0;
                 background-color: $gray-100;
+
+                .order-form-controls {
+                    input {
+                        width: 6rem;
+                    }
+                }
 
                 & + .order-form-item {
                     margin-top: $m-gutter;
@@ -278,7 +288,7 @@
         }
 
         .form-select.product-type-select {
-            flex: 0 1 20%;
+            flex: 0 1 136px;
         }
     }
 
@@ -1164,4 +1174,9 @@ textarea.mdc-text-field__input:focus-within {
             }
         }
     }
+}
+
+.previously-known-as {
+    margin-bottom: 0;
+    font-weight: 300;
 }
