@@ -41,11 +41,14 @@
                     </sup>
                     <!-- /ko -->
                 </h5>
+                <!-- ko if: BasketAKAName -->
+                <h6 data-bind="text: BasketAKAName"></h6>
+                <!-- /ko -->
                 <span class="d-block">
                     @HtmlHelperExtra.Resource("BasketProductCode", l, c, d):
                     <span class="product-code" data-bind="text: Code"></span>
                 </span>
-               @if (tradeUser)
+                @if (tradeUser)
                 {
                     <span class="d-block bold" data-bind="text: BasketLineType"></span>
                 }
@@ -169,6 +172,9 @@
                 </h6>
                 <!-- /ko -->
                 <p class="card-text" data-bind="html: DisplayLine"></p>
+                <!-- ko if: BasketAKAName -->
+                <p class="card-text" data-bind="html: BasketAKAName"></p>
+                <!-- /ko -->
                 <!-- ko if: PriceMessage -->
                 <p class="card-text">
                     <span class="d-block" data-bind="html: PriceMessage"></span>

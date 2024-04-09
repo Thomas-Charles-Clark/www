@@ -86,7 +86,7 @@ namespace wwwDesignersGuild.Models.Database
 
             WindowsIdentity.RunImpersonated(token, () =>
             {
-                using (SqlConnection conn = new SqlConnection("Data Source=vm-sql1;Initial Catalog=Flock;Integrated Security=SSPI"))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockIntegratedConnectionString"].ConnectionString))
                 {
                     DataTable leadInterestsTableType = new DataTable();
 

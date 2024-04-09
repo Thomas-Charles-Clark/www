@@ -379,6 +379,8 @@ ul.breadcrumb {
         }
 
         &:not(.collapsed) {
+            border: 1px solid $gray-800;
+
             &::after {
                 transform: rotate(-180deg);
             }

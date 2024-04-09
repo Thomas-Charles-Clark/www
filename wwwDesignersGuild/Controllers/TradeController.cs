@@ -453,7 +453,7 @@ namespace wwwDesignersGuild.Controllers
                 //var css = PdfGenerator.ParseStyleSheet(matches[0].Value, true);
                 //var pdfDocument = PdfGenerator.GeneratePdf(body, PageSize.A4, 20, css);
 
-                var fullUNCFilePath = $"\\\\vm-sql1\\d$\\EmailAttachments\\{fileNameWithExtension}";
+                var fullUNCFilePath = $"\\\\vm-sql2\\d$\\EmailAttachments\\{fileNameWithExtension}";
 
                 //pdfDocument.Save(fullUNCFilePath);
 
@@ -557,7 +557,7 @@ namespace wwwDesignersGuild.Controllers
                 var fileNameWithExtension = $"{docrefdecrypted}.pdf";
                 //var css = PdfGenerator.ParseStyleSheet(matches[1].Value, false);
                 //var pdfDocument = PdfGenerator.GeneratePdf(body, PageSize.A4, 20, css);
-                var fullUNCFilePath = $"\\\\vm-sql1\\d$\\EmailAttachments\\{fileNameWithExtension}";
+                var fullUNCFilePath = $"\\\\vm-sql2\\d$\\EmailAttachments\\{fileNameWithExtension}";
 
                 //pdfDocument.Save(fullUNCFilePath);
 
