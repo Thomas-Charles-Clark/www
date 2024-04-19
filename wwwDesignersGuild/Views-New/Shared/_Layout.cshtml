@@ -6,6 +6,8 @@
     var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
     var c = objMaster.UrlBreakdown.countryDetails.CountryID;
     var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = objMaster.TradeAllowed;
 }
 <!DOCTYPE html>
 <html lang="@objMaster.UrlBreakdown.countryDetails.LanguageDotNetCulture">
@@ -17,7 +19,7 @@
     <meta name="description" content="@(objMaster.MetaDescription ?? objMaster.TitleTag)" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-   @if (String.IsNullOrEmpty(Model.CustomCanonical))
+    @if (String.IsNullOrEmpty(Model.CustomCanonical))
     {
         foreach (var href in objMaster.GoogleHrefs)
         {
@@ -78,6 +80,11 @@
     <!-- #endregion -->
     <!-- #region Global CSS -->
     @Render.StylesPreload("~/bundles/css/common")
+
+    @if (tradeUser)
+    {
+        @Render.StylesPreload("~/bundles/css/trade-common")
+    }
 
     @if (!dgFramework.IsMobileDevice())
     {
@@ -364,6 +371,7 @@
                     @if (!ViewBag.Partial)
                     {
                         @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+                        @Html.Partial("~/Views-New/Shared/_TradeLoginPrompt.cshtml")
                     }
                     @if (!ViewBag.Partial && !dgFramework.IsMobileDevice())
                     {

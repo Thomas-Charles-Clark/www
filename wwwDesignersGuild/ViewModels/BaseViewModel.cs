@@ -2,7 +2,11 @@
 
 using DevExpress.Web;
 
+using DocumentFormat.OpenXml.EMMA;
+
 using iText.Layout.Renderer;
+
+using Microsoft.AspNet.Identity.Owin;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -196,6 +200,21 @@ namespace wwwDesignersGuild.ViewModels
 
         public ProductType CategoryPageProductType { get; set; }
 
+        public tradeContactUsDetail TradeCustomerServicesContactDetail { get; set; }
+
+        public bool ShouldShowTradeLoginPrompt
+        {
+            get
+            {
+                return !IsBot && 
+                    String.IsNullOrEmpty(Partial) && 
+                    HttpContext.Current.Request.Cookies["dg-trade-signin"] != null &&
+                    Convert.ToBoolean(HttpContext.Current.Session["tradeLoginPromptDismissed"]) == false &&
+                    MasterDefinition.UrlBreakdown.countryDetails.URL == HttpContext.Current.Request.Cookies["dg-trade-signin"].Value &&
+                    HttpContext.Current.Session["loginStatus"]?.ToString() != dgLoginStatus.currentLogin.ToString();
+            }
+        }
+
         // This sucks but is temporarily necessary to get the mobile menu updated throughout
         public BaseViewModel(masterDefinition objMaster)
         {
@@ -219,6 +238,7 @@ namespace wwwDesignersGuild.ViewModels
             NoIndex = false;
             CustomCanonical = null;
             CategoryPageProductType = null;
+            TradeCustomerServicesContactDetail = null;
         }
 
         protected BaseViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor)
@@ -238,6 +258,7 @@ namespace wwwDesignersGuild.ViewModels
             NoIndex = false;
             CustomCanonical = null;
             CategoryPageProductType = null;
+            TradeCustomerServicesContactDetail = null;
         }
 
         protected BaseViewModel(BaseViewModel bvm)
@@ -257,6 +278,7 @@ namespace wwwDesignersGuild.ViewModels
             NoIndex = bvm.NoIndex;
             CustomCanonical = bvm.CustomCanonical;
             CategoryPageProductType = bvm.CategoryPageProductType;
+            TradeCustomerServicesContactDetail = null;
         }
 
         public BaseViewModel()
@@ -275,6 +297,7 @@ namespace wwwDesignersGuild.ViewModels
             NoIndex = false;
             CustomCanonical = null;
             CategoryPageProductType = null;
+            TradeCustomerServicesContactDetail = null;
         }
 
         protected async Task Initialise()
@@ -330,13 +353,21 @@ namespace wwwDesignersGuild.ViewModels
                     CountryID,
                     Date);
 
+            var tradeContactDetailsTask = Task.FromResult<IEnumerable<tradeContactUsDetail>>(null);
+
+            if (Visitor.memberTradeAccountID.HasValue)
+            {
+                tradeContactDetailsTask = new visitorDb().generateTradeContactUsAsync(Visitor.memberTradeAccountID.Value);
+            }
+
             await Task.WhenAll(
                 basketTask,
                 dotDigitalBehaviourProfileTask,
                 scrapbookTask,
                 recentlyViewedTask,
                 bannersTask,
-                resourcesTask);
+                resourcesTask,
+                tradeContactDetailsTask);
 
             Basket = await basketTask;
 
@@ -344,11 +375,18 @@ namespace wwwDesignersGuild.ViewModels
 
             Scrapbook = await scrapbookTask;
 
+            var tradeContactDetails = await tradeContactDetailsTask;
+
             var recentlyViewed = await recentlyViewedTask;
 
             await bannersTask;
 
             var resourceDefinition = await resourcesTask;
+
+            if (tradeContactDetails != null && tradeContactDetails.Any())
+            {
+                TradeCustomerServicesContactDetail = tradeContactDetails.FirstOrDefault(tcd => tcd.DepartmentID == 1);
+            }    
 
             var requiredResources = new List<string>() {
                 "Quantity",

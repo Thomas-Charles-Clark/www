@@ -109,6 +109,12 @@
   padding-bottom: 0.25rem;
   text-decoration: none;
 }
+.basket-contents .basket-item .basket-item-inner .basket-item-details > .stock-messaging a {
+  color: #0846a2 !important;
+}
+.basket-contents .basket-item .basket-item-inner .basket-item-details > .stock-messaging a:visited {
+  color: #0846a2 !important;
+}
 .basket-contents .basket-item .basket-item-inner .basket-item-details > a.stock-messaging:active,
 .basket-contents .basket-item .basket-item-inner .basket-item-details > a.stock-messaging:focus,
 .basket-contents .basket-item .basket-item-inner .basket-item-details > a.stock-messaging:hover {

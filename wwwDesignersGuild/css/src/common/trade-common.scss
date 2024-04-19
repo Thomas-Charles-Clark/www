@@ -1,0 +1,79 @@
+@import "../lib/bootstrap/scss/mixins/breakpoints";
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+@import "variables";
+@import "mixins";
+
+a.stock-messaging {
+    color: $blue-400 !important;
+    text-decoration: underline;
+}
+
+.order-form-product {
+    .order-form-details,
+    .order-form-item {
+        .stock-messages {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: $xs-gutter;
+            margin-bottom: $m-gutter;
+
+
+            .order-form-stock-message {
+                display: inline-block;
+                margin-bottom: 0;
+                line-height: normal;
+                color: $blue-400 !important;
+            }
+        }
+    }
+}
+
+.basket-contents {
+    .basket-flex {
+        > :nth-child(2), > :nth-child(3) {
+            flex: 0 1 15.5%;
+        }
+    }
+}
+
+#contact-customer-services-modal {
+    a {
+        color: $blue-300;
+    }
+
+    .list-unstyled {
+        margin-bottom: 0;
+
+        li {
+            + li {
+                margin-top: $l-gutter;
+            }
+        }
+    }
+}
+
+.due-date-heading {
+    a {
+        color: $blue-400 !important;
+    }
+}
+
+.order-form-item {
+    .order-form-controls {
+        z-index: 0;
+    }
+    .reserve-overlay {
+        position: absolute;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.reserve-popover {
+    box-shadow: 0 0 32px 2px rgba(0, 0, 0, 0.65);
+}

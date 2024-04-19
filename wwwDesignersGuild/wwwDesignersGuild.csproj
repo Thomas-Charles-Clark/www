@@ -2226,6 +2226,8 @@
     <Content Include="Content\themes\base\tabs.css" />
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="css\dist\common\trade-common.css" />
+    <Content Include="css\dist\common\trade-common.min.css" />
     <Content Include="css\src\common\collection.scss" />
     <Content Include="css\src\common\common.scss" />
     <Content Include="css\src\common\debug.scss" />
@@ -2838,6 +2840,7 @@
     <Content Include="js\src\models\common\modals\back-in-stock-login-modal.js" />
     <Content Include="js\src\models\common\modals\back-in-stock-success-modal.js" />
     <Content Include="js\src\models\common\modals\confirm-modal.js" />
+    <Content Include="js\src\models\common\modals\contact-customer-services-modal.js" />
     <Content Include="js\src\models\common\modals\error-modal.js" />
     <Content Include="js\src\models\common\modals\info-modal.js" />
     <Content Include="js\src\models\common\modals\large-image-modal.js" />
@@ -2845,6 +2848,7 @@
     <Content Include="js\src\models\common\search.js" />
     <Content Include="js\src\models\common\site-corrector.js" />
     <Content Include="js\src\models\common\stock-info.js" />
+    <Content Include="js\src\models\common\trade-login-prompt.js" />
     <Content Include="js\src\models\landing-page\article-grid.js" />
     <Content Include="js\src\models\landing-page\article-pod.js" />
     <Content Include="js\src\models\landing-page\attribute-group-group.js" />
@@ -2894,6 +2898,10 @@
     <Content Include="js\src\view-model-template.txt" />
     <Content Include="js\src\lib\kendo\dist\kendo.2018.3.1017.all.js" />
     <Content Include="js\dist\lib\jszip\dist\jszip.min.js.map" />
+    <Content Include="css\src\common\trade-common.scss" />
+    <Content Include="css\dist\common\trade-common.css.map" />
+    <Content Include="css\dist\common\trade-common.min.css.map" />
+    <Content Include="js\dist\models\common\modals\contact-customer-services-modal.min.js.map" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -3119,6 +3127,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="Views-New\Shared\_TradeLoginPrompt.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">

@@ -599,9 +599,9 @@ namespace wwwDesignersGuild.Controllers
                             urlData.countryDetails, 
                             urlData.ContentId, 
                             dgContentType.landingPage,
-                            null, 
                             null,
-                            Framework.ProductionVersion ? null : new List<string>() { "dateOverride", "countryOverride" }
+                            null,
+                            Framework.ProductionVersion ? new List<string>() { "t" } : new List<string>() { "t", "dateOverride", "countryOverride" }
                         );
 
                         // Don't index this URL: it is login protected
@@ -1837,6 +1837,8 @@ namespace wwwDesignersGuild.Controllers
                                 if (placeOrderPermission)
                                 {
                                     Session["memberTradeChecksPassed"] = true;
+
+                                    Response.Cookies.Add(new HttpCookie("dg-trade-signin", urlData.countryDetails.URL));
                                 }
                             }
                             else 

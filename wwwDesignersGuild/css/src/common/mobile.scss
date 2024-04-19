@@ -170,6 +170,10 @@ ul.breadcrumb {
         max-height: 100vh;
         overflow-y: auto;
 
+        #main-menu-toggle {
+            font-size: $font-size-base;
+        }
+
         > .navbar-container {
             flex-wrap: nowrap;
         }
@@ -315,6 +319,7 @@ ul.breadcrumb {
 
     .bold-header-no-underline {
         font-weight: normal;
+
         .text-uppercase {
             padding-left: 0;
             padding-right: 0;
@@ -334,6 +339,7 @@ ul.breadcrumb {
     background-color: $gray-100;
 
     #product-type-select {
+        display: none; /* Let the record show that I disagree with hiding this - Tom, 10/04/2024 */
         flex: 1 1 100%;
         margin-bottom: var(--sm-gutter);
         padding-left: var(--m-gutter);
@@ -354,6 +360,16 @@ ul.breadcrumb {
             #product-search-input,
             .btn {
                 background-color: $white;
+            }
+
+            button[type=submit] {
+                &:hover,
+                &:focus,
+                &:focus-within,
+                &:visited,
+                &.active {
+                    color: $body-color;
+                }
             }
         }
     }
@@ -928,6 +944,10 @@ ul.breadcrumb {
         .form-select {
             width: auto;
         }
+
+        .d-block {
+            text-align: center;
+        }
     }
 
     .btn {
@@ -939,6 +959,47 @@ ul.breadcrumb {
         border-bottom: 1px solid $blue-100;
     }
 }
+
+#trade-login-prompt {
+    box-sizing: border-box;
+    opacity: 0;
+    transition: height 300ms ease-out,opacity 300ms ease-out;
+    overflow: hidden;
+    height: 0;
+    width: 100%;
+    opacity: 0;
+    border: 0;
+    position: relative;
+    top: 52px;
+    
+    p {
+        margin-bottom: 0;
+        text-align: left;
+        flex-wrap: wrap;
+
+        .form-select {
+            width: auto;
+        }
+    }
+
+    .btn {
+        flex-shrink: 0;
+    }
+
+    span {
+        text-align: center;
+
+        &.me-3 {
+            margin-right: 0 !important;
+        }
+    }
+
+    &.open {
+        opacity: 1.0;
+        border-bottom: 1px solid $blue-100;
+    }
+}
+
 
 #trade-clearance-card {
     margin: $m-gutter;

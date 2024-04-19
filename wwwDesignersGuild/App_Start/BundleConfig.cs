@@ -138,6 +138,9 @@ namespace wwwDesignersGuild
             bundles.Add(new StyleBundle("~/bundles/css/careers-mobile")
                 .Include($"{cssPrefix}/models/careers-mobile{cssSuffix}", cssTransforms));
 
+            bundles.Add(new StyleBundle("~/bundles/css/trade-common")
+                .Include($"{cssPrefix}/common/trade-common{cssSuffix}", cssTransforms));
+
             bundles.Add(new StyleBundle("~/bundles/css/trade")
                 .Include($"{cssPrefix}/models/basket-page{cssSuffix}", cssTransforms)
                 .Include($"{cssPrefix}/common/trade{cssSuffix}", cssTransforms));
@@ -279,12 +282,14 @@ namespace wwwDesignersGuild
             bundles.Add(new ScriptBundle("~/bundles/js/linq")
                 .Include($"{jsPrefix}/lib/linq/dist/linq{jsSuffix}", sourceMapTransform));
 
-            bundles.Add(new ScriptBundle("~/bundles/js/commmon-modals")
+            bundles.Add(new ScriptBundle("~/bundles/js/common-modals")
                 .Include($"{jsPrefix}/models/common/modals/info-modal{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/common/modals/confirm-modal{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/common/modals/error-modal{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/models/common/modals/back-in-stock-login-modal{jsSuffix}", sourceMapTransform)
-                .Include($"{jsPrefix}/models/common/modals/back-in-stock-success-modal{jsSuffix}", sourceMapTransform));
+                .Include($"{jsPrefix}/models/common/modals/back-in-stock-success-modal{jsSuffix}", sourceMapTransform)
+                .Include($"{jsPrefix}/models/common/modals/contact-customer-services-modal{jsSuffix}", sourceMapTransform)
+                );
 
             bundles.Add(new ScriptBundle("~/bundles/js/large-image-modal")
                 .Include($"{jsPrefix}/models/common/modals/large-image-modal{jsSuffix}", sourceMapTransform));
@@ -321,6 +326,9 @@ namespace wwwDesignersGuild
 
             bundles.Add(new ScriptBundle("~/bundles/js/site-corrector")
                 .Include($"{jsPrefix}/models/common/site-corrector{jsSuffix}", sourceMapTransform));
+
+            bundles.Add(new ScriptBundle("~/bundles/js/trade-login-prompt")
+                .Include($"{jsPrefix}/models/common/trade-login-prompt{jsSuffix}", sourceMapTransform));
 
             bundles.Add(new ScriptBundle("~/bundles/js/cookie-notice")
                 .Include($"{jsPrefix}/models/common/cookie-notice{jsSuffix}", sourceMapTransform));

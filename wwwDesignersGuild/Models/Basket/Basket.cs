@@ -173,6 +173,7 @@ namespace wwwDesignersGuild.Models.BasketClasses
         public string StockMessage { get; set; }
         public string Class { get; set; }
         public int StockBreakdownTab { get; set; }
+        public string Target { get; set; }
     }
 
     public class BasketDeliveryOption

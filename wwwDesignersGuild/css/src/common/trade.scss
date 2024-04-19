@@ -118,6 +118,12 @@
                     position: static;
                     width: 100%;
                     margin-left: 0;
+
+                    h5 {
+                        > span:nth-of-type(2) {
+                            font-weight: 500;
+                        }
+                    }
                 }
             }
 
@@ -139,6 +145,7 @@
             }
 
             .messaging-container {
+                margin-top: $sm-gutter;
                 margin-bottom: 0;
                 text-align: right;
 
@@ -148,18 +155,6 @@
                     justify-content: space-between;
                     align-items: flex-end;
                     font-weight: bold;
-                }
-
-                .stock-messages {
-                    display: inline-flex;
-                    flex-direction: column;
-                    gap: $xs-gutter;
-
-                    .order-form-stock-message {
-                        margin-bottom: 0;
-                        line-height: normal;
-                        color: $blue-400;
-                    }
                 }
             }
 

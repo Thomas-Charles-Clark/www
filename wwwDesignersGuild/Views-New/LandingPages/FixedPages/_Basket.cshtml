@@ -53,9 +53,22 @@
                     <span class="d-block bold" data-bind="text: BasketLineType"></span>
                 }
                 <!-- ko foreach: (StockMessaging ? StockMessaging.BasketQuantityThresholds : []) -->
-                <!-- ko foreach: StockMessages -->
-                <span class="d-block stock-messaging" data-bind="class: Class, html: StockMessage"></span>
-                <!-- /ko -->
+                    <!-- ko foreach: StockMessages -->
+                        <!-- ko if: typeof Target != "undefined" -->
+                            <!-- ko if: Target == "StockBreakdown" -->
+                                <a class="d-block stock-messaging pointer" href="javascript:;" data-bind="html: StockMessage, click: () => { window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 0) }"></a>
+                            <!-- /ko -->
+                            <!-- ko if: Target == "ContactCS" -->
+                                <a class="d-block stock-messaging pointer" href="javascript:;" data-bind="html: StockMessage, click: () => { window.showContactCustomerServices(); }"></a>
+                            <!-- /ko -->
+                            <!-- ko if: Target == "POBreakdown" -->
+                                <a class="d-block stock-messaging pointer" href="javascript:;" data-bind="html: StockMessage, click: () => { window.quickOrderingViewModel.stockInfoModel.showStockInfo($parentContext.$parent, 1) }"></a>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: typeof Target == "undefined" -->
+                            <span class="d-block stock-messaging" data-bind="html: StockMessage"></span>
+                        <!-- /ko -->
+                    <!-- /ko -->
                 <!-- /ko -->
                 <div class="basket-item-quantity">
                     <div class="input-group" data-bind="validationOptions: { insertMessages: false }">
@@ -319,9 +332,30 @@
                                     {
                                         if (tradeUser)
                                         {
-                                            <a class="d-block stock-messaging pointer @sm.Class" data-bind="click: () => { $parent.stockInfoModel.showStockInfo($data, 0) }">
-                                                @sm.StockMessage
-                                            </a>
+                                            @* switch JObject.FromObject(stockMessage).SelectToken("target") case "stock": stock; case "customerservice": customerService; default: break; *@
+                                            switch (sm.Target)
+                                            {
+                                                case "StockBreakdown":
+                                                    <a href="javascript:;" class="d-block stock-messaging pointer" data-bind="click: () => { $parent.stockInfoModel.showStockInfo($data, 0) }">
+                                                        @sm.StockMessage
+                                                    </a>
+                                                    break;
+                                                case "ContactCS":
+                                                    <a href="javascript:;" class="d-block stock-messaging pointer" data-bind="click: () => { window.showContactCustomerServices(); }">
+                                                        @sm.StockMessage
+                                                    </a>
+                                                    break;
+                                                case "POBreakdown":
+                                                    <a href="javascript:;" class="d-block stock-messaging pointer" data-bind="click: () => { $parent.stockInfoModel.showStockInfo($data, 1) }">
+                                                        @sm.StockMessage
+                                                    </a>
+                                                    break;
+                                                default:
+                                                    <span class="d-block stock-messaging pointer">
+                                                        @sm.StockMessage
+                                                    </span>
+                                                    break;
+                                            }
                                         }
                                         else
                                         {
@@ -366,7 +400,7 @@
                                             data-bind="enable: canIncreaseQuantity,
                                                         css: {
                                                             'disabled': !canIncreaseQuantity(),
-                                                            'validation-element': !quantity.isValid() 
+                                                            'validation-element': !quantity.isValid()
                                                         },
                                                         click: increaseQuantity">
                                         <i class="bi bi-plus-lg"></i>

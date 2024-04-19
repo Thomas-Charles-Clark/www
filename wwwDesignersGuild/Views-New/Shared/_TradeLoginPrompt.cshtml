@@ -1,0 +1,37 @@
+﻿@model BaseViewModel
+@{
+    var objMaster = Model.MasterDefinition;
+    var cd = objMaster.UrlBreakdown.countryDetails;
+    var contentId = objMaster.UrlBreakdown.ContentId;
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+}
+@if (Model.ShouldShowTradeLoginPrompt)
+{
+    <div id="trade-login-prompt"
+            class="alert alert-secondary p-0 mb-0">
+        <div class="container">
+            <p class="d-flex align-items-center justify-content-center px-1 py-3 gap-2 mb-0">
+                <span class="d-block">
+                    @HtmlHelperExtra.Resource("TradeLoginPromptWelcomeBack", l, c, d)
+                </span>
+                <span class="d-block me-3">
+                    <span>
+                        @HtmlHelperExtra.Resource("TradeLoginPromptPlease", l, c, d)
+                    </span>
+                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberLogin, cd, null, null, new []{ new KeyValuePair<string, string>("t", "1") })" target="_self">
+                        @HtmlHelperExtra.Resource("TradeLoginPromptLoginAgain", l, c, d)
+                    </a>
+                    <span>
+                        @HtmlHelperExtra.Resource("TradeLoginPromptToAccess", l, c, d)
+                    </span>
+                </span>
+                <button class="btn-close btn-close-white"
+                        data-bind="click: hide">
+                </button>
+            </p>
+        </div>
+    </div>
+    @Render.Script("~/bundles/js/trade-login-prompt")
+}

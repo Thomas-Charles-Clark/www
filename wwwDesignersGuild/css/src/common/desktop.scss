@@ -726,6 +726,10 @@ ul.breadcrumb {
             }
         }
 
+        li#trade-menu {
+            z-index: 20;
+        }
+
         li#signin-menu {
             min-width: 135px;
 
@@ -1132,13 +1136,13 @@ ul.breadcrumb {
         > li.underlay {
             visibility: hidden;
             opacity: 0;
-            position: absolute;
+            position: fixed;
             background-color: $gray-dg;
             left: 0;
             top: 0;
             transition: visibility 0ms, opacity 150ms ease;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             z-index: 3;
         }
 
@@ -2235,5 +2239,11 @@ footer {
 #cookie-notice {
     span.small {
         font-size: 0.825rem;
+    }
+}
+
+#trade-login-prompt {
+    p {
+        line-height: 35px;
     }
 }

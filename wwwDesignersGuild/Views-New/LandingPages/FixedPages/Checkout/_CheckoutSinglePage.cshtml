@@ -541,7 +541,8 @@
 
         ko.applyBindings(viewModel, $('#checkout-wrapper')[0]);
 
-        ko.applyBindings(viewModel, $('#stock-modal')[0]);
+        if (document.querySelector('#stock-modal'))
+            ko.applyBindings(viewModel, document.querySelector('#stock-modal'));
 
         $('.braintree-input-wrapper').each(function (x) {
             ko.cleanNode(x[0]);

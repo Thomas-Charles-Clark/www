@@ -904,6 +904,7 @@ namespace wwwDesignersGuild.Models.Classes
     public class tradeContactUsDetail
     {
         public byte SortOrder { get; set; }
+        public byte? DepartmentID { get; set; }
         public string Department { get; set; }
         public long? ImageID { get; set; }
         public string Name { get; set; }

@@ -252,9 +252,11 @@ namespace wwwDesignersGuild
             HttpContext.Current.Session.Add("checkoutExpiry", null); // definitely used, expires checkout
             HttpContext.Current.Session.Add("checkoutDisplayGiftTab", false); // not used?
             HttpContext.Current.Session.Add("checkoutDisplayGiftVoucherTab", false); // not used?
+            HttpContext.Current.Session.Add("memberTradeChecksPassed", false); // definitely used!
             HttpContext.Current.Session.Add("serverSearchResult", null); // no longer used: why would we need serverSearchResult in session...?
             HttpContext.Current.Session.Add("backInStockReminder", null); // definitely used: if you attempt to create a BISR without being logged in you get prompted to log in. Then once logged in, the BISR should be automatically created and you informed.
-            HttpContext.Current.Session.Add("countryCorrectorDismissed", false); // definitely used: if you attempt to create a BISR without being logged in you get prompted to log in. Then once logged in, the BISR should be automatically created and you informed.
+            HttpContext.Current.Session.Add("countryCorrectorDismissed", false); // definitely used: country nag
+            HttpContext.Current.Session.Add("tradeLoginPromptDismissed", false); // definitely used: trade login nag
         }
     }
 }

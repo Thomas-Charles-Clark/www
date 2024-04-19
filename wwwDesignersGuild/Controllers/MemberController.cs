@@ -20,6 +20,7 @@ using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Form;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Scrapbook;
+using wwwDesignersGuild.Models.UPS;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
 
@@ -429,6 +430,8 @@ namespace wwwDesignersGuild.Controllers
                                     if (objDetailStore.MemberDetail.TradeAccountID.HasValue)
                                     {
                                         session["memberTradeChecksPassed"] = true;
+
+                                        HttpContext.Current.Response.Cookies.Add(new HttpCookie("dg-trade-signin", thisCountry.URL));
                                     }
 
                                     session["loginStatus"] = dgLoginStatus.currentLogin.ToString();
@@ -1152,6 +1155,8 @@ namespace wwwDesignersGuild.Controllers
                     session["memberDisplayTradePrice"] = objSubmission.displayTradePrice;
 
                     success = true;
+
+                    HttpContext.Current.Response.Cookies.Add(new HttpCookie("dg-trade-signin", objSubmission.masterDefinition.UrlBreakdown.countryDetails.URL));
                 }
                 else
                 {

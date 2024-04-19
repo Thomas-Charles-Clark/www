@@ -27,6 +27,18 @@
 
         self.quantity(self.stockMessage?.quantityMinimum ?? 1);
 
+        let qMax = 9999;
+
+        switch (self.basketLineTypeId) {
+            case 2:
+            case 3:
+                qMax = self.stockMessage.reserveQuantityMaximum;
+                break;
+            default:
+                qMax = self.stockMessage.quantityMaximum;
+                break;
+        }
+
         self.quantity.extend({
             numberFormatted: {
                 digits: countDecimals(self.stockMessage?.quantityIncrement),
@@ -34,7 +46,7 @@
                     FormattingCulture: getCulture()
                 },
                 minValue: self.stockMessage?.quantityMinimum,
-                maxValue: self.stockMessage?.quantityMaximum,
+                maxValue: qMax,
                 unit: self.stockMessage?.unit
             },
             roundedNumeric: {
@@ -59,15 +71,15 @@
                 message: `${self.resources.pleaseGreaterThanEqualTo} ${self.stockMessage?.quantityMinimum}`
             },
             max: {
-                params: self.stockMessage?.quantityMaximum,
+                params: qMax,
                 onlyIf: function () {
                     return self.enabled()
                 },
-                message: `${self.resources.pleaseLessThanEqualTo} ${self.stockMessage?.quantityMaximum}`
+                message: `${self.resources.pleaseLessThanEqualTo} ${qMax}`
             }
         });
 
-        if (newValue.stockMessage.quantityMaximum === 0) {
+        if (!qMax) {
             self.enabled(false);
         }
 
@@ -104,6 +116,27 @@
     // utility function to permit "with" against the appropriate product entry.
     self.getProductByBasketLineType = (productId, basketLineTypeId) =>
         self.products().filter(p => p.productId == productId && p.basketLineTypeId == basketLineTypeId)[0];
+
+    self.buildPopover = () => {
+        //var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        //var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        //    return new bootstrap.Popover(popoverTriggerEl)
+        //})
+
+        let orderFormItemElement = self.quantity.DOMElement.closest('.order-form-item');
+
+        if (orderFormItemElement) {
+
+            let reserveOverlayElement = orderFormItemElement.querySelector('.reserve-overlay');
+
+            if (reserveOverlayElement) {
+
+                if (reserveOverlayElement.dataset["bsToggle"] == "popover") {
+                    var popover = bootstrap.Popover.getOrCreateInstance(reserveOverlayElement);
+                }
+            }
+        }
+    }
 
     return self;
 });

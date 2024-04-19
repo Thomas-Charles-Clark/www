@@ -113,6 +113,14 @@
                     padding-top: 0.25rem;
                     padding-bottom: 0.25rem;
                     text-decoration: none;
+
+                    a {
+                        color: $blue-600 !important;
+
+                        &:visited {
+                            color: $blue-600 !important;
+                        }
+                    }
                 }
 
                 > a.stock-messaging:active,

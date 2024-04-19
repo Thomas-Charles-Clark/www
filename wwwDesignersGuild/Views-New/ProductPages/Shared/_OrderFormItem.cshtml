@@ -9,6 +9,14 @@
 
     var imageSize = ImageSize.Two;
 }
+<script type="text/javascript">
+    window.addBootstrapLoadFunction(() => {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl)
+        })
+    });
+</script>
 <div id="@(Model.OrderFormID.Replace("#", ""))"
      class="order-form-product">
     <span class="d-none" data-bind="init: { convert: JSON.parse, field: image }, remove">
@@ -162,7 +170,7 @@
                                      Model.Product["largeSample"],
                                      OrderFormItemType.LargeSample,
                                      OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID,
-                                     Convert.ToBoolean(Model.Product["controls"]["disableSample"]))
+                                     Convert.ToBoolean(Model.Product["controls"]["disableReturnable"]))
                 <!-- /ko -->
             }
             if (!Model.IsHotspot && Model.ProductTypeID == 18 && c == 81 && l == 1)
@@ -251,20 +259,20 @@
         }
     </div>
     <div class="order-form-item-underline mt-4 pb-4">
-        <hr class="m-0"/>
+        <hr class="m-0" />
     </div>
 </div>
-@helper OrderFormItemHelper( 
+@helper OrderFormItemHelper(
     NewMasterDefinition objMaster,
     object product,
     OrderFormItemType orderFormItemType,
     byte basketLineTypeId,
     bool disabled)
-{ 
+{
     var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
     var c = objMaster.UrlBreakdown.countryDetails.CountryID;
     var d = objMaster.UrlBreakdown.ContentDate;
-    
+
     var tradeUser = Model.MasterDefinition.TradeAllowed;
 
     var objProduct = JObject.FromObject(product);
@@ -274,9 +282,15 @@
     var quantityMinimum = objProduct.SelectToken("stockMessage").SelectToken("quantityMinimum").Value<decimal>();
     var quantityMaximum = objProduct.SelectToken("stockMessage").SelectToken("quantityMaximum").Value<decimal>();
     var quantityIncrement = objProduct.SelectToken("stockMessage").SelectToken("quantityIncrement").Value<decimal>();
+
+    if (basketLineTypeId == 2 || basketLineTypeId == 3)
+    {
+        quantityMaximum = objProduct.SelectToken("stockMessage").SelectToken("reserveQuantityMaximum").Value<decimal>();
+    }
+
     var enabled = (quantityMaximum > 0);
 
-    if (disabled) 
+    if (disabled)
     {
         enabled = false;
     }
@@ -288,21 +302,22 @@
         initialQuantity = 0;
     }
 
+    var reserveDisabledText = objProduct.SelectToken("stockMessage").SelectToken("reserveDisabledText")?.Value<string>();
+
     var orderFormTypePrefix = orderFormItemType.ToString().ToLowerInvariant();
 
-    var extantInBasket = Model.Basket.basketDetails.SingleOrDefault(p => 
+    var extantInBasket = Model.Basket.basketDetails.SingleOrDefault(p =>
         p.ProductID == objProduct.SelectToken("productId").Value<int>() &&
         p.BasketLineTypeID == basketLineTypeId);
 
-    <div class="order-form-item">
+    <div class="order-form-item relative">
         <span class="d-none" data-bind="init: { convert: parseBool }, text: enabled, remove">
             @enabled
         </span>
-       @if (orderFormItemType != OrderFormItemType.Reserve &&
-  orderFormItemType != OrderFormItemType.ReserveWithBatchCutting)
-       {
-            <div class="stock-messages gap-1 mb-1">
-           @foreach (var stockMessage in objProduct.SelectToken("stockMessage")?
+        @if (orderFormItemType == OrderFormItemType.Order)
+        {
+            <div class="stock-messages gap-1 mb-2">
+                @foreach (var stockMessage in objProduct.SelectToken("stockMessage")?
                                       .SelectToken("basketQuantityThresholds")?
                                       .Children()
                                       .SelectMany(p =>
@@ -313,12 +328,48 @@
                                               return new JEnumerable<JToken>();
                                       })
                                       .ToArray())
-            {
-                <span class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))" data-bind="@((orderFormItemType >= OrderFormItemType.Order ? tradeUser ? "click: () => { $root.stockInfo.showStockInfo($data, 0) }" : "" : null)),
-                    css: { 'pointer': stockMessage.allowStockCheck }">
-                    @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
-                </span>
-            }
+                {
+                    @* switch JObject.FromObject(stockMessage).SelectToken("target") case "stock": stock; case "customerservice": customerService; default: break; *@
+                    switch (JObject.FromObject(stockMessage).SelectToken("target")?.ToString())
+                    {
+                        case "StockBreakdown":
+                            <a href="javascript:;" class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))" data-bind="@((orderFormItemType >= OrderFormItemType.Order ? tradeUser ? "click: () => { $root.stockInfo.showStockInfo($data, 0) }" : "" : null)), css: { 'pointer': stockMessage.allowStockCheck }">
+                                @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
+                            </a>
+                            break;
+                        case "ContactCS":
+                            <a href="javascript:;" class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))" data-bind="@((orderFormItemType >= OrderFormItemType.Order ? tradeUser ? "click: () => { window.showContactCustomerServices(); }" : "" : null)), css: { 'pointer': stockMessage.allowStockCheck }">
+                                @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
+                            </a>
+                            break;
+                        case "POBreakdown":
+                            <a href="javascript:;" class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))" data-bind="@((orderFormItemType >= OrderFormItemType.Order ? tradeUser ? "click: () => { $root.stockInfo.showStockInfo($data, 1) }" : "" : null)), css: { 'pointer': stockMessage.allowStockCheck }">
+                                @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
+                            </a>
+                            break;
+                        default:
+                            <span class="order-form-stock-message @(JObject.FromObject(stockMessage).SelectToken("class"))">
+                                @(JObject.FromObject(stockMessage).SelectToken("stockMessage"))
+                            </span>
+                            break;
+                    }
+                }
+                @if (backInStockReminder)
+                {
+                    <a href="javascript:;" class="order-form-stock-message" data-bind="click: window.basketModel.backInStockReminder">
+                        @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
+                    </a>
+                }
+            </div>
+        }
+        @if (basketLineTypeId == 2 || basketLineTypeId == 3 && !String.IsNullOrEmpty(reserveDisabledText))
+        {
+            <div class="reserve-overlay pointer" data-bind="attr: {
+                'data-bs-toggle': 'popover',
+                'data-bs-content': '@(@HtmlHelperExtra.EscapeForJS(reserveDisabledText))',
+                'data-bs-custom-class': 'reserve-popover',
+                title: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Information", l, c, d))'
+            }">
             </div>
         }
         <div class="order-form-controls">
@@ -326,29 +377,26 @@
                 @HtmlHelperExtra.Resource("QuantityAbbreviated", l, c, d)
             </label>
             <input type="text" id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity" class="form-control"
-                                                value="@(initialQuantity)"
-                                                min="@(quantityMinimum)"
-                                                max="@(quantityMaximum)"
-                                                step="@(quantityIncrement)"
-                                                aria-invalid="false"
-                                                aria-errormessage="quantity-@(objProduct.SelectToken("productId"))-error"
-                                                autocomplete="off"
-                                                data-bind="init: { convert: parseFloat },
+                   value="@(initialQuantity)"
+                   min="@(quantityMinimum)"
+                   max="@(quantityMaximum)"
+                   step="@(quantityIncrement)"
+                   aria-invalid="false"
+                   aria-errormessage="quantity-@(objProduct.SelectToken("productId"))-error"
+                   autocomplete="off"
+                   data-bind="init: { convert: parseFloat },
                                                             selectOnFocus,
-                                                            keepElement: quantity, 
+                                                            keepElement: quantity,
                                                             validationOptions: { insertMessages: false },
                                                             validationElement: quantity,
-                                                            numeric: quantity, 
+                                                            numeric: quantity,
                                                             value: quantity.formatted,
                                                             attr: {
                                                                 'aria-invalid': !quantity.isValid(),
                                                                 'disabled': !enabled()
                                                             }"
-                                               @if (!enabled)
-                                                {
-                                                    @:disabled
-                                                }
-                                                />
+                   @if (!enabled) { @: disabled
+                   } />
             <span class="d-none" data-bind="init: { field: enabled, value: @(enabled ? "true" : "false") }"></span>
             <button id="product-@(objProduct["productId"])-@(orderFormItemType.ToString().ToLowerInvariant())-btn"
                     type="button"
@@ -406,19 +454,11 @@
             </button>
         </div>
         <span id="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity-error" style="display: none;" class="validation-message" data-bind="validationMessage: quantity"></span>
-       @if (extantInBasket != null)
+        @if (extantInBasket != null)
         {
             <span class="basket-message">
                 @Html.Raw(Model.AlreadyInBasketString(extantInBasket, orderFormItemType))
             </span>
-        } 
-       @if (backInStockReminder)
-       {
-            <div class="back-in-stock-wrapper mt-2 text-right">
-                <a href="javascript:;"data-bind="click: window.basketModel.backInStockReminder">
-                    @HtmlHelperExtra.Resource("BISRAnchorText", l, c, d)
-                </a>
-            </div>
-       }
+        }
     </div>
 }

@@ -22,6 +22,7 @@ using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Util;
 using SimpleImpersonation;
 using Braintree;
+using System.Runtime.CompilerServices;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -1094,7 +1095,8 @@ namespace wwwDesignersGuild.Models.Database
                         MobileNumber = reader.IsDBNull(5) ? null : (string)reader.GetString(5),
                         Email = reader.IsDBNull(6) ? null : (string)reader.GetString(6),
                         OpeningHours = reader.IsDBNull(7) ? null : (string)reader.GetString(7),
-                        Notes = reader.IsDBNull(8) ? null : (string)reader.GetString(8)
+                        Notes = reader.IsDBNull(8) ? null : (string)reader.GetString(8),
+                        DepartmentID = reader.IsDBNull(9) ? (byte?)null : (byte)reader.GetByte(9)
                     });
                 }
             }
@@ -1102,6 +1104,15 @@ namespace wwwDesignersGuild.Models.Database
             return result;
         }
 
+        internal async Task<IEnumerable<tradeContactUsDetail>> generateTradeContactUsAsync(int tradeAccountId)
+        {
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                var result = await conn.QueryAsync<tradeContactUsDetail>("pub.MyAccount_DesignersGuildContactDetails_Select", new { TradeAccountID = tradeAccountId }, null, null, CommandType.StoredProcedure);
+
+                return result;
+            }
+        }
 
         internal bool callTradeMemberDelete(int memberId, int editorMemberId)
         {

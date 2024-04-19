@@ -88,7 +88,7 @@
             <ul class="dropdown" aria-label="submenu">
                 <li>
                     <a class="btn btn-link"
-                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeHomePage, cd))">
+                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeHomePage, cd, null, null, new[] { new KeyValuePair<string,string>("t", "1") }))">
                         @HtmlHelperExtra.Resource("NewTradeWebsite", l, c, d)
                     </a>
                 </li>
@@ -225,7 +225,7 @@
     <div id="product-search-content"
          class="@((Model.ContentID == 76 ? "open" : ""))"
          data-bind="keepElement: searchTerm"> @* hold this guy open if on Search page *@
-        <div id="product-search-form-wrapper">
+        <div id="product-search-form-wrapper" tabindex="0">
             <div id="product-search-advanced-dropdown" class="dropdown">
                 <button id="product-search-advanced-btn"
                         type="button"
@@ -314,7 +314,7 @@
                 </div>
             </form>
         </div>
-        <div id="search-overlay" onclick="document.querySelector('#product-search-input').focus()">
+        <div id="search-overlay" onclick="document.querySelector('#product-search-input').focus()" tabindex="1">
             <span>
                 @HtmlHelperExtra.Resource("EnterSearch", l, c, d)
             </span>

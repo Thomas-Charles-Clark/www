@@ -212,7 +212,8 @@ namespace wwwDesignersGuild.Controllers
                     PurchaseOrderNumber = null,
                     DueDate = p.DueInDate?.ToString("dd/MM/yyyy"),
                     Length = p.DueInQuantity.ToString("N2"),
-                    POConfirmed = p.POConfirmed
+                    POConfirmed = p.POConfirmed,
+                    DueInMessage = p.DueInMessage
                 }).ToList();
             }
                  
@@ -300,6 +301,7 @@ namespace wwwDesignersGuild.Controllers
             public string DueDate { get; set; }
             public string Length { get; set; }
             public bool? POConfirmed { get; set; }
+            public string DueInMessage { get; set; }
         }
     }
 }

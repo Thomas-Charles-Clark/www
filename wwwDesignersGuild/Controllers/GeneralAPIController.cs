@@ -535,5 +535,13 @@ namespace wwwDesignersGuild.Controllers
 
             return Ok(new { });
         }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> TradeLoginPromptDismissed()
+        {
+            HttpContext.Current.Session["tradeLoginPromptDismissed"] = true;
+
+            return Ok(new { });
+        }
     }
 }

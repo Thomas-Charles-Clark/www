@@ -81,6 +81,9 @@
     // Search result hints
     self.predictiveSearchResults = ko.observableArray([]);
 
+    // Fetch signal controller
+    self.predictiveSearchSignalController = new AbortController();
+
     //#endregion
 
 
@@ -143,7 +146,7 @@
 
         if (!self.holdBusy()) {
 
-            if (nv && nv.length > 3) {
+            if (nv && nv.length >= 3) {
 
                 self.busy(true);
 
@@ -158,7 +161,8 @@
                         siteCountry: getSiteCountry(),
                         countryId: getCountryId(),
                         languageId: getLanguageId()
-                    })
+                    }),
+                    signal: self.predictiveSearchSignalController.signal
                 })
                     .then(window.handleFetchResponse)
                     .then(data => {
@@ -185,9 +189,13 @@
                             self.busy(false);
                     })
                     .catch(err => {
-                        if (!self.holdBusy())
-                            self.busy(false);
-                        window.catchFetchErrors(err);
+                        if (err && err.code && err.code === 20) {
+                            console.warn("predictiveSearch aborted via abortController.signal");
+                        } else {
+                            if (!self.holdBusy())
+                                self.busy(false);
+                            window.catchFetchErrors(err);
+                        }
                     })
             }
         }
@@ -339,6 +347,7 @@
             }, 0);
             return false;
         } else {
+            self.predictiveSearchSignalController.abort();
             self.busy(true);
             self.holdBusy(true);
             return true;
