@@ -1436,6 +1436,7 @@ input::-webkit-inner-spin-button {
                 font-size: $font-size-base;
                 padding: $btn-padding-y $btn-padding-x;
                 letter-spacing: 0;
+                align-self: stretch;
             }
 
             .btn-secondary {

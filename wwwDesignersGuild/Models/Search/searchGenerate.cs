@@ -17,6 +17,7 @@ using wwwDesignersGuild.Models.Attribute;
 using Nuclex.Support.Cloning;
 using System.Globalization;
 using wwwDesignersGuild.Models.ProductPage;
+using System.IO;
 
 namespace wwwDesignersGuild.Models.Search
 {
@@ -53,21 +54,20 @@ namespace wwwDesignersGuild.Models.Search
             sw.Start();
 
 #endif
+            var dtSearchIndexThesaurusPath = System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"];
 
+
+            if (!Directory.Exists(dtSearchIndexThesaurusPath)) 
+            {
+                Directory.CreateDirectory(dtSearchIndexThesaurusPath);
+            }
 
             //  Call dtSearch
-            string dtSearchThesaurusPath = String.Format("{0}{1}\\Thesaurus\\thesaur.xml",
-                                                            System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"],
-                                                            languageId.ToString());
+            var dtSearchThesaurusPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\Thesaurus\\thesaur.xml";
 
-            string dtSearchProductCodeIndexPath = String.Format("{0}{1}\\ProductCodeIndex",
-                                                            System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"],
-                                                            languageId.ToString());
+            var dtSearchProductCodeIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\ProductCodeIndex";
 
-            string dtSearchMainIndexPath = String.Format("{0}{1}\\MainIndex",
-                                                            System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"],
-                                                            languageId.ToString());
-
+            var dtSearchMainIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\MainIndex";
 
             Options options = new Options
             {
@@ -77,16 +77,15 @@ namespace wwwDesignersGuild.Models.Search
 
 
             //  SEARCH: Product code
-            SearchJob searchJobProductCodeIndex = new SearchJob();
+            var searchJobProductCodeIndex = new SearchJob();
             searchJobProductCodeIndex.IndexesToSearch.Add(dtSearchProductCodeIndexPath.Replace(@"\\", @"\"));
             searchJobProductCodeIndex.Request = searchTerm;
-            searchJobProductCodeIndex.SearchFlags = SearchFlags.dtsSearchPositionalScoring |
-                                                       SearchFlags.dtsSearchTypeAllWords;
+            searchJobProductCodeIndex.SearchFlags = SearchFlags.dtsSearchPositionalScoring | SearchFlags.dtsSearchTypeAllWords;
 
             searchJobProductCodeIndex.Execute();
 
-            List<searchResultDefinition> tempProductCodeSearchResults = new List<searchResultDefinition>();
-            using (SearchResults results = searchJobProductCodeIndex.Results)
+            var tempProductCodeSearchResults = new List<searchResultDefinition>();
+            using (var results = searchJobProductCodeIndex.Results)
             {
                 results.Sort(SortFlags.dtsSortByRelevanceScore, "");
 
@@ -101,7 +100,7 @@ namespace wwwDesignersGuild.Models.Search
 
             //  SEARCH: Main text
             //  Note:   SearchFlags.dtsSearchPhonic has been removed as it made the search results too general
-            SearchJob searchJobMainIndex = new SearchJob();
+            var searchJobMainIndex = new SearchJob();
             searchJobMainIndex.IndexesToSearch.Add(dtSearchMainIndexPath.Replace(@"\\", @"\"));
             searchJobMainIndex.Request = searchTerm;
             searchJobMainIndex.SearchFlags = SearchFlags.dtsSearchStemming |
@@ -115,7 +114,7 @@ namespace wwwDesignersGuild.Models.Search
             
             searchJobMainIndex.Execute();
 
-            List<searchResultDefinition> tempMainSearchResults = new List<searchResultDefinition>();
+            var tempMainSearchResults = new List<searchResultDefinition>();
             using (SearchResults results = searchJobMainIndex.Results)
             {
                 results.Sort(SortFlags.dtsSortByRelevanceScore, "");
@@ -129,16 +128,16 @@ namespace wwwDesignersGuild.Models.Search
 
 
             //  Merge the two search results (product code takes priority)
-            List<searchResultDefinition> objSearchResults = new List<searchResultDefinition>();
-            foreach (searchResultDefinition objProductResult in tempProductCodeSearchResults)
+            var objSearchResults = new List<searchResultDefinition>();
+            foreach (var objProductResult in tempProductCodeSearchResults)
             {
                 objProductResult.ScorePercent = 100;    //  Product code matches always get 100% as they appear first in the search results
                 objSearchResults.Add(objProductResult);
             }
-            foreach (searchResultDefinition objMainResult in tempMainSearchResults)
+            foreach (var objMainResult in tempMainSearchResults)
             {
                 bool productPageFound = false;
-                foreach (searchResultDefinition objProductResult in tempProductCodeSearchResults)
+                foreach (var objProductResult in tempProductCodeSearchResults)
                 {
                     if (objProductResult.productPageID == objMainResult.productPageID)
                     {
@@ -153,11 +152,11 @@ namespace wwwDesignersGuild.Models.Search
                 }
             }
 
-            DataTable productPageTable = new DataTable();
+            var productPageTable = new DataTable();
             productPageTable.Columns.Add("ProductPageID", typeof(int));
             productPageTable.Columns.Add("ScorePercentage", typeof(int));
 
-            foreach (searchResultDefinition searchResult in objSearchResults)
+            foreach (var searchResult in objSearchResults)
             {
                 productPageTable.Rows.Add(searchResult.productPageID, searchResult.ScorePercent);
                 // replaced 0 with searchResult.ScorePercent: forever and a day the ServerSearchResults_Generate procedure wanted nothing to do with manipulating the relevance scoring
@@ -203,7 +202,7 @@ namespace wwwDesignersGuild.Models.Search
 
             Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
             {
-                searchResultDefinition tempSearch = objSearchResults.Where(p => p.productPageID == tempResult.ProductPageID).FirstOrDefault();
+                var tempSearch = objSearchResults.Where(p => p.productPageID == tempResult.ProductPageID).FirstOrDefault();
 
                 if (tempSearch == null) { }
                 else

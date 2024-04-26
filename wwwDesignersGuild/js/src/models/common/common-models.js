@@ -11,9 +11,9 @@
 
     self.enabled = ko.observable(true);
 
-    self.enabled.subscribe((nv) => {
-        console.log('enabled', nv)
-    });
+    //self.enabled.subscribe((nv) => {
+    //    console.log('enabled', nv)
+    //});
 
     self.quantity = ko.observable();
 
@@ -132,7 +132,7 @@
             if (reserveOverlayElement) {
 
                 if (reserveOverlayElement.dataset["bsToggle"] == "popover") {
-                    var popover = bootstrap.Popover.getOrCreateInstance(reserveOverlayElement);
+                    bootstrap.Popover.getOrCreateInstance(reserveOverlayElement);
                 }
             }
         }

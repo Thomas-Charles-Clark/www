@@ -21,7 +21,7 @@
     <input type="hidden" name="product-type" data-bind="init: { convert: parseString }, text: productPageGrid.productType" value="@Model.ProductPageGrid.ProductType"/>
     if (Model.SearchHints != null)
     {
-        <div id="predictive-search-hints-section" class="mb-4">
+        <div id="predictive-search-hints-section" class="mb-5">
             <div class="predictive-search-inner">
                 <div class="predictive-hints-grid grid">
                    @if (Model.SearchHints.predictiveSearchHints.brands.Any())
@@ -34,7 +34,7 @@
                                 @foreach (var b in Model.SearchHints.predictiveSearchHints.brands)
                                 {
                                     <li>
-                                        <a class="hint hint-brand" href="@b.URLKeywords">
+                                        <a class="hint hint-brand" href="@dgFramework.buildUrl(dgContentType.landingPage, b.PageID, ci, null, null, null, b.URLKeywords, null)">
                                             <span>
                                                 @b.Heading
                                             </span>
@@ -57,7 +57,7 @@
                                 @foreach (var col in Model.SearchHints.predictiveSearchHints.collections)
                                 {
                                     <li>
-                                        <a class="hint hint-collection" href="@col.URLKeywords">
+                                        <a class="hint hint-collection" href="@dgFramework.buildUrl(dgContentType.collectionPage, col.CollectionID, ci, null, null, null, col.URLKeywords, null)">
                                             <span>
                                                 @col.Heading
                                             </span>
@@ -85,7 +85,7 @@
                                 @foreach (var des in Model.SearchHints.predictiveSearchHints.designs)
                                 {
                                     <li>
-                                        <a class="hint hint-design" href="@des.URLKeywords">
+                                        <a class="hint hint-design" href="@dgFramework.buildUrl(dgContentType.productPage, des.ProductPageID, ci, null, null, null, des.URLKeywords, null)">
                                             <span>
                                                 @des.Heading
                                             </span>

@@ -1399,6 +1399,7 @@ namespace wwwDesignersGuild.Models.Classes
         public string Code { get; set; }
         public long ImageID { get; set; }
         public bool New { get; set; }
+        public string AKAHeading { get; set; }
     }
 
     public class brandSearch

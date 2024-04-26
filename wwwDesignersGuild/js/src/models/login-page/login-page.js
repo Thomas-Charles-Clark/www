@@ -265,28 +265,28 @@
 
     self.loginEmailAddress.subscribe(nv => self.invalidLogin(false));
 
-    window.addBootstrapLoadFunction(() => {
-        self.registrationMode.subscribe(nv => {
+    self.registrationMode.subscribe(nv => {
+        if (bootstrap) {
             let carouselElement = document.querySelector('#retail-login-form-carousel');
             let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
             carousel.to(nv ? 1 : 0);
-        });
+        }
     });
 
-    window.addBootstrapLoadFunction(() => {
-        self.tradeRegistrationMode.subscribe(nv => {
+    self.tradeRegistrationMode.subscribe(nv => {
+        if (bootstrap) {
             let carouselElement = document.querySelector('#trade-login-form-carousel');
             let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
             carousel.to(nv);
-        });
+        }
     });
 
-    window.addBootstrapLoadFunction(() => {
-        self.tradeAccountState.subscribe(nv => {
+    self.tradeAccountState.subscribe(nv => {
+        if (bootstrap) {
             let carouselElement = document.querySelector('#trade-account-state-carousel');
             let carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
             carousel.to(nv);
-        });
+        }
     });
 
     self.registrationAllCountries.subscribe(nvs => {

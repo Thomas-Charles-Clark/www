@@ -72,7 +72,7 @@
                         data-bind="click: basketModel.toggleScrapbook">
                     <i class="bi @(Model.Base.IsImageInScrapbook(image.ImageID) ? "bi-bookmark-heart" : "bi-bookmark-plus")"></i>
                 </button>
-               @if (image.Hotspots.Any())
+               @if (!dgFramework.IsMobileDevice() && image.Hotspots.Any())
                {
                     <div class="hotspot-products-btn-wrapper">
                         <button class="btn btn-link hotspot-products-btn"

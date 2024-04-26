@@ -362,15 +362,17 @@
                 }
             </div>
         }
-        @if (basketLineTypeId == 2 || basketLineTypeId == 3 && !String.IsNullOrEmpty(reserveDisabledText))
+        @if ((basketLineTypeId == 2 || basketLineTypeId == 3) && !String.IsNullOrEmpty(reserveDisabledText))
         {
-            <div class="reserve-overlay pointer" data-bind="attr: {
-                'data-bs-toggle': 'popover',
-                'data-bs-content': '@(@HtmlHelperExtra.EscapeForJS(reserveDisabledText))',
-                'data-bs-custom-class': 'reserve-popover',
-                title: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Information", l, c, d))'
-            }">
-            </div>
+            <a class="reserve-overlay pointer"
+               role="button"
+               tabindex="0"
+               data-bs-toggle="popover"
+               data-bs-trigger="@(dgFramework.IsMobileDevice() ? "focus blur" : "click hover focus blur")"
+               data-bs-content="@HtmlHelperExtra.EscapeForJS(reserveDisabledText)"
+               data-bs-custom-class="reserve-popover"
+               title="@HtmlHelperExtra.Resource("Information", l, c, d)">
+            </a>
         }
         <div class="order-form-controls">
             <label for="@(orderFormTypePrefix)@(ViewBag.OrderFormPrefix)-@(objProduct.SelectToken("productId"))-quantity">

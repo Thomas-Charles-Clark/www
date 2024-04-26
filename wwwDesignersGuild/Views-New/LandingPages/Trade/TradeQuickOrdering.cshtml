@@ -42,7 +42,7 @@
                 </a>
                 <div class="order-form-detail-text">
                     <h5 class="d-flex justify-content-between align-center">
-                        <span data-bind="text: orderFormName"></span>
+                        <span data-bind="text: name"></span>
                         <span data-bind="html: priceMessage"></span>
                     </h5>
                     <!-- ko if: AKA -->
@@ -129,15 +129,19 @@
     </div>
 </script>
 <script id="ko-order-form-item-button-template" type="text/html">
-    <div class="order-form-item trade relative" data-bind="css: { 'mt-0': [2,3].indexOf(basketLineTypeId) > -1 }">
-        <!-- ko if: stockMessage.reserveDisabledText != null && orderFormTypeId == 3 || orderFormTypeId == 4 -->
-        <div class="reserve-overlay pointer" data-bind="attr: {
-            'data-bs-toggle': stockMessage.reserveDisabledText ? 'popover' : null,
-            'data-bs-content': stockMessage.reserveDisabledText ? stockMessage.reserveDisabledText : null,
-            'data-bs-custom-class': 'reserve-popover',
-            title: stockMessage.reserveDisabledText ? '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("Information", l, c, d))' : null
-        }">
-        </div>
+    <div class="order-form-item trade relative" data-bind="css: { 'mt-0': [2,3].indexOf(basketLineTypeId) > -1 }" onclick="() => { }" onmouseover="() => { }" onmouseout="() => { }">
+        <!-- ko if: (orderFormTypeId == 3 || orderFormTypeId == 4) && stockMessage.reserveDisabledText != null -->
+        <a class="reserve-overlay pointer"
+           role="button"
+           tabindex="1" 
+           data-bs-toggle="popover"
+           data-bs-trigger="@(dgFramework.IsMobileDevice() ? "focus blur" : "click hover focus blur")"
+           data-bs-custom-class="reserve-popover"
+           title="@HtmlHelperExtra.Resource("Information", l, c, d)"
+           data-bind="attr: {
+                'data-bs-content': stockMessage.reserveDisabledText
+            }">
+        </a>
         <!-- /ko -->
         <div class="order-form-controls">
             <label for="-quantity" data-bind="attr: {  for: `product-${productId}-order-form-type-${basketLineTypeId}-qty` }">
