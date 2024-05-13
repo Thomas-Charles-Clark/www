@@ -12,8 +12,6 @@
 
     var ag = Model.AttributeGroup;
 
-    var filterIndexRestrictions = Model.Grid.ProductTypes.SingleOrDefault(pt => pt.FormValue == Model.Grid.ProductType)?.FilterIndexRestrictions;
-
     var attributeCombinations = Model.Grid.AttributeCombinations;
 
     var currentAttributeSignature = Model.Grid.CurrentAttributeSignature;
@@ -118,7 +116,7 @@
                             }
                             else
                             {
-                                <a href="@Model.Grid.BuildAttributeURL(ag, a, filterIndexRestrictions, attributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
+                                <a href="@Model.Grid.BuildAttributeURL(ag, a, attributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
                                     <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
                                            for="attribute-@(a.AttributeID)-check"
                                            data-bind="css: { 'unavailable': disabled }">
@@ -227,7 +225,7 @@
                             }
                             else
                             {
-                                <a href="@Model.Grid.BuildAttributeURL(ag, a, filterIndexRestrictions, attributeSignature, attributeCombinations)" target="self" onclick="(event) => { event.preventDefault(); }">
+                                <a href="@Model.Grid.BuildAttributeURL(ag, a, attributeSignature, attributeCombinations)" target="self" onclick="(event) => { event.preventDefault(); }">
                                     <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
                                            for="attribute-@(a.AttributeID)-check"
                                            data-bind="css: { 'unavailable': disabled }">

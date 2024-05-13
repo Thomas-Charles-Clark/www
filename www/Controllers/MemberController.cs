@@ -13,6 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+
+using Tweetinvi.Core.Extensions;
+
 using wwwDesignersGuild.Models.BackInStockReminder;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Country;
@@ -431,7 +434,11 @@ namespace wwwDesignersGuild.Controllers
                                     {
                                         session["memberTradeChecksPassed"] = true;
 
-                                        HttpContext.Current.Response.Cookies.Add(new HttpCookie("dg-trade-signin", thisCountry.URL));
+                                        var tradeSignInCookie = new HttpCookie("dg-trade-signin", thisCountry.URL);
+
+                                        tradeSignInCookie.Expires = DateTime.Now.AddMonths(1);
+
+                                        HttpContext.Current.Response.Cookies.Add(tradeSignInCookie);
                                     }
 
                                     session["loginStatus"] = dgLoginStatus.currentLogin.ToString();
@@ -1156,7 +1163,11 @@ namespace wwwDesignersGuild.Controllers
 
                     success = true;
 
-                    HttpContext.Current.Response.Cookies.Add(new HttpCookie("dg-trade-signin", objSubmission.masterDefinition.UrlBreakdown.countryDetails.URL));
+                    var tradeSignInCookie = new HttpCookie("dg-trade-signin", objSubmission.masterDefinition.UrlBreakdown.countryDetails.URL);
+
+                    tradeSignInCookie.Expires = DateTime.Now.AddMonths(1);
+
+                    HttpContext.Current.Response.Cookies.Add(tradeSignInCookie);
                 }
                 else
                 {
@@ -1613,15 +1624,24 @@ namespace wwwDesignersGuild.Controllers
 
 
             //  Save the return
-            VisitorFactory visitorFactory = new VisitorFactory();
-            Int32 returnHeadId = await visitorFactory.saveReturn(visitorDbId, (Int32) objSaveReturn.orderHeadId, returnTableType);
+            Int32 returnHeadId = -1;
 
-            var objReturn = new returnDetails
+            try
             {
-                ReturnIdentifier = dgCrypto.Encrypt($"{returnHeadId}")
-            };
+                VisitorFactory visitorFactory = new VisitorFactory();
+                returnHeadId = await visitorFactory.saveReturn(visitorDbId, (Int32)objSaveReturn.orderHeadId, returnTableType);
 
-            return Ok(objReturn);
+                var objReturn = new returnDetails
+                {
+                    ReturnIdentifier = dgCrypto.Encrypt($"{returnHeadId}")
+                };
+
+                return Ok(objReturn);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
 

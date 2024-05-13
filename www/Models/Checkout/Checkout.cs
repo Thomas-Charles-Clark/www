@@ -126,6 +126,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public string CutPieceBreakdown { get; set; }
         public string Batch { get; set; }
         public string Memo { get; set; }
+        public string Units { get; set; }
         public string LineReference { get; set; }
         public string OtherTreatment { get; set; }
         public bool StainTreatment { get; set; }

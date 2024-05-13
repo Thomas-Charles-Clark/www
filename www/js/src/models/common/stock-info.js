@@ -9,10 +9,12 @@
         self.product = ko.observable();
         self.totalStock = ko.observable();
         self.totalPurchaseOrderStock = ko.observable();
+        self.totalSupplierPurchaseOrderStock = ko.observable();
         self.unit = ko.observable();
         self.stockStatus = ko.observable();
         self.inStockData = ko.observable();
         self.dueInData = ko.observable();
+        self.supplierDueInData = ko.observable();
         self.supplierData = ko.observable();
         self.supplierStockAvailabilityMessage = ko.observable();
 
@@ -22,7 +24,7 @@
             if (self.inStockData()) {
                 let subTotal = 0;
                 self.inStockData().flatMap(isd => isd.Pieces).forEach(p => {
-                    subTotal += +p.Length;
+                    subTotal += +(p.Length.replace(/[^\d.]/, ''));
                 });
                 return Number(Math.round((subTotal) * 10) / 10).toFixed(2) + self.unit();
             } else {
@@ -34,7 +36,7 @@
             if (self.dueInData()) {
                 let subTotal = 0;
                 self.dueInData().forEach(p => {
-                    subTotal += +p.Length;
+                    subTotal += +(p.Length.replace(/[^\d.]/, ''));
                 });
                 return Number(Math.round((subTotal) * 10) / 10).toFixed(2) + self.unit();
             } else {
@@ -45,8 +47,20 @@
         self.totalSupplier = ko.pureComputed(function () {
             if (self.supplierData()) {
                 let subTotal = 0;
-                self.supplierData().flatMap(sd => [sd.Pieces]).forEach(p => {
-                    subTotal += +p.Length;
+                self.supplierData().flatMap(sd => sd.Pieces).forEach(p => {
+                    subTotal += +(p.Length.replace(/[^\d.]/, ''));
+                });
+                return Number(Math.round((subTotal) * 10) / 10).toFixed(2) + self.unit();
+            } else {
+                return 0
+            }
+        }, self);
+
+        self.totalSupplierDueIn = ko.pureComputed(function () {
+            if (self.supplierDueInData()) {
+                let subTotal = 0;
+                self.supplierDueInData().forEach(p => {
+                    subTotal += +(p.Length.replace(/[^\d.]/, ''));
                 });
                 return Number(Math.round((subTotal) * 10) / 10).toFixed(2) + self.unit();
             } else {
@@ -62,7 +76,7 @@
             let pieces = self.supplierData().flatMap(sd => [sd.Pieces]);
 
             return pieces.find(p => {
-                return +p.Length <= +self.Quantity
+                return +(p.Length.replace(/[^\d.]/, '')) <= +self.Quantity
             });
         }, self);
 
@@ -156,7 +170,11 @@
 
                             self.dueInData(data.PurchaseOrders);
 
+                            self.supplierDueInData(data.SupplierPurchaseOrders);
+
                             self.totalPurchaseOrderStock(data.TotalPurchaseOrderLength);
+
+                            self.totalSupplierPurchaseOrderStock(data.TotalSupplierPurchaseOrderLength);
 
                             self.supplierStockAvailabilityMessage(data.SupplierAvailabilityMessage);
 

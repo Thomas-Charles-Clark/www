@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using wwwDesignersGuild.Models.ImgSize;
 using DocumentFormat.OpenXml.EMMA;
 using DevExpress.Web.Rendering;
+using wwwDesignersGuild.Models.Hotspot;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -866,71 +867,72 @@ namespace wwwDesignersGuild.Models.Helper
 
         // This should be working with the addition of AttributeSignature
         // However something still needs to be done about JS not being able to pull the appropriate AttributeSignature text for a given filter change
-        public static string ProcessAttributeFilterText(string filterText, string attributeFilterText, string productTypePluralPropercase, string attributeSignatureText, bool useHtml = true)
+        public static string ProcessAttributeFilterText(string input, string attributeFilterText, string productTypePluralPropercase, string attributeSignatureText, bool enabledByAttributeCombination, bool useHtml = true)
         {
             var filterRegex = new Regex(@"{FilterStart}((.|\n|\r)*?){FilterEnd}");
+            var noFilterRegex = new Regex(@"{NoFilterStart}((.|\n|\r)*?){NoFilterEnd}");
             var productTypeProperRegex = new Regex(@"{ProductTypeProperStart}((.|\n|\r)*?){ProductTypeProperEnd}");
             var productTypeRegex = new Regex(@"{ProductTypeStart}((.|\n|\r)*?){ProductTypeEnd}");
             var attributeSignatureRegex = new Regex(@"{AttributeSignatureStart}((.|\n|\r)*?){AttributeSignatureEnd}");
 
             if (useHtml)
             {
-                if (!String.IsNullOrEmpty(attributeFilterText))
+                if (enabledByAttributeCombination && !String.IsNullOrEmpty(attributeFilterText))
                 {
-                    filterText = filterRegex.Replace(filterText, $"<span class=\"filter-text\" data-original-contents=\"$1\">{attributeFilterText}</span> ");
-                    filterText = filterText.Replace("{NoFilterStart}", "<span class=\"d-none no-filter-visible\">");
-                    filterText = filterText.Replace("{NoFilterEnd}", "</span>");
+                    input = filterRegex.Replace(input, $"<span class=\"filter-text\" data-original-contents=\"$1\">{attributeFilterText?.Trim()}</span> ");
+                    input = input.Replace("{NoFilterStart}", "<span class=\"d-none no-filter-visible\">");
+                    input = input.Replace("{NoFilterEnd}", "</span>");
                 }
                 else
                 {
-                    filterText = filterRegex.Replace(filterText, "<span class=\"filter-text\" data-original-contents=\"$1\">$1</span>");
+                    input = filterRegex.Replace(input, "<span class=\"filter-text\" data-original-contents=\"$1\">$1</span>");
                     //filterText = noFilterRegex.Replace(filterText, "<span class=\"no-filter-text\" data-original-contents=\"$1\">$1</span>");
-                    filterText = filterRegex.Replace(filterText, $"<span class=\"filter-text\" data-original-contents=\"$1\">{attributeFilterText}</span> ");
-                    filterText = filterText.Replace("{NoFilterStart}", "<span class=\"no-filter-visible\">");
-                    filterText = filterText.Replace("{NoFilterEnd}", "</span>");
+                    input = filterRegex.Replace(input, $"<span class=\"filter-text\" data-original-contents=\"$1\">{attributeFilterText?.Trim()}</span> ");
+                    input = input.Replace("{NoFilterStart}", "<span class=\"no-filter-visible\">");
+                    input = input.Replace("{NoFilterEnd}", "</span>");
                 }
 
                 if (!String.IsNullOrEmpty(productTypePluralPropercase))
                 {
-                    filterText = productTypeProperRegex.Replace(filterText, $"<span class=\"product-type-propercase-text\" data-original-contents=\"$1\">{productTypePluralPropercase}</span> ");
-                    filterText = productTypeRegex.Replace(filterText, $"<span class=\"product-type-text\" data-original-contents=\"$1\">{productTypePluralPropercase.ToLowerInvariant()}</span> ");
+                    input = productTypeProperRegex.Replace(input, $"<span class=\"product-type-propercase-text\" data-original-contents=\"$1\">{productTypePluralPropercase?.Trim()}</span> ");
+                    input = productTypeRegex.Replace(input, $"<span class=\"product-type-text\" data-original-contents=\"$1\">{productTypePluralPropercase?.Trim().ToLowerInvariant()}</span> ");
                 }
 
                 if (!String.IsNullOrEmpty(attributeSignatureText))
                 {
-                    filterText = attributeSignatureRegex.Replace(filterText, $"<span class=\"attribute-signature-text\" data-original-contents=\"$1\">{attributeSignatureText}</span> ");
+                    input = attributeSignatureRegex.Replace(input, $"<span class=\"attribute-signature-text\" data-original-contents=\"$1\">{attributeSignatureText?.Trim()}</span> ");
                 }
                 else
                 {
-                    filterText = attributeSignatureRegex.Replace(filterText, "<span class=\"attribute-signature-text\"></span>"); //placeholder necessary to receive ast as filters change
+                    input = attributeSignatureRegex.Replace(input, "<span class=\"attribute-signature-text\"></span>"); //placeholder necessary to receive ast as filters change
                 }
             }
             else
             {
-                if (!String.IsNullOrEmpty(attributeFilterText))
+                if (enabledByAttributeCombination && !String.IsNullOrEmpty(attributeFilterText))
                 {
-                    filterText = filterRegex.Replace(filterText, $"{attributeFilterText}");
-                    filterText = filterText.Replace("{NoFilterStart}", "<span class=\"d-none no-filter-visible\">");
-                    filterText = filterText.Replace("{NoFilterEnd}", "</span>");
+                    input = filterRegex.Replace(input, $"{attributeFilterText?.Trim()}");
+                    input = input.Replace("{NoFilterStart}", "<span class=\"d-none no-filter-visible\">");
+                    input = input.Replace("{NoFilterEnd}", "</span>");
                 }
 
                 if (!String.IsNullOrEmpty(productTypePluralPropercase))
                 {
-                    filterText = productTypeProperRegex.Replace(filterText, productTypePluralPropercase);
-                    filterText = productTypeRegex.Replace(filterText, productTypePluralPropercase.ToLowerInvariant());
+                    input = productTypeProperRegex.Replace(input, productTypePluralPropercase?.Trim());
+                    input = productTypeRegex.Replace(input, productTypePluralPropercase?.Trim().ToLowerInvariant());
                 }
 
                 if (!String.IsNullOrEmpty(attributeSignatureText))
                 {
-                    filterText = attributeSignatureRegex.Replace(filterText, attributeSignatureText);
+                    input = attributeSignatureRegex.Replace(input, attributeSignatureText?.Trim());
                 }
                 else
                 {
-                    filterText = attributeSignatureRegex.Replace(filterText, "");
+                    input = attributeSignatureRegex.Replace(input, "");
                 }
             }
 
-            return filterText;
+            return input;
         }
 
         private static Regex ImageParentColumn = new Regex(@"g-col-([^0-9\-]+)?-?([0-9]+)");
@@ -944,17 +946,76 @@ namespace wwwDesignersGuild.Models.Helper
             section.Contents = new Regex(@"\<\/?head\>").Replace(section.Contents, "");
             section.Contents = new Regex(@"\<\/?body\>").Replace(section.Contents, "");
 
-            //section.Contents = ProcessAttributeFilterText(section.Contents, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural);
+            section.Contents = ProcessAttributeFilterText(section.Contents, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural, objBase.AttributeSignatureText, objBase.FilterIndexCombinationEnabled, true);
 
-            var controller = ViewRenderer.CreateController<GenericController>();
+            if (!String.IsNullOrEmpty(section.Contents))
+            {
+                section.Contents = ProcessHTMLImages(section.Contents, section.HtmlSectionID, section.ImageIDs, section.Hotspots, objBase);
+            }
 
             var doc = new HtmlDocument();
 
             doc.LoadHtml(section.Contents);
 
-            var htmlModelImagesInit = $@"<span class=""d-none"" data-bind=""init: {{ field: html.images, value: [{String.Join(",", section.ImageIDs.Select(i => $"imageViewModel({i})"))}] }}, remove""></span>";
+            if (HtmlHelperExtra.IsNonProductionVersion)
+            {
+                var nvc = new System.Collections.Specialized.NameValueCollection(HttpContext.Current.Request.QueryString);
 
-            doc.DocumentNode.PrependChild(HtmlNode.CreateNode(htmlModelImagesInit));
+                var anchorQuery = doc.DocumentNode.Descendants("a");
+
+                var qs = Framework.ConstructQueryString(nvc);
+
+                foreach (var aTag in anchorQuery.ToList())
+                {
+                    var currentHref = aTag.Attributes["href"]?.Value;
+
+                    if (!String.IsNullOrEmpty(currentHref))
+                    {
+                        if (currentHref.IndexOf('?') == -1)
+                        {
+                            currentHref = $"{currentHref}?{qs}";
+                        }
+                        else
+                        {
+                            if (currentHref.LastIndexOf('?') > currentHref.LastIndexOf('/'))
+                            {
+                                currentHref = $"{currentHref}&{qs}";
+                            }
+                            else
+                            {
+                                currentHref = $"{currentHref}?{qs}";
+                            }
+                        }
+
+                        aTag.Attributes.Remove("data-preview-overrides");
+
+                        aTag.Attributes["href"].Value = currentHref.TrimEnd(new char[] { '?' });
+                    }
+                }
+            }
+
+            return new HtmlString(doc.DocumentNode.OuterHtml);// ProcessAttributeFilterText(doc.DocumentNode.OuterHtml, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural, objBase.AttributeSignatureText));
+        }
+
+        public static string ProcessHTMLImages(
+            string source,
+            long? htmlSectionId,
+            IEnumerable<long> imageIds,
+            IEnumerable<ImageHotspot> imageHotspots,
+            BaseViewModel objBase)
+        {
+            var controller = ViewRenderer.CreateController<GenericController>();
+
+            var doc = new HtmlDocument();
+
+            doc.LoadHtml(source);
+
+            if (imageIds.Any())
+            {
+                var htmlModelImagesInit = $@"<span class=""d-none"" data-bind=""init: {{ field: html.images, value: [{String.Join(",", imageIds.Select(i => $"imageViewModel({i})"))}] }}, remove""></span>";
+
+                doc.DocumentNode.PrependChild(HtmlNode.CreateNode(htmlModelImagesInit));
+            }
 
             var imgQuery = doc.DocumentNode.Descendants("img");
 
@@ -983,7 +1044,7 @@ namespace wwwDesignersGuild.Models.Helper
                         maxWidth = mw;
                     }
 
-                    while(!parentNode.GetClasses().Any(c => ImageParentColumn.Match(c).Success) && parentNode != doc.DocumentNode)
+                    while (!parentNode.GetClasses().Any(c => ImageParentColumn.Match(c).Success) && parentNode != doc.DocumentNode)
                     {
                         parentNode = parentNode.ParentNode;
                     }
@@ -992,25 +1053,25 @@ namespace wwwDesignersGuild.Models.Helper
 
                     //if (!dgFramework.IsMobileDevice())
                     //{
-                        foreach (var c in parentNode.GetClasses().Where(c => ImageParentColumn.Match(c).Success))
+                    foreach (var c in parentNode.GetClasses().Where(c => ImageParentColumn.Match(c).Success))
+                    {
+                        var matches = ImageParentColumn.Matches(c);
+
+                        for (var i = 0; i < matches.Count; i++)
                         {
-                            var matches = ImageParentColumn.Matches(c);
+                            var match = matches[i];
 
-                            for(var i = 0; i < matches.Count; i++)
+                            if (match.Groups.Count == 3)
                             {
-                                var match = matches[i];
+                                imageSizes.Add(new BootstrapBreakpointImageSize(
+                                    bb: (BootstrapBreakpoint)Enum.Parse(typeof(BootstrapBreakpoint), String.IsNullOrEmpty(match.Groups[1].Value) ? "xs" : match.Groups[1].Value),
+                                    i: (ImageSize)Convert.ToInt32(match.Groups[2].Value)
+                                ));
 
-                                if (match.Groups.Count == 3)
-                                {
-                                    imageSizes.Add(new BootstrapBreakpointImageSize(
-                                        bb: (BootstrapBreakpoint)Enum.Parse(typeof(BootstrapBreakpoint), String.IsNullOrEmpty(match.Groups[1].Value) ? "xs" : match.Groups[1].Value),
-                                        i: (ImageSize)Convert.ToInt32(match.Groups[2].Value)
-                                    ));
-
-                                    imageSize = (ImageSize)Convert.ToInt32(match.Groups[2].Value);
-                                }
+                                imageSize = (ImageSize)Convert.ToInt32(match.Groups[2].Value);
                             }
                         }
+                    }
                     //}
                     //else
                     //{
@@ -1032,7 +1093,7 @@ namespace wwwDesignersGuild.Models.Helper
                     if (Int16.TryParse(imgTag.Attributes["height"]?.Value, out short h))
                         height = h;
 
-                    var hotspotImage = section.Hotspots.SingleOrDefault(hi => hi.ImageID == imageId);
+                    var hotspotImage = imageHotspots.SingleOrDefault(hi => hi.ImageID == imageId);
 
                     var hotspotDance = hotspotImage != null && hotspotImage.Hotspots.Any();
 
@@ -1062,7 +1123,7 @@ namespace wwwDesignersGuild.Models.Helper
                     {
                         hotspots += $@"
 <div class=""carousel"">
-    <div class=""collapse hotspot-collapse"" id=""html-section-{section.HtmlSectionID}-image-{imageId}-hotspot-collapse"">
+    <div class=""collapse hotspot-collapse"" id=""html-section-{htmlSectionId}-image-{imageId}-hotspot-collapse"">
         <!-- ko with: html.getImageById({imageId}) -->
         <!-- ko foreachInit: {{ data: orderFormGroups, createElement: createOrderFormGroup }} -->
     ";
@@ -1087,8 +1148,8 @@ namespace wwwDesignersGuild.Models.Helper
         <!-- /ko -->
     </div>
     <div class=""hotspot-products-btn-wrapper"">
-        <i class=""btn btn-link hotspot-products-btn"" data-bs-target=""#html-section-{section.HtmlSectionID}-image-{imageId}-hotspot-collapse"" data-bs-toggle=""collapse"" onclick=""this.closest('.g-col-6').classList.toggle('g-col-12')"">
-            { Resource("ShowImageProducts", objBase.LanguageID, objBase.CountryID, objBase.Date)}
+        <i class=""btn btn-link hotspot-products-btn"" data-bs-target=""#html-section-{htmlSectionId}-image-{imageId}-hotspot-collapse"" data-bs-toggle=""collapse"" onclick=""this.closest('.g-col-6').classList.toggle('g-col-12')"">
+            {Resource("ShowImageProducts", objBase.LanguageID, objBase.CountryID, objBase.Date)}
         </i>
     </div>
 </div>";
@@ -1155,44 +1216,7 @@ namespace wwwDesignersGuild.Models.Helper
                 }
             }
 
-            if (HtmlHelperExtra.IsNonProductionVersion)
-            {
-                var nvc = new System.Collections.Specialized.NameValueCollection(HttpContext.Current.Request.QueryString);
-
-                var anchorQuery = doc.DocumentNode.Descendants("a");
-
-                var qs = Framework.ConstructQueryString(nvc);
-
-                foreach (var aTag in anchorQuery.ToList())
-                {
-                    var currentHref = aTag.Attributes["href"]?.Value;
-
-                    if (!String.IsNullOrEmpty(currentHref))
-                    {
-                        if (currentHref.IndexOf('?') == -1)
-                        {
-                            currentHref = $"{currentHref}?{qs}";
-                        }
-                        else
-                        {
-                            if (currentHref.LastIndexOf('?') > currentHref.LastIndexOf('/'))
-                            {
-                                currentHref = $"{currentHref}&{qs}";
-                            }
-                            else
-                            {
-                                currentHref = $"{currentHref}?{qs}";
-                            }
-                        }
-
-                        aTag.Attributes.Remove("data-preview-overrides");
-
-                        aTag.Attributes["href"].Value = currentHref.TrimEnd(new char[] { '?' });
-                    }
-                }
-            }
-
-            return new HtmlString(ProcessAttributeFilterText(doc.DocumentNode.OuterHtml, objBase.AttributeFilterText, objBase.CategoryPageProductType?.NamePlural, objBase.AttributeSignatureText));
+            return doc.DocumentNode.OuterHtml;
         }
     }
 }

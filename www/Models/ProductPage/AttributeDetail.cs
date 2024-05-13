@@ -11,7 +11,6 @@ namespace wwwDesignersGuild.Models.Classes
         public Int16 AttributeID { get; set; }
         public String Name { get; set; }
         public byte SortOrder { get; set; }
-        public bool EnableFilterIndexing { get; set; }
         public List<int> ProductPageIDs { get; set; }
         public List<int> AvailableProductPageIDs { get; set; }
 

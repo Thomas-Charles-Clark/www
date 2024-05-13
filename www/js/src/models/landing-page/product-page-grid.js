@@ -91,17 +91,30 @@
 
         // grab dependencies
         let productTypeText = self.productTypeText();
+
         let productTypeTextPlural = self.productTypeTextPlural();
+
         let filterText = self.filterText();
 
         let selectedAttributeIdsSignature = self.selectedAttributes().map(sa => {
             return self.attributes().find(a => a.FormValue == sa).AttributeID;
-        }).join('.')
-        let attributeSignature = self.attributeSignatures && self.attributeSignatures.find(a => a.AttributeSignature == selectedAttributeIdsSignature)?.FooterText;
+        }).join('.');
 
+        let filterIndexCombination = self.attributeSignatures && self.attributeSignatures.find(a => a.AttributeSignature == selectedAttributeIdsSignature);
+
+        let filterIndexCombinationFound = filterIndexCombination != null;
+
+        // FooterText is a misnomer: it could come anywhere on the page argh
+        // can't change that easily as it's coming out of the database, try to remember to change it eventually
+        let filterIndexCombinationText = filterIndexCombination?.FooterText;
+        
         // parent doesn't necessarily have Definition yet; init might not have taken place yet
         if (self.parent.hasOwnProperty('Definition')) {
+
+            // sanity check: filter indexing must be enabled on the page
             if (self.parent.Definition.FilterIndexingEnabled) {
+
+                // bugger about with the product type text
                 if (productTypeTextPlural) {
                     document.querySelectorAll('.product-type-propercase-text').forEach(e => {
                         e.innerHTML = `${productTypeTextPlural}`;
@@ -118,6 +131,7 @@
                     });
                 }
 
+                // bugger about with the result count
                 document.querySelectorAll('.filter-indexing-result-count').forEach(e => {
                     let r = self.allProductPages().length > 1 ? self.resources.AttributeFilterTextResultsFoundFor : self.resources.AttributeFilterTextResultFoundFor;
                     r = r.replace('{Count}', self.filteredContent().length);
@@ -127,16 +141,45 @@
                     }
                 });
 
+
+                // do some seriously annoying shit
+                // what's the objective here?
+                // SIMPLIFYYYY, MAAAN!
+                // Okay, we have two possible states. Either:
+                //      we are filtered towards a combination which we wish Google to index
+                //      or
+                //      we are not
+                //
+                //      filterIndexCombinationEnabled... shouldn't be necessary to tell us that: the absence of a record corresponding to the current signature tells us
+                //      // buuuut we might have a record with no footer text specified so might as well keep testing for it
+
+                if (filterIndexCombinationFound) {
+                    // great, swap all the smart tags out as appropriate
+                } else {
+                    // boo, get the original boilerplate for the... page...? back in place. The "unfiltered" state.
+                }
+
+                // this is BaseViewModel.AttributeFilterText, built from the URL by lex sort orders of attribute groups then attributes.
                 if (filterText) {
+
                     document.querySelectorAll('.filter-text').forEach(e => {
                         e.innerHTML = `${filterText} `;
                     });
+
                     document.querySelectorAll('.no-filter-text').forEach(e => {
                         e.innerHTML = '';
                     });
-                    document.querySelectorAll('.no-filter-visible').forEach(e => {
-                        e.classList.add('d-none');
-                    });
+
+                    if (filterIndexCombinationText) {
+                        document.querySelectorAll('.no-filter-visible').forEach(e => {
+                            e.classList.add('d-none');
+                        });
+                    } else {
+                        document.querySelectorAll('.no-filter-visible').forEach(e => {
+                            e.classList.remove('d-none');
+                        });
+                    }
+
                     document.title = `${filterText} ${productTypeTextPlural} | Designers Guild`;
 
                     self.allProductPages().forEach(pp => {
@@ -148,17 +191,23 @@
                             }
                         }
                     });
+
                 } else {
+
                     document.querySelectorAll('.filter-text').forEach(e => {
                         e.innerHTML = e.dataset['originalContents'];
                     });
+
                     document.querySelectorAll('.no-filter-text').forEach(e => {
                         e.innerHTML = e.dataset['originalContents'];
                     });
+
                     document.querySelectorAll('.no-filter-visible').forEach(e => {
                         e.classList.remove('d-none');
                     });
+
                     window.lazyImages();
+
                     if (self.originalTitle())
                         document.title = self.originalTitle();
 
@@ -171,9 +220,9 @@
                     });
                 }
 
-                if (attributeSignature) {
+                if (filterIndexCombinationText) {
                     document.querySelectorAll('.attribute-signature-text').forEach(e => {
-                        e.innerHTML = `${attributeSignature}`;
+                        e.innerHTML = `${filterIndexCombinationText}`;
                     });
                 } else {
                     document.querySelectorAll('.attribute-signature-text').forEach(e => {
@@ -224,7 +273,7 @@
         }).filter(x => x.length);
     }
 
-    // Sorry, this method has to be lifted too
+    // This method has to be lifted too
     self.updateUrl = () => {
         if (self.parent.hasOwnProperty('PageSection')) {
             if (document.querySelector(`#page-section-${self.parent.PageSection.PageSectionID}-form`)) {
@@ -277,12 +326,14 @@
 
                 // if we're doing the filter indexing dance
                 if (self.parent.hasOwnProperty('Definition')) {
+                    // [dbo].[Page].[EnableFilterIndexing]
                     if (self.parent.Definition.FilterIndexingEnabled) {
 
                         // we might not have any selected attributes, in which case we still need to do the rebuild beneath
+                        // here, have an unhelpful variable name...
                         let alreadyProcessed = false;
 
-                        // match the urlString against our urlParsingRegex
+                        // match the urlString against our urlParsingRegex:   (/(.*)(\/)(.*)\/([a-z][\d]+)(\??)(.*)$/g);
                         let matches = self.urlParsingRegex.exec(urlString);
 
                         // we definitely should have matches and can't proceed unless we do - and we must have at least 4
@@ -293,18 +344,16 @@
                             let malleableSegment = matches[3];
 
                             // remove the original semantic string from the malleable segment. In the above example
-                            // this would be "malleable-segment". This must be re-added as a suffix once we're finished with the
-                            // attribute dance
+                            // this would be "malleable-segment". This must be re-added as a suffix once we're finished with the attribute dance
                             malleableSegment = malleableSegment.replace(window.pageModel.OriginalSemanticString, '');
 
                             // split the malleable segment on hyphens, removing empty entries
                             let originalSplit = malleableSegment.split('-').filter(x => x != '');
 
-                            // but because we're trying to avoid using any symbol other than hyphen, produce the power set of the resultant array
-                            let powerSet = self.powerSet(originalSplit);
-
-                            // this will give all possible combinations of ordering of elements
+                            // produce the power set of the resultant array
+                            // this gives all possible combinations of ordering of elements
                             // meaning we can provide e.g. english-heritage-cushions and one of the resultant elements in the power set is guaranteed to be english-heritage
+                            let powerSet = self.powerSet(originalSplit);
 
                             let split = ko.observableArray();
 
@@ -319,7 +368,9 @@
 
                             //console.trace(ko.unwrap(split));
 
-                            // here we can remove anything which is not a currently select attribute
+                            // here we remove anything which is not a currently select attribute
+                            // currently selected attributes are determined server-side by parsing the query string for attributeGroups and their value lists
+                            // these are rendered into the response and thence into the client-side model(s)
                             split.remove(x => {
                                 return self.selectedAttributes().indexOf(x.attribute) === -1;
                                 //&& x.attribute != window.pageModel.OriginalSemanticString
@@ -332,115 +383,113 @@
                                 // as we could have multiple attributes sharing the same FormValue. How else am I to do this?
                                 var attribute = self.attributes().filter(x => x.FormValue == a)[0];
 
-                                // if this attribute involves itself with filter indexing
-                                if (attribute.EnableFilterIndexing) {
+                                // If attribute's parent attributeGroup involves itself with filter indexing given the currently selected product type
+                                // (this is just based on the product type having a non-null lexicographical sort order)
+                                if (attribute.parent.involveInFilterIndexing(self.productType())) {
 
-                                    // and this attribute's parent attributeGroup involves itself with filter indexing given the currently selected product type
-                                    if (attribute.parent.involveInFilterIndexing(self.productType())) {
-
-                                        // This adds the current selectedAttribute to our split array if it isn't already present 
-                                        if (!split().filter(s => s.attribute == a).length) {
-                                            let ag = self.attributeGroups().filter(ag => ag.attributeGroupId() == attribute.AttributeGroupID)[0];
-                                            split.push({
-                                                attribute: a,
-                                                attributeName: attribute.Name,
-                                                lexSortOrder: null,
-                                                logicalOperator: ag.logicalOperator()
-                                            })
-                                        }
-
-                                        // find those attribute groups which engage in filter indexing given the currently selected product type
-                                        let attributeGroups = self.attributeGroups().filter(ag => ag.involveInFilterIndexing(self.productType()));
-
-                                        // because we're forEaching over an array avoid modifying it within the iteration
-                                        let toRemove = [];
-                                        let toAdd = [];
-
-                                        // iterate over the array of attributes lifted from the malleable segment
-                                        // (which now includes the currently considered selectedAttribute if it didn't initially)
-                                        split().forEach(s => {
-                                            // only if this split is still contained within our attribute selection
-                                            // [previously also considered whether or not it was part of the original URL]
-                                            if (self.selectedAttributes().indexOf(s.attribute) > -1) {
-                                                //|| s.attribute == window.pageModel.OriginalSemanticString) {
-
-                                                // identify the attributeGroup parent to this split entry
-                                                let thisAttributeGroup = attributeGroups.filter(ag => ag.attributes().flatMap(a => a.FormValue).indexOf(s.attribute) > -1)[0];
-
-                                                // if we have an attributeGroup parent (we always should, but someone might have typed nonsense in there manually)
-                                                if (thisAttributeGroup) {
-
-                                                    // pull the lexicographical sort order 
-                                                    let lexSortOrder = thisAttributeGroup.productTypes().filter(pt => pt.FormValue == self.productType())[0].LexicographicalSortOrder;
-
-                                                    // if that isn't null, set it on this split entry
-                                                    if (lexSortOrder != null) {
-                                                        s.lexSortOrder = lexSortOrder;
-                                                        s.logicalOperator = thisAttributeGroup.logicalOperator() // as well as the logical operator... might not need this
-                                                    }
-
-                                                    // if this attribute group performs a logical OR within itself
-                                                    //if (thisAttributeGroup.logicalOperator() == 'OR') {
-
-                                                    // sanity check, this should be true...
-                                                    if (attribute.AttributeGroupID == thisAttributeGroup.attributeGroupId()) {
-
-                                                        // mark this current entry for removal
-                                                        toRemove.push(s);
-
-                                                        // and if our additions does not yet already contain this entry, insert it
-                                                        // this avoids doubling up of attributes, as we're necessarily doing a nested loop dance
-                                                        if (toAdd.filter(ta => {
-                                                            return ta.attribute == attribute.FormValue &&
-                                                                ta.attributeName == attribute.Name &&
-                                                                ta.lexSortOrder == lexSortOrder &&
-                                                                ta.logicalOperator == thisAttributeGroup.logicalOperator()
-                                                        }).length == 0) {
-                                                            toAdd.push({
-                                                                attribute: a,
-                                                                attributeName: attribute.Name,
-                                                                lexSortOrder: lexSortOrder,
-                                                                logicalOperator: thisAttributeGroup.logicalOperator()
-                                                            })
-                                                        }
-                                                    }
-                                                    //} else {
-                                                    //    toAdd.push({
-                                                    //        attribute: a,
-                                                    //        attributeName: attribute.Name,
-                                                    //        lexSortOrder: lexSortOrder,
-                                                    //        logicalOperator: thisAttributeGroup.logicalOperator()
-                                                    //    })
-                                                    //}
-                                                }
-                                            } else {
-                                                // this split entry is no longer present in our selectedAttributes: remove it
-                                                toRemove.push(s);
-                                            }
-                                        });
-
-                                        // remove all of the removals
-                                        toRemove.forEach(s => {
-                                            split.remove(e => {
-                                                return e.attribute == s.attribute &&
-                                                    e.attributeName == s.attributeName &&
-                                                    e.lexSortOrder == s.lexSortOrder &&
-                                                    e.logicalOperator == s.logicalOperator
-                                            });
-                                        });
-
-                                        // add all of the additions
-                                        toAdd.forEach(s => {
-                                            split.push(s);
-                                        });
-
-                                        // sort by lexicographical sort order
-                                        split(split.sorted((a, b) => {
-                                            return a.lexSortOrder == b.lexSortOrder ? 0
-                                                : a.lexSortOrder < b.lexSortOrder ? -1
-                                                    : 1;
-                                        }));
+                                    // Then add the current selectedAttribute to our split array if it isn't already present 
+                                    if (!split().filter(s => s.attribute == a).length) {
+                                        let ag = self.attributeGroups().filter(ag => ag.attributeGroupId() == attribute.AttributeGroupID)[0];
+                                        split.push({
+                                            attribute: a,
+                                            attributeName: attribute.Name,
+                                            lexSortOrder: null,
+                                            logicalOperator: ag.logicalOperator()
+                                        })
                                     }
+
+                                    // find those attribute groups which engage in filter indexing given the currently selected product type
+                                    let attributeGroups = self.attributeGroups().filter(ag => ag.involveInFilterIndexing(self.productType()));
+
+                                    // because we're forEaching over an array avoid modifying it within the iteration
+                                    let toRemove = [];
+                                    let toAdd = [];
+
+                                    // iterate over the array of attributes lifted from the malleable segment
+                                    // (which now includes the currently considered selectedAttribute if it didn't initially)
+                                    split().forEach(s => {
+                                        // only if this split is still contained within our attribute selection
+                                        // [previously also considered whether or not it was part of the original URL]
+                                        if (self.selectedAttributes().indexOf(s.attribute) > -1) {
+                                            //|| s.attribute == window.pageModel.OriginalSemanticString) {
+
+                                            // identify the attributeGroup parent to this split entry
+                                            let thisAttributeGroup = attributeGroups.filter(ag => ag.attributes().flatMap(a => a.FormValue).indexOf(s.attribute) > -1)[0];
+
+                                            // if we have an attributeGroup parent (we always should, but someone might have typed nonsense in there manually)
+                                            if (thisAttributeGroup) {
+
+                                                // pull the lexicographical sort order 
+                                                let lexSortOrder = thisAttributeGroup.productTypes().filter(pt => pt.FormValue == self.productType())[0].LexicographicalSortOrder;
+
+                                                // if that isn't null, set it on this split entry
+                                                if (lexSortOrder != null) {
+                                                    s.lexSortOrder = lexSortOrder;
+                                                    s.logicalOperator = thisAttributeGroup.logicalOperator() // as well as the logical operator... might not need this
+                                                }
+
+                                                // if this attribute group performs a logical OR within itself
+                                                //if (thisAttributeGroup.logicalOperator() == 'OR') {
+
+                                                // sanity check, this should be true...
+                                                if (attribute.AttributeGroupID == thisAttributeGroup.attributeGroupId()) {
+
+                                                    // mark this current entry for removal
+                                                    toRemove.push(s);
+
+                                                    // and if our additions does not yet already contain this entry, insert it
+                                                    // this avoids doubling up of attributes, as we're necessarily doing a nested loop dance
+                                                    if (toAdd.filter(ta => {
+                                                        return ta.attribute == attribute.FormValue &&
+                                                            ta.attributeName == attribute.Name &&
+                                                            ta.lexSortOrder == lexSortOrder &&
+                                                            ta.logicalOperator == thisAttributeGroup.logicalOperator()
+                                                    }).length == 0) {
+                                                        toAdd.push({
+                                                            attribute: a,
+                                                            attributeName: attribute.Name,
+                                                            lexSortOrder: lexSortOrder,
+                                                            logicalOperator: thisAttributeGroup.logicalOperator()
+                                                        })
+                                                    }
+                                                }
+                                                //} else {
+                                                //    toAdd.push({
+                                                //        attribute: a,
+                                                //        attributeName: attribute.Name,
+                                                //        lexSortOrder: lexSortOrder,
+                                                //        logicalOperator: thisAttributeGroup.logicalOperator()
+                                                //    })
+                                                //}
+                                            }
+                                        } else {
+                                            // this split entry is no longer present in our selectedAttributes: remove it
+                                            toRemove.push(s);
+                                        }
+                                    });
+
+                                    // remove all of the removals
+                                    toRemove.forEach(s => {
+                                        split.remove(e => {
+                                            return e.attribute == s.attribute &&
+                                                e.attributeName == s.attributeName &&
+                                                e.lexSortOrder == s.lexSortOrder &&
+                                                e.logicalOperator == s.logicalOperator
+                                        });
+                                    });
+
+                                    // add all of the additions
+                                    toAdd.forEach(s => {
+                                        split.push(s);
+                                    });
+
+                                    // sort by lexicographical sort order
+                                    split(split.sorted((a, b) => {
+                                        return a.lexSortOrder == b.lexSortOrder ? 0
+                                            : a.lexSortOrder < b.lexSortOrder ? -1
+                                                : 1;
+                                    }));
+                                        
                                 }
                             });
 
@@ -465,42 +514,64 @@
 
                             urlString = urlString.replace(self.urlParsingRegex, `$1/${segment}/$4`);
 
-                            alreadyProcessed = true;
+                            // can't for the life of me think what this bullshit was for, commenting it out...
+                            // "if we haven't processed at least once, we still need to do this rebuilding bit"
+                            //if (!alreadyProcessed) {
 
-                            // if we haven't processed at least once, we still need to do this rebuilding bit
-                            if (!alreadyProcessed) {
+                            //    // clear the filter text
+                            //    self.filterText('');
 
-                                // clear the filter text
-                                self.filterText('');
+                            //    // if we haven't processed at least once then we haven't had the chance to add the originalSemanticString to the split array
+                            //    split.push({
+                            //        attribute: window.pageModel.OriginalSemanticString
+                            //    })
 
-                                // if we haven't processed at least once then we haven't had the chance to add the originalSemanticString to the split array
-                                split.push({
-                                    attribute: window.pageModel.OriginalSemanticString
-                                })
+                            //    // update the url string
+                            //    urlString = urlString.replace(self.urlParsingRegex, `$1/${split().map(s => s.attribute).join('-')}/$4`);
 
-                                // rebuild the segment
-                                let segment = split().map(s => s.attribute).join('-');
-
-                                // update the url string
-                                urlString = urlString.replace(self.urlParsingRegex, `$1/${segment}/$4`);
-                            }
+                            //    alreadyProcessed = true;
+                            //}
                         }
                     }
                 }
 
                 //console.log(urlString);
 
-                url = new URL(urlString);
+                // 09/05/2024
+                // We added some stuff to let AttributeSignatureText still be used and displayed whether or not a particular attribute set should be indexable by Google
+                let selectedAttributeIdsSignature = self.selectedAttributes().map(sa => {
+                    return self.attributes().find(a => a.FormValue == sa).AttributeID;
+                }).join('.')
 
-                url.search = qs;
+                let attributeCombinationEnabled = self.attributeSignatures && self.attributeSignatures.find(a => a.AttributeSignature == selectedAttributeIdsSignature)?.Enabled;
 
-                // avoid updating the URL initially
-                if (self.parent.Definition &&
-                    self.parent.Definition.FilterIndexingEnabled &&
-                    self.skippedFirstUrlUpdate == null) {
-                    self.skippedFirstUrlUpdate = true;
-                } else {
-                    console.log('updating URL', url);
+                // 09/05/2024
+                // Amine doesn't want the URL updating if the thing is... something...
+                if (attributeCombinationEnabled === true || self.selectedAttributes().length === 0) {
+                    url = new URL(urlString);
+
+                    url.search = qs;
+
+                    //// avoid updating the URL initially
+                    //if (self.parent.Definition &&
+                    //    self.parent.Definition.FilterIndexingEnabled &&
+                    //    self.skippedFirstUrlUpdate == null) {
+                    //    self.skippedFirstUrlUpdate = true;
+                    //} else {
+                    //    console.log('updating URL', url);
+                    //    window.history.replaceState({}, '', url);
+                    //}
+
+                    window.history.replaceState({}, '', url);
+
+                }
+                else
+                {
+                    // only update the query string, resetting the urlkeywords to the base for the page.
+                    url = new URL(window.location.href.replace(self.urlParsingRegex, `$1/${window.pageModel.CategoryPageProductType.URLKeywords}/$4`));
+
+                    url.search = qs;
+
                     window.history.replaceState({}, '', url);
                 }
             }

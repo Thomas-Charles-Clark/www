@@ -167,6 +167,7 @@
                                                 aria-selected="true">
                                             <span>
                                                 @HtmlHelperExtra.Resource("InStock", l, c, d)
+                                                <br/>
                                                 (<span data-bind="text: totalInStock"></span>)
                                             </span>
                                         </button>
@@ -182,6 +183,7 @@
                                                 aria-selected="false">
                                             <span>
                                                 @HtmlHelperExtra.Resource("DueIn", l, c, d)
+                                                <br />
                                                 (<span data-bind="text: totalDueIn"></span>)
                                             </span>
                                         </button>
@@ -197,6 +199,7 @@
                                                 aria-selected="false">
                                             <span>
                                                 @HtmlHelperExtra.Resource("SupplierStock", l, c, d)
+                                                <br />
                                                 (<span data-bind="text: totalSupplier"></span>)
                                             </span>
                                         </button>
@@ -308,19 +311,24 @@
                                                     <!-- ko if: DueInMessage == null -->
                                                     <td class="due-date-heading" data-bind="text: DueDate + (POConfirmed == null ? '' : (POConfirmed ? ' (confirmed)' : ' (unconfirmed)'))"></td>
                                                     <!-- /ko -->
-                                                    <td class="text-right" data-bind="text: Number(Length).toFixed(2) + $parent.unit()"></td>
+                                                    <td class="text-right" data-bind="text: Length + $parent.unit()"></td>
                                                 </tr>
                                                 <!-- /ko -->
                                                 <tr>
                                                     <th class="total">Total</th>
-                                                    <th class="total text-right" data-bind="text: totalDueIn()"></th>
+                                                    <th class="total text-right">
+                                                        <span class="text-bold" data-bind="text: totalPurchaseOrderStock"></span><span class="text-bold" data-bind="text: unit"></span>
+                                                    </th>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                     <!-- ko if: supplierHasStock() -->
                                     <div id="stock-tab-supplier" class="tab-pane">
-                                        <table class="stock-table stock-total-table table table-bordered">
+                                        <!-- ko if: supplierStockAvailabilityMessage() -->
+                                        <p class="margin-bottom-15" data-bind="text: supplierStockAvailabilityMessage"></p>
+                                        <!-- /ko -->
+                                        <table class="stock-table stock-total-table table table-bordered mb-3">
                                             <colgroup>
                                                 <col>
                                                 <col style="width: 182px;">
@@ -336,11 +344,8 @@
                                                 </tr>
                                             </thead>
                                         </table>
-                                        <!-- ko if: supplierStockAvailabilityMessage() -->
-                                        <p class="margin-bottom-15" data-bind="text: supplierStockAvailabilityMessage"></p>
-                                        <!-- /ko -->
                                         <!-- ko with: supplierData -->
-                                        <table class="stock-table table table-bordered">
+                                        <table class="stock-table table table-bordered mb-3">
                                             <colgroup>
                                                 <col style="width: 25%">
                                                 <col>
@@ -380,6 +385,55 @@
                                             </tbody>
                                         </table>
                                         <!-- /ko -->
+                                        <table class="stock-table stock-total-table table table-bordered mb-3">
+                                            <colgroup>
+                                                <col>
+                                                <col style="width: 182px;">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th style="border-right: 0;">
+                                                        @HtmlHelperExtra.Resource("IncomingStock", l, c, d)
+                                                    </th>
+                                                    <th class="stock-total total-heading text-end" style="border-left: 0;">
+                                                        <span class="text-bold" data-bind="text: totalSupplierPurchaseOrderStock"></span><span class="text-bold" data-bind="text: unit"></span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <table class="stock-table table table-bordered">
+                                            <colgroup>
+                                                <col style="width: 385px;">
+                                                <col style="width: 182px;">
+                                            </colgroup>
+                                            <tbody>
+                                                <tr>
+                                                    <th class="due-date-heading">
+                                                        @HtmlHelperExtra.Resource("DueDate", l, c, d)
+                                                    </th>
+                                                    <th class="length-heading text-right">
+                                                        @HtmlHelperExtra.Resource("Length", l, c, d)
+                                                    </th>
+                                                </tr>
+                                                <!-- ko foreach: supplierDueInData -->
+                                                <tr>
+                                                    <!-- ko if: DueInMessage != null -->
+                                                    <td class="due-date-heading">
+                                                        <a href="javascript:;" data-bind="html: DueInMessage, click: window.showContactCustomerServices"></a>
+                                                    </td>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: DueInMessage == null -->
+                                                    <td class="due-date-heading" data-bind="text: DueDate + (POConfirmed == null ? '' : (POConfirmed ? ' (confirmed)' : ' (unconfirmed)'))"></td>
+                                                    <!-- /ko -->
+                                                    <td class="text-right" data-bind="text: Length + $parent.unit()"></td>
+                                                </tr>
+                                                <!-- /ko -->
+                                                <tr>
+                                                    <th class="total">Total</th>
+                                                    <th class="total text-right" data-bind="text: totalSupplierDueIn()"></th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                     <!-- /ko -->
                                 </div>

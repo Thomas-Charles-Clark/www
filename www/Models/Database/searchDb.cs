@@ -349,55 +349,25 @@ namespace wwwDesignersGuild.Models.Database
 
         }
 
-        internal async Task<IEnumerable<FilterIndexRestriction>> FetchFilterIndexRestrictionsAsync()
+        internal async Task<IEnumerable<FilterIndexAttributeCombination>> FetchFilterIndexAttributeCombinationsAsync(byte languageId, byte? productTypeId, string siteUrl)
         {
             var db = new databaseDataContext();
 
-            return await db.Connection.QueryAsync<FilterIndexRestriction>("SELECT ProductTypeID, AttributeGroupSignature, AttributeGroupDescription FROM dbo.FilterIndexRestrictions WHERE Deleted = 0 AND Enabled = 1", null, null, 30, CommandType.Text);
-        }
-
-        internal IEnumerable<FilterIndexRestriction> FetchFilterIndexRestrictions()
-        {
-            var db = new databaseDataContext();
-
-            return db.Connection.Query<FilterIndexRestriction>("SELECT ProductTypeID, AttributeGroupSignature, AttributeGroupDescription FROM dbo.FilterIndexRestrictions WHERE Deleted = 0 AND Enabled = 1", null, null, true, 30, CommandType.Text);
-        }
-
-        internal async Task<IEnumerable<FilterIndexAttributeCombination>> FetchFilterIndexAttributeCombinationsAsync(byte languageId, byte productTypeId)
-        {
-            var db = new databaseDataContext();
-
-            return await db.Connection.QueryAsync<FilterIndexAttributeCombination>(@"
-                SELECT
-                    FIC.ProductTypeID, 
-                    FIC.AttributeSignature,
-                    FIC.AttributeDescription,
-                    FICL.FooterText 
-                FROM 
-                    dbo.FilterIndexCombination_Language AS FICL
-                    INNER JOIN dbo.FilterIndexCombinations AS FIC ON FIC.FilterIndexCombinationID = FICL.FilterIndexCombinationID
-                WHERE FIC.ProductTypeID = @ProductTypeID AND FICL.LanguageID = @LanguageID AND FIC.Deleted = 0 AND FIC.Enabled = 1", new { 
+            return await db.Connection.QueryAsync<FilterIndexAttributeCombination>(@"pub.FilterIndexCombination_Select", new { 
                 ProductTypeID = productTypeId,
-                LanguageID = languageId
-            }, null, 30, CommandType.Text);
+                LanguageID = languageId,
+                Culture = siteUrl
+            }, null, 30, CommandType.StoredProcedure);
         } 
 
-        internal IEnumerable<FilterIndexAttributeCombination> FetchFilterIndexAttributeCombinations(byte languageId)
+        internal IEnumerable<FilterIndexAttributeCombination> FetchFilterIndexAttributeCombinations(byte languageId, string siteUrl)
         {
             var db = new databaseDataContext();
 
-            return db.Connection.Query<FilterIndexAttributeCombination>(@"
-                SELECT
-                    FIC.ProductTypeID, 
-                    FIC.AttributeSignature,
-                    FIC.AttributeDescription,
-                    FICL.FooterText 
-                FROM 
-                    dbo.FilterIndexCombination_Language AS FICL
-                    INNER JOIN dbo.FilterIndexCombinations AS FIC ON FIC.FilterIndexCombinationID = FICL.FilterIndexCombinationID
-                WHERE FICL.LanguageID = @LanguageID AND FIC.Deleted = 0 AND FIC.Enabled = 1", new { 
-                LanguageID = languageId
-            }, null, true, 30, CommandType.Text);
+            return db.Connection.Query<FilterIndexAttributeCombination>(@"pub.FilterIndexCombination_Select", new { 
+                LanguageID = languageId,
+                Culture = siteUrl
+            }, null, true, 30, CommandType.StoredProcedure);
         }
     }
 }

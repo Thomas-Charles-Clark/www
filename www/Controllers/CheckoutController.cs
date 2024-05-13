@@ -805,7 +805,7 @@ namespace wwwDesignersGuild.Controllers
             if (session["visitorIdFromDatabase"] == null)
             {
                 Logger.Error("saveCheckoutAddress - no visitor ID from session!");
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter, "Session.visitorIdFromDatabase was NULL!");
             }
             else
             {
@@ -814,17 +814,17 @@ namespace wwwDesignersGuild.Controllers
 
             if (objDeliveryAddress == null)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters, "objDeliveryAddress was NULL!");
             }
 
             if (objDeliveryAddress.masterDefinition == null)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters, "objDeliveryAddress.masterDefinition was NULL!");
             }
 
             if (dgFramework.doesUserHaveACheckoutId(session["checkoutId"]) == false)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutNoBasket);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutNoBasket, "Session.checkoutId was NULL!");
             }
             else if (dgFramework.isCheckoutSessionValid(session["checkoutExpiry"]) == false)
             {
@@ -871,7 +871,7 @@ namespace wwwDesignersGuild.Controllers
             if (dgFramework.doesCountryExistFromText(objDeliveryAddress.BasketCountry, objCountryData)) { }
             else
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry, "objDeliveryAddress.BasketCountry was invalid!");
             }
 
             var objCountryItem = dgFramework.getCountryFromText(objDeliveryAddress.BasketCountry, objCountryData);
@@ -883,7 +883,7 @@ namespace wwwDesignersGuild.Controllers
 
             if (objCountryItem == null)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry, "countryItem could not be identified from objDeliveryAddress.BasketCountry!");
             }
 
             var objDeliverableCountries = await objCountry.countrySelectList(objCountryItem.CountryID, objCountryItem.LanguageID);
@@ -925,7 +925,7 @@ namespace wwwDesignersGuild.Controllers
 
                 Logger.Error($"saveCheckoutAddress errored {checkoutId} {sb}");
 
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters, $"saveCheckoutAddress errored {checkoutId} {sb}");
             }
             
             string zipTax = null;
@@ -1080,7 +1080,7 @@ namespace wwwDesignersGuild.Controllers
 
                 if (idCountry == null)
                 {
-                    dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
+                    dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry, "idCountry could not be identified from objDeliveryAddress.BasketCountry!");
                 }
                 upsIdAddress = new passCheckoutSaveAddressData()
                 {
@@ -1117,7 +1117,7 @@ namespace wwwDesignersGuild.Controllers
 
             if (success == false)
             {
-                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutAddressNotSelected);
+                dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutAddressNotSelected, "checkoutAddressSave did not return successfully!");
             }
 
             return Ok(new { state = "OK" });

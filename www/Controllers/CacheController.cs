@@ -10,6 +10,9 @@ using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models;
 using System.Collections.Generic;
+using wwwDesignersGuild.Models.Country;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -17,10 +20,19 @@ namespace wwwDesignersGuild.Controllers
     {
         [HttpPost]
         [CacheAuthentication]
-        public IHttpActionResult Purge([FromBody]PassCachePurge objPurge)
+        public async Task<IHttpActionResult> Purge([FromBody]PassCachePurge objPurge)
         {
             try
             {
+                if (objPurge.CountryURL == null)
+                {
+                    var countries = new cmsCountry();
+
+                    var countryLanguages = await countries.countryLanguageSelect(objPurge.ContentDate);
+
+                    objPurge.CountryURL = countryLanguages.countryItems.FirstOrDefault(cl => cl.CountryID == objPurge.CountryID && cl.LanguageID == objPurge.LanguageID)?.URL;
+                }
+
                 switch (objPurge.ContentType)
                 {
                     case "banner":
@@ -65,9 +77,6 @@ namespace wwwDesignersGuild.Controllers
                         break;
                     case "collectionPage":
                         PurgeCollectionPage(objPurge);
-                        break;
-                    case "filterIndexing":
-                        PurgeFilterIndexing(objPurge);
                         break;
                 }
             }
@@ -261,17 +270,6 @@ namespace wwwDesignersGuild.Controllers
             var cache = new ArticlePageCacheProvider();
 
             cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
-        }
-
-        public void PurgeFilterIndexing(PassCachePurge objPurge)
-        {
-            var cache = new FilterIndexAttributeCombinationCacheProvider();
-
-            var otherCache = new FilterIndexRestrictionCacheProvider();
-
-            cache.Invalidate(new PassFilterIndexAttributeCombinationCacheFetch(objPurge.LanguageID, (byte)objPurge.ContentID, objPurge.ContentDate));
-
-            otherCache.Invalidate(new PassFilterIndexRestrictionCacheFetch() { Date = objPurge.ContentDate });
         }
     }
 }

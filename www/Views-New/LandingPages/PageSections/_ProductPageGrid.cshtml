@@ -41,8 +41,6 @@
         thisPage = grid.GetProductPages(objMaster, null, null).ToList();
     }
 
-    var filterIndexRestrictions = grid.ProductTypes.SingleOrDefault(pt => pt.FormValue == grid.ProductType)?.FilterIndexRestrictions;
-
     var attributeCombinations = grid.AttributeCombinations;
 
     var currentAttributeSignature = grid.CurrentAttributeSignature;
@@ -76,7 +74,7 @@
     <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle, remove">
         @grid.OriginalTitle
     </span>
-    <div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures">
+    <div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures, remove">
         @JsonConvert.SerializeObject(grid.AttributeCombinations)
     </div>
    @if (grid.Searchable)

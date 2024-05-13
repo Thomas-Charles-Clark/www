@@ -14,10 +14,12 @@ const stockInfo = (function (parent) {
     self.product = ko.observable();
     self.totalStock = ko.observable();
     self.totalPurchaseOrderStock = ko.observable();
+    self.totalSupplierPurchaseOrderStock = ko.observable();
     self.unit = ko.observable();
     self.stockStatus = ko.observable();
     self.inStockData = ko.observable();
     self.dueInData = ko.observable();
+    self.supplierDueInData = ko.observable();
     self.supplierData = ko.observable();
     self.supplierStockAvailabilityMessage = ko.observable();
 
@@ -26,7 +28,7 @@ const stockInfo = (function (parent) {
             return Number(Math.round((Enumerable.From(self.inStockData()).SelectMany(function (x) {
                 return x.Pieces
             }).Select(function (x) {
-                return +x.Length
+                return +(x.Length.replace(/[^\d.]/, ''))
             }).Sum()) * 10) / 10).toFixed(2) + self.unit()
         } else {
             return 0
@@ -36,7 +38,7 @@ const stockInfo = (function (parent) {
     self.totalDueIn = ko.pureComputed(function () {
         if (self.dueInData()) {
             return Number(Math.round((Enumerable.From(self.dueInData()).Select(function (x) {
-                return +x.Length
+                return +(x.Length.replace(/[^\d.]/, ''))
             }).Sum()) * 10) / 10).toFixed(2) + self.unit()
         } else {
             return 0
@@ -48,7 +50,17 @@ const stockInfo = (function (parent) {
             return Number(Math.round((Enumerable.From(self.supplierData()).SelectMany(function (x) {
                 return x.Pieces
             }).Select(function (x) {
-                return +x.Length
+                return +(x.Length.replace(/[^\d.]/, ''))
+            }).Sum()) * 10) / 10).toFixed(2) + self.unit()
+        } else {
+            return 0
+        }
+    }, self);
+
+    self.totalSupplierDueIn = ko.pureComputed(function () {
+        if (self.supplierDueInData()) {
+            return Number(Math.round((Enumerable.From(self.supplierDueInData()).Select(function (x) {
+                return +(x.Length.replace(/[^\d.]/, ''))
             }).Sum()) * 10) / 10).toFixed(2) + self.unit()
         } else {
             return 0
@@ -63,7 +75,7 @@ const stockInfo = (function (parent) {
         return Enumerable.From(self.inStockData()).SelectMany(function (x) {
             return x.Pieces
         }).Where(function (x) {
-            return +x.Length <= +self.Quantity
+            return +(x.Length.replace(/[^\d.]/, '')) <= +self.Quantity
         }).SingleOrDefault();
     }, self);
 
@@ -132,7 +144,11 @@ const stockInfo = (function (parent) {
 
                     self.dueInData(data.PurchaseOrders);
 
+                    self.supplierDueInData(data.PurchaseOrders);
+
                     self.totalPurchaseOrderStock(data.TotalPurchaseOrderLength);
+
+                    self.totalSupplierPurchaseOrderStock(data.TotalSupplierPurchaseOrderLength);
 
                     self.supplierStockAvailabilityMessage(data.SupplierAvailabilityMessage);
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using wwwDesignersGuild.Models.Cache.General;
 using wwwDesignersGuild.Models.Database;
-
+using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Hotspot;
 
 using wwwDesignersGuild.ViewModels;
@@ -20,6 +20,7 @@ namespace wwwDesignersGuild.Models
         public string AttributeSignature { get; set; }
         public string AttributeDescription { get; set; }
         public string FooterText { get; set; }
+        public bool Enabled { get; set; }
     }
 
     public class cmsFilterIndexAttributeCombinationResult
@@ -30,14 +31,16 @@ namespace wwwDesignersGuild.Models
     public class PassFilterIndexAttributeCombinationCacheFetch
     {
         public byte LanguageID { get; set; }
-        public byte ProductTypeID { get; set; }
+        public byte? ProductTypeID { get; set; }
         public DateTime Date { get; set; }
+        public string CountryURL { get; set; }
 
-        public PassFilterIndexAttributeCombinationCacheFetch(byte languageID, byte productTypeID, DateTime date)
+        public PassFilterIndexAttributeCombinationCacheFetch(byte languageID, byte? productTypeID, DateTime date, string countryURL)
         {
             LanguageID = languageID;
             ProductTypeID = productTypeID;
             Date = date;
+            CountryURL = countryURL;
         }
     }
 
@@ -62,7 +65,15 @@ namespace wwwDesignersGuild.Models
 
         private async Task<cmsFilterIndexAttributeCombinationResult> loadFilterIndexingAttributeCombinationsFromCms(PassFilterIndexAttributeCombinationCacheFetch objFetch, BaseViewModel objBase)
         {
-            var results = await new databaseDataContext().FetchFilterIndexAttributeCombinationsAsync(objFetch.LanguageID, objFetch.ProductTypeID);
+            var results = await new databaseDataContext().FetchFilterIndexAttributeCombinationsAsync(objFetch.LanguageID, objFetch.ProductTypeID, objBase.CountryURL);
+
+            foreach (var item in results)
+            {
+                if (!String.IsNullOrEmpty(item.FooterText))
+                {
+                    item.FooterText = HtmlHelperExtra.ProcessHTMLImages(item.FooterText, null, new long[] { }, new ImageHotspot[] { }, objBase);
+                }
+            }
 
             return new cmsFilterIndexAttributeCombinationResult()
             {
@@ -72,7 +83,15 @@ namespace wwwDesignersGuild.Models
 
         public cmsFilterIndexAttributeCombinationResult loadFilterIndexingRestrictionsFromCmsSync(PassFilterIndexAttributeCombinationCacheFetch objFetch, BaseViewModel objBase)
         {
-            var results = new databaseDataContext().FetchFilterIndexAttributeCombinations(objFetch.LanguageID);
+            var results = new databaseDataContext().FetchFilterIndexAttributeCombinations(objFetch.LanguageID, objBase.CountryURL);
+
+            foreach (var item in results)
+            {
+                if (!String.IsNullOrEmpty(item.FooterText))
+                {
+                    item.FooterText = HtmlHelperExtra.ProcessHTMLImages(item.FooterText, null, new long[] { }, new ImageHotspot[] { }, objBase);
+                }
+            }
 
             return new cmsFilterIndexAttributeCombinationResult()
             {

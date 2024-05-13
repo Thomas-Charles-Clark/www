@@ -113,17 +113,8 @@ namespace wwwDesignersGuild.ViewModels
             // Attribute load fn
             var objAttributeLoad = objAttribute.loadAttributeFromCms(LanguageID).Result;
 
-            // Filter index restrictions fn
-            var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction()
-                .loadFilterIndexingRestrictionsFromCmsSync(
-                    new PassFilterIndexRestrictionCacheFetch() { Date = BaseViewModel.Date },
-                    BaseViewModel
-                );
-
             // Attribute results (cached)
             var attributeData = objAttributeLoad;
-
-            var filterIndexRestrictions = objFilterIndexRestrictionLoad;
 
             // Attribute Group Product Type mapping (This attribute group has that set of product types)
             var attributeGroupProductTypes = attributeData.attributeGroupProductTypes;
@@ -184,8 +175,8 @@ namespace wwwDesignersGuild.ViewModels
                 .OrderBy(pt => pt.SortOrder)
                 .Select(pt => new ProductType(
                     productType: pt,
-                    productPageIds: Definition.searchResultCores.Where(p => p.ProductTypeID == pt.ProductTypeID).Select(p => p.ProductPageID),
-                    filterIndexRestrictions: filterIndexRestrictions.Restrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID)))
+                    productPageIds: Definition.searchResultCores.Where(p => p.ProductTypeID == pt.ProductTypeID).Select(p => p.ProductPageID)
+                ))
                 .ToList();
 
             // Search results from the DT Search Engine

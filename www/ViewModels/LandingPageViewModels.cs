@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 using HtmlAgilityPack;
 
+using iText.Layout.Renderer;
+
 using iTextSharp.text;
 
 using MertexerV2.SQLFunctions;
@@ -234,6 +236,29 @@ namespace wwwDesignersGuild.ViewModels
 
                 switch (pageSection.PageSectionTypeID)
                 {
+                    case (byte)PageSectionType.ProductPageGrid:
+                        PageSections.Add(new PageSectionViewModel(
+                            pageSection: pageSection,
+                            baseViewModel: this,
+                            sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
+                                originalUrlKeywords: Definition.PageDetails.URLKeywords,
+                                productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
+                                pagingEnabled: pageSection.Paging || pageSection.Filter,
+                                filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+                                isShop: Definition.PageDetails.IsShop,
+                                isLifestyleGallery: pageSection.IsLifestyleGallery,
+                                model: this
+                            ),
+                            isShop: Definition.PageDetails.IsShop));
+
+                        var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
+
+                        if (ppgps.Contents.Any())
+                        {
+                            allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
+                        }
+
+                        break;
                     case (byte)PageSectionType.HTML:
                         var htmlSection = Definition.pageSectionHtmls.Single(p => p.PageSectionID == pageSectionId);
 
@@ -299,29 +324,6 @@ namespace wwwDesignersGuild.ViewModels
                                 useDate: MasterDefinition.UrlBreakdown.ContentDate
                             ),
                             isShop: Definition.PageDetails.IsShop));
-                        break;
-                    case (byte)PageSectionType.ProductPageGrid:
-                        PageSections.Add(new PageSectionViewModel(
-                            pageSection: pageSection,
-                            baseViewModel: this,
-                            sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
-                                originalUrlKeywords: Definition.PageDetails.URLKeywords,
-                                productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
-                                pagingEnabled: pageSection.Paging || pageSection.Filter,
-                                filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-                                isShop: Definition.PageDetails.IsShop,
-                                isLifestyleGallery: pageSection.IsLifestyleGallery,
-                                model: this
-                            ),
-                            isShop: Definition.PageDetails.IsShop));
-
-                        var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
-
-                        if (ppgps.Contents.Any())
-                        {
-                            allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
-                        }
-
                         break;
                     case (byte)PageSectionType.CollectionGrid:
                         var collections = Definition.pageSectionCollections.Where(p => p.PageSectionID == pageSectionId).ToList();
@@ -1636,7 +1638,7 @@ namespace wwwDesignersGuild.ViewModels
 
         public List<ImageHotspot> Hotspots { get; set; }
 
-        private HtmlPageSection(
+        public HtmlPageSection(
             long htmlSectionId,
             string contents,
             IEnumerable<long> imageIds
@@ -1898,19 +1900,11 @@ namespace wwwDesignersGuild.ViewModels
             
             var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
             
-            // Filter index restrictions fn
-            var objFilterIndexRestrictionLoad = new cmsFilterIndexRestriction().loadFilterIndexingRestrictionsFromCmsAsync(
-                    new PassFilterIndexRestrictionCacheFetch() { Date = model.Date },
-                    model
-                );
-
             // Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
 
-            await Task.WhenAll(objAttributeLoad, objFilterIndexRestrictionLoad); //(, ...);
+            await Task.WhenAll(objAttributeLoad); //(, ...);
 
             var attributeData = await objAttributeLoad;
-
-            var filterIndexRestrictions = await objFilterIndexRestrictionLoad;
 
             var preResultSet = new List<ProductPageFilterablePodWrapper>();
 
@@ -1978,7 +1972,6 @@ namespace wwwDesignersGuild.ViewModels
             result.ProductTypes.ForEach(pt =>
             {
                 pt.ProductPageIDs = completeResultSet.Where(crs => crs.ProductTypeID == pt.ProductTypeID).Select(crs => crs.ProductPageID);
-                pt.FilterIndexRestrictions = filterIndexRestrictions.Restrictions.Where(fir => fir.ProductTypeID == pt.ProductTypeID);
             });
 
             if (result.ProductTypes.Count > 1)
@@ -1999,7 +1992,7 @@ namespace wwwDesignersGuild.ViewModels
 
                     // Filter index restrictions fn
                     var objFilterIndexCombinations = await new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
-                            new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date),
+                            new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date, model.CountryURL),
                             model
                         );
 
@@ -2047,6 +2040,8 @@ namespace wwwDesignersGuild.ViewModels
                 result.AttributeGroups.RemoveAll(p => p.AttributeGroupID == 0);
             }
 
+            var attributeFormValuesFromQueryString = new List<string>();
+
             result.AttributeGroups.ForEach(ag =>
             {
                 var attributeNames = HttpContext.Current.Request.QueryString[$"{HttpUtility.UrlEncode(ag.Name.ToLowerInvariant())}"]?
@@ -2061,12 +2056,47 @@ namespace wwwDesignersGuild.ViewModels
                         .ToList();
 
                     ag.Selection = ag.Selection.Distinct().ToList();
+
+                    attributeFormValuesFromQueryString.AddRange(ag.Selection);
                 }
                 else
                 {
                     ag.Selection = new List<string>();
                 }
             });
+
+            #region QueryString based attribute determination dance
+
+            // produce the power set of all words in the malleable url segment
+            // it's possible that some are attributes
+            var queryStringAttributesPowerSet = EnumerableExtensions.PowerSet(attributeFormValuesFromQueryString);
+
+            var queryStringAttributesList = new List<AttributeSorter>();
+
+            foreach (var potentialAttribute in queryStringAttributesPowerSet)
+            {
+                var value = String.Join("-", potentialAttribute);
+
+                foreach (var ag in result.AttributeGroups.Where(g => g.InvolveInFilterIndexing(result.ProductType)))
+                {
+                    var attrs = ag.Attributes.ToList();
+                    var attr = attrs.SingleOrDefault(a => a.FormValue == HttpUtility.UrlEncode(value));
+
+                    // Do this little dance
+                    if (attr != null)
+                    {
+                        queryStringAttributesList.Add(new AttributeSorter(attr.AttributeID, attr.AttributeGroupID, attr.FormValue, attr.Name, ag.ProductTypes.Single(pt => pt.FormValue == result.ProductType).LexicographicalSortOrder, ag.LogicalOperator));
+
+                        ag.Selection.Add(HttpUtility.UrlEncode(value));
+
+                        ag.Selection = ag.Selection.Distinct().ToList();
+                    }
+                }
+            }
+
+            #endregion
+
+            #region URLKeyword based attribute determination dance
 
             var url = HttpContext.Current.Request.Url.ToString();
             
@@ -2108,6 +2138,17 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
+            #endregion
+
+            if (attributesList.Any())
+            {
+                // this is a noop! fun to say, even more fun to program. NOOP NOOP!
+            }
+            else
+            {
+                attributesList = queryStringAttributesList;
+            }
+
             attributesList = attributesList.OrderBy(al => al.LexicographicalSortOrder).ToList();
 
             var attributeSignature = String.Join(".", attributesList.Select(a => $"{a.AttributeID}"));
@@ -2116,7 +2157,16 @@ namespace wwwDesignersGuild.ViewModels
 
             model.AttributeFilterText = String.Join(" ", attributesList.Select(al => al.AttributeName));
 
-            model.AttributeSignatureText = result.AttributeCombinations?.SingleOrDefault(c => c.AttributeSignature == attributeSignature)?.FooterText;
+            var filterIndexCombination = result.AttributeCombinations?.SingleOrDefault(c => c.AttributeSignature == attributeSignature);
+
+            model.AttributeSignatureText = filterIndexCombination?.FooterText;
+
+            model.FilterIndexCombinationEnabled = filterIndexCombination != null;
+
+            if (!String.IsNullOrEmpty(model.AttributeSignatureText))
+            {
+                model.AttributeSignatureText = HtmlHelperExtra.ProcessHTMLImages(model.AttributeSignatureText, null, new long[] { }, new ImageHotspot[] { }, model);
+            }
 
             if (attributesList.Any())
             {
@@ -2151,10 +2201,11 @@ namespace wwwDesignersGuild.ViewModels
                     }
 
                     result.MasterDefinition.MetaDescription = HtmlHelperExtra.ProcessAttributeFilterText(
-                        filterText: result.MasterDefinition.MetaDescription ?? "",
+                        input: result.MasterDefinition.MetaDescription ?? "",
                         attributeFilterText: model.AttributeFilterText,
                         productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
                         attributeSignatureText: model.AttributeSignatureText,
+                        enabledByAttributeCombination: model.FilterIndexCombinationEnabled,
                         useHtml: false);
 
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
@@ -2409,7 +2460,7 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
-        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, IEnumerable<FilterIndexRestriction> filterIndexRestrictions, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
+        public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
         {
             //if (attribute.FormValue == "blue")
             //{
@@ -2417,7 +2468,7 @@ namespace wwwDesignersGuild.ViewModels
             //}
 
             // if FilterIndexing is enabled on this grid's containing page
-            if (FilterIndexingEnabled && attribute.EnableFilterIndexing)
+            if (FilterIndexingEnabled)
             {
                 // does this ProductType describe a LexicographicalSortOrder for this AttributeGroup?
                 if (attributeGroup.InvolveInFilterIndexing(ProductType))
@@ -2508,11 +2559,17 @@ namespace wwwDesignersGuild.ViewModels
 
                             split = split.OrderBy(s => s.LexicographicalSortOrder).ToList();
 
-                            if (filterIndexRestrictions == null || 
-                                filterIndexRestrictions.Count() == 0 || 
-                                filterIndexRestrictions
-                                    .Select(fir => fir.AttributeGroupSignature)
-                                    .Contains(String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeGroupID))))
+                            if (attributeCombinations
+                                .SingleOrDefault(ac =>
+                                    ac.Enabled == true &&
+                                    ac.AttributeSignature == (
+                                        String.IsNullOrEmpty(currentAttributeSignature)
+                                            ? $"{attribute.AttributeID}"
+                                            : String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
+                            {
+                                return "#";
+                            }
+                            else
                             {
                                 split.Add(new AttributeSorter(0, 0, OriginalSemanticString, null, null, null));
 
@@ -2524,20 +2581,7 @@ namespace wwwDesignersGuild.ViewModels
                                     url = url.Substring(0, url.IndexOf("?"));
                                 }
 
-                                if (attributeCombinations.SingleOrDefault(ac =>
-                                    ac.AttributeSignature == (
-                                        String.IsNullOrEmpty(currentAttributeSignature)
-                                            ? $"{attribute.AttributeID}"
-                                            : String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
-                                {
-                                    return null;
-                                }
-
                                 return url;
-                            }
-                            else
-                            {
-                                return "#";
                             }
                         }
                     }

@@ -21,6 +21,7 @@ using Newtonsoft.Json.Converters;
 using System.Dynamic;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.Models.Checkout;
+using System.Net.Http;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -617,10 +618,24 @@ namespace wwwDesignersGuild.Models.Helper
         // This routine raises error that are NOT handled in the JavaScript (e.g. bad data submitted)
         public static void raiseErrorNotHandled(webapiUnhandledError errorMessage, string additionalInfo = null)
         {
-            var resp = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
+            HttpResponseMessage resp = null;
+
+            if (additionalInfo != null)
             {
-                ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")
-            };
+                resp = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
+                {
+                    Content = new StringContent($"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")),
+                    ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")
+                };
+            }
+            else
+            {
+                new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
+                {
+                    Content = new StringContent($"{errorMessage}".Replace(System.Environment.NewLine, "")),
+                    ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")
+                };
+            }
             throw new System.Web.Http.HttpResponseException(resp);
         }
         #endregion

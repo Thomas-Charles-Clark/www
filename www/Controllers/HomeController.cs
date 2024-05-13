@@ -1,12 +1,15 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
+using wwwDesignersGuild.Models;
 using wwwDesignersGuild.Models.ArticlePage;
 using wwwDesignersGuild.Models.Attribute;
 using wwwDesignersGuild.Models.Banner;
@@ -699,24 +702,41 @@ namespace wwwDesignersGuild.Controllers
                         return new RedirectResult(tempUrl, true);
                     }
 
-                    if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing &&
-                        FilterIndexingURLKeywordsRequireCorrecting(urlData.countryDetails.URL, landingPageViewModel.Definition.PageDetails.URLKeywords, urlParameterWithoutSuffix, urlData.countryDetails.LanguageID, out string correction))
+                    var filterIndexingURLKeywordsCorrection = new Tuple<string, NameValueCollection>(null, null);
+
+                    if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing)
+                    {
+                        filterIndexingURLKeywordsCorrection = await FilterIndexingURLKeywordsRequireCorrecting(
+                                urlData.countryDetails.URL,
+                                landingPageViewModel.Definition.PageDetails.URLKeywords,
+                                urlParameterWithoutSuffix,
+                                urlData.countryDetails.LanguageID,
+                                landingPageViewModel.Definition.PageDetails.ProductTypeID,
+                                landingPageViewModel);
+                    }
+
+                    if (!String.IsNullOrEmpty(filterIndexingURLKeywordsCorrection.Item1))
                     {
 #if DEBUG
-                        System.Diagnostics.Debug.WriteLine($"FilterIndexingURLKeywordsRequireCorrecting:\r\n\t\t{urlData.SemanticString}\r\nto\t\t{landingPageViewModel.Definition.PageDetails.URLKeywords}");
+                        System.Diagnostics.Debug.WriteLine($"filterIndexingURLKeywordsCorrection:\r\n\t\t{urlData.SemanticString}\r\nto\t\t{landingPageViewModel.Definition.PageDetails.URLKeywords}");
 #endif
+
+                        foreach(var k in Request.QueryString.AllKeys)
+                        {
+                            filterIndexingURLKeywordsCorrection.Item2.Add(k, Request.QueryString[k]);
+                        }
 
                         //  Self-healing URL (note: dateOverride is built up after url)
                         var tempUrl = dgFramework.buildUrl(
                             urlData.countryDetails,
-                            correction.StartsWith($"{urlData.countryDetails.URL}/") 
-                                ? correction.Substring($"{urlData.countryDetails.URL}/".Length)
-                                : correction,
+                            filterIndexingURLKeywordsCorrection.Item1.StartsWith($"{urlData.countryDetails.URL}/") 
+                                ? filterIndexingURLKeywordsCorrection.Item1.Substring($"{urlData.countryDetails.URL}/".Length)
+                                : filterIndexingURLKeywordsCorrection.Item1,
                             dgContentType.landingPage,
                             urlData.ContentId,
                             !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
                             !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-                            Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
+                            filterIndexingURLKeywordsCorrection.Item2.HasKeys() ? $"{filterIndexingURLKeywordsCorrection.Item2}" : null);
 
                         // 03/04/2023: Scratch that: apparently the noindex also means "don't register the redirect"
 
@@ -1774,18 +1794,67 @@ namespace wwwDesignersGuild.Controllers
             }
         }
 
-        private bool FilterIndexingURLKeywordsRequireCorrecting(string country, string intended, string current, byte languageId, out string correction)
+        private async Task<Tuple<string, NameValueCollection>> FilterIndexingURLKeywordsRequireCorrecting(string country, string intended, string current, byte languageId, byte? productTypeId, BaseViewModel objBase)
         {
-            var attribute = new cmsAttribute();
+            string correction = null;
 
-            var attributeData = attribute.loadAttributeFromCms(languageId).Result;
+            var attributeLoader = new cmsAttribute();
+            var attributesTask = attributeLoader.loadAttributeFromCms(languageId);
 
-            var attributes = attributeData.attributeDetails.Where(a => a.EnableFilterIndexing).Select(a => a.FormValue).ToList();
+            var combinationsLoader = new cmsFilterIndexAttributeCombination();
+            var filterIndexCombinationsTask = combinationsLoader.loadFilterIndexingAttributeCombinationsFromCmsAsync(new PassFilterIndexAttributeCombinationCacheFetch(languageId, productTypeId, objBase.Date, country), objBase);
 
-            attributes.ForEach(at =>
+            await Task.WhenAll(attributesTask, filterIndexCombinationsTask);
+
+            var attributes = await attributesTask;
+
+            var filterIndexCombinations = await filterIndexCombinationsTask;
+
+            attributes.attributeGroups.ForEach(ag =>
             {
-                current = current.Replace($"{at}-", ""); 
+                ag.Attributes = attributes.attributeDetails.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
             });
+
+            foreach (var combination in filterIndexCombinations.Combinations.Where(c => c.Enabled))
+            {
+                var attributeIds = combination.AttributeSignature.Split(new char[] { '.' }).Select(a => Convert.ToInt16(a));
+
+                foreach (var attributeId in attributeIds)
+                {
+                    var attribute = attributes.attributeDetails.SingleOrDefault(ad => ad.AttributeID == attributeId);
+
+                    if (attribute != null)
+                    {
+                        current = current.Replace($"{attribute.FormValue}-", "");
+                    }
+                }
+            }
+
+            var qs = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+            foreach (var combination in filterIndexCombinations.Combinations.Where(c => c.Enabled == false))
+            {
+                foreach(var attributeGroup in attributes.attributeGroups.Where(ag => ag.Attributes?.Any() == true))
+                {
+                    var attributeIds = combination.AttributeSignature.Split(new char[] { '.' }).Select(a => Convert.ToInt16(a));
+
+                    foreach (var attributeId in attributeIds)
+                    {
+                        if (attributeGroup.Attributes.Select(a => a.AttributeID).Contains(attributeId) == true)
+                        {
+                            var attribute = attributes.attributeDetails.SingleOrDefault(ad => ad.AttributeID == attributeId);
+
+                            if (attribute != null)
+                            {
+                                if (current.Contains(attribute.FormValue))
+                                {
+                                    qs.Add(attributeGroup.FormName, attribute.FormValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             intended = $"{country.ToLowerInvariant()}/{intended.ToLowerInvariant()}";
 
@@ -1795,16 +1864,12 @@ namespace wwwDesignersGuild.Controllers
 
             var currentSegmentsOfInterest = regex.Match(current);
 
-            if (currentSegmentsOfInterest.Captures.Count == 1)
+            if ((current != intended) && currentSegmentsOfInterest.Captures.Count == 1)
             {
                 correction = $"{intendedSegmentsOfInterest.Value}{regex.Replace(current, "")}";
-
-                return intendedSegmentsOfInterest.Value != currentSegmentsOfInterest.Value;
             }
 
-            correction = null;
-
-            return false;
+            return new Tuple<string,NameValueCollection>(correction, qs);
         }
 
         // Where is this called from... this is called from above, on every session... so do the local SQL check.
@@ -1838,7 +1903,11 @@ namespace wwwDesignersGuild.Controllers
                                 {
                                     Session["memberTradeChecksPassed"] = true;
 
-                                    Response.Cookies.Add(new HttpCookie("dg-trade-signin", urlData.countryDetails.URL));
+                                    var tradeSignInCookie = new HttpCookie("dg-trade-signin", urlData.countryDetails.URL);
+
+                                    tradeSignInCookie.Expires = DateTime.Now.AddMonths(1);
+
+                                    Response.Cookies.Add(tradeSignInCookie);
                                 }
                             }
                             else 

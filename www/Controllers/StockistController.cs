@@ -166,12 +166,10 @@ namespace wwwDesignersGuild.Controllers
                     // bother translating it - and won't ever bother translating it. Skip this result set:
                     reader.NextResult();
 
-                    // This final result set can be translated. It isn't, at the time of writing, but at least it can be.
-                    reader.NextResult();
-
                     while (reader.Read())
                     {
-                        result.SupplierAvailabilityMessage = reader.IsDBNull(0) ? null : reader.GetString(0);
+                        // ProductID is returned in the zeroth column on this result set. Skip it.
+                        result.SupplierAvailabilityMessage = reader.IsDBNull(1) ? null : reader.GetString(1);
                     }
 
                     reader.Close();
@@ -186,7 +184,8 @@ namespace wwwDesignersGuild.Controllers
             {
                 result.Code = preresult.First().ProductCode;
                 result.TotalStock = preresult.Select(p => p.AvailableNowQuantity).Sum()?.ToString("N2");
-                result.TotalPurchaseOrderLength = preresult.Select(p => p.DueInQuantity).Sum().ToString("N2");
+                result.TotalPurchaseOrderLength = preresult.Where(p => p.StockLocationTypeID == 1).Select(p => p.DueInQuantity).Sum().ToString("N2");
+                result.TotalSupplierPurchaseOrderLength = preresult.Where(p => p.StockLocationTypeID == 2).Select(p => p.DueInQuantity).Sum().ToString("N2");
 
                 var batchGrouping = preresult.Where(p => p.StockLocationTypeID == 1 && p.AvailableNowQuantity > 0).GroupBy(p => p.Batch).ToList();
 
@@ -208,7 +207,16 @@ namespace wwwDesignersGuild.Controllers
                     Pieces = p.Select(q => new BatchPiece() { Length = q.AvailableNowQuantity?.ToString("N2"), Quantity = "1" }).ToList()
                 }).ToList();
 
-                result.PurchaseOrders = preresult.Where(p => p.DueInQuantity > 0).OrderBy(p => p.DueInDate).Select(p => new PurchaseOrder() {
+                result.PurchaseOrders = preresult.Where(p => p.StockLocationTypeID == 1 && p.DueInQuantity > 0).OrderBy(p => p.DueInDate).Select(p => new PurchaseOrder() {
+                    PurchaseOrderNumber = null,
+                    DueDate = p.DueInDate?.ToString("dd/MM/yyyy"),
+                    Length = p.DueInQuantity.ToString("N2"),
+                    POConfirmed = p.POConfirmed,
+                    DueInMessage = p.DueInMessage
+                }).ToList();
+
+                result.SupplierPurchaseOrders = preresult.Where(p => p.StockLocationTypeID == 2 && p.DueInQuantity > 0).OrderBy(p => p.DueInDate).Select(p => new PurchaseOrder()
+                {
                     PurchaseOrderNumber = null,
                     DueDate = p.DueInDate?.ToString("dd/MM/yyyy"),
                     Length = p.DueInQuantity.ToString("N2"),
@@ -270,7 +278,9 @@ namespace wwwDesignersGuild.Controllers
             public List<Batch> Batches { get; set; }
             public List<Batch> SupplierStock { get; set; }
             public List<PurchaseOrder> PurchaseOrders { get; set; }
+            public List<PurchaseOrder> SupplierPurchaseOrders { get; set; }
             public string TotalPurchaseOrderLength { get; set; }
+            public string TotalSupplierPurchaseOrderLength { get; set; }
 
             public string SupplierAvailabilityMessage { get; set; }
         }

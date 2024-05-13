@@ -222,5 +222,6 @@ namespace wwwDesignersGuild.Util
         public byte? templateId { get; set; }
         public DateTimeOffset? ExplicitExpiry { get; set; }
         public IEnumerable<long> PageSectionIDs { get; set; }
+        public string CountryURL { get; set; }
     }
 }

@@ -38,8 +38,9 @@ namespace wwwDesignersGuild.ViewModels
         public bool NoFollow { get; set; }
         public bool NoIndex { get; set; }
         public string CustomCanonical { get; set; }
-        public string AttributeFilterText { get; set; }
+        public string AttributeFilterText { get; set; } // this comes from dbo.FilterIndexCombination_Language
         public string AttributeSignatureText { get; set; } // this comes from dbo.FilterIndexCombination_Language
+        public bool FilterIndexCombinationEnabled { get; set; } // this is true only if a matching record exists from FilterIndexCombination_Select
 
         public bool UserInCorrectSite
         {
@@ -145,6 +146,14 @@ namespace wwwDesignersGuild.ViewModels
             get
             {
                 return MasterDefinition.UrlBreakdown.countryDetails.CountryID;
+            }
+        }
+
+        public string CountryURL
+        {
+            get
+            {
+                return MasterDefinition.UrlBreakdown.countryDetails.URL;
             }
         }
 

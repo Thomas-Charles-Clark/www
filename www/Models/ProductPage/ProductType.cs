@@ -15,8 +15,6 @@ namespace wwwDesignersGuild.Models.ProductPage
         public string URLKeywords { get; set; }
         public byte SortOrder { get; set; }
         
-        public IEnumerable<FilterIndexRestriction> FilterIndexRestrictions { get; set; }
-
         public IEnumerable<int> ProductPageIDs { get; set; }
 
         public string FormValue
@@ -37,16 +35,14 @@ namespace wwwDesignersGuild.Models.ProductPage
         public ProductType()
         {
             ProductPageIDs = new List<int>();
-            FilterIndexRestrictions = new List<FilterIndexRestriction>();
         }
 
-        public ProductType(ProductType productType, IEnumerable<int> productPageIds, IEnumerable<FilterIndexRestriction> filterIndexRestrictions)
+        public ProductType(ProductType productType, IEnumerable<int> productPageIds)
         {
             ProductTypeID = productType.ProductTypeID;
             Name = productType.Name;
             SortOrder = productType.SortOrder;
             ProductPageIDs = productPageIds;
-            FilterIndexRestrictions = filterIndexRestrictions;
         }
 
         // Product Types have sets of Attribute Groups
