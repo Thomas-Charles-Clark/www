@@ -1810,10 +1810,10 @@ namespace wwwDesignersGuild.Controllers
 
             var filterIndexCombinations = await filterIndexCombinationsTask;
 
-            attributes.attributeGroups.ForEach(ag =>
-            {
-                ag.Attributes = attributes.attributeDetails.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
-            });
+            //attributes.attributeGroups.ForEach(ag =>
+            //{
+            //    ag.Attributes = attributes.attributeDetails.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
+            //});
 
             foreach (var combination in filterIndexCombinations.Combinations.Where(c => c.Enabled))
             {
@@ -1832,7 +1832,7 @@ namespace wwwDesignersGuild.Controllers
 
             var qs = System.Web.HttpUtility.ParseQueryString(string.Empty);
 
-            foreach (var combination in filterIndexCombinations.Combinations.Where(c => c.Enabled == false))
+            foreach (var combination in filterIndexCombinations.Combinations)
             {
                 foreach(var attributeGroup in attributes.attributeGroups.Where(ag => ag.Attributes?.Any() == true))
                 {

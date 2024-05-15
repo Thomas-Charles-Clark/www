@@ -688,11 +688,15 @@
 
     self.attributeSelectionComputer = ko.computed(() => {
         let attributes = [];
-        let observables = self.attributeGroups().map(ag => ag.selection);
+        let attributeGroups = self.attributeGroups();
+
+        //attributeGroups.sort((a, b) => {
+        //    return a.lexicographicalSortOrder > b.lexicographicalSortOrder ? -1 : 1;
+        //});
 
         // take dependencies on attribute groups' selection observables
-        observables.forEach((s) => {
-            let selection = ko.unwrap(s);
+        attributeGroups.forEach((ag) => {
+            let selection = ko.unwrap(ag.selection);
             if (Array.isArray(selection))
                 selection.forEach(a => {
                     if (attributes.indexOf(a) == -1)
@@ -700,9 +704,13 @@
                 });
             else {
                 if (selection != '')
-                    attributes.push(selection);
+                    attributes.push({ selection: selection, lexicographicalSortOrder: ag.lexicographicalSortOrder });
             }
         });
+
+        attributes = attributes.sort((a, b) => {
+            return a.lexicographicalSortOrder < b.lexicographicalSortOrder ? -1 : 1;
+        }).map(a => a.selection);
 
         // I think we don't want to include Product Type as a clearable filter. 25/08/2022
         //self.filterCount(attributes.length + (self.productType() ? (self.productType() == 'all' ? 0 : 1) : 0));

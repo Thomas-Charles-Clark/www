@@ -2032,6 +2032,11 @@ namespace wwwDesignersGuild.ViewModels
                     .Where(agpt => agpt.AttributeGroupID == ag.AttributeGroupID)
                     .Select(agpt => new AttributeGroupProductType(attributeData.productTypes.Single(pt => pt.ProductTypeID == agpt.ProductTypeID), agpt.LexicographicalSortOrder))
                     .ToList();
+
+                if (!String.IsNullOrEmpty(result.ProductType))
+                {
+                    ag.LexicographicalSortOrder = ag.ProductTypes.SingleOrDefault(pt => pt.FormValue == result?.ProductType).LexicographicalSortOrder ?? 0;
+                }
             });
 
             if (!model.MasterDefinition.TradeAllowed) /* If you're not trade and trade-allowed */
@@ -2332,12 +2337,12 @@ namespace wwwDesignersGuild.ViewModels
 
                 ag.Attributes.ForEach(a =>
                 {
-                    //if (a.FormValue == "orange")
-                    //{
-                    //    int f = 0;
-                    //}
+                    if (a.FormValue == "grey")
+                    {
+                        int f = 0;
+                    }
 
-                    if (productPageIdsAffectingThisAttributeGroup.Any())
+                    if (ag.LogicalOperator == "AND" && productPageIdsAffectingThisAttributeGroup.Any())
                     {
                         a.AvailableProductPageIDs = a.ProductPageIDs.Intersect(productPageIdsAffectingThisAttributeGroup).ToList();
                     }

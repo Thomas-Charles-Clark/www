@@ -13,7 +13,7 @@
     var attributeGroupViewModels = grid.AttributeGroups.OrderBy(p => p.SortOrder).Select(p =>
     {
         var name = p.Name.Replace("'", "’");
-        return $"attributeGroupViewModel('{name}', productPageGrid)";
+        return $"attributeGroupViewModel('{name}', {p.LexicographicalSortOrder}, productPageGrid)";
     });
 
     var attributeGroupGroupViewModels = grid.AttributeGroupGroups.OrderBy(p => p.AttributeGroupGroupID).Select(p =>

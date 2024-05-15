@@ -15,6 +15,7 @@ namespace wwwDesignersGuild.Models.Classes
         public string Name { get; set; }
         public Boolean UseIcons { get; set; }
         public byte SortOrder { get; set; }
+        public byte LexicographicalSortOrder { get; set; }
         public bool MultipleSelect { get; set; }
         public string LogicalOperator { get; set; }
         public List<AttributeDetail> Attributes { get; set; }

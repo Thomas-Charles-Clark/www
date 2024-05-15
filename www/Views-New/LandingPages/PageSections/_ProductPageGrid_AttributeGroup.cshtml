@@ -87,7 +87,7 @@
                             <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
                                 @Html.Raw(JsonConvert.SerializeObject(a))
                             </span>
-                            @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
+                           @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
                             {
                                 <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
                                        for="attribute-@(a.AttributeID)-check"
@@ -113,35 +113,38 @@
                                     </span>
                                     <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
                                 </label>
-                            }
-                            else
-                            {
-                                <a href="@Model.Grid.BuildAttributeURL(ag, a, attributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
-                                    <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
-                                           for="attribute-@(a.AttributeID)-check"
-                                           data-bind="css: { 'unavailable': disabled }">
-                                        <img width="783" height="153" src="/Content/images/icon/Attributes/@(a.AttributeID)@(Framework.WebpOrJpgExtension)" alt="@(a.Name)" loading="lazy" />
-                                        <span>
-                                            @a.Name
-                                            <span data-bind="text: availableProductPagesDisplay">
-                                                (@(a.ProductPageIDs.Count))
-                                            </span>
-                                        </span>
-                                        <i class="bi bi-check-circle-fill text-secondary visually-hidden" data-bind="css: { 'visually-hidden': !selected() }"></i>
-                                        <span class="visually-hidden">
-                                            <!-- ko if: disabled() -->
+                           }
+                           else
+                           {
+                                if (a.ProductPageIDs != null)
+                                {
+                                    <a href="@Model.Grid.BuildAttributeURL(ag, a, attributeSignature, attributeCombinations)" target="_self" onclick="(event) => { event.preventDefault() }">
+                                        <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "") colour-attribute"
+                                               for="attribute-@(a.AttributeID)-check"
+                                               data-bind="css: { 'unavailable': disabled }">
+                                            <img width="783" height="153" src="/Content/images/icon/Attributes/@(a.AttributeID)@(Framework.WebpOrJpgExtension)" alt="@(a.Name)" loading="lazy" />
                                             <span>
-                                                @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                                @a.Name
+                                                <span data-bind="text: availableProductPagesDisplay">
+                                                    (@(a.ProductPageIDs.Count))
+                                                </span>
                                             </span>
-                                            <!-- /ko -->
-                                            <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                                   data-bind="checked: $parent.selection,
-                                                        checkedValue: '@(a.FormValue)',
-                                                        attr: { disabled: disabled }" />
-                                        </span>
-                                        <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                    </label>
-                                </a>
+                                            <i class="bi bi-check-circle-fill text-secondary visually-hidden" data-bind="css: { 'visually-hidden': !selected() }"></i>
+                                            <span class="visually-hidden">
+                                                <!-- ko if: disabled() -->
+                                                <span>
+                                                    @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                                </span>
+                                                <!-- /ko -->
+                                                <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
+                                                       data-bind="checked: $parent.selection,
+                                                            checkedValue: '@(a.FormValue)',
+                                                            attr: { disabled: disabled }" />
+                                            </span>
+                                            <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
+                                        </label>
+                                    </a>
+                                }
                             }
                         </div>
                         <!-- /ko -->
@@ -192,38 +195,41 @@
                         <!-- ko with: attributes()[@attributeIndex]-->
                         var selected = ag.Selection.Contains(a.FormValue);
                         var unavailable = ag.MultipleSelect == false && ag.Selection.Count > 0 && !selected;
-                        <div class="form-check attribute">
-                            <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
-                                @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
-                            </span>
-                            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-                                @Html.Raw(JsonConvert.SerializeObject(a))
-                            </span>
-                            @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
-                            {
-                                <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
-                                       for="attribute-@(a.AttributeID)-check"
-                                       data-bind="css: { 'unavailable': disabled }">
-                                    <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
-                                           data-bind="checked: $parent.selection,
+                    <div class="form-check attribute">
+                        <span class="d-none" data-bind="init: { field: availableProductPageIds, convert: JSON.parse }, remove">
+                            @Html.Raw(JsonConvert.SerializeObject(a.ProductPageIDs))
+                        </span>
+                        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                            @Html.Raw(JsonConvert.SerializeObject(a))
+                        </span>
+                        @if (a.AvailableProductPageIDs != null && a.AvailableProductPageIDs.Count() == 0)
+                        {
+                            <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
+                                   for="attribute-@(a.AttributeID)-check"
+                                   data-bind="css: { 'unavailable': disabled }">
+                                <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
+                                       data-bind="checked: $parent.selection,
                                                    checkedValue: '@(a.FormValue)',
                                                    attr: { disabled: disabled }" />
-                                    @a.Name
-                                    <span data-bind="text: availableProductPagesDisplay">
-                                        (@(a.ProductPageIDs.Count))
-                                    </span>
-                                    <!-- ko if: disabled() -->
-                                    <span class="visually-hidden">
-                                        @HtmlHelperExtra.Resource("Unavailable", l, c, d)
-                                    </span>
-                                    <!-- /ko -->
-                                    @if (!ag.MultipleSelect)
-                                    {
-                                        <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
-                                    }
-                                </label>
-                            }
-                            else
+                                @a.Name
+                                <span data-bind="text: availableProductPagesDisplay">
+                                    (@(a.ProductPageIDs.Count))
+                                </span>
+                                <!-- ko if: disabled() -->
+                                <span class="visually-hidden">
+                                    @HtmlHelperExtra.Resource("Unavailable", l, c, d)
+                                </span>
+                                <!-- /ko -->
+                                @if (!ag.MultipleSelect)
+                                {
+                                    <i class="bi bi-x text-secondary visually-hidden" data-bind="click: deselect, css: { 'visually-hidden': !selected() }"></i>
+                                }
+                            </label>
+                        }
+                        else
+                        {
+                            @**Previously you could rely on a.ProductPageIDs not being NULL here; not since a change was necessary in the FilterIndexingURLKeywordsRequireCorrecting function HomeController.cs:1815 *@
+                            if (a.ProductPageIDs != null)
                             {
                                 <a href="@Model.Grid.BuildAttributeURL(ag, a, attributeSignature, attributeCombinations)" target="self" onclick="(event) => { event.preventDefault(); }">
                                     <label class="form-check-label pointer page-section-@(Model.Grid.PageSectionID)-submitter @(unavailable ? "unavailable" : "")"
@@ -231,8 +237,8 @@
                                            data-bind="css: { 'unavailable': disabled }">
                                         <input class="form-check-input" type="@(ag.MultipleSelect ? "checkbox" : "radio")" name="@(ag.FormName)" value="@(a.FormValue)" id="attribute-@(a.AttributeID)-check" @(selected ? "checked" : "")
                                                data-bind="checked: $parent.selection,
-                                                       checkedValue: '@(a.FormValue)',
-                                                       attr: { disabled: disabled }" />
+                                                           checkedValue: '@(a.FormValue)',
+                                                           attr: { disabled: disabled }" />
                                         @a.Name
                                         <span data-bind="text: availableProductPagesDisplay">
                                             (@(a.ProductPageIDs.Count))
@@ -249,7 +255,8 @@
                                     </label>
                                 </a>
                             }
-                        </div>
+                        }
+                    </div>
                         <!-- /ko -->
                     }
                 </div>

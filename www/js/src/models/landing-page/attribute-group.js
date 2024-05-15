@@ -1,6 +1,7 @@
-﻿const attributeGroupViewModel = ((name, productPageGrid) => {
+﻿const attributeGroupViewModel = ((name, lexicographicalSortOrder, productPageGrid) => {
     let self = {
         name: name,
+        lexicographicalSortOrder: lexicographicalSortOrder,
         parent: productPageGrid
     };
 
