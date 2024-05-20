@@ -38,4 +38,5 @@ Disallow: */h261$ # checkoutPay
 Disallow: */h271$ # checkoutConfirm
 Disallow: */h291$ # checkoutPayPalExpress
 Disallow: */h300$ # checkoutSessionExpired
-Disallow: */api/* # do not crawl our bloody API endpoints
+Disallow: */api/* # do not crawl our API endpoints
+Disallow: */ni/* # do not crawl our non-index endpoints

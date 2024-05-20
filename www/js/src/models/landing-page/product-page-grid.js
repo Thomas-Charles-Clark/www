@@ -568,7 +568,14 @@
                 else
                 {
                     // only update the query string, resetting the urlkeywords to the base for the page.
-                    url = new URL(window.location.href.replace(self.urlParsingRegex, `$1/${window.pageModel.CategoryPageProductType.URLKeywords}/$4`));
+
+
+
+                    let urlKeywords = window.pageModel.CategoryPageProductType == null
+                        ? window.pageModel.MasterDefinition.UrlBreakdown.SemanticString
+                        : window.pageModel.CategoryPageProductType.URLKeywords;
+
+                    url = new URL(window.location.href.replace(self.urlParsingRegex, `$1/${urlKeywords}/$4`));
 
                     url.search = qs;
 
@@ -700,7 +707,7 @@
             if (Array.isArray(selection))
                 selection.forEach(a => {
                     if (attributes.indexOf(a) == -1)
-                        attributes.push(a);
+                        attributes.push({ selection: a, lexicographicalSortOrder: ag.lexicographicalSortOrder });
                 });
             else {
                 if (selection != '')
