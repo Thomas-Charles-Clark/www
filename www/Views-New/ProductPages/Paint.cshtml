@@ -13,9 +13,48 @@
     {
         tradeUser = true;
     }
+
+    // we need to get the attributes of the product to select
+    // then go through surface, finish and then size in order to force our pre-rendering to be maintained
+
+    var autoOpen = Model.AllProducts.SingleOrDefault(p => p.ProductCode == Model.AutoOpenPartNumber);
+
+    var surfaces = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 71) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
+
+    var finishes = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 72) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
+
+    var sizes = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 73) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
+
+    wwwDesignersGuild.Models.Classes.Attribute autoSurface = null;
+    wwwDesignersGuild.Models.Classes.Attribute autoFinish = null;
+    wwwDesignersGuild.Models.Classes.Attribute autoSize = null;
+
+    if (autoOpen != null)
+    {
+        autoSurface = autoOpen.Attributes.FirstOrDefault(a => surfaces.Attributes.Select(at => (int)at.AttributeID).ToList().Contains(a.AttributeID));
+        autoFinish = autoOpen.Attributes.FirstOrDefault(a => finishes.Attributes.Select(at => (int)at.AttributeID).ToList().Contains(a.AttributeID));
+        autoSize = autoOpen.Attributes.FirstOrDefault(a => sizes.Attributes.Select(at => (int)at.AttributeID).ToList().Contains(a.AttributeID));
+    }
 }
 @section LateTemplateScripts {
     @Render.Script("~/bundles/js/product-page")
+    @if (autoOpen != null)
+    {
+        <script type="text/javascript">
+        @if (autoSurface != null)
+        {
+            @:window.productPageModel.surface(@(autoSurface.AttributeID));
+        }
+        @if (autoFinish != null)
+        {
+            @:window.productPageModel.finish(@(autoFinish.AttributeID));
+        }
+        @if (autoSize != null)
+        {
+            @:window.productPageModel.size(@(autoSize.AttributeID));
+        }
+        </script>
+    }
 }
 @Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
 <div id="ko-wrapper">
@@ -33,8 +72,6 @@
     }
     <span class="d-none" data-bind="foreachInit: { name: 'ko-blank-template', data: allSurfaces, createElement: miniAttribute }, remove">
         @{
-            var surfaces = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 71) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
-
             foreach (var attribute in surfaces.Attributes)
             {
                 <span>
@@ -50,8 +87,6 @@
     </span>
     <span class="d-none" data-bind="foreachInit: { name: 'ko-blank-template', data: allFinishes, createElement: miniAttribute }, remove">
         @{
-            var finishes = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 72) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
-
             foreach (var attribute in finishes.Attributes)
             {
                 <span>
@@ -67,8 +102,6 @@
     </span>
     <span class="d-none" data-bind="foreachInit: { name: 'ko-blank-template', data: allSizes, createElement: miniAttribute }, remove">
         @{
-            var sizes = Model.AttributeGroups.SingleOrDefault(ag => ag.AttributeGroupID == 73) ?? new AttributeGroup() { Attributes = new List<AttributeDetail>() };
-
             foreach (var attribute in sizes.Attributes)
             {
                 <span>
@@ -101,7 +134,7 @@
                                 </sup>
                             }
                         </h4>
-                       @if (!String.IsNullOrEmpty(Model.Definition.aka))
+                        @if (!String.IsNullOrEmpty(Model.Definition.aka))
                         {
                             <h6 class="text-uppercase">
                                 @Model.Definition.aka
@@ -139,7 +172,7 @@
             }
             else
             {
-                if (Model.SamplePot != null)
+                if (autoOpen == null && Model.SamplePot != null)
                 {
                     <div data-bind="foreachInit: { data: samplePotOrderFormGroups, createElement: createOrderFormGroup }">
                         <div data-init
@@ -254,7 +287,7 @@
                         {
                             <div data-bind="foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup }">
                                 <div data-init
-                                     style="display: none"
+                                     style="@(Model.AutoOpenPartNumber != Model.MainProduct.ProductCode ? "display: none" : "" )"
                                      class="order-form-group"
                                      data-bind="visible: $parent.visiblePaintProductIds().some(x => x === primaryProductId())">
                                     <span data-bind="init: { convert: parseInt }, text: primaryProductId, remove">
@@ -282,6 +315,15 @@
                             {
                                 @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormGroup.cshtml", ofg)
                             }
+                        }
+                        if (autoOpen != null && Model.SamplePot != null)
+                        {
+                            <div data-bind="foreachInit: { data: samplePotOrderFormGroups, createElement: createOrderFormGroup }">
+                                <div data-init
+                                     class="order-form-group">
+                                    @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", Model.SamplePot)
+                                </div>
+                            </div>
                         }
                     }
                 }

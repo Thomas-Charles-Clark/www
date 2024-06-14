@@ -177,152 +177,152 @@
   font-family: "Arial";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/arial-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/arial-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Arial";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/arial-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/arial-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Arial";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/arial-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/arial-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Courier New";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/courier-new-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/courier-new-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Courier New";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/courier-new-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/courier-new-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Courier New";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/courier-new-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/courier-new-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Garamond";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/garamond-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/garamond-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Garamond";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/garamond-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/garamond-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Garamond";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/garamond-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/garamond-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Georgia";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/georgia-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/georgia-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Georgia";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/georgia-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/georgia-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Georgia";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/georgia-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/georgia-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Lucida Calligraphy Italic";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/lucida-calligraphy-italic-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/lucida-calligraphy-italic-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Tahoma";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/tahoma-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/tahoma-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Tahoma";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/tahoma-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/tahoma-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Times New Roman";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/times-new-roman-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/times-new-roman-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Times New Roman";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/times-new-roman-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/times-new-roman-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Times New Roman";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/times-new-roman-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/times-new-roman-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Trebuchet MS";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/trebuchet-ms-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/trebuchet-ms-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Trebuchet MS";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/trebuchet-ms-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/trebuchet-ms-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Trebuchet MS";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/trebuchet-ms-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/trebuchet-ms-400-italic.woff2) format("woff2");
 }
 @font-face {
   font-family: "Verdana";
   font-display: swap;
   font-weight: 400;
-  src: url(/css/fonts/src/verdana-400.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/verdana-400.woff2) format("woff2");
 }
 @font-face {
   font-family: "Verdana";
   font-display: swap;
   font-weight: 700;
-  src: url(/css/fonts/src/verdana-700.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/verdana-700.woff2) format("woff2");
 }
 @font-face {
   font-family: "Verdana";
   font-display: swap;
   font-weight: 400;
   font-style: italic;
-  src: url(/css/fonts/src/verdana-400-italic.woff2) format("woff2");
+  src: url(/css/dist/fonts/src/verdana-400-italic.woff2) format("woff2");
 }
 #member-wrapper {
   transition: background-color 300ms ease-in-out;
@@ -514,7 +514,7 @@
   width: 18px;
   height: 18px;
   margin-left: 0.5rem;
-  background-image: url(../../Content/images/svg/share-std-light.svg);
+  background-image: url(/Content/images/svg/share-std-light.svg);
   background-size: cover;
   width: 24px;
   height: 24px;
@@ -685,7 +685,7 @@ body.modal-open {
   padding: 0 2rem;
 }
 #moodboard-share-modal .modal-body #comment-wrapper > .hstack > a .twitter {
-  background-image: url(../../Content/images/social/icon-twitter-light.png);
+  background-image: url(/Content/images/social/icon-twitter-light.png);
   background-size: cover;
   width: 24px;
   height: 24px;
@@ -710,7 +710,7 @@ body.modal-open {
   padding: 0 2rem;
 }
 #moodboard-share-modal .modal-body #email-share-wrapper > .hstack > a .email {
-  background-image: url(../../Content/images/svg/email-circular-light.svg);
+  background-image: url(/Content/images/svg/email-circular-light.svg);
   background-size: cover;
   width: 24px;
   height: 24px;
@@ -763,31 +763,31 @@ body.modal-open {
   cursor: pointer;
 }
 #moodboard-share-modal .modal-footer .email {
-  background-image: url(../../Content/images/svg/email-circular-light.svg);
+  background-image: url(/Content/images/svg/email-circular-light.svg);
   background-size: cover;
   width: 24px;
   height: 24px;
 }
 #moodboard-share-modal .modal-footer .pinterest {
-  background-image: url(../../Content/images/social/icon-pinterest-light.png);
+  background-image: url(/Content/images/social/icon-pinterest-light.png);
   background-size: cover;
   width: 24px;
   height: 24px;
 }
 #moodboard-share-modal .modal-footer .facebook {
-  background-image: url(../../Content/images/social/icon-facebook-light.png);
+  background-image: url(/Content/images/social/icon-facebook-light.png);
   background-size: cover;
   width: 24px;
   height: 24px;
 }
 #moodboard-share-modal .modal-footer .twitter {
-  background-image: url(../../Content/images/social/icon-twitter-light.png);
+  background-image: url(/Content/images/social/icon-twitter-light.png);
   background-size: cover;
   width: 24px;
   height: 24px;
 }
 #moodboard-share-modal .modal-footer .copy {
-  background-image: url(../../Content/images/svg/link-circular-light.svg);
+  background-image: url(/Content/images/svg/link-circular-light.svg);
   background-size: cover;
   width: 24px;
   height: 24px;

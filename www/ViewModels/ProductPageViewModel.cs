@@ -93,6 +93,7 @@ namespace wwwDesignersGuild.ViewModels
                         name: g.Key.OrderFormGroup,
                         useSizeButtons: UseSizeButtons,
                         autoOpenFirstSize: g.Key.PrimaryProduct && autoOpenFirstSize,
+                        autoOpenPartNumber: AutoOpenPartNumber,
                         items: g,
                         objMaster: MasterDefinition));
             }
@@ -566,6 +567,14 @@ namespace wwwDesignersGuild.ViewModels
             get
             {
                 return HttpContext.Current.Request.QueryString.AllKeys.Contains("lifestyle");
+            }
+        }
+
+        public string AutoOpenPartNumber
+        {
+            get
+            {
+                return HttpContext.Current.Request.QueryString["productCode"];
             }
         }
 

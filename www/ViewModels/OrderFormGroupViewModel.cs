@@ -33,18 +33,22 @@ namespace wwwDesignersGuild.ViewModels
 
         public bool AutoOpenFirstSize { get; set; }
         
+        public string AutoOpenPartNumber { get; set; }
+
         public OrderFormGroupViewModel(
             int? orderFormGroupId, 
             string name,
             bool useSizeButtons,
             bool autoOpenFirstSize,
+            string autoOpenPartNumber,
             IEnumerable<OrderFormItemViewModel> items,
             NewMasterDefinition objMaster)
         {
             OrderFormGroupID = orderFormGroupId;
             Name = name;
             UseSizeButtons = useSizeButtons;
-            AutoOpenFirstSize = autoOpenFirstSize;
+            AutoOpenFirstSize = String.IsNullOrEmpty(autoOpenPartNumber) ? autoOpenFirstSize : false;
+            AutoOpenPartNumber = autoOpenPartNumber;
             Items = items;
             MasterDefinition = objMaster;
         }

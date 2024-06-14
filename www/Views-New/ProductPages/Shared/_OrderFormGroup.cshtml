@@ -4,6 +4,23 @@
     var c = Model.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
     var d = Model.MasterDefinition.UrlBreakdown.ContentDate;
     var cd = Model.MasterDefinition.UrlBreakdown.countryDetails;
+
+    int? indexToOpen = null;
+
+    if (Model.AutoOpenFirstSize == true)
+    {
+        indexToOpen = 0;
+    }
+
+    if (!String.IsNullOrEmpty(Model.AutoOpenPartNumber))
+    {
+        var match = Model.Items.FirstOrDefault(i => i.ProductCode == Model.AutoOpenPartNumber);
+
+        if (match != null)
+        {
+            indexToOpen = Model.Items.OrderBy(p => p.SortOrder).ToList().IndexOf(match);
+        }
+    }
 }
 <div data-init 
      class="order-form-group">
@@ -24,7 +41,7 @@
        {
            var item = obj.value;
            var index = obj.index;
-            <button class="btn btn-light size-button g-col-1 @(Model.AutoOpenFirstSize && obj.index == 0 ? "active" : "")"
+            <button class="btn btn-light size-button g-col-1 @(indexToOpen != null && obj.index == indexToOpen ? "active" : "")"
                     type="button"
                     aria-controls="@(item.OrderFormCarouselID.Replace("#", ""))"
                     data-bs-target="#@(Model.OrderFormCarouselID)"
@@ -35,7 +52,7 @@
     </div>
     <div id="@(Model.OrderFormCarouselID)" class="pt-2 carousel slide carousel-fade order-form-group-carousel" data-bs-interval="false" data-bs-touch="false">
         <div class="carousel-inner">
-            <div class="order-form-product carousel-item mt-0 mb-4 placeholder @(Model.AutoOpenFirstSize ? "" : "active")">
+            <div class="order-form-product carousel-item mt-0 mb-4 placeholder @(indexToOpen == null ? "active" : "")">
             </div>
             <!-- ko foreachInit: { name: 'ko-blank-template', data: sizeGroups, createElement: createSizeGroup } -->
             @foreach (var value in Model.Items.OrderBy(p => p.SortOrder).Select((item, i) => new { item, i }))
@@ -44,7 +61,7 @@
                 var index = value.i;
 
                 <div id="@(item.OrderFormCarouselID.Replace("#", ""))"
-                     class="order-form-product carousel-item @(Model.AutoOpenFirstSize && index == 0 ? "active" : "")"
+                     class="order-form-product carousel-item @(indexToOpen != null && index == indexToOpen ? "active" : "")"
                      data-init>
                     @Html.Partial("~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", item)
                 </div>

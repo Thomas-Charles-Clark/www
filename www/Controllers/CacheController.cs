@@ -74,6 +74,7 @@ namespace wwwDesignersGuild.Controllers
                         });
                     case "productPage":
                         PurgeProductPage(objPurge);
+                        PurgeSnippet(objPurge);
                         break;
                     case "collectionPage":
                         PurgeCollectionPage(objPurge);
