@@ -2499,6 +2499,11 @@ namespace wwwDesignersGuild.Controllers
 
             ViewBag.Partial = false;
 
+            if (!objReturn.checkoutReceipt.checkoutReceiptTransactionDetails.Any())
+            {
+                return PartialView("~/Views-New/LandingPages/FixedPages/Checkout/_checkoutConfirmSpartan.cshtml", objBase);
+            }
+
             return PartialView("~/Views-New/LandingPages/FixedPages/Checkout/_CheckoutConfirm.cshtml", new FixedPageViewModel_CheckoutConfirm(objBase, objReturn));
             //return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
         }

@@ -51,7 +51,10 @@ namespace wwwDesignersGuild.Models.Database
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Product_BedAndBath", DbType = "bit")] System.Nullable<Boolean> productBedAndBath,
                                                                 [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Product_Paint", DbType = "bit")] System.Nullable<Boolean> productPaint,
                                                                 //[global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryCodeOverride", DbType = "nvarchar(2)")] String countryCodeOverride,
-                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Mobile", DbType = "bit")] Boolean mobile)
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Mobile", DbType = "bit")] Boolean mobile,
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "PremiumPartner", DbType = "bit")] Boolean premiumPartner,
+                                                                [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "QR", DbType = "bit")] Boolean qr
+                                                                )
 
         {
 
@@ -77,7 +80,9 @@ namespace wwwDesignersGuild.Models.Database
                 productBedAndBath,
                 productPaint,
                 //countryCodeOverride,
-                mobile);
+                mobile,
+                premiumPartner,
+                qr);
             return (IMultipleResults)result.ReturnValue;
 
         }

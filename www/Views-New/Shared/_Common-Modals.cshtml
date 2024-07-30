@@ -7,6 +7,9 @@
     var ci = objMaster.UrlBreakdown.countryDetails;
 
     var tradeUser = objMaster.TradeAllowed;
+
+    var isCheckoutPage = objMaster.UrlBreakdown.ContentId == (int)dgFixedPage.checkoutSinglePage && objMaster.UrlBreakdown.ContentType == dgContentType.landingPage;
+
 }<div class="modal fade" tabindex="-1" id="back-in-stock-success-modal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -110,8 +113,14 @@
             </div>
             <div class="modal-body">
                 <p class="mb-0">
-                    @HtmlHelperExtra.Resource(tradeUser ? "MajorErrorTrade" : "MajorError", l, c, d)
+                    @HtmlHelperExtra.Resource(isCheckoutPage ? "MajorErrorCheckout" : tradeUser ? "MajorErrorTrade" : "MajorError", l, c, d)
                 </p>
+               @if (isCheckoutPage)
+                {
+                      <button class="btn btn-secondary mt-3 w-100" onclick="window.location.reload();">
+                        @HtmlHelperExtra.Resource("ReloadPage", l, c, d)
+                    </button>
+                }
             </div>
         </div>
     </div>

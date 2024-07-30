@@ -30,6 +30,14 @@
     // Whether or not we have searched at least once
     self.haveSearched = ko.observable(false);
 
+    self.premiumPartner = ko.observable(getPremiumPartner()).extend({
+        postable: true
+    });
+
+    self.qr = ko.observable(getQr()).extend({
+        postable: true
+    });
+
     // The user's search term
     self.searchTerm = ko.observable().extend({
         required: {
@@ -91,6 +99,14 @@
 
     // Do we need to FORCE a geocode lookup?
     self.forceGeocode = ko.observable(false);
+
+    self.premiumPartner = ko.observable(getPremiumPartner()).extend({
+        postable: true
+    });
+
+    self.qr = ko.observable(getQr()).extend({
+        postable: true
+    });
 
     // Error groups
     self.errors = new ko.validation.group([
@@ -163,7 +179,13 @@
                     obj[kvp[0]] = kvp[1];
                 }
             }
+            let oqs = new URLSearchParams(window.location.search);
             let qs = new URLSearchParams(obj);
+            oqs.forEach((v, k) => {
+                if (!qs.has(k)) {
+                    qs.append(k, v);
+                }
+            });
             let url = new URL(window.location);
             url.search = qs;
             window.history.replaceState({}, '', url);

@@ -636,6 +636,15 @@ namespace wwwDesignersGuild.ViewModels
             FooterBanners = footerBannersUnrestrictedByPage.Concat(footerBannersRestrictedByPage).OrderBy(bl => bl.id).ToList();
 
             Banners = availableBanners;
+
+            if (dgFramework.IsBot)
+            {
+                // Make 100% sure you remove the eComm popup banners: bannerLocationIds 54 and 55.
+                EcommercePopupBanners = new List<bannerLocation>();
+                HeaderBanners = HeaderBanners.Where(hb => hb.id != 54 && hb.id != 55).ToList();
+                FooterBanners = FooterBanners.Where(hb => hb.id != 54 && hb.id != 55).ToList();
+                Banners = Banners.Where(hb => hb.id != 54 && hb.id != 55).ToList();
+            }
         }
 
         public async Task SiteCultureCheck()

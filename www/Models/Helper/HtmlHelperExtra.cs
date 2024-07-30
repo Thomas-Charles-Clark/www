@@ -1082,6 +1082,13 @@ namespace wwwDesignersGuild.Models.Helper
 
                     var altText = imgTag.Attributes["alt"]?.Value;
                     var titleText = imgTag.Attributes["title"]?.Value ?? altText;
+                    var hideHotspots = false;
+
+                    if (Boolean.TryParse(imgTag.GetDataAttribute("hide-hotspots")?.Value, out bool hh)) 
+                    {
+                        hideHotspots = hh;
+                    }
+
                     var largeImageModalAvailable = Convert.ToBoolean(imgTag.GetDataAttribute("large-image-modal-available")?.Value ?? "false");
                     var folderWidth = Convert.ToInt16(InitialImageFolderSize(imageSize).ToString());
                     var width = folderWidth;
@@ -1095,7 +1102,7 @@ namespace wwwDesignersGuild.Models.Helper
 
                     var hotspotImage = imageHotspots.SingleOrDefault(hi => hi.ImageID == imageId);
 
-                    var hotspotDance = hotspotImage != null && hotspotImage.Hotspots.Any();
+                    var hotspotDance = hideHotspots == false && hotspotImage != null && hotspotImage.Hotspots.Any();
 
                     var replacement = $@"<img src=""/image{Framework.WebPFallback}/{folderWidth}/{imageId}""
                                               class=""d-block w-100""

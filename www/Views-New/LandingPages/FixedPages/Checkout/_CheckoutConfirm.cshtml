@@ -58,6 +58,7 @@
     }
 
     decimal grandTotal = objReceipt.checkoutReceiptTransactionDetails[0].Revenue.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Revenue.Value : 0;
+    
     grandTotal += objReceipt.checkoutReceiptTransactionDetails[0].Shipping.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Shipping.Value : 0;
 
     var gbNFI = new System.Globalization.CultureInfo("en-GB").NumberFormat;
@@ -171,8 +172,8 @@
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-GB");
 }
 
-@* Permit status@designersguild.com to reload this ad nauseam *@
-@if ((HtmlHelperExtra.IsProductionVersion && !objReceipt.ReceiptViewed) ||
+@* Permit status@designersguild.com to reload this ad nauseam, refuse to track Trade orders *@
+@if ((HtmlHelperExtra.IsProductionVersion && !objReceipt.ReceiptViewed && !Model.MasterDefinition.TradeAllowed) ||
     Model.Visitor?.memberId == 1547882)
 {
     if (objMaster.UrlBreakdown.countryDetails.CountryID == 238)

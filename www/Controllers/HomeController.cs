@@ -1753,6 +1753,11 @@ namespace wwwDesignersGuild.Controllers
 
             ViewBag.footerBanners = footerBannersUnrestrictedByPage.Concat(footerBannersRestrictedByPage).ToList();
 
+            if (dgFramework.IsBot)
+            {
+                availableBanners = availableBanners.Where(b => b.id != 54 && b.id != 55).ToList();
+            }
+
             ViewBag.banners = availableBanners;
         }
 

@@ -802,6 +802,11 @@ namespace wwwDesignersGuild.Controllers
             
             long visitorDbId = -1;
 
+            if (dgFramework.isCheckoutSessionValid(session["checkoutExpiry"]) == false)
+            {
+                return Ok(dgFramework.raiseErrorToHandle(webapiDataError.checkoutBasketExpired));
+            }
+
             if (session["visitorIdFromDatabase"] == null)
             {
                 Logger.Error("saveCheckoutAddress - no visitor ID from session!");
@@ -825,10 +830,6 @@ namespace wwwDesignersGuild.Controllers
             if (dgFramework.doesUserHaveACheckoutId(session["checkoutId"]) == false)
             {
                 dgFramework.raiseErrorNotHandled(webapiUnhandledError.checkoutNoBasket, "Session.checkoutId was NULL!");
-            }
-            else if (dgFramework.isCheckoutSessionValid(session["checkoutExpiry"]) == false)
-            {
-                return Ok(dgFramework.raiseErrorToHandle(webapiDataError.checkoutBasketExpired));
             }
             
             var useDate = DateTime.Now;
@@ -3007,14 +3008,6 @@ namespace wwwDesignersGuild.Controllers
                 {
                     return dgFramework.raiseErrorToHandle(webapiDataError.checkoutBasketExpired);
                 }
-                // We want as much security as possible around this call, obviously...
-                // Should that exist in the database, or here, or both? Database, I say.
-                // We can't just let people use Postman etc. to fire a call off to checkoutOrderGenerate - which they could well do...
-                // as this would result in the order being generated.
-                // they must have:
-                // a valid checkoutId
-                // a PaymentSavedDT... it would actually be desirable not to have to perform a million different calls to fetch data out of the db, 
-                // when we're about to call the DB and give it a perfectly good opportunity to perform those checks itself.
 
                 await objCheckout.checkoutPaySaveRedux(Convert.ToInt64(Session["checkoutId"]));
 

@@ -7,6 +7,9 @@
     var d = objMaster.UrlBreakdown.ContentDate;
 
     var tradeUser = objMaster.TradeAllowed;
+
+    var qr = Request.QueryString["qr"] == "1";
+    var premium = Request.QueryString["pp"] == "1";
 }
 @Render.StylesPreload("~/bundles/css/stockists")
 @if (dgFramework.IsMobileDevice())
@@ -117,6 +120,12 @@
     window.googleMapsReady = () => {
 
     }
+    window.getPremiumPartner = () => {
+        return @(premium ? "true" : "false");
+    }
+    window.getQr = () => {
+        return @(qr ? "true" : "false");
+    }
 </script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@(System.Web.Configuration.WebConfigurationManager.AppSettings["googleMapsAPIKey"])&callback=googleMapsReady"></script>
 <form id="stockist-search-form"
@@ -136,6 +145,24 @@
         <div class="offcanvas-body">
             <div id="stockist-options">
                 <h5>
+                    @HtmlHelperExtra.Resource("PremiumPartners", l, c, d)
+                </h5>
+                <div id="premium-partner">
+                    <div class="form-check">
+                        
+                        <label class="form-check-label">
+                            <input class="form-check-input"
+                                   name="pp"
+                                   type="checkbox"
+                                   data-bind="checked: premiumPartner">
+
+
+                            @HtmlHelperExtra.Resource("PremiumPartners", l, c, d)
+
+                        </label>
+                    </div>
+                </div>
+                <h5 class="mt-5">
                     @HtmlHelperExtra.Resource("StockistBrand", l, c, d)
                 </h5>
                 <div id="brands">

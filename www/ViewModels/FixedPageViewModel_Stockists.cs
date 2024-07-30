@@ -126,6 +126,8 @@ namespace wwwDesignersGuild.ViewModels
                 useDate,
                 new PassStockistSearch()
                 {
+                    qr = HttpContext.Current.Request.QueryString["qr"] == "1",
+                    premiumPartner = HttpContext.Current.Request.QueryString["pp"] == "1",
                     countryCode = CountryCode,
                     latitude = Latitude.HasValue ? (float)Latitude.Value : 0.0f,
                     longitude = Longitude.HasValue ? (float)Longitude.Value : 0.0f

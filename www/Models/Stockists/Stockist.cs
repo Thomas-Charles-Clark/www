@@ -91,7 +91,9 @@ namespace wwwDesignersGuild.Models.Stockists
                 objStockistSearch.selectedProductTypes.Contains("wallpaper"),
                 objStockistSearch.selectedProductTypes.Contains("bed-and-bath"),
                 objStockistSearch.selectedProductTypes.Contains("paint"),
-                isMobile);
+                isMobile,
+                objStockistSearch.premiumPartner,
+                objStockistSearch.qr);
 
 
             //  Convert from IEnumerable to a List so a query can be run multiple times
@@ -293,6 +295,8 @@ namespace wwwDesignersGuild.Models.Stockists
 
     public class PassStockistSearch
     {
+        public bool qr { get; set; }
+        public bool premiumPartner { get; set; }
         public string countryCode { get; set; }
         public float latitude { get; set; }
         public float longitude { get; set; }

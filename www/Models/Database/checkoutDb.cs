@@ -1161,11 +1161,13 @@ namespace wwwDesignersGuild.Models.Database
                 SqlCommand cmd = new SqlCommand("pub.Checkout_Complete", conn)
                 {
                     CommandType = CommandType.StoredProcedure,
-                    CommandTimeout = 10 // in seconds (30 is the default, if this is going to succeed it should do so in well under 10 seconds)
+                    CommandTimeout = 60 // 01/07/2024 -- 10 seconds isn't long enough! 
+                                        // = 10 // in seconds (30 is the default, if this is going to succeed it should do so in well under 10 seconds)
                 };
                 cmd.Parameters.AddWithValue("@CheckoutID", checkoutId);
                 
                 conn.Open();
+
                 result = Convert.ToBoolean(cmd.ExecuteNonQuery());
             }
 

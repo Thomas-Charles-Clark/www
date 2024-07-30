@@ -630,10 +630,10 @@ namespace wwwDesignersGuild.Models.Helper
             }
             else
             {
-                new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
+                resp = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.ExpectationFailed)
                 {
                     Content = new StringContent($"{errorMessage}".Replace(System.Environment.NewLine, "")),
-                    ReasonPhrase = $"{errorMessage}\t\t\t{additionalInfo}".Replace(System.Environment.NewLine, "")
+                    ReasonPhrase = $"{errorMessage}".Replace(System.Environment.NewLine, "")
                 };
             }
             throw new System.Web.Http.HttpResponseException(resp);
@@ -2147,6 +2147,22 @@ namespace wwwDesignersGuild.Models.Helper
 
         //    return mobileDetectionResult;
         //}
+
+        #endregion
+
+        #region Bot Detection
+
+        private static RegexOptions RegexOptions = RegexOptions.Multiline | RegexOptions.CultureInvariant;
+
+        private static System.Text.RegularExpressions.Regex BotRegex = new System.Text.RegularExpressions.Regex(@"(Googlebot)|(AdsBot-Google)|(AdsBot-Google-Mobile)|(http:\/\/www\.google\.com\/bot\.html)|(APIs-Google)|(GoogleOther)|(Google-InspectionTool)|(Storebot-Google)|(Mediapartners-Google)|(bingbot)|(MicrosoftPreview)", RegexOptions);
+
+        public static bool IsBot
+        {
+            get 
+            {
+                return BotRegex.IsMatch(HttpContext.Current?.Request?.UserAgent ?? "");
+            }
+        }
 
         #endregion
 

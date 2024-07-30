@@ -25,7 +25,7 @@
 
     Checkout and Confirm pages should not call identify themselves
 *@
-@if (!tradeAllowed)
+@if (!tradeAllowed && !dgFramework.IsBot)
 {
 <script type="text/javascript" defer>
     window.addLoadFunction(() => {
@@ -130,8 +130,8 @@
     });
 
     function updateDotDigital() {
-        
         let payload = JSON.stringify(getMasterDefinition());
+
         fetch('/api/basket/DotDigitalJSON', {
             method: 'POST',
             headers: window.fetchHeaders,
@@ -139,22 +139,22 @@
             credentials: 'same-origin',
             body: payload
         })
-        .then(async (response) => {
-            return JSON.parse(await window.handleFetchResponse(response, payload));
-        })
-        .then((reply) => {
-            if (reply && typeof reply === 'object' && !reply.hasOwnProperty('error')) {
-                reply.cartUrl = window.location.href;
-                console.log('dotDigital is pushing cartInsight with', reply);
-                if (typeof window.dmPt === 'function') {
-                    window.dmPt("cartInsight", reply);
+            .then(async (response) => {
+                return JSON.parse(await window.handleFetchResponse(response, payload));
+            })
+            .then((reply) => {
+                if (reply && typeof reply === 'object' && !reply.hasOwnProperty('error')) {
+                    reply.cartUrl = window.location.href;
+                    console.log('dotDigital is pushing cartInsight with', reply);
+                    if (typeof window.dmPt === 'function') {
+                        window.dmPt("cartInsight", reply);
+                    }
                 }
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            logClientSideError(JSON.stringify(err));
-        });
+            })
+            .catch(err => {
+                console.log(err);
+                logClientSideError(JSON.stringify(err));
+            });
     }
 </script>
         }

@@ -1052,7 +1052,7 @@ const deliveryAddressFactory = ((parent) => {
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         //console.log('dg-memberaddaddress: ' + textStatus);
-                        alert(self.resources.MajorError);
+                        window.showError();
                         setTimeout(function () {
                             $('#buttonBlockAddress-edit-delete').hide();
                         }, 500);
@@ -1209,7 +1209,7 @@ const deliveryAddressFactory = ((parent) => {
                 self.addressConfirmed(false);
                 self.busy(false);
                 //console.log('deliveryAddressFactory saveDeliveryAddress error: ', xhr, textStatus, errorThrown);
-                alert(self.resources.MajorError);
+                window.showError();
                 //    setTimeout(function () {
                 //        $('#buttonBlockAddress-edit').hide();
                 //    }, 500);
@@ -1265,7 +1265,7 @@ const deliveryAddressFactory = ((parent) => {
             },
             error: function (xhr, textStatus, errorThrown) {
                 //console.log('deliveryAddressFactory removeDeliveryAddress error: ', xhr, textStatus, errorThrown);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -1375,7 +1375,7 @@ const deliveryAddressFactory = ((parent) => {
             },
             error: function (xhr, textStatus, errorThrown) {
                 //console.log('deliveryAddressFactory checkSalesTaxZipCode error:', xhr, textStatus, errorThrown);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -1425,7 +1425,7 @@ const deliveryAddressFactory = ((parent) => {
                 //console.log('makeDefaultAddress returned', data);
             },
             error: function () {
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -1551,7 +1551,7 @@ const deliveryAddressFactory = ((parent) => {
                                 self.upsLocatorResults(results);
                             },
                             error: function (xhr, s, a) {
-                                alert(self.resources.MajorError);
+                                window.showError();
                             }
                         });
 
@@ -2003,7 +2003,7 @@ const deliveryAddressFactory = ((parent) => {
             error: function (xhr, textStatus, errorThrown) {
                 self.parent.itemsBusy(false);
                 self.parent.summaryBusy(false);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
 
@@ -2130,7 +2130,7 @@ const lineMemo = ((r) => {
                 $('#line-memo-modal').modal('hide');
             },
             error: function (xhr, s, a) {
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -2213,7 +2213,7 @@ const lineTreatment = ((r) => {
                 $('#line-treatments-modal').modal('hide');
             },
             error: function (xhr, s, a) {
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -3482,6 +3482,25 @@ const checkoutDeliveryAddress = (
 
                     self.errors.filter(x => {
                         x.isValid.notifySubscribers(x.isValid());
+                        if (!self.fullName.isValid()) {
+                            window.scrollTo(0, $("label[for=delivery-name]")?.offset()?.top);
+                        } else if (!self.companyName.isValid()) {
+                            window.scrollTo(0, $("label[for=delivery-company-name]")?.offset()?.top);
+                        } else if (!self.addressLine1.isValid()) {
+                            window.scrollTo(0, $("label[for=address1]")?.offset()?.top);
+                        } else if (!self.addressLine2.isValid()) {
+                            window.scrollTo(0, $("label[for=address2]")?.offset()?.top);
+                        } else if (!self.town.isValid()) {
+                            window.scrollTo(0, $("label[for=addressTown]")?.offset()?.top);
+                        } else if (self.countyListOrText() ? !self.countyFromList.isValid() : !self.county.isValid()) {
+                            window.scrollTo(0, $("label[for=addressCounty]")?.offset()?.top);
+                        } else if (!self.postcode.isValid()) {
+                            window.scrollTo(0, $("label[for=addressPostcode]")?.offset()?.top);
+                        } else if (!self.country.isValid()) {
+                            window.scrollTo(0, $("label[for=addressCountry]")?.offset()?.top);
+                        } else if (!self.phone.isValid()) {
+                            window.scrollTo(0, $("label[for=delivery-phone]")?.offset()?.top);
+                        }
                     })
 
                     self.parent.parent.checkoutLog(LOG_ACTION_PAY_NOW_STEP, 'current checkoutAddress failed validation - ' + self.errors().join(', '));
@@ -4228,7 +4247,7 @@ const paymentMethodFactory = ((parent) => {
             self.braintreeCVVInstance.tokenize(function (tokenizeErr, payload) {
                 if (tokenizeErr) {
                     self.hideCompletingMessage();
-                    alert(self.resources.MajorError);
+                    window.showError();
                     return;
                 }
                 else {
@@ -4695,7 +4714,7 @@ const paymentMethodFactory = ((parent) => {
             error: function (xhr, textStatus, errorThrown) {
                 self.hideCompletingMessage();
                 //console.log('dg-checkoutPay: ' + textStatus);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -4946,7 +4965,7 @@ const paymentMethodFactory = ((parent) => {
             },
             error: function (xhr, textStatus, errorThrown) {
                 //console.log('dg-checkoutPay: ' + textStatus);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -5512,7 +5531,7 @@ const paymentMethodFactory = ((parent) => {
             error: function (data, status) {
                 self.parent.busy(false);
                 //console.log('dg-getAmazonSelectedAddress: ' + status);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -5548,7 +5567,7 @@ const paymentMethodFactory = ((parent) => {
                 self.amazonValueUpdated(false);
 
                 //console.log('dg-updateAmazonValue: ' + status);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
@@ -5893,7 +5912,7 @@ const giftBoxFactory = ((parent) => {
                         $('#gift-wrap-modal').modal('hide');
                     },
                     error: function (xhr, s, a) {
-                        alert(self.resources.MajorError);
+                        window.showError();
                     }
                 });
             });
@@ -5916,7 +5935,7 @@ const giftBoxFactory = ((parent) => {
                     $('#gift-wrap-modal').modal('hide');
                 },
                 error: function (xhr, s, a) {
-                    alert(self.resources.MajorError);
+                    window.showError();
                 }
             });
         }
@@ -6044,7 +6063,7 @@ const giftCardFactory = ((parent) => {
                 });
             },
             error: function (xhr, s, a) {
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
 
@@ -6302,7 +6321,7 @@ const giftVoucherFactory = ((parent) => {
                 error: function (xhr, textStatus, errorThrown) {
                     self.validateNow(false);
                     //console.log('dg-checkoutPay: ' + textStatus);
-                    alert(self.resources.MajorError);
+                    window.showError();
                 }
             });
         }
@@ -6346,7 +6365,7 @@ const giftVoucherFactory = ((parent) => {
             },
             error: function (xhr, textStatus, errorThrown) {
                 //console.log('dg-checkoutPay: ' + textStatus);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     };
@@ -6381,7 +6400,7 @@ const giftVoucherFactory = ((parent) => {
             },
             error: function (xhr, textStatus, errorThrown) {
                 //console.log('dg-checkoutPay: ' + textStatus);
-                alert(self.resources.MajorError);
+                window.showError();
             }
         });
     }
