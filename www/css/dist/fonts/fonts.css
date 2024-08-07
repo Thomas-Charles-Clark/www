@@ -104,6 +104,13 @@
     src: local("/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2"), url("/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2") format("woff2");
 }
 
+@font-face {
+    font-family: "Gill-Sans";
+    font-display: swap;
+    font-weight: 400;
+    src: url(/css/dist/fonts/src/gill-sans-light.ttf);
+}
+
 /*@font-face {
     font-family: "Trixie";*/ /* Trixie HD W05 Heavy */
 /*font-display: swap;

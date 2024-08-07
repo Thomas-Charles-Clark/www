@@ -26,7 +26,7 @@ const
     gulprollup = require('gulp-best-rollup-2');
 
 const regex = {
-    css: /(?<!s)\.css$/,
+    css: /\.(?<!s)css$/,
     scss: /\.(scss)$/,
     html: /\.(html|htm)$/,
     rollup: /\.rollup\.js$/,
@@ -74,7 +74,10 @@ function minjs() {
     return merge(tasks);
 }
 
-function mincss() {
+function mincss(done) {
+
+    console.log('bundlesByInputFileNames css', getBundlesByInputFileNames(regex.css));
+
     var tasks = getBundlesByInputFileNames(regex.css).map(function (bundle) {
         return gulp.src(bundle.inputFiles, { since: gulp.lastRun(mincss), base: '.' })
             .pipe(sourcemaps.init())
@@ -85,7 +88,10 @@ function mincss() {
             .pipe(sourcemaps.write('.'))
             .pipe(gulp.dest('.'));
     });
-    return merge(tasks);
+
+    merge(tasks);
+
+    done();
 }
 
 function mincssSingleFile(bundle) {

@@ -258,6 +258,8 @@ namespace wwwDesignersGuild.Models.Stockists
         public string Twitter { get; set; }
         public string Image { get; set; }
 
+        public bool PremiumPartner { get; set; }
+
         public bool DG { get; set; }
         public bool CL { get; set; }
         public bool RC { get; set; }

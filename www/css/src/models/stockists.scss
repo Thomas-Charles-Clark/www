@@ -3,6 +3,15 @@
 @import "../lib/bootstrap/scss/variables";
 @import "../common/variables";
 
+
+.premium-partner-label {
+    padding: 0;
+    line-height: 1.3rem;
+    font-family: "Trixie Rough";
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-transform: none;
+}
 #stockist-search-form {
     position: relative;
     margin-bottom: var(--xxl-gutter);
@@ -46,11 +55,25 @@
 
             .stockist-detail {
                 flex: 1;
-                padding: var(--l-gutter);
+                padding: 0;
                 border-radius: $border-radius;
                 background-color: $gray-100;
                 /*border: 1px solid $gray-300;*/
                 transition: color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out;
+                display: flex;
+                justify-content: space-between;
+                gap: 0;
+                box-sizing: border-box;
+                flex-wrap: wrap-reverse;
+
+                > div:first-of-type {
+                    padding: $l-gutter;
+                    flex: 1;
+                }
+
+                > div:last-of-type {
+                    flex: 0 0 100%;
+                }
 
                 a {
                     transition: color 150ms ease-in-out;
@@ -58,6 +81,16 @@
 
                 > span + span {
                     margin-top: var(--vsm-gutter);
+                }
+
+                .premium-partner-label {
+                    padding: $m-gutter $l-gutter;
+                    background-color: $blue-600;
+                    color: $white;
+                    cursor: pointer;
+                    text-align: left;
+                    white-space: nowrap;
+                    width: 100%;
                 }
             }
 
@@ -70,6 +103,10 @@
 
                 a {
                     color: $white;
+                }
+
+                .premium-partner-label {
+                    text-shadow: 0 0 4px rgba(255,255,255,0.8);
                 }
             }
 
@@ -192,6 +229,20 @@
         .modal-dialog {
             position: relative;
 
+            .modal-header {
+                &.premium-partner {
+                    background-color: $blue-600;
+                    color: $white;
+                }
+
+                .modal-title {
+                    display: flex;
+                    gap: $l-gutter;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+            }
+
             .modal-body {
                 min-height: 500px;
 
@@ -201,8 +252,20 @@
 
                     p {
                         word-break: keep-all;
+
+                        &.address-block {
+                            margin-bottom: 0;
+
+                            span {
+                                display: block;
+                            }
+                        }
                     }
 
+                    .opening-times {
+                        text-indent: $l-gutter;
+                    }
+                    
                     > div {
                         flex: 1 1 50%;
 
@@ -214,14 +277,12 @@
                 }
 
                 .stockist-img {
-                    max-width: 320px;
                     width: 100%;
                     height: auto;
-                    align-self: flex-start;
                 }
 
                 #map-canvas {
-                    width: 500px;
+                    width: 100%;
                     height: 500px;
                 }
             }

@@ -109,6 +109,14 @@
                     .stockist-brands {
                         display: none;
                     }
+
+                    .stockist-detail {
+                        gap: 0;
+
+                        > div:last-of-type {
+                            flex: 0 0 100%;
+                        }
+                    }
                 }
             }
         }

@@ -1776,6 +1776,7 @@
     <Content Include="Content\images\icon\icon-twitter-x2.webp" />
     <Content Include="Content\images\icon\icon-twitter.png" />
     <Content Include="Content\images\icon\icon-twitter.webp" />
+    <Content Include="Content\images\icon\icon-x.png" />
     <Content Include="Content\images\icon\icon-youtube-x2.png" />
     <Content Include="Content\images\icon\icon-youtube-x2.webp" />
     <Content Include="Content\images\icon\icon-youtube.png" />
@@ -1986,6 +1987,7 @@
     <Content Include="Content\images\social\icon-tiktok.png" />
     <Content Include="Content\images\social\icon-twitter-light.png" />
     <Content Include="Content\images\social\icon-twitter.png" />
+    <Content Include="Content\images\social\icon-x.png" />
     <Content Include="Content\images\social\icon-youtube-light.png" />
     <Content Include="Content\images\social\icon-youtube.png" />
     <Content Include="Content\images\stockist\christian_lacroix.gif" />
@@ -2900,6 +2902,9 @@
     <Content Include="css\dist\common\trade-common.css.map" />
     <Content Include="css\dist\common\trade-common.min.css.map" />
     <Content Include="js\dist\models\common\modals\contact-customer-services-modal.min.js.map" />
+    <Content Include="css\dist\fonts\src\gill-sans-light.ttf" />
+    <Content Include="Content\images\icon\icon-x.webp" />
+    <Content Include="Content\images\social\icon-x.webp" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />

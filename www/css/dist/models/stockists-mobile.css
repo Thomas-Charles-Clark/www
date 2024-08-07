@@ -104,6 +104,12 @@
 #stockist-search-form #stockists-panel #stockist-results .stockist .stockist-inner .stockist-brands {
   display: none;
 }
+#stockist-search-form #stockists-panel #stockist-results .stockist .stockist-inner .stockist-detail {
+  gap: 0;
+}
+#stockist-search-form #stockists-panel #stockist-results .stockist .stockist-inner .stockist-detail > div:last-of-type {
+  flex: 0 0 100%;
+}
 #stockist-search-form #stockist-detail-modal .modal-dialog .modal-body > div.d-flex {
   flex-direction: column;
 }

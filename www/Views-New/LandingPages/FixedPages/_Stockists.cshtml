@@ -26,18 +26,23 @@
         <!-- /ko -->
         <div class="stockist-detail"
              data-bind="click: $parent.loadStockistDetail">
-            <strong class="d-block mb-3" data-bind="text: Name"></strong>
-            <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
-            <!-- ko if: Telephone -->
-            <span class="d-block">
-                T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
-            </span>
-            <!-- /ko -->
-            <!-- ko if: Email -->
-            <span class="d-block">
-                T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
-            </span>
-            <!-- /ko -->
+            <div>
+                <strong class="d-block mb-3" data-bind="text: Name"></strong>
+                <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
+                <!-- ko if: Telephone -->
+                <span class="d-block">
+                    T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+                </span>
+                <!-- /ko -->
+                <!-- ko if: Email -->
+                <span class="d-block">
+                    T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+                </span>
+                <!-- /ko -->
+            </div>
+            <div>
+
+            </div>
         </div>
     </div>
 </script>
@@ -53,20 +58,29 @@
     <div class="stockist">
         <div class="stockist-inner">
             <div class="stockist-detail" data-bind="click: $parent.loadStockistDetail">
-                <strong class="d-block mb-3">
-                    <span class="me-3" data-bind="text: Name"></span>
-                    <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
-                </strong>
-                <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
-                <!-- ko if: Telephone -->
-                <span class="d-block">
-                    T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
-                </span>
-                <!-- /ko -->
-                <!-- ko if: Email -->
-                <span class="d-block">
-                    T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
-                </span>
+                <div>
+                    <strong class="d-block mb-3">
+                        <span class="me-3" data-bind="text: Name"></span>
+                        <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
+                    </strong>
+                    <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
+                    <!-- ko if: Telephone -->
+                    <span class="d-block">
+                        T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+                    </span>
+                    <!-- /ko -->
+                    <!-- ko if: Email -->
+                    <span class="d-block">
+                        T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+                    </span>
+                    <!-- /ko -->
+                </div>
+                <!-- ko if: PremiumPartner -->
+                <div>
+                    <label class="premium-partner-label">
+                        @HtmlHelperExtra.Resource("PremiumPartner", l, c, d)
+                    </label>
+                </div>
                 <!-- /ko -->
             </div>
             <div class="stockist-brands">
@@ -121,7 +135,7 @@
 
     }
     window.getPremiumPartner = () => {
-        return @(premium ? "true" : "false");
+        return @(premium ? 1 : 0);
     }
     window.getQr = () => {
         return @(qr ? "true" : "false");
@@ -149,14 +163,11 @@
                 </h5>
                 <div id="premium-partner">
                     <div class="form-check">
-                        
                         <label class="form-check-label">
                             <input class="form-check-input"
                                    name="pp"
                                    type="checkbox"
-                                   data-bind="checked: premiumPartner">
-
-
+                                   data-bind="checkedValue: 1, checked: premiumPartner">
                             @HtmlHelperExtra.Resource("PremiumPartners", l, c, d)
 
                         </label>
@@ -383,46 +394,49 @@
            name="lng"
            value="@Model.Longitude"
            data-bind="value: longitude" />
-    <div id="featured-stockists"
-         class="grid"
-         style="--bs-columns: @(MathExtensions.Clamp(Model.StockistSearchSelect.featuredStockists.Count, 3, 4))"
-         data-bind="foreachInit: { name: 'ko-featured-stockist-template', data: featuredStockists, createElement: createStockistViewModel }">
-        @foreach (var stockist in Model.StockistSearchSelect.featuredStockists)
-        {
-            <div class="stockist featured-stockist"
-                 data-bind="click: $parent.loadStockistDetail">
-                <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-                    @Html.Raw(JsonConvert.SerializeObject(stockist))
-                </span>
-                @if (!Request.IsLocal && !String.IsNullOrEmpty(stockist.Image))
-                {
-                    <img src="/Content/images/stockist/featured/@(stockist.Image)"
-                         width="200"
-                         height="200" />
-                }
-                <div class="stockist-detail">
-                    <strong class="d-block mb-3">
-                        @stockist.Name
-                    </strong>
-                    <span class="d-block mb-3">
-                        @stockist.AddressDisplay
+   @if (qr == false)
+    {
+        <div id="featured-stockists"
+             class="grid"
+             style="--bs-columns: @(MathExtensions.Clamp(Model.StockistSearchSelect.featuredStockists.Count, 3, 4))"
+             data-bind="foreachInit: { name: 'ko-featured-stockist-template', data: featuredStockists, createElement: createStockistViewModel }">
+            @foreach (var stockist in Model.StockistSearchSelect.featuredStockists)
+            {
+                <div class="stockist featured-stockist"
+                     data-bind="click: $parent.loadStockistDetail">
+                    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+                        @Html.Raw(JsonConvert.SerializeObject(stockist))
                     </span>
-                    @if (!String.IsNullOrEmpty(stockist.Telephone))
+                    @if (!Request.IsLocal && !String.IsNullOrEmpty(stockist.Image))
                     {
-                        <span class="d-block">
-                            T. <a href="tel:@(stockist.Telephone)">@stockist.Telephone</a>
-                        </span>
+                        <img src="/Content/images/stockist/featured/@(stockist.Image)"
+                             width="200"
+                             height="200" />
                     }
-                    @if (!String.IsNullOrEmpty(stockist.Email))
-                    {
-                        <span class="d-block">
-                            <a href="mailto:@(stockist.Email)">@stockist.Email</a>
+                    <div class="stockist-detail">
+                        <strong class="d-block mb-3">
+                            @stockist.Name
+                        </strong>
+                        <span class="d-block mb-3">
+                            @stockist.AddressDisplay
                         </span>
-                    }
+                        @if (!String.IsNullOrEmpty(stockist.Telephone))
+                        {
+                            <span class="d-block">
+                                T. <a href="tel:@(stockist.Telephone)">@stockist.Telephone</a>
+                            </span>
+                        }
+                        @if (!String.IsNullOrEmpty(stockist.Email))
+                        {
+                            <span class="d-block">
+                                <a href="mailto:@(stockist.Email)">@stockist.Email</a>
+                            </span>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
     <div id="stockists-toolbar">
         <h5 class="text-center pt-2 pb-3 text-uppercase">
             @HtmlHelperExtra.Resource("LifestyleGalleryFindLocalStockist", l, c, d)
@@ -492,213 +506,204 @@
                 <div class="spinner-border"></div>
                 <h5 data-bind="text: detailBusyMessage"></h5>
             </div>
-            <div class="modal-content">
-                <div class="modal-header" data-bind="with: inspectingStockist">
-                    <h5 class="modal-title" data-bind="text: Name"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content" data-bind="with: inspectingStockist">
+                <div class="modal-header" data-bind="css: { 'premium-partner': PremiumPartner }">
+                    <h5 class="modal-title">
+                        <span data-bind="text: Name"></span>
+                        <!-- ko if: PremiumPartner -->
+                        <span class="premium-partner-label">
+                            @HtmlHelperExtra.Resource("PremiumPartner", l, c, d)
+                        </span>
+                        <!-- /ko -->
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-bind="css: { 'btn-close-white': PremiumPartner }"></button>
                 </div>
-                <div class="modal-body" data-bind="with: inspectingStockist">
+                <div class="modal-body">
                     <div class="d-flex">
-                        <div>
-                            <div class="d-flex">
-                                <div>
-                                    <p>
-                                        <!-- ko if: Name -->
-                                        <strong class="d-block mb-3">
-                                            <span data-bind="text: Name" class="d-block"></span>
-                                            <!-- ko if: typeof Distance != 'undefined' -->
-                                            <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
+                        <div class="relative">
+                            <div class="mb-4">
+                                <p class="address-block">
+                                    <!-- ko if: Name -->
+                                    <strong class="d-block mb-2">
+                                        <span data-bind="text: Name" class="d-block"></span>
+                                        <!-- ko if: typeof Distance != 'undefined' -->
+                                        <span data-bind="text: `(${Distance} ${Distance == 1 ? $parentContext.$parent.resources.Mile : $parentContext.$parent.resources.Miles})`"></span>
+                                        <!-- /ko -->
+                                    </strong>
+                                    <!-- /ko -->
+                                    <!-- ko if: Address -->
+                                    <span data-bind="text: Address"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: City -->
+                                    <span data-bind="text: City"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: County -->
+                                    <span data-bind="text: County"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: Postcode -->
+                                    <span data-bind="text: Postcode"></span>
+                                    <!-- /ko -->
+                                </p>
+                            </div>
+                            <div class="mb-4">
+                                <!-- ko if: Telephone -->
+                                <p class="mb-2">
+                                    @HtmlHelperExtra.Resource("Tel", l, c, d). <a class="bold" data-bind="attr: { href: 'tel:' + Telephone }, text: Telephone"></a>
+                                </p>
+                                <!-- /ko -->
+                                <!-- ko if: Fax -->
+                                <p class="mb-2">
+                                    @HtmlHelperExtra.Resource("Fax", l, c, d) <a class="bold" data-bind="attr: { href: 'tel:' + Fax }, text: Fax"></a>
+                                </p>
+                                <!-- /ko -->
+                                <!-- ko if: Email -->
+                                <p class="mb-2">
+                                    @HtmlHelperExtra.Resource("email", l, c, d) <a class="bold" data-bind="attr: { href: 'mailto:' + Email }, text: Email"></a>
+                                </p>
+                                <!-- /ko -->
+                                <!-- ko if: Website -->
+                                <p>
+                                    @HtmlHelperExtra.Resource("Website", l, c, d) <a class="bold" data-bind="attr: { href: 'https://' + Website?.replace(/https?:\/\//, '') }, text: Website" href="#" target="_blank"></a>
+                                </p>
+                                <!-- /ko -->
+                            </div>
+                            <div class="mb-4">
+                                <ul class="list-unstyled" data-bind="with: detail">
+                                    <!-- ko if: Facebook -->
+                                    <li>
+                                        <a data-bind="attr: { href: Facebook }" href="#" target="_blank">
+                                            <img src="/Content/images/icon/icon-facebook.png" alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
+                                        </a>
+                                    </li>
+                                    <!-- /ko -->
+                                    <!-- ko if: Twitter -->
+                                    <li>
+                                        <a data-bind="attr: { href: Twitter }" href="#" target="_blank">
+                                            <img src="/Content/images/icon/icon-x.png" alt="@HtmlHelperExtra.Resource("TwitterX", l, c, d)" />
+                                        </a>
+                                    </li>
+                                    <!-- /ko -->
+                                </ul>
+                                <div data-bind="with: detail">
+                                    <!-- ko if: ShowOpeningTimes === true -->
+                                    <div class="mb-4">
+                                        <p class="mb-2">
+                                            @HtmlHelperExtra.Resource("OpeningTimes", l, c, d)
+                                        </p>
+                                        <ul class="opening-times list-unstyled">
+                                            <!-- ko if: OpenMonday || ClosedMonday -->
+                                            <li>
+                                                <span class="day">
+                                                    @HtmlHelperExtra.Resource("Monday", l, c, d)
+                                                </span>
+                                                <span class="time" data-bind="text: OpenMonday ? OpenMonday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedMonday ? ClosedMonday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
                                             <!-- /ko -->
-                                        </strong>
-                                        <!-- /ko -->
-                                        <!-- ko if: Address -->
-                                        <span data-bind="text: Address"></span><br />
-                                        <!-- /ko -->
-                                        <!-- ko if: City -->
-                                        <span data-bind="text: City"></span><br />
-                                        <!-- /ko -->
-                                        <!-- ko if: County -->
-                                        <span data-bind="text: County"></span><br />
-                                        <!-- /ko -->
-                                        <!-- ko if: Postcode -->
-                                        <span data-bind="text: Postcode"></span><br /><br />
-                                        <!-- /ko -->
-                                    </p>
-                                    <!-- ko if: Telephone -->
-                                    <p>
-                                        @HtmlHelperExtra.Resource("Tel", l, c, d). <strong data-bind="text: Telephone"></strong>
-                                    </p>
+                                            <!-- ko ifnot: OpenMonday || ClosedMonday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Monday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenTuesday || ClosedTuesday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenTuesday ? OpenTuesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedTuesday ? ClosedTuesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenTuesday || ClosedTuesday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenWednesday || ClosedWednesday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenWednesday ? OpenWednesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedWednesday ? ClosedWednesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenWednesday || ClosedWednesday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenThursday || ClosedThursday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenThursday ? OpenThursday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedThursday ? ClosedThursday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenThursday || ClosedThursday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenFriday || ClosedFriday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenFriday ? OpenFriday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedFriday ? ClosedFriday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenFriday || ClosedFriday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenSaturday || ClosedSaturday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenSaturday ? OpenSaturday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedSaturday ? ClosedSaturday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenSaturday || ClosedSaturday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko if: OpenSunday || ClosedSunday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
+                                                <span class="time" data-bind="text: OpenSunday ? OpenSunday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
+                                                <span class="time" data-bind="text: ClosedSunday ? ClosedSunday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
+                                            </li>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: OpenSunday || ClosedSunday -->
+                                            <li>
+                                                <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
+                                                <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
+                                            </li>
+                                            <!-- /ko -->
+                                        </ul>
+                                    </div>
                                     <!-- /ko -->
-                                    <!-- ko if: Fax -->
-                                    <p>
-                                        @HtmlHelperExtra.Resource("Fax", l, c, d). <strong data-bind="text: Fax"></strong>
-                                    </p>
-                                    <!-- /ko -->
-                                    <!-- ko if: Email -->
-                                    <p>
-                                        @HtmlHelperExtra.Resource("email", l, c, d). <a data-bind="attr: { href: 'mailto:' + Email }, text: Email"></a>
-                                    </p>
-                                    <!-- /ko -->
-                                    <!-- ko if: Website -->
-                                    <p>
-                                        @HtmlHelperExtra.Resource("Website", l, c, d). <a data-bind="attr: { href: 'https://' + Website?.replace(/https?:\/\//, '') }, text: Website" href="#" target="_blank"></a>
-                                    </p>
-                                    <!-- /ko -->
-                                    <ul class="list-unstyled" data-bind="with: detail">
-                                        <!-- ko if: Facebook -->
-                                        <li>
-                                            <a data-bind="attr: { href: Facebook }" href="#" target="_blank">
-                                                <img src="/Content/images/icon/icon-facebook.png" alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
-                                            </a>
-                                        </li>
-                                        <!-- /ko -->
-                                        <!-- ko if: Twitter -->
-                                        <li>
-                                            <a data-bind="attr: { href: Twitter }" href="#" target="_blank">
-                                                <img src="/Content/images/icon/icon-twitter.png" alt="@HtmlHelperExtra.Resource("Twitter", l, c, d)" />
-                                            </a>
-                                        </li>
-                                        <!-- /ko -->
-                                    </ul>
-                                    <div class="opening-times" data-bind="with: detail">
-                                        <!-- ko if: ShowOpeningTimes === true -->
-                                        <div>
-                                            <p><strong>@HtmlHelperExtra.Resource("OpeningTimes", l, c, d)</strong></p>
-                                            <ul>
-                                                <!-- ko if: OpenMonday || ClosedMonday -->
-                                                <li>
-                                                    <span class="day">
-                                                        @HtmlHelperExtra.Resource("Monday", l, c, d)
-                                                    </span>
-                                                    <span class="time" data-bind="text: OpenMonday ? OpenMonday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedMonday ? ClosedMonday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenMonday || ClosedMonday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Monday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenTuesday || ClosedTuesday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenTuesday ? OpenTuesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedTuesday ? ClosedTuesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenTuesday || ClosedTuesday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Tuesday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenWednesday || ClosedWednesday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenWednesday ? OpenWednesday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedWednesday ? ClosedWednesday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenWednesday || ClosedWednesday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Wednesday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenThursday || ClosedThursday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenThursday ? OpenThursday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedThursday ? ClosedThursday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenThursday || ClosedThursday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Thursday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenFriday || ClosedFriday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenFriday ? OpenFriday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedFriday ? ClosedFriday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenFriday || ClosedFriday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Friday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenSaturday || ClosedSaturday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenSaturday ? OpenSaturday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedSaturday ? ClosedSaturday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenSaturday || ClosedSaturday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Saturday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko if: OpenSunday || ClosedSunday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
-                                                    <span class="time" data-bind="text: OpenSunday ? OpenSunday + ' - ' : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))' +  ' - '"></span>
-                                                    <span class="time" data-bind="text: ClosedSunday ? ClosedSunday : '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("NotApplicable", l, c, d))'"></span>
-                                                </li>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: OpenSunday || ClosedSunday -->
-                                                <li>
-                                                    <span class="day">@HtmlHelperExtra.Resource("Sunday", l, c, d)</span>
-                                                    <span class="time">@HtmlHelperExtra.Resource("Closed", l, c, d)</span>
-                                                </li>
-                                                <!-- /ko -->
-                                            </ul>
+                                    <div class="service-offering">
+                                        <div data-bind="with: ServiceOffer">
+                                            <p data-bind="html: $data"></p>
                                         </div>
-                                        <!-- /ko -->
-                                        <div class="service-offering">
-                                            <!-- ko if: ServiceOffer && Info -->
-                                            <div class="stockLeft">
-                                                <p><strong>@HtmlHelperExtra.Resource("ServiceOffer", l, c, d)</strong></p>
-
-                                                <p data-bind="html: ServiceOffer"></p>
-                                            </div>
-                                            <div class="stockRight">
-                                                <p><strong>@HtmlHelperExtra.Resource("Info", l, c, d)</strong></p>
-
-                                                <p data-bind="html: Info"></p>
-                                            </div>
-                                            <!-- /ko -->
-                                            <!-- ko ifnot: ServiceOffer && Info -->
-                                            <!-- ko if: ServiceOffer -->
-                                            <div class="stockLeft" style="width:98%;">
-                                                <p><strong>@HtmlHelperExtra.Resource("ServiceOffer", l, c, d)</strong></p>
-
-                                                <p data-bind="html: ServiceOffer"></p>
-                                            </div>
-                                            <!-- /ko -->
-                                            <!-- ko if: Info -->
-                                            <div class="stockRight" style="width:98%; margin-left:0;">
-                                                <p><strong>@HtmlHelperExtra.Resource("Info", l, c, d)</strong></p>
-
-                                                <p data-bind="html: Info"></p>
-                                            </div>
-                                            <!-- /ko -->
-                                            <!-- /ko -->
+                                        <div data-bind="with: Info">
+                                            <p data-bind="html: $data"></p>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- ko if: Image -->
-                                <img class="stockist-img" data-bind="attr: { src: '/Content/images/stockist/featured/' + Image }" alt="" />
-                                <!-- /ko -->
                             </div>
                         </div>
-                        <div id="map-canvas"></div>
+                        <div>
+                            <!-- ko if: PremiumPartner && Image -->
+                            <img class="stockist-img mb-3" data-bind="attr: { src: `https://www.designersguild.com/content/images/stockist/featured/${Image}` }" alt="" />
+                            <!-- /ko -->
+                            <div id="map-canvas"></div>
+                        </div>
                     </div>
                 </div>
             </div>
