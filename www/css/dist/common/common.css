@@ -2078,6 +2078,10 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   width: 100%;
   opacity: 0;
   border: 0;
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 #site-corrector p,
 #trade-login-prompt p {
@@ -2516,5 +2520,33 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   background-color: #343a40;
   color: #fff;
   border-color: #6c757d;
+}
+
+.carousel-video-item {
+  padding: 100% 0 0 0;
+  background-color: #000;
+  position: relative;
+}
+.carousel-video-item iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-video-thumbnail-btn .material-icons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 2rem;
+  will-change: color;
+  transition: color 150ms ease-in-out;
+}
+.carousel-video-thumbnail-btn:hover .material-icons {
+  color: #212529;
+  text-shadow: 0 0 6px #e9ecef;
 }
 /*# sourceMappingURL=common.css.map */

@@ -760,7 +760,12 @@ namespace wwwDesignersGuild.ViewModels
                                   .Where(i => i.templateImageId == 2)
                                   .OrderBy(i => i.sortOrder)
                                   .Select(i => new CarouselImage(i.imageId, i.sortOrder, i.altText, ImageSize.Six, null, i.maxWidth)),
-                this
+                this,
+                true,
+                null,
+                true,
+                Definition.videoUrl,
+                Definition.videoThumbnail
             )
             {
                 DisplayThumbnails = true

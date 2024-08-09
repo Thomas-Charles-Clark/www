@@ -1297,6 +1297,30 @@ namespace wwwDesignersGuild.Models.Classes
             }
         }
 
+        public string videoUrl
+        {
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectToken("videoUrl")?.Value<string>();
+            }
+        }
+
+        public string videoThumbnail
+        {
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectToken("videoThumbnail")?.Value<string>();
+            }
+        }
+
         public List<googleHref> googleHrefs 
         { 
             set

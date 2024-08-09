@@ -852,8 +852,8 @@ ul.breadcrumb li {
   width: 100%;
   opacity: 0;
   border: 0;
-  position: relative;
-  top: 52px;
+  position: sticky;
+  top: 49px;
 }
 #site-corrector p {
   margin-bottom: 0;

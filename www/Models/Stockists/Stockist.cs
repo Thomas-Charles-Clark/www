@@ -150,6 +150,7 @@ namespace wwwDesignersGuild.Models.Stockists
         public string Website { get; set; }
         public string Facebook { get; set; }
         public string Twitter { get; set; }
+        public string Instagram { get; set; }
         public string Image { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
@@ -210,6 +211,7 @@ namespace wwwDesignersGuild.Models.Stockists
         public string Website { get; set; }
         public string Facebook { get; set; }
         public string Twitter { get; set; }
+        public string Instagram { get; set; }
         public string Image { get; set; }
 
         public string AddressDisplay
@@ -256,6 +258,7 @@ namespace wwwDesignersGuild.Models.Stockists
         public string Website { get; set; }
         public string Facebook { get; set; }
         public string Twitter { get; set; }
+        public string Instagram { get; set; }
         public string Image { get; set; }
 
         public bool PremiumPartner { get; set; }

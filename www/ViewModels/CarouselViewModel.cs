@@ -21,6 +21,8 @@ namespace wwwDesignersGuild.ViewModels
         public bool DisplayDashes { get; set; }
         public int? Interval { get; set; }
         public bool PermitLargeImageModal { get; set; }
+        public string VideoURL { get; set; }
+        public string VideoThumbnail { get; set; }
 
         [JsonIgnore]
         public SocialMediaShareViewModel SocialMediaViewModel { get; set; }
@@ -35,7 +37,9 @@ namespace wwwDesignersGuild.ViewModels
             BaseViewModel baseViewModel,
             bool displayDashes = true,
             int? interval = null,
-            bool permitLargeImageModal = true
+            bool permitLargeImageModal = true,
+            string videoUrl = null,
+            string videoThumbnail = null
         )
         {
             var imageList = images.ToList();
@@ -62,6 +66,10 @@ namespace wwwDesignersGuild.ViewModels
             Interval = interval;
 
             PermitLargeImageModal = permitLargeImageModal;
+
+            VideoURL = videoUrl;
+
+            VideoThumbnail = videoThumbnail;
         }
     }
 }

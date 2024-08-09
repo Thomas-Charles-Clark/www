@@ -31,12 +31,12 @@
                 <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
                 <!-- ko if: Telephone -->
                 <span class="d-block">
-                    T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+                    Tel. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
                 </span>
                 <!-- /ko -->
                 <!-- ko if: Email -->
                 <span class="d-block">
-                    T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+                    Email <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
                 </span>
                 <!-- /ko -->
             </div>
@@ -66,12 +66,12 @@
                     <span class="d-block mb-3" data-bind="text: AddressDisplay"></span>
                     <!-- ko if: Telephone -->
                     <span class="d-block">
-                        T. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
+                        Tel. <a data-bind="attr: { href: `tel:${Telephone}` }, text: Telephone"></a>
                     </span>
                     <!-- /ko -->
                     <!-- ko if: Email -->
                     <span class="d-block">
-                        T. <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
+                        Email <a data-bind="attr: { href: `mailto:${Email}` }, text: Email"></a>
                     </span>
                     <!-- /ko -->
                 </div>
@@ -567,23 +567,34 @@
                                 </p>
                                 <!-- /ko -->
                             </div>
+                            <!-- ko if: Facebook || Twitter || Instagram -->
                             <div class="mb-4">
-                                <ul class="list-unstyled" data-bind="with: detail">
+                                <ul class="d-flex flex-row list-unstyled justify-content-start gap-3 align-items-center" data-bind="with: detail">
                                     <!-- ko if: Facebook -->
                                     <li>
                                         <a data-bind="attr: { href: Facebook }" href="#" target="_blank">
-                                            <img src="/Content/images/icon/icon-facebook.png" alt="@HtmlHelperExtra.Resource("Facebook", l, c, d)" />
+                                            <img src="/Content/images/social/icon-facebook.png" width="24" height="24" alt="Facebook" title="Facebook" />
                                         </a>
                                     </li>
                                     <!-- /ko -->
                                     <!-- ko if: Twitter -->
                                     <li>
                                         <a data-bind="attr: { href: Twitter }" href="#" target="_blank">
-                                            <img src="/Content/images/icon/icon-x.png" alt="@HtmlHelperExtra.Resource("TwitterX", l, c, d)" />
+                                            <img src="/Content/images/social/icon-x.png" width="24" height="24" alt="X (Twitter)" title="X (Twitter)" />
+                                        </a>
+                                    </li>
+                                    <!-- /ko -->
+                                    <!-- ko if: Instagram -->
+                                    <li>
+                                        <a data-bind="attr: { href: Instagram }" href="#" target="_blank">
+                                            <img src="/Content/images/social/icon-instagram.png" width="24" height="24" alt="Instagram" title="Instagram" />
                                         </a>
                                     </li>
                                     <!-- /ko -->
                                 </ul>
+                            </div>
+                            <!-- /ko -->
+                            <div class="mb-4">
                                 <div data-bind="with: detail">
                                     <!-- ko if: ShowOpeningTimes === true -->
                                     <div class="mb-4">

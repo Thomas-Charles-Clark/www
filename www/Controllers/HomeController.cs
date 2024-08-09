@@ -49,6 +49,12 @@ namespace wwwDesignersGuild.Controllers
             {
                 return new RedirectResult("/fr/l0", true);
             }
+
+            
+            if (urlParameter?.IndexOf("dk/") == 0)
+            {
+                return new RedirectResult($"/en-dk/{urlParameter.Substring(3)}", true);
+            }
             
             #region Here we go!
 
