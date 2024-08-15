@@ -1796,3 +1796,35 @@ ko.bindingHandlers.stopBinding = {
         return { controlsDescendantBindings: true };
     }
 }
+
+ko.bindingHandlers.flexFadeVisible = {
+    init: function (element, valueAccessor) {
+        var value = valueAccessor();
+        var unwrapped = ko.unwrap(value);
+        if (!typeof ko.unwrap(unwrapped.boolean) === 'boolean') {
+            console.error('flexVisible bindingHandler error - parameter "boolean" is not a boolean', element, unwrapped);
+        }
+        if (value) {
+            element.classList.remove('d-none');
+            element.classList.add('opacity-100');
+            element.style.display = 'flex';
+        }
+    },
+    update: function (element, valueAccessor) {
+        var value = ko.unwrap(valueAccessor());
+        if (value) {
+            //element.style.display = 'flex';
+            element.classList.remove('d-none');
+            element.classList.add('d-flex');
+            setTimeout(() => {
+                element.classList.add('opacity-100');
+            }, 0);
+        } else {
+            element.classList.remove('opacity-100');
+            setTimeout(() => {
+                element.classList.remove('d-flex');
+                element.classList.add('d-none');
+            }, 150);
+        }
+    }
+}

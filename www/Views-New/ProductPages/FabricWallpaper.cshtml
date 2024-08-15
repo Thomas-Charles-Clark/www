@@ -37,7 +37,7 @@
                     <h4 class="text-uppercase">
                         @Model.Definition.heading
                     </h4>
-                   @if (!String.IsNullOrEmpty(Model.Definition.aka))
+                    @if (!String.IsNullOrEmpty(Model.Definition.aka))
                     {
                         <h6 class="text-uppercase">
                             @Model.Definition.aka
@@ -134,6 +134,14 @@
         @Html.Partial("~/Views-New/ProductPages/Shared/_CoverageCalculatorModal.cshtml", Model)
     }
 </div>
+@if (Model.Definition.productTypeHtmlSection != null)
+{
+    <div class="page-section">
+        <div class="html-section">
+            @HtmlHelperExtra.ProcessHTMLSection(Model.Definition.productTypeHtmlSection, Model, Model.Definition.productTypeHtmlSectionImageHotspots)
+        </div>
+    </div>
+}
 @if (!ViewBag.Partial)
 {
     if (Model.RelatedProductPages.Any())

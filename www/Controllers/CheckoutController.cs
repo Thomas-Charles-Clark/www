@@ -3975,7 +3975,7 @@ namespace wwwDesignersGuild.Controllers
             {
                 var routeData = new RouteData();
                 routeData.Values.Add("controller", controllerName);
-                var fakeRequest = new HttpRequest(null, "http://google.com", null);
+                var fakeRequest = new HttpRequest(null, "https://www.google.com", null);
                 var fakeContext = new HttpContext(fakeRequest, new HttpResponse(null));
                 var fakeControllerContext = new ControllerContext(new HttpContextWrapper(fakeContext), routeData, new FakeController());
                 

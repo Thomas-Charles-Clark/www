@@ -11,6 +11,7 @@ using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Checkout;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Helper;
+using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Models.ImgSize;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Source;
@@ -1308,7 +1309,7 @@ namespace wwwDesignersGuild.Models.Classes
                 return JObject.FromObject(json).SelectToken("videoUrl")?.Value<string>();
             }
         }
-
+        
         public string videoThumbnail
         {
             set
@@ -1320,6 +1321,30 @@ namespace wwwDesignersGuild.Models.Classes
                 return JObject.FromObject(json).SelectToken("videoThumbnail")?.Value<string>();
             }
         }
+
+        public HtmlPageSection productTypeHtmlSection
+        {
+            set
+            {
+
+            }
+            get
+            {
+                var obj = JObject.FromObject(json).SelectToken("productTypeHtmlSection");
+
+                if (obj.HasValues)
+                {
+
+                    return obj.ToObject<HtmlPageSection>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public IEnumerable<ImageHotspot> productTypeHtmlSectionImageHotspots { get; set; } = new List<ImageHotspot>();
 
         public List<googleHref> googleHrefs 
         { 

@@ -22,6 +22,10 @@ using System.Dynamic;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.Models.Checkout;
 using System.Net.Http;
+using System.IO;
+using System.Web.Mvc;
+using System.Web.Routing;
+using wwwDesignersGuild.Controllers;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -3990,6 +3994,26 @@ table.button.small-expand table a,
 	}
 ";
 
+        public static string RenderViewToString(string controllerName, string viewName, object viewData)
+        {
+            using (var writer = new StringWriter())
+            {
+                var routeData = new RouteData();
+                routeData.Values.Add("controller", controllerName);
+                var fakeRequest = new HttpRequest(null, "https://www.google.com", null);
+                var fakeContext = new HttpContext(fakeRequest, new HttpResponse(null));
+                var fakeControllerContext = new ControllerContext(new HttpContextWrapper(fakeContext), routeData, new FakeController());
+
+                // setting IDisplayMode in order to override to force desktop render... orrrr... just remove the .mobile variant of the file?
+
+                var razorViewEngine = new RazorViewEngine();
+                var razorViewResult = razorViewEngine.FindView(fakeControllerContext, viewName, "", false);
+
+                var viewContext = new ViewContext(fakeControllerContext, razorViewResult.View, new ViewDataDictionary(viewData), new TempDataDictionary(), writer);
+                razorViewResult.View.Render(viewContext, writer);
+                return writer.ToString();
+            }
+        }
     }
 
     public class loggedInMemberDetail

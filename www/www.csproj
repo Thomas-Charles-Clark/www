@@ -492,6 +492,7 @@
     <Compile Include="Models\ModularFurniture\Module.cs" />
     <Compile Include="Models\ModularFurniture\ModuleOptionGroup.cs" />
     <Compile Include="Models\ModularFurniture\ModuleOption.cs" />
+    <Compile Include="Models\ModularFurniture\PassModuleOption.cs" />
     <Compile Include="Models\Moodboard\Moodboard.cs" />
     <Compile Include="Models\OrderForm\OrderFormCacheProvider.cs" />
     <Compile Include="Models\OrderHistory\OrderHistory.cs" />

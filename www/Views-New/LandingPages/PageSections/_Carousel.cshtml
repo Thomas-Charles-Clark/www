@@ -123,6 +123,18 @@
             </div>
         }
     </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="prev">
+        <span class="carousel-control-icon-wrapper">
+            <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
+        </span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="next">
+        <span class="carousel-control-icon-wrapper">
+            <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
+        </span>
+        <span class="visually-hidden">Next</span>
+    </button>
    @if ((Model.DisplayDashes == true) && (Model.DisplayThumbnails == false || dgFramework.IsMobileDevice() == true) && (multiple == true))
     {
         <div class="carousel-indicators">

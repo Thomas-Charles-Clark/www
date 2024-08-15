@@ -80,6 +80,18 @@
                                 <!-- /ko -->
                             </div>
                         </div>
+                        <button class="carousel-control-prev" type="button" data-bs-slide="prev" data-bind="attr: { 'data-bs-target': `#${carouselId}` }">
+                            <span class="carousel-control-icon-wrapper">
+                                <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
+                            </span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-slide="next" data-bind="attr: { 'data-bs-target': `#${carouselId}` }">
+                            <span class="carousel-control-icon-wrapper">
+                                <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
+                            </span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                        @if (dgFramework.IsMobileDevice())
                         {
                             <!-- ko if: images().length > 1 -->

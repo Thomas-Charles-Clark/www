@@ -1508,6 +1508,10 @@
 
       const slideEvent = this._triggerSlideEvent(nextElement, eventDirectionName);
 
+      if (slideEvent == null) {
+        return;
+      }
+
       if (slideEvent.defaultPrevented) {
         return;
       }

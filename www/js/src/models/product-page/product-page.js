@@ -14,6 +14,9 @@
     // order form groups
     self.orderFormGroups = ko.observableArray([]);
 
+    // html section - this holds the product type specific html section thing
+    self.html = htmlViewModel(self);
+
     //#endregion
 
 
@@ -210,6 +213,94 @@
     self.coverageCalculator = coverageCalculatorViewModel(self);
 
     //#endregion
+
+    //#region modular furniture related stuff
+
+    self.moduleResult = ko.observable();
+
+    self.moduleBusy = ko.observable(false);
+
+    self.fabricRenderResult = ko.observable();
+
+    self.modularFurnitureModuleSelected = (productPageId, fabricProductPageId) => {
+
+        let params = {
+            productPageId: productPageId,
+            fabricProductPageId: fabricProductPageId,
+            languageId: getLanguageId(),
+            countryId: getCountryId(),
+            masterDefinition: getMasterDefinition()
+        };
+
+        console.log("fetchModuleDetail calling with", params);
+
+        self.moduleBusy(true);
+
+        fetch('/api/productpageapi/fetchModuleDetail', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify(params)
+        })
+            .then(window.handleFetchResponse)
+            .then(data => {
+                console.log("fetchModuleDetail returned", data);
+
+                self.moduleBusy(false);
+
+                self.moduleResult(data.furnitureOrderForm.orderForm.products[0].product);
+
+                self.fabricRenderResult(data.render);
+
+                if (data.render) {
+
+                    window.setTimeout(() => {
+
+                        document.querySelector(".module-option-preview .carousel-item.active .module-option-order-form")?.remove();
+
+                        let moduleOptionGroupElement = document.createElement('div');
+
+                        moduleOptionGroupElement.className = "module-option-order-form";
+
+                        let orderFormDetailsElement = document.createElement('div');
+
+                        orderFormDetailsElement.className = "order-form-details";
+
+                        orderFormDetailsElement.setAttribute("data-bind", "html: fabricRenderResult, stopBinding");
+
+                        moduleOptionGroupElement.appendChild(orderFormDetailsElement);
+
+                        document.querySelector(".module-option-preview .carousel-item.active")?.appendChild(moduleOptionGroupElement);
+
+                        ko.applyBindings(productPageModel, moduleOptionGroupElement)
+
+                        ko.cleanNode(moduleOptionGroupElement);
+
+                        orderFormDetailsElement.removeAttribute("data-bind");
+
+                        ko.applyBindings(orderFormGroupViewModel(self), orderFormDetailsElement);
+
+                    }, 0);
+                }
+
+                if (window.isMobileSite()) {
+                    document.querySelector('.module-option-modal.fade.show').scrollTo({
+                        top: 0,
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            })
+            .catch(err => {
+                self.moduleBusy(false);
+            })
+
+        return true;
+    }
+
+    //#endregion
+    
 
     //#endregion
 

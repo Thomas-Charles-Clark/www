@@ -605,6 +605,13 @@ namespace wwwDesignersGuild.ViewModels
 
             var imageIds = Definition.Images.Select(p => p.imageId).Distinct().ToList();
 
+            if (Definition.productTypeHtmlSection != null && Definition.productTypeHtmlSection.ImageIDs.Any())
+            {
+                imageIds.AddRange(Definition.productTypeHtmlSection.ImageIDs);
+
+                imageIds = imageIds.Distinct().ToList();
+            }
+
             var objProductPage = new cmsProductPage();
 
             var objDb = new databaseDataContext();
@@ -638,6 +645,17 @@ namespace wwwDesignersGuild.ViewModels
                 var hotspotsTask = base.InitialiseHotspots(imageIds);
 
                 await Task.WhenAll(stockTask, techInfoTask, hotspotsTask);
+
+                if (Definition.productTypeHtmlSection != null && Definition.productTypeHtmlSection.ImageIDs.Any())
+                {
+                    await hotspotsTask;
+
+                    var hotspots = base.Hotspots.ToList();
+
+                    var productTypeImageIds = Definition.productTypeHtmlSection.ImageIDs.ToList();
+
+                    Definition.productTypeHtmlSectionImageHotspots = hotspots.Where(h => productTypeImageIds.Contains(h.ImageID)).ToList();
+                }
 
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"ProductPageViewModel stock, tech & hotspot tasks complete {sw.Elapsed}");

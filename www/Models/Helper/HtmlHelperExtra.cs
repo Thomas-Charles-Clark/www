@@ -17,6 +17,7 @@ using wwwDesignersGuild.Models.ImgSize;
 using DocumentFormat.OpenXml.EMMA;
 using DevExpress.Web.Rendering;
 using wwwDesignersGuild.Models.Hotspot;
+using System.Threading.Tasks;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -937,7 +938,7 @@ namespace wwwDesignersGuild.Models.Helper
 
         private static Regex ImageParentColumn = new Regex(@"g-col-([^0-9\-]+)?-?([0-9]+)");
 
-        public static IHtmlString ProcessHTMLSection(HtmlPageSection section, BaseViewModel objBase)
+        public static IHtmlString ProcessHTMLSection(HtmlPageSection section, BaseViewModel objBase, IEnumerable<ImageHotspot> overridingHotspots = null)
         {
             if (String.IsNullOrEmpty(section.Contents))
                 return null;
@@ -950,7 +951,7 @@ namespace wwwDesignersGuild.Models.Helper
 
             if (!String.IsNullOrEmpty(section.Contents))
             {
-                section.Contents = ProcessHTMLImages(section.Contents, section.HtmlSectionID, section.ImageIDs, section.Hotspots, objBase);
+                section.Contents = ProcessHTMLImages(section.Contents, section.HtmlSectionID, section.ImageIDs, overridingHotspots ?? section.Hotspots, objBase);
             }
 
             var doc = new HtmlDocument();
