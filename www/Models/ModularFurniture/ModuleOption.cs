@@ -27,7 +27,6 @@ namespace wwwDesignersGuild.Models.ModularFurniture
 
         public int? FabricProductPageID { get; set; }
 
-
         [JsonProperty("ModuleOptionName")]
         public string Name { get; set; }
 

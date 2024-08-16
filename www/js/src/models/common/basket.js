@@ -41,7 +41,32 @@
 
     //#region Computeds
 
+    self.samples = ko.computed(() => {
+        return self.basketItems().filter(bi => bi.ProductTypeID == 55);
+    }, self);
 
+    self.samplesGrouped = ko.computed(() => {
+        let samples = self.samples();
+
+        let results = [{
+            samples: []
+        }];
+
+        let counter = 0;
+
+        for (let i = 0; i < samples.length; i++) {
+            results[results.length - 1].samples.push(samples[i]);
+            counter++;
+            if (counter % 6 == 0) {
+                counter = 0;
+                results.push({
+                    samples: []
+                });
+            }
+        }
+
+        return results;
+    }, self);
 
     //#endregion
 

@@ -832,6 +832,8 @@ namespace wwwDesignersGuild.ViewModels
                 "PleaseProvideHeight",
                 "PleaseProvideWidth",
                 "PleaseProvideLength",
+                "CloseAndReturnToProductPage",
+                "ViewBasket",
                 "MajorError" };
 
             foreach (var r in required)

@@ -255,9 +255,13 @@
 
                 if (data.render) {
 
+                    window.basketModel.refreshBasket();
+
                     window.setTimeout(() => {
 
                         document.querySelector(".module-option-preview .carousel-item.active .module-option-order-form")?.remove();
+
+                        document.querySelectorAll(".basket-samples-panel").forEach(e => e.remove());
 
                         let moduleOptionGroupElement = document.createElement('div');
 
@@ -271,6 +275,38 @@
 
                         moduleOptionGroupElement.appendChild(orderFormDetailsElement);
 
+                        let basketSamplesPanel = document.createElement("div");
+
+                        basketSamplesPanel.className = "basket-samples-panel";
+
+                        basketSamplesPanel.setAttribute("data-bind", "template: { name: 'basket-samples-panel-template', data: window.basketModel }");
+
+                        moduleOptionGroupElement.appendChild(basketSamplesPanel);
+
+                        let basketAnchor = document.createElement('a');
+
+                        basketAnchor.setAttribute("href", "/l201");
+
+                        basketAnchor.setAttribute("target", "self");
+
+                        basketAnchor.className = "btn btn-dark w-100 mt-5 mb-3";
+
+                        basketAnchor.innerHTML = self.resources.ViewBasket;
+
+                        moduleOptionGroupElement.appendChild(basketAnchor);
+
+                        let closeBtn = document.createElement('button');
+
+                        closeBtn.setAttribute("type", "button");
+
+                        closeBtn.className = "btn btn-secondary w-100";
+
+                        closeBtn.innerHTML = self.resources.CloseAndReturnToProductPage;
+
+                        closeBtn.setAttribute("data-bs-dismiss", "modal");
+
+                        moduleOptionGroupElement.appendChild(closeBtn);
+
                         document.querySelector(".module-option-preview .carousel-item.active")?.appendChild(moduleOptionGroupElement);
 
                         ko.applyBindings(productPageModel, moduleOptionGroupElement)
@@ -280,6 +316,8 @@
                         orderFormDetailsElement.removeAttribute("data-bind");
 
                         ko.applyBindings(orderFormGroupViewModel(self), orderFormDetailsElement);
+
+                        ko.applyBindings(window.basketModel, basketSamplesPanel);
 
                     }, 0);
                 }

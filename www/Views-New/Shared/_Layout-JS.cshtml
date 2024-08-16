@@ -302,3 +302,42 @@
     </div>
 </script>
 <script id="ko-blank-template" type="text/html"></script>
+<script id="basket-samples-panel-template" type="text/html">
+    <!-- ko if: samples().length -->
+    <h4 id="basket-samples-carousel-heading">
+        @HtmlHelperExtra.Resource("SamplesCurrentlyInYourBasket", l, c, d)
+        <span data-bind="text: `(${samples().length})`"></span>
+    </h4>
+    <div id="basket-samples-carousel" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
+        <div class="carousel-inner">
+            <!-- ko foreach: samplesGrouped -->
+            <div class="carousel-item" data-bind="css: { 'active': $index() == 0 }">
+                <div class="grid gap-2" style="--bs-columns: 6">
+                    <!-- ko foreach: samples -->
+                    <div class="basket-sample">
+                        <img data-bind="attr: { src: `/image/90/${ImageID}`, title: BasketName, alt: BasketName }" width="90" height="90" />
+                        <label class="basket-sample-quantity">
+                            &times;
+                            <i data-bind="text: Quantity"></i>
+                        </label>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#basket-samples-carousel" data-bs-slide="prev">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#basket-samples-carousel" data-bs-slide="prev">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+    </div>
+    <!-- /ko -->
+</script>

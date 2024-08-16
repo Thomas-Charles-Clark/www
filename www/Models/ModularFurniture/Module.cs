@@ -13,6 +13,14 @@ namespace wwwDesignersGuild.Models.ModularFurniture
 
         public string Name { get; set; }
 
+        public string Description { get; set; }
+
+        public string ConfirmText { get; set; }
+
+        public string FitGuide { get; set; }
+
+        public long? DimensionsImageID { get; set; }
+
         [JsonProperty("moduleOptions")]
         public List<ModuleOption> Options { get; set; }
 

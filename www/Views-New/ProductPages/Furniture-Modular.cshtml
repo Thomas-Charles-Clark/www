@@ -173,6 +173,21 @@
                 }
             }
             <div id="product-page-accordion" class="my-3 accordion accordion-flush">
+               @if (!String.IsNullOrEmpty(Model.Modules.FirstOrDefault()?.FitGuide))
+                {
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="fit-guide-panel-heading">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#fit-guide-panel" aria-expanded="true" aria-controls="fit-guide-panel">
+                                @HtmlHelperExtra.Resource("FitGuide", l, c, d)
+                            </button>
+                        </h6>
+                        <div id="fit-guide-panel" class="accordion-collapse collapse show" aria-labelledby="fit-guide-panel" data-bs-parent="#product-page-accordion">
+                            <div class="accordion-body">
+                                @Html.Raw(Model.Modules.FirstOrDefault()?.FitGuide)
+                            </div>
+                        </div>
+                    </div>
+                }
                 <div class="accordion-item">
                     <h6 class="accordion-header" id="description-panel-heading">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#description-panel" aria-expanded="true" aria-controls="description-panel">
@@ -407,8 +422,8 @@
 
                                                                     </a>
                                                                     <div class="px-0 mt-3">
-                                                                        <a class="btn btn-secondary btn-large" href="@mo.URL">
-                                                                            @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                                                        <a class="btn btn-dark btn-lg" href="@mo.URL">
+                                                                            @mod.ConfirmText
                                                                         </a>
                                                                     </div>
                                                                 </div>
@@ -454,7 +469,7 @@
                                                             </a>
                                                             <div class="px-0 mt-3">
                                                                 <a class="btn btn-secondary btn-large" href="@mod.Current.URL">
-                                                                    @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                                                    @mod.ConfirmText
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -497,7 +512,7 @@
                                                                 </a>
                                                                 <div class="px-0 mt-3">
                                                                     <a class="btn btn-secondary btn-large" href="@o.URL">
-                                                                        @HtmlHelperExtra.Resource("SelectThisOption", l, c, d)
+                                                                        @mod.ConfirmText
                                                                     </a>
                                                                 </div>
                                                             </div>
