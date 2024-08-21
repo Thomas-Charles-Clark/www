@@ -172,6 +172,7 @@ namespace wwwDesignersGuild.Models.Stockists
         public string ClosedSaturday { get; set; }
         public string OpenSunday { get; set; }
         public string ClosedSunday { get; set; }
+        public bool PremiumPartner { get; set; }
     }
 
 
@@ -213,6 +214,8 @@ namespace wwwDesignersGuild.Models.Stockists
         public string Twitter { get; set; }
         public string Instagram { get; set; }
         public string Image { get; set; }
+
+        public bool PremiumPartner { get; set; }
 
         public string AddressDisplay
         {

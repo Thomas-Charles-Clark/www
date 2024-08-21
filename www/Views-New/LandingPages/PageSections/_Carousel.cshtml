@@ -201,7 +201,7 @@
                         class="btn btn-link carousel-video-thumbnail-btn @(Model.Images.Count == 0 ? "active" : "")"
                         aria-current=""
                         aria-label="@HtmlHelperExtra.Resource("ImageSlide", l, c, d) @(Model.Images.Count + 1)">
-                    <img src="@(Model.VideoThumbnail ?? "https://www.designersguild.com/image/239/")"
+                    <img src="@($"https://www.designersguild.com/image/239/{Model.VideoThumbnail}")"
                          alt="@(Model.Heading)"
                          width="90"
                          height="90" />

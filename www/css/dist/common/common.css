@@ -2528,7 +2528,7 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
 
 .carousel-video-item {
   padding: 100% 0 0 0;
-  background-color: #000;
+  background-color: #fff;
   position: relative;
 }
 .carousel-video-item iframe {
