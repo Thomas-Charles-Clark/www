@@ -1165,6 +1165,8 @@ namespace wwwDesignersGuild.Models.Classes
         public byte productTypeId { get; set; }
         public byte languageId { get; set; }
         public short countryId { get; set; }
+        public bool noIndex { get; set; }
+        public bool noFollow { get; set; }
         public byte templateId 
         {
             set
@@ -2081,6 +2083,8 @@ namespace wwwDesignersGuild.Models.Classes
         public string MetaDescription { get; set; }
         public string URLKeywords { get; set; }
         public bool PreviewColourways { get; set; }
+        public bool NoIndex { get; set; }
+        public bool NoFollow { get; set; }
     }
 
 
@@ -2342,6 +2346,8 @@ namespace wwwDesignersGuild.Models.Classes
         public string MetaDescription { get; set; }
         public string URLKeywords { get; set; }
         public string Contents { get; set; }
+        public bool NoIndex { get; set; }
+        public bool NoFollow { get; set; }
     }
 
     public class articleTypeSelect

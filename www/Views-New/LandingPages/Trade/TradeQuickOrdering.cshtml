@@ -85,55 +85,41 @@
                 </div>
                 @*<div class="flex-grow-0 text-end product-price" data-bind="html: priceMessage"></div>*@
             </div>
-
-
-
             <!-- ko if: controls.allowOrder -->
             <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.Order.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template', afterRender: buildPopover } --><!-- /ko -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template', data: Object.assign($data, { enable: !$parent.controls.disableOrder }), afterRender: buildPopover } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: controls.allowReserve -->
             <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.Reserve.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template', afterRender: buildPopover } --><!-- /ko -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template', data: Object.assign($data, { enable: !$parent.controls.disableOrder }), afterRender: buildPopover } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: controls.allowReserveWithBatchSample -->
             <!-- ko with: getProductByBasketLineType(productId, @(OrderFormItemType.ReserveWithBatchCutting.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template', afterRender: buildPopover } --><!-- /ko -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template', data: Object.assign($data, { enable: !$parent.controls.disableOrder }), afterRender: buildPopover } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: controls.allowSample -->
             <!-- ko with: getProductByBasketLineType(sample.productId, @(OrderFormItemType.Sample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template', afterRender: buildPopover } --><!-- /ko -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template', data: Object.assign($data, { enable: !$parent.controls.disableSample }), afterRender: buildPopover } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: controls.allowLargeSample -->
             <!-- ko with: getProductByBasketLineType(largeSample.productId, @(OrderFormItemType.LargeSample.GetAttributeOfType<BasketLineTypeAttribute>().BasketLineTypeID)) -->
-            <!-- ko template: { name: 'ko-order-form-item-button-template', afterRender: buildPopover } --><!-- /ko -->
+            <!-- ko template: { name: 'ko-order-form-item-button-template', data: Object.assign($data, { enable: !$parent.controls.disableSample }), afterRender: buildPopover } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
-            @*<!-- ko ifnot: controls.allowOrder -->
-        <div class="order-form-item">
-            <div class="order-form-controls">
-                <span class="order-form-controls-spacer">
-                    &nbsp;
-                </span>
-                <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.stockists, cd)" class="btn btn-dark">
-                    @HtmlHelperExtra.Resource("ppWhereToBuy", l, c, d)
-                </a>
-            </div>
-        </div>
-        <!-- /ko -->*@
         </div>
     </div>
 </script>
 <script id="ko-order-form-item-button-template" type="text/html">
+    <span class="d-none" data-bind="init: { field: enabled, value: enable },  remove"></span>
     <div class="order-form-item trade relative" data-bind="css: { 'mt-0': [2,3].indexOf(basketLineTypeId) > -1 }" onclick="() => { }" onmouseover="() => { }" onmouseout="() => { }">
         <!-- ko if: (orderFormTypeId == 3 || orderFormTypeId == 4) && stockMessage.reserveDisabledText != null -->
         <a class="reserve-overlay pointer"
            role="button"
-           tabindex="1" 
+           tabindex="1"
            data-bs-toggle="popover"
            data-bs-trigger="@(dgFramework.IsMobileDevice() ? "focus blur" : "click hover focus blur")"
            data-bs-custom-class="reserve-popover"
@@ -194,7 +180,7 @@
         </div>
     </div>
 }
-@if (!Model.Permission)
+@if (!Model.OverallPermission)
 {
     <div class="alert alert-danger trade-message-warning">
         <h4>

@@ -118,6 +118,10 @@ namespace wwwDesignersGuild.ViewModels
                 }
             });
 
+            NoIndex = Definition.CollectionDetails.NoIndex;
+
+            NoFollow = Definition.CollectionDetails.NoFollow;
+
 #if DEBUG
             sw.Stop();
 

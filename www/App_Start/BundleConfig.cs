@@ -82,6 +82,12 @@ namespace wwwDesignersGuild
             bundles.Add(new StyleBundle("~/bundles/css/furniture-modular-mobile")
                 .Include($"{cssPrefix}/models/furniture-modular-mobile{cssSuffix}", cssTransforms));
 
+            bundles.Add(new StyleBundle("~/bundles/css/furniture-modular-new")
+                .Include($"{cssPrefix}/models/furniture-modular-new{cssSuffix}", cssTransforms));
+
+            bundles.Add(new StyleBundle("~/bundles/css/furniture-modular-mobile-new")
+                .Include($"{cssPrefix}/models/furniture-modular-mobile-new{cssSuffix}", cssTransforms));
+
             bundles.Add(new StyleBundle("~/bundles/css/furniture-wholesale")
                 .Include($"{cssPrefix}/models/furniture-wholesale{cssSuffix}", cssTransforms));
 

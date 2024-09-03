@@ -300,6 +300,9 @@
                 } else {
                     self.featuredStockists(data.featuredStockists.map(d => stockistSearchResultViewModel(d)));
                     self.searchResults(data.stockistResults.map(d => stockistSearchResultViewModel(d)));
+                    if (window.isMobileSite()) {
+                        window.scrollTo(0, document.querySelector('#stockist-results').offsetTop);
+                    }
                 }
                 self.haveSearched(true);
                 self.busy(false);

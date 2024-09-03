@@ -633,6 +633,9 @@ input::-webkit-inner-spin-button {
         display: flex;
         opacity: 0.0;
         width: 10%;
+        bottom: initial;
+        top: 50%;
+        transform: translate(0, -1.5rem);
 
         &:hover {
             opacity: 0.9;
@@ -799,9 +802,10 @@ input::-webkit-inner-spin-button {
         }
 
         .carousel-indicators:not(.carousel-thumbnails) {
-            /*position: absolute;*/
+            position: absolute;
             margin: 0;
             bottom: -12px;
+            left: 0;
             justify-content: flex-end;
 
             button {
@@ -2952,7 +2956,7 @@ nav.article-type-nav.article-sub-type-nav {
         left: 50%;
         transform: translate(-50%, -50%);
         color: $white;
-        font-size: 2rem;
+        font-size: 3rem;
         will-change: color;
         transition: color 150ms ease-in-out;
     }

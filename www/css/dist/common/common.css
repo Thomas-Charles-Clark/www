@@ -603,6 +603,9 @@ input::-webkit-inner-spin-button {
   display: flex;
   opacity: 0;
   width: 10%;
+  bottom: initial;
+  top: 50%;
+  transform: translate(0, -1.5rem);
 }
 .carousel .carousel-control-next:hover,
 .carousel .carousel-control-prev:hover {
@@ -744,9 +747,10 @@ input::-webkit-inner-spin-button {
     opacity: 0.5;
   }
   .carousel .carousel-indicators:not(.carousel-thumbnails) {
-    /*position: absolute;*/
+    position: absolute;
     margin: 0;
     bottom: -12px;
+    left: 0;
     justify-content: flex-end;
   }
   .carousel .carousel-indicators:not(.carousel-thumbnails) button {
@@ -2545,7 +2549,7 @@ nav.article-type-nav.article-sub-type-nav ul.nav li.nav-item.active a.nav-link {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
-  font-size: 2rem;
+  font-size: 3rem;
   will-change: color;
   transition: color 150ms ease-in-out;
 }

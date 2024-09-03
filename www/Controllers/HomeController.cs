@@ -42,20 +42,61 @@ namespace wwwDesignersGuild.Controllers
         /// <param name="urlParameter">Everything after the .com/</param>
         /// <returns></returns>
         /// 
-        //[RequireHttps]
         public async Task<ActionResult> CatchAll(string urlParameter)
         {
-            if (urlParameter == "fr/bienvenue-chez-designers-guild/l0")
+            #region Redirectioneering
+
+            if (urlParameter?.IndexOf("uk/") == 0)
             {
-                return new RedirectResult("/fr/l0", true);
+                return new RedirectResult($"/en-gb/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("se/") == 0)
+            {
+                return new RedirectResult($"/en-se/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("us/") == 0)
+            {
+                return new RedirectResult($"/en-us/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("nl/") == 0)
+            {
+                return new RedirectResult($"/en-nl/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("be/") == 0)
+            {
+                return new RedirectResult($"/en-be/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("au/") == 0)
+            {
+                return new RedirectResult($"/en-au/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("dk/") == 0)
+            {
+                return new RedirectResult($"/en-dk/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("no/") == 0)
+            {
+                return new RedirectResult($"/en-no/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("at/") == 0)
+            {
+                return new RedirectResult($"/de-at/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("nz/") == 0)
+            {
+                return new RedirectResult($"/en-nz/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("ie/") == 0)
+            {
+                return new RedirectResult($"/en-ie/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter?.IndexOf("fi/") == 0)
+            {
+                return new RedirectResult($"/en-fi/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
 
-            
-            if (urlParameter?.IndexOf("dk/") == 0)
-            {
-                return new RedirectResult($"/en-dk/{urlParameter.Substring(3)}", true);
-            }
-            
+            #endregion
+
             #region Here we go!
 
             #region Lordy, lordy lord... IIS is rewriting multiple///empty/segments into urls/without/empty/segments which is preventing me from redirecting!
@@ -1184,7 +1225,28 @@ namespace wwwDesignersGuild.Controllers
                         await FetchBanners(paintModel.MasterDefinition, null);
 
                         return View("~/Views-New/ProductPages/Paint.cshtml", paintModel);
-                        
+
+                    case 10: // Modular Product Page
+                        var modularModelNew = await ProductPageViewModel_Furniture_Modular.CreateAsync
+                            (
+                                objMaster: await NewMasterDefinition.CreateAsync(
+                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    metaDescription: objProductData.objCacheSelect.metaDescription,
+                                    backInStockReminder: (int?)Session["backInStockReminder"],
+                                    itemsInBasket: basketTotalData.TotalQuantity,
+                                    urlBreakdown: urlData,
+                                    googleHrefs: objProductData.objCacheSelect.googleHrefs,
+                                    tradeMember: Session["memberTradeAccountID"] != null
+                                ),
+                                objVisitor: objVisitorSelect,
+                                objCacheSelect: objProductData.objCacheSelect,
+                                isShop: IsShop
+                            );
+
+                        await FetchBanners(modularModelNew.MasterDefinition, null);
+
+                        return View("~/Views-New/ProductPages/Furniture-Modular-New.cshtml", modularModelNew);
+
                     default:
                         throw new Exception("Unrecognised TemplateID!");
                 }

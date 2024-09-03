@@ -741,7 +741,11 @@ namespace wwwDesignersGuild.Controllers
 
             var admin = tradeAccountModel.Administrators.Where(p => p.MemberID == loginCheck.memberId.Value).SingleOrDefault();
 
-            var permission = user?.TradePermissionPlaceOrder ?? admin?.TradePermissionPlaceOrder ?? false;
+            var orderPermission = user?.TradePermissionPlaceOrder ?? admin?.TradePermissionPlaceOrder ?? false;
+
+            var samplePermission = user?.TradePermissionRequestSample ?? admin?.TradePermissionRequestSample ?? false;
+
+            var permission = orderPermission || samplePermission;
 
             var viewModel = await TradeQuickOrderingViewModel.CreateAsync(permission, tradeAccountModel, objBase);
 

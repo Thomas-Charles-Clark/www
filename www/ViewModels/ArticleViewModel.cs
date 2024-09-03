@@ -269,6 +269,10 @@ namespace wwwDesignersGuild.ViewModels
                 }
             });
 
+            NoIndex = Definition.ArticleDetails.NoIndex;
+
+            NoFollow = Definition.ArticleDetails.NoFollow;
+
 #if DEBUG
             sw.Stop();
 

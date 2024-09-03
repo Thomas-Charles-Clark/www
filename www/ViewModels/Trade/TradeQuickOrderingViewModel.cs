@@ -18,7 +18,7 @@ namespace wwwDesignersGuild.ViewModels.Trade
 
         public string Heading { get; set; }
 
-        public bool Permission { get; set; }
+        public bool OverallPermission { get; set; }
 
         public List<ProductType> ProductTypes
         {
@@ -28,9 +28,9 @@ namespace wwwDesignersGuild.ViewModels.Trade
             }
         }
 
-        public TradeQuickOrderingViewModel(bool permission, TradeAccountUsersModel taum, BaseViewModel bvm)
+        public TradeQuickOrderingViewModel(bool overallPermission, TradeAccountUsersModel taum, BaseViewModel bvm)
         {
-            Permission = permission;
+            OverallPermission = overallPermission;
             TradeAccountModel = taum;
             BaseViewModel = bvm;
         }

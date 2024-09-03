@@ -1733,7 +1733,7 @@ namespace wwwDesignersGuild.Models.Helper
 
         public static String getDefaultCountry()
         {
-            return "uk";
+            return "en-gb";
         }
 
         public static bool doesCountryExistFromText(string text, cmsCountryDefinition objCountryData)

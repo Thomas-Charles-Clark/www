@@ -850,6 +850,10 @@ namespace wwwDesignersGuild.ViewModels
 
             PrefetchedResources.AddRange(result);
 
+            NoIndex = Definition.noIndex;
+
+            NoFollow = Definition.noFollow;
+
 #if DEBUG
             sw.Stop();
 

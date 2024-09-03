@@ -2229,6 +2229,10 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="css\dist\common\trade-common.css" />
     <Content Include="css\dist\common\trade-common.min.css" />
+    <Content Include="css\dist\models\furniture-modular-mobile-new.css" />
+    <Content Include="css\dist\models\furniture-modular-mobile-new.min.css" />
+    <Content Include="css\dist\models\furniture-modular-new.css" />
+    <Content Include="css\dist\models\furniture-modular-new.min.css" />
     <Content Include="css\src\common\collection.scss" />
     <Content Include="css\src\common\common.scss" />
     <Content Include="css\src\common\debug.scss" />
@@ -2906,6 +2910,12 @@
     <Content Include="css\dist\fonts\src\gill-sans-light.ttf" />
     <Content Include="Content\images\icon\icon-x.webp" />
     <Content Include="Content\images\social\icon-x.webp" />
+    <Content Include="css\src\models\furniture-modular-mobile-new.scss" />
+    <Content Include="css\src\models\furniture-modular-new.scss" />
+    <Content Include="css\dist\models\furniture-modular-mobile-new.css.map" />
+    <Content Include="css\dist\models\furniture-modular-mobile-new.min.css.map" />
+    <Content Include="css\dist\models\furniture-modular-new.css.map" />
+    <Content Include="css\dist\models\furniture-modular-new.min.css.map" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -3132,6 +3142,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views-New\Shared\_TradeLoginPrompt.cshtml" />
+    <Content Include="Views-New\ProductPages\Furniture-Modular-New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">
