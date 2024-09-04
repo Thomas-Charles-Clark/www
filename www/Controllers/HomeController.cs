@@ -1178,7 +1178,11 @@ namespace wwwDesignersGuild.Controllers
 
                         await FetchBanners(modularModel.MasterDefinition, null);
 
+#if DEBUG
+                        return View("~/Views-New/ProductPages/Furniture-Modular-New.cshtml", modularModel);
+#else
                         return View("~/Views-New/ProductPages/Furniture-Modular.cshtml", modularModel);
+#endif
 
                     case 6: // Consolidated Order Form
                         var consolidatedOrderFormViewModel = await ProductPageViewModel_Standard.CreateAsync

@@ -18,6 +18,12 @@
   padding-left: 0.5rem;
   gap: 1rem;
 }
+.module-option-modal .order-form-item .basket-message {
+  font-size: 0.875rem;
+}
+.module-option-modal .basket-sample {
+  font-size: 0.875rem;
+}
 
 .modules-container .card {
   border: 0;
@@ -52,7 +58,7 @@
   padding-bottom: 64px;
 }
 .module-option-modal .modal-body .flex-wrapper {
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 .module-option-modal .modal-body .flex-wrapper .accordion-wrapper {
   padding: 0;
@@ -69,6 +75,10 @@
   margin-top: 0;
   padding: 0;
   position: static;
+  min-height: 400px;
+}
+.module-option-modal .modal-body .flex-wrapper .module-option-preview .carousel-inner {
+  overflow: visible;
 }
 .module-option-modal .modal-body .flex-wrapper .module-option-preview .carousel-item-heading {
   flex-wrap: wrap;
@@ -83,5 +93,17 @@
 }
 .module-option-modal .modal-body .flex-wrapper .module-option-preview .carousel-item-heading .carousel-item-price {
   margin-left: auto;
+}
+.module-option-modal .modal-body .flex-wrapper .confirm-module-option-btn-wrapper {
+  display: flex;
+  gap: 0.75rem;
+}
+.module-option-modal .modal-body .flex-wrapper .confirm-module-option-btn-wrapper .back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.module-option-modal .modal-body .flex-wrapper .confirm-module-option-btn-wrapper a {
+  flex: 1;
 }
 /*# sourceMappingURL=furniture-modular-mobile-new.css.map */

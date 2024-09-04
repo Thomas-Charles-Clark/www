@@ -42,28 +42,6 @@
     .modal-content {
         height: auto;
         min-height: 100vh;
-
-        .modal-body {
-            overflow-y: initial;
-        }
-    }
-
-    .modal-header {
-        position: static;
-
-        h1 {
-            font-size: 32px;
-            text-transform: none;
-            text-align: center;
-            margin-bottom: 0;
-            padding: $l-gutter;
-        }
-
-        .btn-close {
-            position: absolute;
-            right: 44px;
-            top: 44px;
-        }
     }
 
     .accordion-wrapper {
@@ -153,7 +131,7 @@
         > div:not(.page-blocker) {
             position: relative;
 
-            img {
+            img:not(.order-form-image) {
                 width: 100%;
                 height: auto;
             }
@@ -178,8 +156,7 @@
 
             h4 {
                 font-family: "Gill-Sans", "Open Sans";
-                font-weight: 600;
-                font-size: 24px;
+                margin-bottom: 0;
 
                 &.carousel-item-name {
                     flex: 0 1 75%;
@@ -193,6 +170,17 @@
             }
         }
 
+        .order-form-controls {
+            label,
+            input {
+                display: none;
+            }
+
+            button {
+                margin-left: 0;
+            }
+        }
+
         .order-form-item-properties {
             display: grid;
             grid-template-columns: auto auto;
@@ -202,6 +190,38 @@
             margin-left: 0;
             line-height: normal;
             grid-template-columns: auto 1fr;
+        }
+
+        .order-form-product {
+            .order-form-details {
+                margin-bottom: 0;
+
+                .order-form-item-properties {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: stretch;
+                    align-self: stretch;
+                    margin-right: 0;
+                    flex: 1;
+                    flex-wrap: wrap;
+
+                    .dots-wrapper {
+                        display: none;
+                    }
+                }
+
+                .order-form-image {
+                    margin-right: $m-gutter;
+                }
+            }
+
+            .basket-message {
+                flex: 1 1 100%;
+                text-align: right;
+                padding-top: $sm-gutter;
+                padding-bottom: 0;
+            }
         }
 
         .carousel-item-body {
@@ -265,7 +285,7 @@
 .module-option-modal {
     .accordion {
         .grid {
-            --bs-columns: 1;
+            --bs-columns: 3;
             gap: $sm-gutter;
         }
     }
@@ -299,7 +319,9 @@
     }
 
     .module-btn {
-        font-size: $font-size-lg;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         height: 64px;
 
         &.btn-light {
@@ -311,16 +333,17 @@
         }
 
         i {
-            padding: $sm-gutter 0 $sm-gutter $l-gutter;
             margin-left: auto;
         }
     }
 }
 
+$margin-top-offset: 57px;
+
 .module-option-modal {
     .flex-wrapper {
         display: flex;
-        gap: $l-gutter;
+        gap: $xl-gutter;
         justify-content: center;
 
         .accordion-wrapper {
@@ -329,13 +352,13 @@
 
         .module-option-preview {
             position: sticky;
-            top: 54px;
+            top: $margin-top-offset;
             left: 0;
             padding-right: $xxl-gutter;
             padding-bottom: $xxl-gutter;
 
             &.margin-top-lg {
-                margin-top: 54px;
+                margin-top: $margin-top-offset;
             }
 
             .module-option-group-heading {
@@ -349,13 +372,12 @@
             .order-form-product {
                 > .my-3 {
                     margin-top: $m-gutter;
-                    padding-top: $m-gutter;
-                    border-top: 1px solid $gray-300;
+                    border: 1px solid $gray-300;
+                    padding: $m-gutter;
                 }
             }
 
             .order-form-details {
-                .order-form-image,
                 .product-price {
                     display: none;
                 }
@@ -376,6 +398,7 @@
 
     #basket-samples-carousel-heading {
         font-size: $font-size-base;
+        margin-bottom: $m-gutter;
     }
 
     #basket-samples-carousel {
@@ -504,7 +527,7 @@
             .module-option-preview {
 
                 &.margin-top-lg {
-                    margin-top: 54px;
+                    margin-top: $margin-top-offset;
                 }
 
                 .module-option-group-heading {

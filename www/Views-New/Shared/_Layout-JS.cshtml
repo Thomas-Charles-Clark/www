@@ -316,16 +316,14 @@
                     <!-- ko foreach: samples -->
                     <div class="basket-sample">
                         <img data-bind="attr: { src: `/image/90/${ImageID}`, title: BasketName, alt: BasketName }" width="90" height="90" />
-                        <label class="basket-sample-quantity">
-                            &times;
-                            <i data-bind="text: Quantity"></i>
-                        </label>
+                        <span data-bind="text: BasketName"></span>
                     </div>
                     <!-- /ko -->
                 </div>
             </div>
             <!-- /ko -->
         </div>
+        <!-- ko if: samplesGrouped().length > 1 -->
         <button class="carousel-control-prev" type="button" data-bs-target="#basket-samples-carousel" data-bs-slide="prev">
             <span class="carousel-control-icon-wrapper">
                 <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
@@ -338,6 +336,7 @@
             </span>
             <span class="visually-hidden">Previous</span>
         </button>
+        <!-- /ko -->
     </div>
     <!-- /ko -->
 </script>

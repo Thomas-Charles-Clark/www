@@ -222,7 +222,11 @@
 
     self.fabricRenderResult = ko.observable();
 
-    self.modularFurnitureModuleSelected = (productPageId, fabricProductPageId) => {
+    self.modularFurnitureScrollHold = null;
+
+    self.modularFurnitureModuleSelected = (productPageId, fabricProductPageId, optionName, initialOpen) => {
+        
+        self.modularFurnitureScrollHold = document.querySelector('.module-option-modal.fade.show .modal-body').scrollTop;
 
         let params = {
             productPageId: productPageId,
@@ -247,8 +251,6 @@
             .then(data => {
                 console.log("fetchModuleDetail returned", data);
 
-                self.moduleBusy(false);
-
                 self.moduleResult(data.furnitureOrderForm.orderForm.products[0].product);
 
                 self.fabricRenderResult(data.render);
@@ -259,9 +261,9 @@
 
                     window.setTimeout(() => {
 
-                        document.querySelector(".module-option-preview .carousel-item.active .module-option-order-form")?.remove();
+                        document.querySelector(".module-option-modal.fade.show .module-preview-carousel .carousel-item.active .module-option-order-form")?.remove();
 
-                        document.querySelectorAll(".basket-samples-panel").forEach(e => e.remove());
+                        document.querySelectorAll(".module-option-modal.fade.show .basket-samples-panel").forEach(e => e.remove());
 
                         let moduleOptionGroupElement = document.createElement('div');
 
@@ -275,6 +277,10 @@
 
                         moduleOptionGroupElement.appendChild(orderFormDetailsElement);
 
+                        let productNameSpan = document.createElement('span');
+
+                        productNameSpan.innerHTML = optionName;
+
                         let basketSamplesPanel = document.createElement("div");
 
                         basketSamplesPanel.className = "basket-samples-panel";
@@ -283,31 +289,7 @@
 
                         moduleOptionGroupElement.appendChild(basketSamplesPanel);
 
-                        let basketAnchor = document.createElement('a');
-
-                        basketAnchor.setAttribute("href", "/l201");
-
-                        basketAnchor.setAttribute("target", "self");
-
-                        basketAnchor.className = "btn btn-dark w-100 mt-5 mb-3";
-
-                        basketAnchor.innerHTML = self.resources.ViewBasket;
-
-                        moduleOptionGroupElement.appendChild(basketAnchor);
-
-                        let closeBtn = document.createElement('button');
-
-                        closeBtn.setAttribute("type", "button");
-
-                        closeBtn.className = "btn btn-secondary w-100";
-
-                        closeBtn.innerHTML = self.resources.CloseAndReturnToProductPage;
-
-                        closeBtn.setAttribute("data-bs-dismiss", "modal");
-
-                        moduleOptionGroupElement.appendChild(closeBtn);
-
-                        document.querySelector(".module-option-preview .carousel-item.active")?.appendChild(moduleOptionGroupElement);
+                        document.querySelector(".module-option-modal.fade.show .module-preview-carousel .carousel-item.active")?.appendChild(moduleOptionGroupElement);
 
                         ko.applyBindings(productPageModel, moduleOptionGroupElement)
 
@@ -317,24 +299,52 @@
 
                         ko.applyBindings(orderFormGroupViewModel(self), orderFormDetailsElement);
 
+                        window.setTimeout(() => {
+
+                            let sampleBtn = orderFormDetailsElement.querySelector('.module-option-modal.fade.show .module-preview-carousel .carousel-item.active .order-form-controls .btn-secondary');
+
+                            sampleBtn.remove();
+
+                            orderFormDetailsElement.querySelector('.order-form-item-properties').innerHTML = '';
+
+                            orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(productNameSpan);
+
+                            orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(sampleBtn);
+
+                            if (initialOpen == null) {
+                                window.setTimeout(() => {
+                                    if (window.isMobileSite()) {
+                                        document.querySelector('.module-option-modal.fade.show .modal-body').scrollTo({
+                                            top: document.querySelector('.module-option-modal.fade.show').querySelector('.module-option-preview').offsetTop - 17,
+                                            left: 0,
+                                            behavior: 'instant'
+                                        });
+                                    }
+                                    self.moduleBusy(false);
+                                }, 0);
+                            } else {
+                                self.moduleBusy(false);
+                            }
+
+                        }, 0);
+
                         ko.applyBindings(window.basketModel, basketSamplesPanel);
 
+                        window.lazyImages();
                     }, 0);
-                }
-
-                if (window.isMobileSite()) {
-                    document.querySelector('.module-option-modal.fade.show').scrollTo({
-                        top: 0,
-                        left: 0,
-                        behavior: 'smooth'
-                    });
                 }
             })
             .catch(err => {
                 self.moduleBusy(false);
-            })
+            });
+    }
 
-        return true;
+    self.modularFurnitureGoBack = () => {
+        document.querySelector('.module-option-modal.fade.show .modal-body').scrollTo({
+            top: self.modularFurnitureScrollHold,
+            left: 0,
+            behavior: 'instant'
+        });
     }
 
     //#endregion

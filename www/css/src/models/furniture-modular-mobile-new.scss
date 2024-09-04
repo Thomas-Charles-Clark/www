@@ -10,6 +10,17 @@
             gap: $l-gutter;
         }
     }
+
+
+    .order-form-item {
+        .basket-message {
+            font-size: $font-size-base;
+        }
+    }
+
+    .basket-sample {
+        font-size: $font-size-base;
+    }
 }
 
 .modules-container {
@@ -52,7 +63,7 @@
         padding-bottom: 64px;
 
         .flex-wrapper {
-            flex-direction: column-reverse;
+            flex-direction: column;
 
             .accordion-wrapper {
                 padding: 0;
@@ -72,6 +83,11 @@
                 margin-top: 0;
                 padding: 0;
                 position: static;
+                min-height: 400px;
+
+                .carousel-inner {
+                    overflow: visible;
+                }
 
                 .carousel-item-heading {
                     flex-wrap: wrap;
@@ -89,6 +105,21 @@
                     .carousel-item-price {
                         margin-left: auto;
                     }
+                }
+            }
+
+            .confirm-module-option-btn-wrapper {
+                display: flex;
+                gap: $m-gutter;
+
+                .back-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: $vsm-gutter;
+                }
+
+                a {
+                    flex: 1;
                 }
             }
         }

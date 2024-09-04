@@ -49,24 +49,6 @@
   height: auto;
   min-height: 100vh;
 }
-.module-option-modal .modal-content .modal-body {
-  overflow-y: initial;
-}
-.module-option-modal .modal-header {
-  position: static;
-}
-.module-option-modal .modal-header h1 {
-  font-size: 32px;
-  text-transform: none;
-  text-align: center;
-  margin-bottom: 0;
-  padding: 1rem;
-}
-.module-option-modal .modal-header .btn-close {
-  position: absolute;
-  right: 44px;
-  top: 44px;
-}
 .module-option-modal .accordion-wrapper {
   max-height: 100%;
   overflow-y: auto;
@@ -134,7 +116,7 @@
 .module-option-modal .grid.module-option-preview > div:not(.page-blocker) {
   position: relative;
 }
-.module-option-modal .grid.module-option-preview > div:not(.page-blocker) img {
+.module-option-modal .grid.module-option-preview > div:not(.page-blocker) img:not(.order-form-image) {
   width: 100%;
   height: auto;
 }
@@ -152,8 +134,7 @@
 }
 .module-option-modal .carousel-item .carousel-item-heading h4 {
   font-family: "Gill-Sans", "Open Sans";
-  font-weight: 600;
-  font-size: 24px;
+  margin-bottom: 0;
 }
 .module-option-modal .carousel-item .carousel-item-heading h4.carousel-item-name {
   flex: 0 1 75%;
@@ -162,6 +143,13 @@
   font-family: "Open Sans";
   font-weight: 400;
   font-size: 22px;
+}
+.module-option-modal .carousel-item .order-form-controls label,
+.module-option-modal .carousel-item .order-form-controls input {
+  display: none;
+}
+.module-option-modal .carousel-item .order-form-controls button {
+  margin-left: 0;
 }
 .module-option-modal .carousel-item .order-form-item-properties {
   display: grid;
@@ -172,6 +160,31 @@
   margin-left: 0;
   line-height: normal;
   grid-template-columns: auto 1fr;
+}
+.module-option-modal .carousel-item .order-form-product .order-form-details {
+  margin-bottom: 0;
+}
+.module-option-modal .carousel-item .order-form-product .order-form-details .order-form-item-properties {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  align-self: stretch;
+  margin-right: 0;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.module-option-modal .carousel-item .order-form-product .order-form-details .order-form-item-properties .dots-wrapper {
+  display: none;
+}
+.module-option-modal .carousel-item .order-form-product .order-form-details .order-form-image {
+  margin-right: 0.75rem;
+}
+.module-option-modal .carousel-item .order-form-product .basket-message {
+  flex: 1 1 100%;
+  text-align: right;
+  padding-top: 0.5rem;
+  padding-bottom: 0;
 }
 .module-option-modal .carousel-item .carousel-item-body {
   display: flex;
@@ -214,7 +227,7 @@
 }
 
 .module-option-modal .accordion .grid {
-  --bs-columns: 1;
+  --bs-columns: 3;
   gap: 0.5rem;
 }
 
@@ -237,7 +250,9 @@
   font-weight: 200;
 }
 .modules-container .module-btn {
-  font-size: 1.159375rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 64px;
 }
 .modules-container .module-btn.btn-light {
@@ -248,13 +263,12 @@
   background-color: #f8f9fa;
 }
 .modules-container .module-btn i {
-  padding: 0.5rem 0 0.5rem 1rem;
   margin-left: auto;
 }
 
 .module-option-modal .flex-wrapper {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   justify-content: center;
 }
 .module-option-modal .flex-wrapper .accordion-wrapper {
@@ -262,13 +276,13 @@
 }
 .module-option-modal .flex-wrapper .module-option-preview {
   position: sticky;
-  top: 54px;
+  top: 57px;
   left: 0;
   padding-right: 3rem;
   padding-bottom: 3rem;
 }
 .module-option-modal .flex-wrapper .module-option-preview.margin-top-lg {
-  margin-top: 54px;
+  margin-top: 57px;
 }
 .module-option-modal .flex-wrapper .module-option-preview .module-option-group-heading {
   padding-left: 0;
@@ -278,10 +292,9 @@
 }
 .module-option-modal .flex-wrapper .module-option-preview .order-form-product > .my-3 {
   margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #dee2e6;
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
 }
-.module-option-modal .flex-wrapper .module-option-preview .order-form-details .order-form-image,
 .module-option-modal .flex-wrapper .module-option-preview .order-form-details .product-price {
   display: none;
 }
@@ -295,6 +308,7 @@
 }
 .basket-samples-panel #basket-samples-carousel-heading {
   font-size: 0.875rem;
+  margin-bottom: 0.75rem;
 }
 .basket-samples-panel #basket-samples-carousel .carousel-control-icon-wrapper {
   width: 1.5rem;
@@ -377,7 +391,7 @@
 }
 @media (min-width: 992px) {
   .module-option-modal .flex-wrapper .module-option-preview.margin-top-lg {
-    margin-top: 54px;
+    margin-top: 57px;
   }
   .module-option-modal .flex-wrapper .module-option-preview .module-option-group-heading {
     padding-left: 0;
