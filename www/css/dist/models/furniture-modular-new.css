@@ -219,6 +219,9 @@
 .module-option-modal .carousel-item a {
   display: block;
 }
+.module-option-modal .carousel-item > .order-form-item-properties {
+  display: none;
+}
 .module-option-modal .carousel-item.active:hover .carousel-caption h5 {
   background-color: white;
 }
@@ -247,7 +250,6 @@
 }
 .modules-container .card .card-body .btn {
   flex: 1;
-  font-weight: 200;
 }
 .modules-container .module-btn {
   display: flex;
@@ -272,7 +274,7 @@
   justify-content: center;
 }
 .module-option-modal .flex-wrapper .accordion-wrapper {
-  flex: 0 1 50%;
+  flex: 0 1 75%;
 }
 .module-option-modal .flex-wrapper .module-option-preview {
   position: sticky;
@@ -304,7 +306,7 @@
 }
 
 .basket-samples-panel {
-  margin-top: 2rem;
+  margin-top: 0;
 }
 .basket-samples-panel #basket-samples-carousel-heading {
   font-size: 0.875rem;
@@ -379,6 +381,26 @@
     flex: 0 1 50%;
   }
 }
+/*$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  mxl: 1120px,
+  xl: 1320px,
+  xxl: 1600px,
+  xxxl: 1920px
+) !default;*/
+@media (min-width: 768px) {
+  .module-option-modal .accordion .grid {
+    --bs-columns: 2;
+  }
+}
+@media (min-width: 992px) {
+  .module-option-modal .accordion .grid {
+    --bs-columns: 3;
+  }
+}
 @media (min-width: 1120px) {
   .module-option-modal .accordion .grid {
     --bs-columns: 4;
@@ -386,7 +408,17 @@
 }
 @media (min-width: 1320px) {
   .module-option-modal .accordion .grid {
+    --bs-columns: 4;
+  }
+}
+@media (min-width: 1600px) {
+  .module-option-modal .accordion .grid {
     --bs-columns: 6;
+  }
+}
+@media (min-width: 1920px) {
+  .module-option-modal .accordion .grid {
+    --bs-columns: 8;
   }
 }
 @media (min-width: 992px) {
@@ -399,5 +431,12 @@
   .module-option-modal .flex-wrapper .module-option-preview .module-option-group-heading.carousel-item-price {
     padding-right: 0;
   }
+}
+#basket-samples-carousel .carousel-inner {
+  overflow: hidden;
+}
+#basket-samples-carousel.carousel .carousel-control-next,
+#basket-samples-carousel.carousel .carousel-control-prev {
+  top: 40%;
 }
 /*# sourceMappingURL=furniture-modular-new.css.map */

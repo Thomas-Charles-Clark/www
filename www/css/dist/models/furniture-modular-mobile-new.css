@@ -18,11 +18,22 @@
   padding-left: 0.5rem;
   gap: 1rem;
 }
-.module-option-modal .order-form-item .basket-message {
+.module-option-modal .order-form-details .basket-message {
   font-size: 0.875rem;
 }
 .module-option-modal .basket-sample {
   font-size: 0.875rem;
+}
+.module-option-modal .basket-sample span {
+  word-break: break-all;
+}
+
+#basket-samples-carousel .carousel-inner {
+  overflow: hidden;
+}
+#basket-samples-carousel.carousel .carousel-control-next,
+#basket-samples-carousel.carousel .carousel-control-prev {
+  top: 40%;
 }
 
 .modules-container .card {
@@ -69,13 +80,14 @@
   padding: 0 0.25rem;
 }
 .module-option-modal .modal-body .flex-wrapper .module-option-group {
-  padding: 0 0.1rem;
+  padding: 0.25rem 0.1rem;
 }
 .module-option-modal .modal-body .flex-wrapper .module-option-preview {
   margin-top: 0;
   padding: 0;
   position: static;
   min-height: 400px;
+  gap: 1rem;
 }
 .module-option-modal .modal-body .flex-wrapper .module-option-preview .carousel-inner {
   overflow: visible;

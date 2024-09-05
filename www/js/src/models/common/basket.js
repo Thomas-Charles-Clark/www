@@ -57,7 +57,7 @@
         for (let i = 0; i < samples.length; i++) {
             results[results.length - 1].samples.push(samples[i]);
             counter++;
-            if (counter % 6 == 0) {
+            if (counter % 6 == 0 && i + 1 < samples.length) {
                 counter = 0;
                 results.push({
                     samples: []
@@ -118,20 +118,50 @@
                         //target.parentElement == order-form-controls
 
                         //target.parentElement.parentElement == order-form-item
+
+
                         if (target) {
-                            if (target.parentElement.parentElement.querySelector('.basket-message'))
-                                target.parentElement.parentElement.removeChild(target.parentElement.parentElement.querySelector('.basket-message'));
+                            let modularFurnitureModal = target.closest('.module-option-preview') != null;
 
-                            let bisr = target.parentElement.parentElement.querySelector('.back-in-stock-wrapper');
+                            if (modularFurnitureModal == false) {
 
-                            if (bisr) {
-                                target.parentElement.parentElement.removeChild(bisr);
-                            }
+                                let extant = target.parentElement.parentElement.querySelector('.basket-message');
 
-                            target.parentElement.parentElement.insertAdjacentHTML('beforeend', `<span class="basket-message">${reply.basketLineText}</span>`);
+                                if (extant)
+                                    target.parentElement.parentElement.removeChild(extant);
 
-                            if (bisr) {
-                                target.parentElement.parentElement.appendChild(bisr);
+                                let bisr = target.parentElement.parentElement.querySelector('.back-in-stock-wrapper');
+
+                                if (bisr) {
+                                    target.parentElement.parentElement.removeChild(bisr);
+                                }
+
+                                target.parentElement.parentElement.insertAdjacentHTML('beforeend', `<span class="basket-message">${reply.basketLineText}</span>`);
+
+                                if (bisr) {
+                                    target.parentElement.parentElement.appendChild(bisr);
+                                }
+
+                            } else {
+
+                                let parent = target.closest('.order-form-details').parentElement.querySelector('.order-form-item.relative');
+
+                                let extant = parent.querySelector('.basket-message');
+
+                                if (extant)
+                                    parent.removeChild(extant);
+
+                                let bisr = parent.querySelector('.back-in-stock-wrapper');
+
+                                if (bisr) {
+                                    parent.removeChild(bisr);
+                                }
+
+                                parent.insertAdjacentHTML('beforeend', `<span class="basket-message">${reply.basketLineText}</span>`);
+
+                                if (bisr) {
+                                    parent.appendChild(bisr);
+                                }
                             }
                         }
                        

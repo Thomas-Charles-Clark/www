@@ -287,7 +287,7 @@
 
                         basketSamplesPanel.setAttribute("data-bind", "template: { name: 'basket-samples-panel-template', data: window.basketModel }");
 
-                        moduleOptionGroupElement.appendChild(basketSamplesPanel);
+                        document.querySelector('.module-option-modal.fade.show .module-option-preview').appendChild(basketSamplesPanel);
 
                         document.querySelector(".module-option-modal.fade.show .module-preview-carousel .carousel-item.active")?.appendChild(moduleOptionGroupElement);
 
@@ -299,34 +299,30 @@
 
                         ko.applyBindings(orderFormGroupViewModel(self), orderFormDetailsElement);
 
-                        window.setTimeout(() => {
+                        let sampleBtn = orderFormDetailsElement.querySelector('.module-option-modal.fade.show .module-preview-carousel .carousel-item.active .order-form-controls .btn-secondary');
 
-                            let sampleBtn = orderFormDetailsElement.querySelector('.module-option-modal.fade.show .module-preview-carousel .carousel-item.active .order-form-controls .btn-secondary');
+                        sampleBtn.remove();
 
-                            sampleBtn.remove();
+                        orderFormDetailsElement.querySelector('.order-form-item-properties').innerHTML = '';
 
-                            orderFormDetailsElement.querySelector('.order-form-item-properties').innerHTML = '';
+                        orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(productNameSpan);
 
-                            orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(productNameSpan);
+                        orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(sampleBtn);
 
-                            orderFormDetailsElement.querySelector('.order-form-item-properties').appendChild(sampleBtn);
-
-                            if (initialOpen == null) {
-                                window.setTimeout(() => {
-                                    if (window.isMobileSite()) {
-                                        document.querySelector('.module-option-modal.fade.show .modal-body').scrollTo({
-                                            top: document.querySelector('.module-option-modal.fade.show').querySelector('.module-option-preview').offsetTop - 17,
-                                            left: 0,
-                                            behavior: 'instant'
-                                        });
-                                    }
-                                    self.moduleBusy(false);
-                                }, 0);
-                            } else {
+                        if (initialOpen == null) {
+                            window.setTimeout(() => {
+                                if (window.isMobileSite()) {
+                                    document.querySelector('.module-option-modal.fade.show .modal-body').scrollTo({
+                                        top: document.querySelector('.module-option-modal.fade.show').querySelector('.module-option-preview').offsetTop - 17,
+                                        left: 0,
+                                        behavior: 'instant'
+                                    });
+                                }
                                 self.moduleBusy(false);
-                            }
-
-                        }, 0);
+                            }, 0);
+                        } else {
+                            self.moduleBusy(false);
+                        }
 
                         ko.applyBindings(window.basketModel, basketSamplesPanel);
 
@@ -337,6 +333,23 @@
             .catch(err => {
                 self.moduleBusy(false);
             });
+    }
+
+    self.modularFurnitureCarouselSlideTo = (carouselElementId, targetIndex, productPageId, fabricProductPageId, optionName, initialOpen) => {
+
+        let params = {
+            carouselElementId, targetIndex, productPageId, fabricProductPageId, optionName, initialOpen
+        }
+
+        console.log("modularFurnitureCarouselSlideTo called with", params);
+
+        let carousel = bootstrap.Carousel.getOrCreateInstance(document.querySelector(carouselElementId));
+
+        carousel.to(targetIndex);
+
+        console.log(`${carouselElementId} sliding to: ${targetIndex}`);
+
+        self.modularFurnitureModuleSelected(productPageId, fabricProductPageId, optionName, initialOpen);
     }
 
     self.modularFurnitureGoBack = () => {

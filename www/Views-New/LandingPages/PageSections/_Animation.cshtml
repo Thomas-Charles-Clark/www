@@ -226,13 +226,17 @@ var hotspotIndex = 0;
                @if (multiple)
                 {
                     <button class="carousel-control-prev" type="button" aria-controls="page-section-@(pageSectionId)-carousel" data-bs-target="#page-section-@(pageSectionId)-carousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="carousel-control-icon-wrapper">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </span>
                         <span class="visually-hidden">
                             @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
                         </span>
                     </button>
                     <button class="carousel-control-next" type="button" aria-controls="page-section-@(pageSectionId)-carousel" data-bs-target="#page-section-@(pageSectionId)-carousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="carousel-control-icon-wrapper">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </span>
                         <span class="visually-hidden">
                             @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
                         </span>

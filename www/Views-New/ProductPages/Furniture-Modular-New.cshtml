@@ -267,15 +267,30 @@
     </div>
     @foreach (var mod in Model.Modules)
     {
-        <div class="modal module-option-modal fade" tabindex="-1" id="module-@(mod.ModuleID)-modal" data-bind="event: { 'shown.bs.modal': () => { return modularFurnitureModuleSelected(@(mod.Current.ProductPageID), @(mod.Current.FabricProductPageID.HasValue ? $"{mod.Current.FabricProductPageID}" : "null"), '@(mod.Current.Name)', true); } }">
+        var currentIndex = 0;
+
+        if (mod.GroupedOptions.Any())
+        {
+            var allOptions = mod.GroupedOptions.SelectMany(go => go.Options).ToList();
+
+            var current = allOptions.Find(o => o.ProductPageID == mod.Current.ProductPageID);
+
+            currentIndex = allOptions.IndexOf(current);
+        }
+        else
+        {
+            // noop?
+        }
+
+        <div class="modal module-option-modal fade" tabindex="-1" id="module-@(mod.ModuleID)-modal" data-bind="event: { 'shown.bs.modal': () => { return modularFurnitureCarouselSlideTo('#module-@(mod.ModuleID)-carousel-a', @(currentIndex), @(mod.Current.ProductPageID), @(mod.Current.FabricProductPageID.HasValue ? $"{mod.Current.FabricProductPageID}" : "null"), '@(mod.Current.Name)', true); } }">
             <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
                 <div class="modal-content">
-                    <div class="page-blocker" style="display: none" data-bind="flexFadeVisible: moduleBusy">
+                    @*<div class="page-blocker" style="display: none" data-bind="flexFadeVisible: moduleBusy">
                         <div class="spinner-border"></div>
                         <h4>
                             @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
                         </h4>
-                    </div>
+                    </div>*@
                     <div class="modal-header">
                         <h4 class="modal-title">
                             @(mod.Name)
@@ -313,10 +328,8 @@
                                                                 open = mod.Current.ProductPageID == mo.ProductPageID;
 
                                                                 <button class="card"
-                                                                        data-bs-target="#module-@(mod.ModuleID)-carousel-a"
-                                                                        data-bs-slide-to="@(index)"
                                                                         class="@(open ? "active" : "")"
-                                                                        data-bind="event: { click: (data, event) => { modularFurnitureModuleSelected(@(mo.ProductPageID), @(mo.FabricProductPageID.HasValue ? $"{mo.FabricProductPageID}" : "null"), '@(mo.Name)'); } }">
+                                                                        data-bind="click: (data, event) => { modularFurnitureCarouselSlideTo('#module-@(mod.ModuleID)-carousel-a', @(index), @(mo.ProductPageID), @(mo.FabricProductPageID.HasValue ? $"{mo.FabricProductPageID}" : "null"), '@(mo.Name)', null) }">
                                                                     <img src="/image@(Framework.WebPFallback)/322/@(mo.ModuleOptionImageID)"
                                                                          width="322"
                                                                          height="322"
@@ -343,8 +356,7 @@
                                     <div class="grid"
                                          style="--bs-columns: @(((mod.OptionsExceptCurrent.Count() + 1) >= 6) ? 6 : mod.OptionsExceptCurrent.Count() + 1)">
                                         <button class="card active"
-                                                data-bs-target="#module-@(mod.ModuleID)-carousel-a"
-                                                data-bs-slide-to="0">
+                                                data-bind="click: (data, event) => { modularFurnitureCarouselSlideTo('#module-@(mod.ModuleID)-carousel-a', 0) }">
                                             <img src="/image@(Framework.WebPFallback)/322/@(mod.Current.ModuleOptionImageID)"
                                                  width="322"
                                                  height="322"
@@ -371,9 +383,7 @@
                                             var mo = obj.value;
                                             var moIndex = obj.index + 1;
                                             <button class="card"
-                                                    data-bs-target="#module-@(mod.ModuleID)-carousel-a"
-                                                    data-bs-slide-to="@(moIndex)"
-                                                    data-bind="event: { click: (data, event) => { modularFurnitureModuleSelected(@(mo.ProductPageID), @(mo.FabricProductPageID.HasValue ? $"{mo.FabricProductPageID}" : "null"), '@(mo.Name)'); } }">
+                                                    data-bind="click: (data, event) => { modularFurnitureCarouselSlideTo('#module-@(mod.ModuleID)-carousel-a', @(moIndex), @(mo.ProductPageID), @(mo.FabricProductPageID.HasValue ? $"{mo.FabricProductPageID}" : "null"), '@(mo.Name)', null) }">
                                                 <img src="/image@(Framework.WebPFallback)/322/@(mo.ModuleOptionImageID)"
                                                      width="322"
                                                      height="322"

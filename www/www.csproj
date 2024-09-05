@@ -2654,7 +2654,6 @@
     <Content Include="css\dist\common\trade.min.css.map" />
     <Content Include="css\dist\common\variables.css.map" />
     <Content Include="css\dist\common\variables.min.css.map" />
-    <Content Include="css\dist\fonts\bootstrap-icons.min.css.map" />
     <Content Include="css\dist\fonts\font-awesome.min.css.map" />
     <Content Include="css\dist\fonts\fonts.min.css.map" />
     <Content Include="css\dist\lib\bootstrap\scss\bootstrap-grid.css.map" />

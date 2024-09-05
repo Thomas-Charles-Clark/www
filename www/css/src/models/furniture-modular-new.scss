@@ -264,6 +264,10 @@
         a {
             display: block;
         }
+
+        > .order-form-item-properties {
+            display: none;
+        }
     }
 
     .carousel-item.active:hover {
@@ -313,7 +317,6 @@
 
             .btn {
                 flex: 1;
-                font-weight: 200;
             }
         }
     }
@@ -347,7 +350,7 @@ $margin-top-offset: 57px;
         justify-content: center;
 
         .accordion-wrapper {
-            flex: 0 1 50%;
+            flex: 0 1 75%;
         }
 
         .module-option-preview {
@@ -394,7 +397,7 @@ $margin-top-offset: 57px;
 }
 
 .basket-samples-panel {
-    margin-top: $xl-gutter;
+    margin-top: 0;
 
     #basket-samples-carousel-heading {
         font-size: $font-size-base;
@@ -501,6 +504,38 @@ $margin-top-offset: 57px;
     }
 }
 
+/*$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  mxl: 1120px,
+  xl: 1320px,
+  xxl: 1600px,
+  xxxl: 1920px
+) !default;*/
+
+@include media-breakpoint-up(md) {
+    .module-option-modal {
+        .accordion {
+            .grid {
+                --bs-columns: 2;
+            }
+        }
+    }
+}
+
+
+@include media-breakpoint-up(lg) {
+    .module-option-modal {
+        .accordion {
+            .grid {
+                --bs-columns: 3;
+            }
+        }
+    }
+}
+
 @include media-breakpoint-up(mxl) {
     .module-option-modal {
         .accordion {
@@ -515,7 +550,27 @@ $margin-top-offset: 57px;
     .module-option-modal {
         .accordion {
             .grid {
+                --bs-columns: 4;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-up(xxl) {
+    .module-option-modal {
+        .accordion {
+            .grid {
                 --bs-columns: 6;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-up(xxxl) {
+    .module-option-modal {
+        .accordion {
+            .grid {
+                --bs-columns: 8;
             }
         }
     }
@@ -538,6 +593,20 @@ $margin-top-offset: 57px;
                     }
                 }
             }
+        }
+    }
+}
+
+
+#basket-samples-carousel {
+    .carousel-inner {
+        overflow: hidden;
+    }
+
+    &.carousel {
+        .carousel-control-next,
+        .carousel-control-prev {
+            top: 40%;
         }
     }
 }
