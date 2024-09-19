@@ -58,65 +58,67 @@
                 let parentElement = data.images().filter(im => im.ImageID == i.ImageID)[0].data.DOMElement.parentElement;
                 let result = imageViewModel(null);
                 result = Object.assign(result, i);
-                result.hotspots(data.Hotspots.flatMap(h => h.ImageID == i.ImageID ? h.Hotspots : []));
-                result.hotspots().forEach(h => {
-                    let ofg = orderFormGroupViewModel();
+                if (!window.isMobileSite()) {
+                    result.hotspots(data.Hotspots.flatMap(h => h.ImageID == i.ImageID ? h.Hotspots : []));
+                    result.hotspots().forEach(h => {
+                        let ofg = orderFormGroupViewModel();
 
-                    let product = h.Product.Product;
+                        let product = h.Product.Product;
 
-                    let products = [];
+                        let products = [];
 
-                    let mainProduct = productViewModel(product.productId, 1);
+                        let mainProduct = productViewModel(product.productId, 1);
 
-                    if (product.controls.allowSample) {
-                        let sample = productViewModel(product.productId, 1);
-                        sample.data(product.sample);
-                        sample.orderFormTypeId = 0;
-                        sample.quantity(sample.stockMessage.quantityMinimum);
-                        products.push(sample);
-                    }
+                        if (product.controls.allowSample) {
+                            let sample = productViewModel(product.productId, 1);
+                            sample.data(product.sample);
+                            sample.orderFormTypeId = 0;
+                            sample.quantity(sample.stockMessage.quantityMinimum);
+                            products.push(sample);
+                        }
 
-                    if (product.controls.allowLargeSample) {
-                        let largeSample = productViewModel(product.productId, 1);
-                        largeSample.data(product.largeSample);
-                        largeSample.orderFormTypeId = 1;
-                        largeSample.quantity(largeSample.stockMessage.quantityMinimum);
-                        products.push(largeSample);
-                    }
+                        if (product.controls.allowLargeSample) {
+                            let largeSample = productViewModel(product.productId, 1);
+                            largeSample.data(product.largeSample);
+                            largeSample.orderFormTypeId = 1;
+                            largeSample.quantity(largeSample.stockMessage.quantityMinimum);
+                            products.push(largeSample);
+                        }
 
-                    if (product.controls.allowOrder) {
-                        let order = productViewModel(product.productId, 1);
-                        order.data(product);
-                        order.orderFormTypeId = 2;
-                        order.quantity(order.stockMessage.quantityMinimum);
-                        products.push(order);
-                    }
+                        if (product.controls.allowOrder) {
+                            let order = productViewModel(product.productId, 1);
+                            order.data(product);
+                            order.orderFormTypeId = 2;
+                            order.quantity(order.stockMessage.quantityMinimum);
+                            products.push(order);
+                        }
 
-                    if (product.controls.allowReserve) {
-                        let reserve = productViewModel(product.productId, 2);
-                        reserve.data(product);
-                        reserve.orderFormTypeId = 3;
-                        reserve.quantity(reserve.stockMessage.quantityMinimum);
-                        products.push(reserve);
-                    }
+                        if (product.controls.allowReserve) {
+                            let reserve = productViewModel(product.productId, 2);
+                            reserve.data(product);
+                            reserve.orderFormTypeId = 3;
+                            reserve.quantity(reserve.stockMessage.quantityMinimum);
+                            products.push(reserve);
+                        }
 
-                    if (product.controls.allowReserveWithBatchSample) {
-                        let reserveWithBatch = productViewModel(product.productId, 3);
-                        reserveWithBatch.data(product);
-                        reserveWithBatch.orderFormTypeId = 4;
-                        reserveWithBatch.quantity(reserveWithBatch.stockMessage.quantityMinimum);
-                        products.push(reserveWithBatch);
-                    }
+                        if (product.controls.allowReserveWithBatchSample) {
+                            let reserveWithBatch = productViewModel(product.productId, 3);
+                            reserveWithBatch.data(product);
+                            reserveWithBatch.orderFormTypeId = 4;
+                            reserveWithBatch.quantity(reserveWithBatch.stockMessage.quantityMinimum);
+                            products.push(reserveWithBatch);
+                        }
 
-                    mainProduct.data(product);
+                        mainProduct.data(product);
 
-                    mainProduct.products(products);
+                        mainProduct.products(products);
 
-                    ofg.products([mainProduct]);
-                    ofg.markup = parentElement.querySelector(`.hotspot-marker #product-${product.productId}`).closest('.hotspot-marker').outerHTML;
-                    ofg.markup = ofg.markup.replace(`product-${product.productId}`, `product-hotspot-${product.productId}`);
-                    result.orderFormGroups.push(ofg);
-                });
+                        ofg.products([mainProduct]);
+                        ofg.markup = parentElement.querySelector(`.hotspot-marker #product-${product.productId}`).closest('.hotspot-marker').outerHTML;
+                        ofg.markup = ofg.markup.replace(`product-${product.productId}`, `product-hotspot-${product.productId}`);
+                        result.orderFormGroups.push(ofg);
+                    });
+                }
                 //let result = Object.assign({}, i);
                 //result.Hotspots = data.Hotspots.flatMap(h => h.ImageID == i.ImageID ? h.Hotspots : [])
                 //result.Hotspots.forEach(h => {

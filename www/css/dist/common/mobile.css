@@ -718,6 +718,10 @@ ul.breadcrumb li {
   left: -1px;
 }
 
+.html-section .grid > div .carousel-cta {
+  padding: 0.25rem 0.5rem;
+}
+
 .carousel.pointer-event {
   touch-action: manipulation;
 }

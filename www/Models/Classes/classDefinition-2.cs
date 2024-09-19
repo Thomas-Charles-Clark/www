@@ -1251,9 +1251,8 @@ namespace wwwDesignersGuild.Models.Classes
             }
         }
 
-
-        public string metaDescription 
-        { 
+        public string metaDescription
+        {
             set
             {
 
@@ -1261,6 +1260,30 @@ namespace wwwDesignersGuild.Models.Classes
             get
             {
                 return JObject.FromObject(json).SelectToken("metaDescription")?.Value<string>();
+            }
+        }
+
+        public string delivery
+        {
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectToken("delivery")?.Value<string>();
+            }
+        }
+
+        public string deliveryHTMLSection 
+        { 
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectToken("deliveryHTMLSection")?.Value<string>();
             }
         }
 

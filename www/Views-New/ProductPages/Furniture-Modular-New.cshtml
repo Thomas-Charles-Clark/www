@@ -101,11 +101,18 @@
                                          data-bs-toggle="modal"
                                          @HtmlHelperExtra.ImageSourceSetSizes(module.Current.ModuleOptionImageID, ImageSize.Two) />
                                 </div>
-                                <button class="btn btn-secondary module-btn"
+                                <button class="btn module-btn"
                                         aria-controls="module-@(module.ModuleID)-modal"
                                         data-bs-target="#module-@(module.ModuleID)-modal"
                                         data-bs-toggle="modal">
-                                    @module.Name
+                                    <span class="text-start">
+                                        <span class="d-block bold">
+                                            @module.Name
+                                        </span>
+                                        <span>
+                                            @module.OptionsCount @HtmlHelperExtra.Resource("OptionsLowercase", l, c, d)
+                                        </span>
+                                    </span>
                                     @*<span class="d-block">
                                             (@module.OptionsCount)
                                         </span>*@
@@ -173,6 +180,18 @@
                 }
             }
             <div id="product-page-accordion" class="my-3 accordion accordion-flush">
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="description-panel-heading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description-panel" aria-expanded="true" aria-controls="description-panel">
+                            @HtmlHelperExtra.Resource("Description", l, c, d)
+                        </button>
+                    </h6>
+                    <div id="description-panel" class="accordion-collapse collapse show" aria-labelledby="description-panel" data-bs-parent="#product-page-accordion">
+                        <div class="accordion-body">
+                            @Html.Raw(JObject.FromObject(Model.Definition.json).SelectToken("description"))
+                        </div>
+                    </div>
+                </div>
                 @if (!String.IsNullOrEmpty(Model.Modules.FirstOrDefault()?.FitGuide))
                 {
                     <div class="accordion-item">
@@ -188,18 +207,6 @@
                         </div>
                     </div>
                 }
-                <div class="accordion-item">
-                    <h6 class="accordion-header" id="description-panel-heading">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#description-panel" aria-expanded="true" aria-controls="description-panel">
-                            @HtmlHelperExtra.Resource("Description", l, c, d)
-                        </button>
-                    </h6>
-                    <div id="description-panel" class="accordion-collapse collapse" aria-labelledby="description-panel" data-bs-parent="#product-page-accordion">
-                        <div class="accordion-body">
-                            @Html.Raw(JObject.FromObject(Model.Definition.json).SelectToken("description"))
-                        </div>
-                    </div>
-                </div>
                 <div class="accordion-item">
                     <h6 class="accordion-header" id="information-panel-heading">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#information-panel" aria-expanded="false" aria-controls="information-panel">
@@ -262,6 +269,23 @@
                         </div>
                     </div>
                 </div>
+                @if (!String.IsNullOrEmpty(Model.Definition.deliveryHTMLSection))
+                {
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="delivery-html-section-panel-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#delivery-panel" aria-expanded="false" aria-controls="delivery-panel">
+                                @HtmlHelperExtra.Resource("Delivery", l, c, d)
+                            </button>
+                        </h6>
+                        <div id="delivery-panel" class="accordion-collapse collapse" aria-labelledby="delivery-panel" data-bs-parent="#product-page-accordion">
+                            <div class="accordion-body">
+                                <div class="page-section html-section">
+                                    @Html.Raw(Model.Definition.deliveryHTMLSection)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>

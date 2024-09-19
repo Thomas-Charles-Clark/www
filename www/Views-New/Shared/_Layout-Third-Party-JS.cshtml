@@ -9,8 +9,10 @@
 
     var productionVersion = System.Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]);
 }
-@* Facebook *@
-@if (productionVersion)
+@* Facebook - excluded from Stockists Search 11/09/2024 *@
+@if (productionVersion &&
+        !(Model.MasterDefinition.UrlBreakdown.ContentType == dgContentType.landingPage && Model.MasterDefinition.UrlBreakdown.ContentId == (int)dgFixedPage.stockists)
+    )
 {
     <script type="text/javascript" defer>
         window.fbAsyncInit = function () {
@@ -85,6 +87,21 @@
     fbq('track', 'PageView');
     </script>
     <!-- End Facebook Pixel Code -->
+}
+
+@if (productionVersion)
+{
+    <!-- Hotjar Tracking Code for Site 5125385 (name missing) -->
+    <script>
+        (function (h, o, t, j, a, r) {
+            h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };
+            h._hjSettings = { hjid: 5125385, hjsv: 6 };
+            a = o.getElementsByTagName('head')[0];
+            r = o.createElement('script'); r.async = 1;
+            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+    </script>
 }
 
 @* Pinterest *@

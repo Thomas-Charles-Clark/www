@@ -628,14 +628,23 @@ input::-webkit-inner-spin-button {
         }
     }
 
+    .carousel-control-next {
+        right: 1%;
+    }
+
+    .carousel-control-prev {
+        left: 1%;
+    }
+
     .carousel-control-next,
     .carousel-control-prev {
         display: flex;
         opacity: 0.0;
-        width: 10%;
+        width: auto;
         bottom: initial;
         top: 50%;
-        transform: translate(0, -1.5rem);
+        transform: translate(0, -50%);
+        clip-path: circle(1.5rem);
 
         &:hover {
             opacity: 0.9;
@@ -2847,7 +2856,6 @@ nav.article-type-nav.article-sub-type-nav {
 
 .html-section {
     .carousel {
-
         .carousel-inner {
             .carousel-item {
                 .grid {

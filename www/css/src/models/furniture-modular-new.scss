@@ -122,10 +122,10 @@
     .grid.module-option-preview {
         --bs-columns: 1;
         gap: $sm-gutter;
-        flex: 0 1 50%;
+        flex: 0 1 40%;
         align-self: flex-start;
         margin-top: $vsm-gutter;
-        padding-right: $xl-gutter;
+        padding-right: 0;
         max-width: 640px;
 
         > div:not(.page-blocker) {
@@ -145,6 +145,11 @@
 
     .module-option-group {
         padding: 0 $m-gutter;
+
+        .grid {
+            overflow: visible;
+            padding-bottom: $m-gutter;
+        }
     }
 
     .carousel-item {
@@ -303,6 +308,7 @@
             gap: $l-gutter;
             align-items: center;
             justify-content: flex-start;
+            padding: 0;
 
             .thumb-wrapper {
                 /*border: 3px dashed $white;*/
@@ -323,9 +329,10 @@
 
     .module-btn {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         height: 64px;
+        border: 1px solid $gray-300;
 
         &.btn-light {
             width: 100%;
@@ -336,7 +343,10 @@
         }
 
         i {
-            margin-left: auto;
+            position: absolute;
+            right: 1em;
+            top: 50%;
+            transform: translateY(-50%);
         }
     }
 }
@@ -350,14 +360,14 @@ $margin-top-offset: 57px;
         justify-content: center;
 
         .accordion-wrapper {
-            flex: 0 1 75%;
+            flex: 0 1 100%;
         }
 
         .module-option-preview {
             position: sticky;
             top: $margin-top-offset;
             left: 0;
-            padding-right: $xxl-gutter;
+            padding-right: $m-gutter;
             padding-bottom: $xxl-gutter;
 
             &.margin-top-lg {
@@ -374,9 +384,9 @@ $margin-top-offset: 57px;
 
             .order-form-product {
                 > .my-3 {
-                    margin-top: $m-gutter;
-                    border: 1px solid $gray-300;
+                    margin-top: 0 !important;
                     padding: $m-gutter;
+                    background-color: $gray-100;
                 }
             }
 
@@ -453,6 +463,27 @@ $margin-top-offset: 57px;
                 background-color: $white;
                 padding: $xs-gutter $m-gutter;
             }
+
+            .remove-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background-color: $white;
+                opacity: 0.4;
+                transition: opacity 150ms ease-in-out;
+                cursor: pointer;
+                font-size: $font-size-md;
+                padding: $xs-gutter $vsm-gutter;
+                border-bottom-left-radius: 4px;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+
+            span {
+                word-break: break-all;
+            }
         }
     }
 }
@@ -464,25 +495,15 @@ $margin-top-offset: 57px;
                 --bs-columns: 2;
             }
         }
-    }
-}
 
-@include media-breakpoint-up(md) {
-    .module-option-modal {
-        .accordion {
-            .grid {
-                --bs-columns: 3;
+        .flex-wrapper {
+            .accordion-wrapper {
+                flex: 0 1 45%;
             }
         }
-    }
-}
 
-@include media-breakpoint-up(lg) {
-    .module-option-modal {
-        .accordion {
-            .grid {
-                --bs-columns: 4;
-            }
+        .grid.module-option-preview {
+            flex: 0 1 55%;
         }
     }
 }
@@ -493,12 +514,6 @@ $margin-top-offset: 57px;
         .carousel-item {
             a {
                 max-width: 100%;
-            }
-        }
-
-        .flex-wrapper {
-            .accordion-wrapper {
-                flex: 0 1 50%;
             }
         }
     }
@@ -519,8 +534,18 @@ $margin-top-offset: 57px;
     .module-option-modal {
         .accordion {
             .grid {
-                --bs-columns: 2;
+                --bs-columns: 3;
             }
+        }
+
+        .flex-wrapper {
+            .accordion-wrapper {
+                flex: 0 1 60%;
+            }
+        }
+
+        .grid.module-option-preview {
+            flex: 0 1 40%;
         }
     }
 }
@@ -530,8 +555,18 @@ $margin-top-offset: 57px;
     .module-option-modal {
         .accordion {
             .grid {
-                --bs-columns: 3;
+                --bs-columns: 4;
             }
+        }
+
+        .flex-wrapper {
+            .accordion-wrapper {
+                flex: 0 1 65%;
+            }
+        }
+
+        .grid.module-option-preview {
+            flex: 0 1 35%;
         }
     }
 }
@@ -543,6 +578,16 @@ $margin-top-offset: 57px;
                 --bs-columns: 4;
             }
         }
+
+        .flex-wrapper {
+            .accordion-wrapper {
+                flex: 0 1 70%;
+            }
+        }
+
+        .grid.module-option-preview {
+            flex: 0 1 30%;
+        }
     }
 }
 
@@ -550,8 +595,18 @@ $margin-top-offset: 57px;
     .module-option-modal {
         .accordion {
             .grid {
-                --bs-columns: 4;
+                --bs-columns: 7;
             }
+        }
+
+        .flex-wrapper {
+            .accordion-wrapper {
+                flex: 0 1 75%;
+            }
+        }
+
+        .grid.module-option-preview {
+            flex: 0 1 25%;
         }
     }
 }
@@ -560,7 +615,7 @@ $margin-top-offset: 57px;
     .module-option-modal {
         .accordion {
             .grid {
-                --bs-columns: 6;
+                --bs-columns: 8;
             }
         }
     }
@@ -606,7 +661,7 @@ $margin-top-offset: 57px;
     &.carousel {
         .carousel-control-next,
         .carousel-control-prev {
-            top: 40%;
+
         }
     }
 }

@@ -107,10 +107,10 @@
 .module-option-modal .grid.module-option-preview {
   --bs-columns: 1;
   gap: 0.5rem;
-  flex: 0 1 50%;
+  flex: 0 1 40%;
   align-self: flex-start;
   margin-top: 0.25rem;
-  padding-right: 2rem;
+  padding-right: 0;
   max-width: 640px;
 }
 .module-option-modal .grid.module-option-preview > div:not(.page-blocker) {
@@ -126,6 +126,10 @@
 }
 .module-option-modal .module-option-group {
   padding: 0 0.75rem;
+}
+.module-option-modal .module-option-group .grid {
+  overflow: visible;
+  padding-bottom: 0.75rem;
 }
 .module-option-modal .carousel-item .carousel-item-heading {
   margin: 1rem 0;
@@ -239,6 +243,7 @@
   gap: 1rem;
   align-items: center;
   justify-content: flex-start;
+  padding: 0;
 }
 .modules-container .card .card-body .thumb-wrapper {
   /*border: 3px dashed $white;*/
@@ -253,9 +258,10 @@
 }
 .modules-container .module-btn {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   height: 64px;
+  border: 1px solid #dee2e6;
 }
 .modules-container .module-btn.btn-light {
   width: 100%;
@@ -265,7 +271,10 @@
   background-color: #f8f9fa;
 }
 .modules-container .module-btn i {
-  margin-left: auto;
+  position: absolute;
+  right: 1em;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .module-option-modal .flex-wrapper {
@@ -274,13 +283,13 @@
   justify-content: center;
 }
 .module-option-modal .flex-wrapper .accordion-wrapper {
-  flex: 0 1 75%;
+  flex: 0 1 100%;
 }
 .module-option-modal .flex-wrapper .module-option-preview {
   position: sticky;
   top: 57px;
   left: 0;
-  padding-right: 3rem;
+  padding-right: 0.75rem;
   padding-bottom: 3rem;
 }
 .module-option-modal .flex-wrapper .module-option-preview.margin-top-lg {
@@ -293,9 +302,9 @@
   padding-right: 0;
 }
 .module-option-modal .flex-wrapper .module-option-preview .order-form-product > .my-3 {
-  margin-top: 0.75rem;
-  border: 1px solid #dee2e6;
+  margin-top: 0 !important;
   padding: 0.75rem;
+  background-color: #f8f9fa;
 }
 .module-option-modal .flex-wrapper .module-option-preview .order-form-details .product-price {
   display: none;
@@ -357,28 +366,39 @@
   background-color: #fff;
   padding: 0.1rem 0.75rem;
 }
+.basket-samples-panel #basket-samples-carousel .basket-sample .remove-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #fff;
+  opacity: 0.4;
+  transition: opacity 150ms ease-in-out;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0.1rem 0.25rem;
+  border-bottom-left-radius: 4px;
+}
+.basket-samples-panel #basket-samples-carousel .basket-sample .remove-icon:hover {
+  opacity: 0.8;
+}
+.basket-samples-panel #basket-samples-carousel .basket-sample span {
+  word-break: break-all;
+}
 
 @media (min-width: 576px) {
   .module-option-modal .accordion .grid {
     --bs-columns: 2;
   }
-}
-@media (min-width: 768px) {
-  .module-option-modal .accordion .grid {
-    --bs-columns: 3;
+  .module-option-modal .flex-wrapper .accordion-wrapper {
+    flex: 0 1 45%;
   }
-}
-@media (min-width: 992px) {
-  .module-option-modal .accordion .grid {
-    --bs-columns: 4;
+  .module-option-modal .grid.module-option-preview {
+    flex: 0 1 55%;
   }
 }
 @media (max-width: 991.98px) {
   .module-option-modal .carousel-item a {
     max-width: 100%;
-  }
-  .module-option-modal .flex-wrapper .accordion-wrapper {
-    flex: 0 1 50%;
   }
 }
 /*$grid-breakpoints: (
@@ -393,27 +413,51 @@
 ) !default;*/
 @media (min-width: 768px) {
   .module-option-modal .accordion .grid {
-    --bs-columns: 2;
+    --bs-columns: 3;
+  }
+  .module-option-modal .flex-wrapper .accordion-wrapper {
+    flex: 0 1 60%;
+  }
+  .module-option-modal .grid.module-option-preview {
+    flex: 0 1 40%;
   }
 }
 @media (min-width: 992px) {
   .module-option-modal .accordion .grid {
-    --bs-columns: 3;
+    --bs-columns: 4;
+  }
+  .module-option-modal .flex-wrapper .accordion-wrapper {
+    flex: 0 1 65%;
+  }
+  .module-option-modal .grid.module-option-preview {
+    flex: 0 1 35%;
   }
 }
 @media (min-width: 1120px) {
   .module-option-modal .accordion .grid {
     --bs-columns: 4;
   }
+  .module-option-modal .flex-wrapper .accordion-wrapper {
+    flex: 0 1 70%;
+  }
+  .module-option-modal .grid.module-option-preview {
+    flex: 0 1 30%;
+  }
 }
 @media (min-width: 1320px) {
   .module-option-modal .accordion .grid {
-    --bs-columns: 4;
+    --bs-columns: 7;
+  }
+  .module-option-modal .flex-wrapper .accordion-wrapper {
+    flex: 0 1 75%;
+  }
+  .module-option-modal .grid.module-option-preview {
+    flex: 0 1 25%;
   }
 }
 @media (min-width: 1600px) {
   .module-option-modal .accordion .grid {
-    --bs-columns: 6;
+    --bs-columns: 8;
   }
 }
 @media (min-width: 1920px) {
@@ -434,9 +478,5 @@
 }
 #basket-samples-carousel .carousel-inner {
   overflow: hidden;
-}
-#basket-samples-carousel.carousel .carousel-control-next,
-#basket-samples-carousel.carousel .carousel-control-prev {
-  top: 40%;
 }
 /*# sourceMappingURL=furniture-modular-new.css.map */

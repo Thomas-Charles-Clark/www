@@ -31,11 +31,6 @@
 #basket-samples-carousel .carousel-inner {
   overflow: hidden;
 }
-#basket-samples-carousel.carousel .carousel-control-next,
-#basket-samples-carousel.carousel .carousel-control-prev {
-  top: 40%;
-}
-
 .modules-container .card {
   border: 0;
 }

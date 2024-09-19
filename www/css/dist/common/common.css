@@ -598,14 +598,21 @@ input::-webkit-inner-spin-button {
 .carousel:hover .carousel-control-prev {
   opacity: 0.4;
 }
+.carousel .carousel-control-next {
+  right: 1%;
+}
+.carousel .carousel-control-prev {
+  left: 1%;
+}
 .carousel .carousel-control-next,
 .carousel .carousel-control-prev {
   display: flex;
   opacity: 0;
-  width: 10%;
+  width: auto;
   bottom: initial;
   top: 50%;
-  transform: translate(0, -1.5rem);
+  transform: translate(0, -50%);
+  clip-path: circle(1.5rem);
 }
 .carousel .carousel-control-next:hover,
 .carousel .carousel-control-prev:hover {

@@ -405,7 +405,9 @@ namespace wwwDesignersGuild.ViewModels
                 "SearchTerm",
                 "SearchTermOptional",
                 "SearchFiltersShowAll",
-                "EnterSearch"
+                "EnterSearch",
+                "AreYouSure",
+                "ConfirmBasketItemDelete"
             };
 
             foreach (var r in requiredResources)

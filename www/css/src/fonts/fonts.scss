@@ -1,0 +1,179 @@
+﻿/* fallback */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/css/dist/fonts/src/material-icons.woff2") format('woff2');
+}
+/* latin */
+@font-face {
+    font-family: 'Open Sans';
+    font-display: swap;
+    font-weight: 300;
+    src: url("/css/dist/fonts/src/open-sans-300.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-display: swap;
+    font-weight: 400;
+    src: url("/css/dist/fonts/src/open-sans-400.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-display: swap;
+    font-weight: 600;
+    src: url("/css/dist/fonts/src/open-sans-600.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-display: swap;
+    font-weight: 700;
+    src: url("/css/dist/fonts/src/open-sans-700.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-display: swap;
+    font-weight: 900;
+    src: url("/css/dist/fonts/src/open-sans-900.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+@font-face {
+    font-family: 'Trixie';
+    font-display: swap;
+    font-weight: 400;
+    src: url(src/trixie-web-pro-regular.woff2) format('woff2');
+}
+@font-face {
+    font-family: 'Trixie';
+    font-display: swap;
+    font-weight: 700;
+    src: url(src/trixie-web-pro-heavy.woff2) format('woff2');
+}*/
+
+@font-face {
+    font-family: 'Care Symbols';
+    font-display: swap;
+    font-weight: 400;
+    src: url("/css/dist/fonts/src/wash-care-symbols-m54.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Trixie Rough"; /* Trixie Rough OT W05 Light */
+    font-display: swap;
+    font-weight: 400;
+    src: url("/css/dist/fonts/src/5355145/7b581bfb-fe90-4438-9589-f44b3f85e5e1.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Trixie Rough"; /* Trixie Rough OT W05 Heavy */
+    font-display: swap;
+    font-weight: 700;
+    src: url("/css/dist/fonts/src/5353122/44f98f55-29b4-4bb1-99b3-e9298ecfec9b.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Trixie"; /* Trixie W05 Light */
+    font-display: swap;
+    font-weight: 400;
+    src: url("/css/dist/fonts/src/5359239/acb8e019-6e8d-486d-9222-15170d9657c1.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Trixie"; /* Trixie W05 Heavy */
+    font-display: swap;
+    font-weight: 600;
+    src: url("/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Trixie"; /* Trixie W05 Heavy */
+    font-display: swap;
+    font-weight: 700;
+    src: url(/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2);
+    src: local("/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2"), url("/css/dist/fonts/src/5355143/c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Gill-Sans";
+    font-display: swap;
+    font-weight: 400;
+    src: url(/css/dist/fonts/src/gill-sans-light.ttf);
+}
+
+/*@font-face {
+    font-family: "Trixie";*/ /* Trixie HD W05 Heavy */
+/*font-display: swap;
+    font-weight: 700;
+    src: url("/css/dist/fonts/src/5361968/9f40b09f-113d-4f09-b06f-ec32ec3eca88.woff2") format("woff2");
+}*/
+
+/* This file needs replacing once Fonts.com get back to us */
+/*@font-face {
+    font-family: "Trixie W05 HD Light";*/ /* Trixie W05 HD Light */
+/*src: url("/css/dist/fonts/src/5765071/acabe057-a581-46f6-ae2a-0541e2873b47.woff2") format("woff2");
+}*/
+
+.trixie {
+    font-family: 'Trixie';
+}
+
+h1.trixie {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #808080;
+}
+
+h2.trixie {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #808080;
+}
+
+.trixie-rough {
+    font-family: 'Trixie Rough';
+}
+
+.care-symbol {
+    font-family: 'Care Symbols';
+    font-size: 3rem;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.bolder {
+    font-weight: bolder;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-display: swap;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}

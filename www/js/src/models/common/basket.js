@@ -1,6 +1,6 @@
 ﻿const basketViewModel = ((resources) => {
     let self = {
-        resources: ko.observable(resources)
+        resources: resources
     };
 
     //#region Properties
@@ -229,6 +229,58 @@
                 window.catchFetchErrors(err);
             });
     }
+
+    self.removeBasketItem = (basketItem) => {
+        window.showConfirm(self.resources.AreYouSure, self.resources.ConfirmBasketItemDelete, () => {
+            var data = {
+                objMaster: getMasterDefinition(),
+                productId: basketItem?.ProductID,
+                basketLineTypeId: basketItem?.BasketLineTypeID,
+                quantity: 0,
+                basketCountry: getSiteCountry(),
+                savedForLaterFlag: false
+            }
+
+            console.log('updateBasket calling with', data);
+
+            self.busy(true);
+
+            fetch('/api/basket/UpdateBasket', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                cache: 'no-store',
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+                .then(window.handleFetchResponse)
+                .then((data) => {
+                    console.log('updateBasket returned', data);
+
+                    self.basketItems(data.BasketItems);
+
+                    if (data.handleErrorMessage) {
+                        alert(getResource('majorError'));
+                        return;
+                    }
+
+                    if (typeof updateDotDigital === 'function') {
+                        updateDotDigital();
+                    }
+
+                    if (basketItem
+                        && typeof gTagAddToCart === 'function'
+                        && typeof gTagRemoveFromCart === 'function') {
+
+                        gTagRemoveFromCart(basketItem, 999999);
+                    }
+                })
+                .catch((err) => {
+                    window.catchFetchErrors(err);
+                    self.busy(false);
+                });
+        }, null);
+    }
+
     // very handy toggle scrapbook functionality
     self.toggleScrapbook = (i, e) => {
         console.trace(i, e);

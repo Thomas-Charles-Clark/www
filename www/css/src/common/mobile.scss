@@ -769,6 +769,16 @@ ul.breadcrumb {
     }
 }
 
+.html-section {
+    .grid {
+        > div {
+            .carousel-cta {
+                padding: $vsm-gutter $sm-gutter;
+            }
+        }
+    }
+}
+
 .carousel.pointer-event {
     touch-action: manipulation;
 }

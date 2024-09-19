@@ -111,7 +111,7 @@
                 @if (!String.IsNullOrEmpty(Model.FurniturePDFURL))
                 {
                     <a class="btn btn-dark"
-                       href="~/pdf/furniture/@Model.FurniturePDFURL"
+                       href="@Model.FurniturePDFURL"
                        target="_blank">
                         @HtmlHelperExtra.Resource("DimensionsAndTechnicalSpecs", l, c, d)
                     </a>

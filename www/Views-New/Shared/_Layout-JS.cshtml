@@ -315,8 +315,8 @@
                 <div class="grid gap-2" style="--bs-columns: 6">
                     <!-- ko foreach: samples -->
                     <div class="basket-sample">
+                        <i class="remove-icon bi bi-x" data-bind="click: $parentContext.$parent.removeBasketItem"></i>
                         <img data-bind="attr: { src: `/image/90/${ImageID}`, title: BasketName, alt: BasketName }" width="90" height="90" />
-                        <span data-bind="text: BasketName"></span>
                     </div>
                     <!-- /ko -->
                 </div>

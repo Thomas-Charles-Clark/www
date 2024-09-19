@@ -2915,6 +2915,9 @@
     <Content Include="css\dist\models\furniture-modular-mobile-new.min.css.map" />
     <Content Include="css\dist\models\furniture-modular-new.css.map" />
     <Content Include="css\dist\models\furniture-modular-new.min.css.map" />
+    <Content Include="css\src\fonts\fonts.scss" />
+    <Content Include="css\src\fonts\font-awesome.scss" />
+    <Content Include="css\src\fonts\bootstrap-icons.scss" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
