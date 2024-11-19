@@ -38,7 +38,7 @@
                     @Model.Definition.CollectionDetails.SubHeading
                 </h5>
                 <p>
-                    @Model.Definition.CollectionDetails.Description
+                    @Html.Raw(Model.Definition.CollectionDetails.Description?.Replace("\n", "<br/><br/>"))
                 </p>
             </div>
             <div class="my-3">

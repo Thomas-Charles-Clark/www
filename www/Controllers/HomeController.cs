@@ -1,4 +1,6 @@
-﻿using NLog;
+﻿using Kendo.Mvc;
+
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -46,53 +48,129 @@ namespace wwwDesignersGuild.Controllers
         {
             #region Redirectioneering
 
-            if (urlParameter?.IndexOf("uk/") == 0)
-            {
+            // Honestly, I don't love that this was done. Redirects should *all* be handled from the database.
+            // Tom 18/10/2024
+
+            if (urlParameter?.IndexOf("uk/") == 0 && urlParameter?.Length >= 4) 
+            {  
                 return new RedirectResult($"/en-gb/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("se/") == 0)
+            else if (urlParameter?.IndexOf("se/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-se/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("us/") == 0)
+            else if (urlParameter?.IndexOf("us/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-us/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("nl/") == 0)
+            else if (urlParameter?.IndexOf("nl/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-nl/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("be/") == 0)
+            else if (urlParameter?.IndexOf("be/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-be/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("au/") == 0)
+            else if (urlParameter?.IndexOf("au/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-au/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("dk/") == 0)
+            else if (urlParameter?.IndexOf("dk/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-dk/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("no/") == 0)
+            else if (urlParameter?.IndexOf("no/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-no/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("at/") == 0)
+            else if (urlParameter?.IndexOf("at/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/de-at/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("nz/") == 0)
+            else if (urlParameter?.IndexOf("nz/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-nz/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("ie/") == 0)
+            else if (urlParameter?.IndexOf("ie/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-ie/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
-            else if (urlParameter?.IndexOf("fi/") == 0)
+            else if (urlParameter?.IndexOf("fi/") == 0 && urlParameter?.Length >= 4)
             {
                 return new RedirectResult($"/en-fi/{urlParameter.Substring(3)}{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+
+            if (urlParameter == "uk" || urlParameter == "uk/" || urlParameter == "en-gb" || urlParameter == "en-gb/")
+            {
+                return new RedirectResult($"/en-gb/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "se" || urlParameter == "se/" || urlParameter == "en-se" || urlParameter == "en-se/")
+            {
+                return new RedirectResult($"/en-se/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "us" || urlParameter == "us/" || urlParameter == "en-us" || urlParameter == "en-us/")
+            {
+                return new RedirectResult($"/en-us/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "nl" || urlParameter == "nl/" || urlParameter == "en-nl" || urlParameter == "en-nl/")
+            {
+                return new RedirectResult($"/en-nl/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "be" || urlParameter == "be/" || urlParameter == "en-be" || urlParameter == "en-be/")
+            {
+                return new RedirectResult($"/en-be/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "au" || urlParameter == "au/" || urlParameter == "en-au" || urlParameter == "en-au/")
+            {
+                return new RedirectResult($"/en-au/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "dk" || urlParameter == "dk/" || urlParameter == "en-dk" || urlParameter == "en-dk/")
+            {
+                return new RedirectResult($"/en-dk/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "no" || urlParameter == "no/" || urlParameter == "en-no" || urlParameter == "en-no/")
+            {
+                return new RedirectResult($"/en-no/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "at" || urlParameter == "at/" || urlParameter == "de-at" || urlParameter == "de-at/")
+            {
+                return new RedirectResult($"/de-at/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "nz" || urlParameter == "nz/" || urlParameter == "en-nz" || urlParameter == "en-nz/")
+            {
+                return new RedirectResult($"/en-nz/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "ie" || urlParameter == "ie/" || urlParameter == "en-ie" || urlParameter == "en-ie/")
+            {
+                return new RedirectResult($"/en-ie/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "fi" || urlParameter == "fi/" || urlParameter == "en-fi" || urlParameter == "en-fi/")
+            {
+                return new RedirectResult($"/en-fi/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "de" || urlParameter == "de/")
+            {
+                return new RedirectResult($"/de/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "fr" || urlParameter == "fr/")
+            {
+                return new RedirectResult($"/fr/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "es" || urlParameter == "es/")
+            {
+                return new RedirectResult($"/es/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "it" || urlParameter == "it/")
+            {
+                return new RedirectResult($"/it/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "eu" || urlParameter == "eu/")
+            {
+                return new RedirectResult($"/eu/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
+            }
+            else if (urlParameter == "row" || urlParameter == "row/")
+            {
+                return new RedirectResult($"/de/l0{(Request.QueryString.HasKeys() ? $"\\?{Request.QueryString}" : "")}", true);
             }
 
             #endregion
@@ -392,6 +470,13 @@ namespace wwwDesignersGuild.Controllers
 
             #endregion
 
+            #region Basket Data
+
+            var objBasket = new basketRoutines();
+
+            var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, objVisitorSelect.memberId, urlData.countryDetails.CountryID);
+
+            #endregion
 
             #region Test for Redirect
 
@@ -410,26 +495,16 @@ namespace wwwDesignersGuild.Controllers
 
             #region Potential Redirect:  urlData.contentTypeAndIdNotFound
 
-            // 302
+            // 404
             //
             // Have we parsed a valid ContentType character and a valid number from your URLParameter?
-            // if not, boom you're being redirected to the default (which was set in the Parse function)
-            if (urlData.contentTypeAndIdNotFound == true)
+            // if not, boom you're being 404'ed
+            if (urlData.contentTypeAndIdNotFound == true && urlData.ContentId == -2)
             {
-                var url = dgFramework.buildUrl(
-                                urlData.countryDetails,
-                                "",
-                                DefaultContentType,
-                                DefaultContentId,
-                                !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-                                !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null);
-                
-                // Don't index this URL: it was invalid!
-                Response.Headers.Add("X-Robots-Tag", "noindex");
-
-                Response.Headers.Add("cache-control", "no-cache");
-
-                return new RedirectResult(url, true);
+                return await ReturnGeneric404(
+                    urlData,
+                    basketTotalData.TotalQuantity,
+                    objVisitorSelect);
             }
 
             #endregion
@@ -692,19 +767,31 @@ namespace wwwDesignersGuild.Controllers
                     }
                 }
 
-                var landingPageViewModel = await LandingPageViewModel.CreateAsync(
-                    objMaster: await NewMasterDefinition.CreateAsync(
-                        titleTag: null,
-                        metaDescription: null,
-                        backInStockReminder: (int?)Session["backInStockReminder"],
-                        itemsInBasket: 0m,
-                        urlBreakdown: urlData,
-                        googleHrefs: null,
-                        tradeMember: Session["memberTradeAccountID"] != null
-                    ),
-                    objVisitor: objVisitorSelect,
-                    isShop: IsShop
-                );
+                LandingPageViewModel landingPageViewModel = null; 
+
+                try 
+                {
+                    landingPageViewModel = await LandingPageViewModel.CreateAsync(
+                        objMaster: await NewMasterDefinition.CreateAsync(
+                            titleTag: null,
+                            metaDescription: null,
+                            backInStockReminder: (int?)Session["backInStockReminder"],
+                            itemsInBasket: 0m,
+                            urlBreakdown: urlData,
+                            googleHrefs: null,
+                            tradeMember: Session["memberTradeAccountID"] != null
+                        ),
+                        objVisitor: objVisitorSelect,
+                        isShop: IsShop
+                    );
+                }
+                catch (PageNotFoundException)
+                {
+                    return await ReturnGeneric404(
+                        urlData,
+                        basketTotalData.TotalQuantity,
+                        objVisitorSelect);
+                }
 
                 if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing)
                 {
@@ -872,6 +959,7 @@ namespace wwwDesignersGuild.Controllers
                     return View("~/Views-New/LandingPages/LandingPage.cshtml", landingPageViewModel);
                 }
             }
+
             #endregion
 
 
@@ -910,10 +998,6 @@ namespace wwwDesignersGuild.Controllers
                     memberTradeAccountId = (int?)Session["memberTradeAccountID"];
                 }
 
-                var objBasket = new basketRoutines();
-
-                var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, memberId, urlData.countryDetails.CountryID);
-
                 var collectionModel = await CollectionViewModel.CreateAsync
                     (
                         objMaster: await NewMasterDefinition.CreateAsync(
@@ -931,19 +1015,32 @@ namespace wwwDesignersGuild.Controllers
                 // We have no collection selected: redirect as appropriate.
                 if (collectionModel.Definition.CollectionDetails == null)
                 {
-                    //  Redirect the UK home page (last fall back)
-                    string url = dgFramework.buildUrl(urlData.countryDetails,
-                                                    null,
-                                                    DefaultContentType,
-                                                    DefaultContentId,
-                                                    !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-                                                    !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-                                                    Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
+                    if (collectionModel.Definition.objUnavailabilityRedirect != null)
+                    {
+                        var collection404Model = await CollectionViewModel_404.CreateAsync
+                            (
+                                redirectUrl: collectionModel.Definition.objUnavailabilityRedirect.redirectUrl,
+                                objMaster: await NewMasterDefinition.CreateAsync(
+                                    titleTag: "404 - Designers Guild",
+                                    metaDescription: "404 - Designers Guild",
+                                    backInStockReminder: (int?)Session["backInStockReminder"],
+                                    itemsInBasket: basketTotalData.TotalQuantity,
+                                    urlBreakdown: urlData,
+                                    googleHrefs: new List<googleHref>(),
+                                    tradeMember: Session["memberTradeAccountID"] != null
+                                ),
+                                objVisitor: objVisitorSelect
+                            );
 
-                    // Don't index the approached URL: it was an invalid or unavailable collection
-                    Response.Headers.Add("cache-control", "no-cache");
+                        Response.StatusCode = 404;
 
-                    return new RedirectResult(url, true);
+                        return View("~/Views-New/Collections/404.cshtml", collection404Model);
+                    }
+
+                    return await ReturnGeneric404(
+                        urlData,
+                        basketTotalData.TotalQuantity,
+                        objVisitorSelect);
                 }
                 else
                 {
@@ -1024,29 +1121,15 @@ namespace wwwDesignersGuild.Controllers
                 {
                     if (objProductData.objUnavailabilityRedirect == null || objProductData.objUnavailabilityRedirect.redirectUrl == null)
                     {
-                        //  Redirect the UK home page (last fall back)
-                        var url = dgFramework.buildUrl(urlData.countryDetails,
-                                                        null,
-                                                        DefaultContentType,
-                                                        DefaultContentId,
-                                                        !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-                                                        !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-                                                        Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-
-                        Response.Headers.Add("cache-control", "no-cache");
-
-                        return new RedirectResult(url, true);
-                    }
-                    else
-                    {
-                        Response.Headers.Add("cache-control", "no-cache");
-
-                        return new RedirectResult(objProductData.objUnavailabilityRedirect.redirectUrl, true);
+                        return await ReturnGeneric404(
+                            urlData,
+                            basketTotalData.TotalQuantity,
+                            objVisitorSelect);
                     }
                 }
 
 
-                if (URLKeywordsRequireCorrecting(urlData.countryDetails.URL, objProductData.objCacheSelect.urlSemantics, urlParameterWithoutSuffix) == true)
+                if (objProductData.objCacheSelect != null && URLKeywordsRequireCorrecting(urlData.countryDetails.URL, objProductData.objCacheSelect.urlSemantics, urlParameterWithoutSuffix) == true)
                 {
                     //  Self-healing URL
                     var tempUrl = dgFramework.buildUrl(urlData.countryDetails, objProductData.objCacheSelect.urlSemantics, dgContentType.productPage, urlData.ContentId,
@@ -1058,11 +1141,7 @@ namespace wwwDesignersGuild.Controllers
 
                     return new RedirectResult(tempUrl, true);
                 }
-
-                var objBasket = new basketRoutines();
-
-                var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, memberId, urlData.countryDetails.CountryID);
-
+                
                 //#if DEBUG
                 //              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.eu/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
                 //#else
@@ -1092,6 +1171,31 @@ namespace wwwDesignersGuild.Controllers
                 };
 
                 objVisitorFactory.logPageView(pageView);
+
+                if (objProductData.objCacheSelect == null &&
+                    objProductData.objUnavailabilityRedirect != null &&
+                    objProductData.objUnavailabilityRedirect.redirectUrl != null)
+                {
+                    var productPage404Model = await ProductPageViewModel_404.CreateAsync
+                        (
+                            redirectUrl: objProductData.objUnavailabilityRedirect.redirectUrl,
+                            objMaster: await NewMasterDefinition.CreateAsync(
+                                titleTag: objProductData.objCacheSelect?.titleTag,
+                                metaDescription: objProductData.objCacheSelect?.metaDescription,
+                                backInStockReminder: (int?)Session["backInStockReminder"],
+                                itemsInBasket: basketTotalData.TotalQuantity,
+                                urlBreakdown: urlData,
+                                googleHrefs: new List<googleHref>(),
+                                tradeMember: Session["memberTradeAccountID"] != null
+                            ),
+                            objVisitor: objVisitorSelect,
+                            isShop: IsShop
+                        );
+
+                    Response.StatusCode = 404;
+
+                    return View("~/Views-New/ProductPages/404.cshtml", productPage404Model);
+                }
 
                 // All cases in here SERVE [No. 4, whatever that means in 2022 Tom?] instead of redirecting
                 switch (objProductData.objCacheSelect.templateId)
@@ -1259,25 +1363,29 @@ namespace wwwDesignersGuild.Controllers
             if (urlData.ContentType == dgContentType.articlePage)
             {
                 var objLandingPage = new cmsArticlePage();
-                var objArticleData = await objLandingPage.loadArticlePageFromCms(urlData.ContentId,
-                                                                                        urlData.countryDetails.LanguageID,
-                                                                                        urlData.countryDetails.CountryID,
-                                                                                        urlData.ContentDate);
+
+                short parsedContentId = -1;
+
+                cmsArticlePageDefinition objArticleData = null;
+
+                if (Int16.TryParse($"{urlData.ContentId}", out parsedContentId)) 
+                {
+                    objArticleData = await objLandingPage.loadArticlePageFromCms(urlData.ContentId,
+                                                                                    urlData.countryDetails.LanguageID,
+                                                                                    urlData.countryDetails.CountryID,
+                                                                                    urlData.ContentDate);
+                }
+                else
+                {
+                    objArticleData = new cmsArticlePageDefinition();
+                }
 
                 if (objArticleData.ArticleDetails == null)
                 {
-                    //  Redirect the UK home page (last fall back)
-                    string url = dgFramework.buildUrl(urlData.countryDetails,
-                                                    null,
-                                                    DefaultContentType,
-                                                    DefaultContentId,
-                                                    !Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-                                                    !Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-                                                    Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-
-                    Response.Headers.Add("cache-control", "no-cache");
-
-                    return new RedirectResult(url, true);
+                    return await ReturnGeneric404(
+                        urlData,
+                        basketTotalData.TotalQuantity,
+                        objVisitorSelect);
                 }
 
 
@@ -1293,10 +1401,6 @@ namespace wwwDesignersGuild.Controllers
 
                     return new RedirectResult(tempUrl, true);
                 }
-
-                var objBasket = new basketRoutines();
-
-                var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, memberId, urlData.countryDetails.CountryID);
 
                 var articleViewModel = await ArticleViewModel.CreateAsync
                 (
@@ -1408,9 +1512,13 @@ namespace wwwDesignersGuild.Controllers
 
             #endregion CheckoutPart
 
+
             #region End Return 404 (never hit)
 
-            return HttpNotFound();
+            return await ReturnGeneric404(
+                urlData,
+                basketTotalData.TotalQuantity,
+                objVisitorSelect);
 
             #endregion
         }
@@ -1594,7 +1702,7 @@ namespace wwwDesignersGuild.Controllers
             var result = new urlBreakdown
             {
                 countryDetails = dgFramework.getCountryFromText(dgFramework.getDefaultCountry(), objCountryData),
-                ContentType = dgContentType.landingPage,
+                ContentType = dgContentType.invalid, // assume invalid
                 ContentId = (int)dgFixedPage.globalSiteSelector,
                 SemanticString = "",
                 ContentDate = useDate,
@@ -1607,6 +1715,10 @@ namespace wwwDesignersGuild.Controllers
                 // this isn't the be-all-and-end-all, is it
                 // because if the visitor has a previous culture, we want to direct them to that rather than serve them the www.designersguild.com page
                 // see lines 279 - 292
+
+                // must set landing page here, to avoid 404'ing them
+                result.ContentType = dgContentType.landingPage;
+
                 return result;
             }
 
@@ -1671,6 +1783,7 @@ namespace wwwDesignersGuild.Controllers
                     }
                 }
 
+                
                 string source = parameters[parameters.Length - 1];
 
                 if (source.Length > 1)
@@ -1684,6 +1797,7 @@ namespace wwwDesignersGuild.Controllers
                     if (result.ContentType == dgContentType.invalid)
                     {
                         result.contentTypeAndIdNotFound = true;
+                        result.ContentId = -2;
                         return result;
                     }
 
@@ -1695,6 +1809,7 @@ namespace wwwDesignersGuild.Controllers
                     else
                     {
                         result.contentTypeAndIdNotFound = true;
+                        result.ContentId = -2;
                         return result;
                     }
 
@@ -2041,6 +2156,35 @@ namespace wwwDesignersGuild.Controllers
             objReturn.objMaster = objMaster;
 
             return PartialView("~/Views-New/Shared/Components/_trackingJson.cshtml", objReturn);
+        }
+
+        public async Task<ViewResult> ReturnGeneric404(
+            urlBreakdown urlBreakdown,
+            decimal basketTotalQuantity,
+            VisitorSelect objVisitorSelect
+            )
+        {
+            var generic404model = await GenericViewModel_404.CreateAsync(
+                redirectUrl: $"/{urlBreakdown.countryDetails.URL}/l0",
+                objMaster: await NewMasterDefinition.CreateAsync(
+                        titleTag: "404 - Designers Guild",
+                        metaDescription: "404 - Designers Guild",
+                        backInStockReminder: (int?)Session["backInStockReminder"],
+                        itemsInBasket: basketTotalQuantity,
+                        urlBreakdown: urlBreakdown,
+                        googleHrefs: new List<googleHref>(),
+                        tradeMember: Session["memberTradeAccountID"] != null
+                    ),
+                objVisitor: objVisitorSelect);
+
+            // Don't index this URL: it was invalid!
+            Response.Headers.Add("X-Robots-Tag", "noindex");
+
+            Response.Headers.Add("cache-control", "no-cache");
+
+            Response.StatusCode = 404;
+
+            return View("~/Views-New/Shared/_404.cshtml", generic404model);
         }
     }
 }

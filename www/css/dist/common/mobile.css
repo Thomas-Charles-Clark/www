@@ -109,6 +109,27 @@ footer p {
   text-transform: uppercase;
 }
 
+#background-404 {
+  background-image: var(--bg-img);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 640px;
+  align-items: flex-start;
+  justify-content: center;
+}
+#background-404 .card {
+  position: relative;
+  background-color: transparent;
+  border: none;
+  margin-top: 1rem;
+  max-width: 50%;
+}
+#background-404 .card h1 {
+  font-family: "Trixie Rough";
+  font-size: 76px;
+  text-align: left;
+}
 .order-mobile-1 {
   order: 1;
 }

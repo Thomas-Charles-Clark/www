@@ -30,7 +30,7 @@ namespace wwwDesignersGuild.Util
                 var finalStream = new MemoryStream();
                 //PdfCopyFields copy = new PdfCopyFields(finalStream);
 
-                BaseFont gillSansMt = BaseFont.CreateFont(rootPath + "/css/fonts/src/gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+                BaseFont gillSansMt = BaseFont.CreateFont(rootPath + "/css/dist/fonts/src/gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
 
                 var normalFont = new Font(gillSansMt, 10, Font.NORMAL, BaseColor.BLACK);//FontFactory.GetFont("Arial", 10, Font.NORMAL, BaseColor.BLACK);
                 var subtitleFont = new Font(gillSansMt, 12, Font.NORMAL, BaseColor.BLACK);// FontFactory.GetFont("", 12, Font.BOLD, BaseColor.BLACK);
@@ -659,7 +659,7 @@ namespace wwwDesignersGuild.Util
                 var finalStream = new MemoryStream();
                 //PdfCopyFields copy = new PdfCopyFields(finalStream);
                 
-                BaseFont gillSansMt = BaseFont.CreateFont(rootPath + "/css/fonts/src/gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+                BaseFont gillSansMt = BaseFont.CreateFont(rootPath + "/css/dist/fonts/src/gill-sans-mt.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
 
                 var normalFont = new Font(gillSansMt, 10, Font.NORMAL, BaseColor.BLACK);//FontFactory.GetFont("Arial", 10, Font.NORMAL, BaseColor.BLACK);
                 var subtitleFont = new Font(gillSansMt, 12, Font.NORMAL, BaseColor.BLACK);// FontFactory.GetFont("", 12, Font.BOLD, BaseColor.BLACK);

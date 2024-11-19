@@ -89,6 +89,16 @@ namespace wwwDesignersGuild.ViewModels
                     MasterDefinition.TradeMember
                 );
 
+            if (Definition.CollectionDetails == null && Definition.objUnavailabilityRedirect != null)
+            {
+#if DEBUG
+                sw.Stop();
+
+                System.Diagnostics.Debug.WriteLine($"CollectionViewModel initialised in {sw.Elapsed}");
+#endif
+                return;
+            }
+
             Carousel = new CarouselViewModel(
                 carouselId: $"#collection-{MasterDefinition.UrlBreakdown.ContentId}-carousel",
                 wrapperCssClass: null,
@@ -118,9 +128,9 @@ namespace wwwDesignersGuild.ViewModels
                 }
             });
 
-            NoIndex = Definition.CollectionDetails.NoIndex;
+            NoIndex = Definition.CollectionDetails?.NoIndex == true;
 
-            NoFollow = Definition.CollectionDetails.NoFollow;
+            NoFollow = Definition.CollectionDetails?.NoFollow == true;
 
 #if DEBUG
             sw.Stop();

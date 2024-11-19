@@ -1,0 +1,43 @@
+﻿@model ProductPageViewModel_404
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+
+    var tradeUser = false;
+
+    if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) &&
+        Convert.ToBoolean(Session["tradeOrderingAllowed"]))
+    {
+        tradeUser = true;
+    }
+
+    ViewBag.Title = "404 - Designers Guild";
+}
+@section LateTemplateScripts {
+
+}
+<div id="ko-wrapper">
+    <div id="background-404" class="d-flex" style="--bg-img: url('https://www.designersguild.com/image@(Framework.WebPFallback)/@(dgFramework.IsMobileDevice() ? "1546" : "3092")/@(dgFramework.IsMobileDevice() ? "170704" : "170705")')">
+        <div class="card">
+            <h1>
+                404
+            </h1>
+            <p>
+                @HtmlHelperExtra.Resource("ProductPage404Message", l, c, d)
+            </p>
+            <p class="mb-0">
+                <a href="@(Model.RedirectURL)">@(Model.RedirectURL.IndexOf("/") == 0 ? $"{Request.Url.Scheme}://{Request.Url.Authority}{Model.RedirectURL}" : Model.RedirectURL)</a>
+            </p>
+        </div>
+    </div>
+</div>
+@if (!ViewBag.Partial)
+{
+    if (Model.ShowRecentlyViewed)
+    {
+        @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+    }
+}

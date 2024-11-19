@@ -114,7 +114,14 @@ namespace wwwDesignersGuild.ViewModels
         {
             get
             {
-                return JObject.FromObject(Prices).SelectToken("productPages").Children().Where(p => p.SelectToken("productPageId").Value<int>() == Definition.productPageId).Select(p => p.SelectToken("productPage")).Select(p => p.SelectToken("productPagePrice")).SingleOrDefault();
+                if (Prices != null)
+                {
+                    return JObject.FromObject(Prices).SelectToken("productPages").Children().Where(p => p.SelectToken("productPageId").Value<int>() == Definition.productPageId).Select(p => p.SelectToken("productPage")).Select(p => p.SelectToken("productPagePrice")).SingleOrDefault();
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -125,6 +132,19 @@ namespace wwwDesignersGuild.ViewModels
                 if (JObject.FromObject(Definition.json).SelectToken("reviewCount").Type != JTokenType.Null)
                 {
                     return JObject.FromObject(Definition.json).SelectToken("reviewCount").Value<int>();
+                }
+
+                return 0;
+            }
+        }
+
+        public byte TemplateID
+        {
+            get
+            {
+                if (JObject.FromObject(Definition.json).SelectToken("templateId").Type != JTokenType.Null)
+                {
+                    return JObject.FromObject(Definition.json).SelectToken("templateId").Value<byte>();
                 }
 
                 return 0;
@@ -852,7 +872,11 @@ namespace wwwDesignersGuild.ViewModels
 
             NoIndex = Definition.noIndex;
 
+            NoIndex = true;
+
             NoFollow = Definition.noFollow;
+
+            NoFollow = true;
 
 #if DEBUG
             sw.Stop();

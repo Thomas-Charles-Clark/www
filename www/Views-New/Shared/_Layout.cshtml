@@ -491,7 +491,11 @@
            </script>
            @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
         }
+
         @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
+
         @RenderSection("LateTemplateScripts", required: false)
+
+        @Render.ScriptDefer("~/bundles/js/bootstrap-onload")
     </body>
 </html>

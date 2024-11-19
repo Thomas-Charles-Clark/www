@@ -82,6 +82,7 @@ namespace wwwDesignersGuild.Models.CollectionPage
                 collectionVideos = results.GetResult<collectionVideo>().ToList<collectionVideo>(),
                 collectionGoogleHrefs = results.GetResult<googleHref>().ToList<googleHref>(),
                 collectionPageBreadcrumbs = results.GetResult<collectionBreadcrumb>().ToList(),
+                objUnavailabilityRedirect = results.GetResult<collectionUnavailabilityRedirect>().SingleOrDefault(),
             };
 
             return collectionStore;

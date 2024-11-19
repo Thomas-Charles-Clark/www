@@ -49,6 +49,8 @@
 
     self.accept = () => {
         document.cookie = `cookie-notice=done; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax; Secure; Path=/`;
+        if (typeof window.allConsentGranted === 'function')
+            window.allConsentGranted();
         self.hide();
     }
 

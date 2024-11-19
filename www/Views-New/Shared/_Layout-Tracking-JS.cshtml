@@ -47,8 +47,8 @@
     {
         @:window.dmPt("identify", "@(Session["memberEmail"])");
     }
-    else if ((Model.MasterDefinition.UrlBreakdown.ContentId != 213 && 
-            Model.MasterDefinition.UrlBreakdown.ContentId != 271 && 
+    else if ((Model.MasterDefinition.UrlBreakdown.ContentId != 213 &&
+            Model.MasterDefinition.UrlBreakdown.ContentId != 271 &&
             Model.MasterDefinition.UrlBreakdown.ContentId != 281) && (Session["memberEmail"] != null))
     {
         @:window.dmPt("identify", "@(Session["memberEmail"])");
@@ -59,7 +59,7 @@
 
             let dotDigitalModel = null;
 
-            if (productPageModel.hasOwnProperty('ProductPagePrice')) {
+            if (productPageModel.hasOwnProperty('ProductPagePrice') && productPageModel.ProductPagePrice != null) {
 
                 let priceMessage = null;
                 let price = productPageModel.ProductPagePrice.priceMin;
@@ -101,27 +101,29 @@
                 }
 
             } else {
-                dotDigitalModel = {
-                    product_name: productPageModel.Definition.heading || '',
-                    product_url: window.location.href,
-                    product_image_path: ('https://www.designersguild.com/image-nonwebp/600/' + productPageModel.images()[0].ImageID) || '',
-                    product_description: productPageModel.Definition.json.description || '',
-                    product_sku: ('P' + productPageModel.Definition.productPageId) || '',
-                    product_price: price || '',
-                    product_status: document.querySelector('#no-products-available') ? 'Not Available' : 'Available',
-                    product_currency: '@(objMaster.UrlBreakdown.countryDetails.CurrencyCode)',
-                    product_specialPrice: salePrice || '',
-                    product_price_was: '',
-                    product_price_now: '',
-                    product_categories: productPageModel.Definition.json.category || '',
-                    product_brand: productPageModel.Definition.json.brand || ''
-                };
+                if (productPageModel.images().length) {
 
-                if (dotDigitalModel != null) {
-                    console.log('dotDigital is pushing track with', dotDigitalModel);
-                    window.dmPt('track', dotDigitalModel);
+                    dotDigitalModel = {
+                        product_name: productPageModel.Definition.heading || '',
+                        product_url: window.location.href,
+                        product_image_path: ('https://www.designersguild.com/image-nonwebp/600/' + productPageModel.images()[0].ImageID) || '',
+                        product_description: productPageModel.Definition.json.description || '',
+                        product_sku: ('P' + productPageModel.Definition.productPageId) || '',
+                        product_price: price || '',
+                        product_status: document.querySelector('#no-products-available') ? 'Not Available' : 'Available',
+                        product_currency: '@(objMaster.UrlBreakdown.countryDetails.CurrencyCode)',
+                        product_specialPrice: salePrice || '',
+                        product_price_was: '',
+                        product_price_now: '',
+                        product_categories: productPageModel.Definition.json.category || '',
+                        product_brand: productPageModel.Definition.json.brand || ''
+                    };
+
+                    if (dotDigitalModel != null) {
+                        console.log('dotDigital is pushing track with', dotDigitalModel);
+                        window.dmPt('track', dotDigitalModel);
+                    }
                 }
-
             }
         } else {
             console.log('dotDigital is pushing track without details');

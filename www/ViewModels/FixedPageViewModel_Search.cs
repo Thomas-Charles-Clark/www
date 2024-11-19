@@ -377,6 +377,26 @@ namespace wwwDesignersGuild.ViewModels
 
             #endregion
 
+            #region Attempt to infer Product Type selection from search term
+
+            if (ProductPageGrid.ProductType == null && !String.IsNullOrEmpty(SearchTerm))
+            {
+                var searchTermLowered = SearchTerm.ToLowerInvariant();
+
+                var productType = ProductPageGrid.ProductTypes.SingleOrDefault(pt => {
+                    return pt.Name?.ToLowerInvariant() == searchTermLowered ||
+                           pt.NamePlural?.ToLowerInvariant() == searchTermLowered;
+                    }
+                );
+
+                if (productType != null)
+                {
+                    ProductPageGrid.ProductType = productType.FormValue;
+                }
+            }
+
+            #endregion
+
             productPageIdsToRender = ProductPageGrid.FilteredIDs.Skip((ProductPageGrid.Page - 1) * ProductPageGrid.PageSize).Take(ProductPageGrid.PageSize).ToList();
 
             #endregion

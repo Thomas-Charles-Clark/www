@@ -9,6 +9,8 @@
     var tradeUser = objMaster.TradeAllowed;
 
     var heading = Model.ProductPage.Heading?.Replace("\"", "'");
+
+    // 
 }
 <div>
     <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
@@ -37,7 +39,7 @@
             url = Framework.URLFixup(url);
         }
 
-        <a class="pod-card" href="@(url)">
+        <a class="pod-card" href="@(url)" rel="@(Model.Rel)">
             <div class="card">
                 @if (HtmlHelperExtra.Debug)
                 {

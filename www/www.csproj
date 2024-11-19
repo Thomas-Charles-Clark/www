@@ -468,6 +468,7 @@
     <Compile Include="Models\Careers\Careers.cs" />
     <Compile Include="Models\Checkout\Checkout.cs" />
     <Compile Include="Models\ClientError\ClientError.cs" />
+    <Compile Include="Models\CollectionPage\collectionUnavailabilityRedirect.cs" />
     <Compile Include="Models\Country\Country.cs" />
     <Compile Include="Models\County\CountyItem.cs" />
     <Compile Include="Models\CoverageCalculator\CoverageCalculator.cs" />
@@ -753,6 +754,8 @@
     <Compile Include="ViewModels\ArticleViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CarouselViewModel.cs" />
+    <Compile Include="ViewModels\GenericViewModel_404.cs" />
+    <Compile Include="ViewModels\CollectionViewModel_404.cs" />
     <Compile Include="ViewModels\CollectionViewModel.cs" />
     <Compile Include="ViewModels\FixedPageViewModel.cs" />
     <Compile Include="ViewModels\FixedPageViewModel_Checkout.cs" />
@@ -777,6 +780,7 @@
     <Compile Include="ViewModels\PagerViewModel.cs" />
     <Compile Include="ViewModels\ProductPagePodViewModel.cs" />
     <Compile Include="ViewModels\ProductPageViewModel.cs" />
+    <Compile Include="ViewModels\ProductPageViewModel_404.cs" />
     <Compile Include="ViewModels\ProductPageViewModel_Empty.cs" />
     <Compile Include="ViewModels\ProductPageViewModel_FabricWallpaper.cs" />
     <Compile Include="ViewModels\ProductPageViewModel_Furniture_Modular.cs" />
@@ -3145,6 +3149,9 @@
     </Content>
     <Content Include="Views-New\Shared\_TradeLoginPrompt.cshtml" />
     <Content Include="Views-New\ProductPages\Furniture-Modular-New.cshtml" />
+    <Content Include="Views-New\ProductPages\404.cshtml" />
+    <Content Include="Views-New\Collections\404.cshtml" />
+    <Content Include="Views-New\Shared\_404.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">

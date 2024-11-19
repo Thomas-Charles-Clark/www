@@ -22,7 +22,7 @@
      data-bs-interval="@(Model.Interval.HasValue ? $"{Model.Interval}" : "false")"
      data-bind="keepElement: images">
     <div class="carousel-inner" data-bind="foreachInit: { name: 'ko-blank-template', data: images, createElement: createImage }">
-       @foreach (var i in Model.Images.Select((value, index) => new { value, index }))
+        @foreach (var i in Model.Images.Select((value, index) => new { value, index }))
         {
             var image = i.value;
             var index = i.index;
@@ -62,7 +62,7 @@
                             @(Model.DisplayThumbnails && Model.PermitLargeImageModal ? @"click: (data, event) => { window.largeImageModal.load($parent, event) }" : "")"
                      @if ((dgFramework.IsMobileDevice() && index > 0) || image.ForceLazyLoading) { <text>
                      loading="lazy"
-                     </text>  }
+                     </text> }
                      @HtmlHelperExtra.ImageSourceSetSizes(image.ImageID, image.ImageSize, image.MaxWidth)>
                 <button class="btn btn-link btn-scrapbook position-absolute"
                         aria-label="@HtmlHelperExtra.Resource("AddToScrapbook", l, c, d)"
@@ -116,29 +116,32 @@
                 }
             </div>
         }
-       @if (!String.IsNullOrEmpty(Model.VideoURL))
+        @if (!String.IsNullOrEmpty(Model.VideoURL))
         {
             <div class="carousel-item @(Model.Images.Count == 0 ? "active" : "") carousel-video-item">
                 <iframe src="@(Model.VideoURL)" frameborder="0" allow="autoplay; fullscreen; picture-in-picture"></iframe>
             </div>
         }
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="prev">
-        <span class="carousel-control-icon-wrapper">
-            <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
-        </span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="next">
-        <span class="carousel-control-icon-wrapper">
-            <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
-        </span>
-        <span class="visually-hidden">Next</span>
-    </button>
-   @if ((Model.DisplayDashes == true) && (Model.DisplayThumbnails == false || dgFramework.IsMobileDevice() == true) && (multiple == true))
+   @if (Model.Images.Count > 1)
+    {
+        <button class="carousel-control-prev" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="prev">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="@(Model.CarouselID)" data-bs-slide="next">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    }
+    @if ((Model.DisplayDashes == true) && (Model.DisplayThumbnails == false || dgFramework.IsMobileDevice() == true) && (multiple == true))
     {
         <div class="carousel-indicators">
-           @foreach (var i in Model.Images.Select((value, index) => new { value, index }))
+            @foreach (var i in Model.Images.Select((value, index) => new { value, index }))
             {
                 var image = i.value;
                 var index = i.index;
@@ -149,7 +152,7 @@
                         aria-current="@(index == 0 ? "true" : "")"
                         aria-label="@HtmlHelperExtra.Resource("ImageSlide", l, c, d) @(index + 1)"></button>
             }
-           @if (!String.IsNullOrEmpty(Model.VideoURL))
+            @if (!String.IsNullOrEmpty(Model.VideoURL))
             {
                 <button data-bs-target="@(Model.CarouselID)"
                         data-bs-slide-to="@(Model.Images.Count)"

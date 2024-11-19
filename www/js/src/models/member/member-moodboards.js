@@ -79,6 +79,14 @@
 
     self.shareModalElement = document.querySelector('#moodboard-share-modal');
 
+    self.shareModalElement.addEventListener('show.bs.modal', () => {
+        window.setTimeout(() => {
+            document.getElementById('email-collapse').addEventListener('show.bs.collapse', () => {
+                self.emailer.initCaptcha();
+            }, { once: true });
+        }, 0);
+    }, { once: true })
+
     self.productsModalElement = document.querySelector('#moodboard-products-modal');
 
     self.validateEmailNow = ko.observable(false);
@@ -237,6 +245,14 @@
                     window.showInfo(self.resources.ThankYou, self.resources.MoodboardShareSendEmailSuccess)
                 else
                     window.showError();
+
+                try {
+                    grecaptcha.reset();
+                }
+                catch (e) {
+
+                }
+
                 if (typeof onComplete === 'function')
                     onComplete();
             })

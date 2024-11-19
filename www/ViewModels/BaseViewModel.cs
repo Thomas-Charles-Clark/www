@@ -432,6 +432,7 @@ namespace wwwDesignersGuild.ViewModels
 
             RecentlyViewed.ForEach(rv => 
             {
+                rv.NoFollow = true;
                 rv.ProductPage.ReviewCount = 0;
             });
 

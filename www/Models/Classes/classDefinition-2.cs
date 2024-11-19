@@ -9,11 +9,13 @@ using System.Text;
 using System.Web;
 using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Checkout;
+using wwwDesignersGuild.Models.CollectionPage;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Models.ImgSize;
 using wwwDesignersGuild.Models.ProductPage;
+using wwwDesignersGuild.Models.Redirects;
 using wwwDesignersGuild.Models.Source;
 using wwwDesignersGuild.Models.Trade;
 using wwwDesignersGuild.Util;
@@ -2075,6 +2077,9 @@ namespace wwwDesignersGuild.Models.Classes
         public List<googleHref> collectionGoogleHrefs { get; set; }
         public List<collectionBreadcrumb> collectionPageBreadcrumbs { get; set; }
         public PageSectionJSON productPageJson { get; set; }
+
+        public collectionUnavailabilityRedirect objUnavailabilityRedirect { get; set; }
+
         private List<ProductPageFilterablePod> collectionProductPages 
         {
             get 

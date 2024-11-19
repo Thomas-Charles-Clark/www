@@ -394,16 +394,24 @@ else
 
     <script type="text/javascript">
 
-        function getReserveOrders() {
+        window.getReserveOrders = () => {
             return @Html.Raw(JsonConvert.SerializeObject(Model.ReserveOrders.Results));
         }
 
-        function getInvoiceAddress() {
+        window.getInvoiceAddress = () => {
             return @Html.Raw(JsonConvert.SerializeObject(Model.InvoiceAddress))
         }
 
-        function getDefaultDeliveryReference() {
+        window.getDefaultDeliveryReference = () => {
             return '@(Model.DefaultDeliveryReference)'
+        }
+
+        window.getDefaultDeliveryAddress = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.DefaultMemberAddress));
+        }
+
+        window.getDefaultMemberAddressId = () => {
+            return @Html.Raw(Model.DefaultMemberAddress?.MemberAddressID);
         }
 
     </script>

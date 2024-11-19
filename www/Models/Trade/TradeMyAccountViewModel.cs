@@ -240,6 +240,7 @@ namespace wwwDesignersGuild.Models.Trade
         public OutstandingOrdersReturn ReserveOrders { get; set; }
         public MertexInvoiceAddress InvoiceAddress { get; set; }
         public string DefaultDeliveryReference { get; set; }
+        public MemberAddress DefaultMemberAddress { get; set; }
 
         public TradeAccountReserveOrdersModel(
             BaseViewModel bvm,
@@ -247,6 +248,7 @@ namespace wwwDesignersGuild.Models.Trade
             bool p,
             MertexInvoiceAddress mia,
             string ddr,
+            MemberAddress dma,
             TradeAccountUsersModel tam)
         {
             BaseViewModel = bvm;
@@ -255,6 +257,7 @@ namespace wwwDesignersGuild.Models.Trade
             TradeAccountModel = tam;
             InvoiceAddress = mia;
             DefaultDeliveryReference = ddr;
+            DefaultMemberAddress = dma;
             ReserveOrders = new OutstandingOrdersReturn();
         }
     }

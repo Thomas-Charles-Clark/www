@@ -1,4 +1,6 @@
-﻿using Kendo.Mvc.UI;
+﻿using iText.Layout.Renderer;
+
+using Kendo.Mvc.UI;
 
 using Newtonsoft.Json;
 using System;
@@ -499,6 +501,34 @@ namespace wwwDesignersGuild.Models.Classes
         public byte? SortOrder { get; set; }
         public string Design { get; set; }
         public productPagePodPrice ProductPagePrice { get; set; }
+        public bool NoIndex { get; set; }
+        public bool NoFollow { get; set; }
+        public string Rel
+        {
+            get
+            {
+                var parts = new List<string>();
+
+                if (NoIndex)
+                {
+                    parts.Add("noindex");
+                }
+
+                if (NoFollow)
+                {
+                    parts.Add("nofollow");
+                }
+
+                if (parts.Any())
+                {
+                    return String.Join(", ", parts);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         private int ReviewWholeStars
         {

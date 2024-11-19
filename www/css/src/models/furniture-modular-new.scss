@@ -301,7 +301,6 @@
 }
 
 .modules-container {
-
     .card {
         .card-body {
             display: flex;
@@ -320,10 +319,13 @@
                 }
             }
 
-
             .btn {
                 flex: 1;
             }
+        }
+
+        & + .card {
+            margin-top: $l-gutter;
         }
     }
 

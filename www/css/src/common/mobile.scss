@@ -53,6 +53,35 @@ footer {
     }
 }
 
+#background-404 {
+    background-image: var(--bg-img);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 640px;
+    align-items: flex-start;
+    justify-content: center;
+
+    .card {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        margin-top: $l-gutter;
+        max-width: 50%;
+
+        h1 {
+            font-family: 'Trixie Rough';
+            font-size: 76px;
+            text-align: left;
+        }
+
+        a {
+
+
+        }
+    }
+}
+
 @include order('mobile', 12);
 
 .modal,

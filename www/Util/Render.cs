@@ -79,7 +79,7 @@ namespace wwwDesignersGuild.Util
             }
             else
             {
-                if (dgFramework.IsMobileDevice())
+                if (dgFramework.IsMobileDevice() && (path?.Contains("bootstrap.onload") == false))
                 {
                     return new HtmlString(Scripts.RenderFormat($"<script src='{{0}}' defer></script>", path).ToString().TrimEnd(newline));
                 }

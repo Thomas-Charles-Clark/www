@@ -1765,7 +1765,7 @@ namespace wwwDesignersGuild.Controllers
         
         [HttpPost]
         public async Task<IHttpActionResult> extantEmailCheck(PassEmail objEmail)
-        {
+        { 
             //  Does the email address already exist
             VisitorFactory visitorFactory = new VisitorFactory();
             var emailExists = await visitorFactory.callEmailExistsSelect(objEmail.email);

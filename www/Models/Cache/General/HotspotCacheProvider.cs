@@ -20,6 +20,8 @@ namespace wwwDesignersGuild.Models.Cache.General
 
         public void Set(PassHotspotCacheFetch objFetch, cmsHotspotDefinition data)
         {
+            // This is a stupid: it only disables hotspots if hotspotCacheEnabled <> true / false.
+            // Silly.
             if (Boolean.TryParse(WebConfigurationManager.AppSettings["hotspotCacheEnabled"], out bool _))
             {
                 var policy = new CacheItemPolicy();

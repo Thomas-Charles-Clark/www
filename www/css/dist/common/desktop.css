@@ -145,6 +145,27 @@ a:hover {
   text-transform: uppercase;
 }
 
+#background-404 {
+  background-image: var(--bg-img);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 640px;
+  align-items: center;
+  justify-content: center;
+}
+#background-404 .card {
+  position: relative;
+  top: -2rem;
+  background-color: transparent;
+  border: none;
+  max-width: 420px;
+}
+#background-404 .card h1 {
+  font-family: "Trixie Rough";
+  font-size: 76px;
+}
+
 .order-desktop-1 {
   order: 1;
 }
@@ -2337,7 +2358,7 @@ footer #change-country:focus-within {
 }
 .carousel .carousel-control-prev-icon,
 .carousel .carousel-control-next-icon {
-  display: none;
+  /*display: none;*/
 }
 .carousel .hotspot-collapse {
   display: block;

@@ -43,6 +43,31 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public bool NoFollow { get; set; }
+        public bool NoIndex { get; set; }
+        public string Rel
+        {
+            get
+            {
+                var strings = new List<string>();
+
+                if (NoFollow)
+                {
+                    strings.Add("nofollow");
+                }
+
+                if (NoIndex) 
+                {
+                    strings.Add("noindex");
+                }
+
+                if (strings.Any())
+                    return String.Join(", ", strings);
+                else
+                    return null;
+            }
+        }
+
         public ProductPagePodViewModel(NewMasterDefinition objMaster,
             ProductPageFilterablePod objProductPage,
             bool useLifestyleGalleryBehaviour,
@@ -52,6 +77,8 @@ namespace wwwDesignersGuild.ViewModels
             ProductPage = objProductPage;
             UseLifestyleGalleryBehaviour = useLifestyleGalleryBehaviour;
             ImageSize = imageSize ?? (dgFramework.IsMobileDevice() ? ImageSize.Six : ImageSize.Three);
+            NoFollow = objProductPage.NoFollow;
+            NoIndex = objProductPage.NoIndex;
         }
     }
 }

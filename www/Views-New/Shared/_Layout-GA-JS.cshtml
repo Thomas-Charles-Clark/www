@@ -226,6 +226,23 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
+
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+
+        //window.allConsentGranted = () => {
+        //    gtag('consent', 'update', {
+        //        'ad_storage': 'granted',
+        //        'ad_user_data': 'granted',
+        //        'ad_personalization': 'granted',
+        //        'analytics_storage': 'granted'
+        //    });
+        //}
+
         gtag('config', 'UA-53708903-1', {
             'dimension4': 'retail_or_trade',
             'allow_enhanced_conversions': true

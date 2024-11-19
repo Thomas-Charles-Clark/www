@@ -89,6 +89,29 @@ a:hover {
     }
 }
 
+#background-404 {
+    background-image: var(--bg-img);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 640px;
+    align-items: center;
+    justify-content: center;
+
+    .card {
+        position: relative;
+        top: calc($xl-gutter * -1);
+        background-color: transparent;
+        border: none;
+        max-width: 420px;
+
+        h1 {
+            font-family: 'Trixie Rough';
+            font-size: 76px;
+        }
+    }
+}
+
 @include order('desktop', 12);
 
 #debug-navbar {
@@ -1803,7 +1826,7 @@ footer {
 
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-        display: none;
+        /*display: none;*/
     }
 
     .hotspot-collapse {

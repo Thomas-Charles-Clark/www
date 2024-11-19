@@ -32,6 +32,21 @@ namespace wwwDesignersGuild.Models.ProductPage
             }
         }
 
+        public string FormValuePlural
+        {
+            get
+            {
+                if (ProductTypeID == 0)
+                    return "";
+                else
+                    return HttpUtility.UrlEncode(NamePlural?.ToLowerInvariant().Replace(" ", "-"));
+            }
+            set
+            {
+
+            }
+        }
+
         public ProductType()
         {
             ProductPageIDs = new List<int>();

@@ -26,6 +26,7 @@ using System.IO;
 using System.Web.Mvc;
 using System.Web.Routing;
 using wwwDesignersGuild.Controllers;
+using Microsoft.Owin.Security.Provider;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -1954,12 +1955,15 @@ namespace wwwDesignersGuild.Models.Helper
 
         #region Mobile Detection Routines
 
+        [Obsolete("Do not use. Remove.")]
         public static String GetPreferredDeviceView(String viewPath)
         {
-            //  Need to ensure 'viewPath' is a string that contains '{0}'
-            String viewExtension = IsMobileDevice() ? ".mobile" : "";
+            return String.Format(viewPath, "");
 
-            return String.Format(viewPath, viewExtension);
+            ////  Need to ensure 'viewPath' is a string that contains '{0}'
+            //String viewExtension = IsMobileDevice() ? ".mobile" : "";
+
+            //return String.Format(viewPath, viewExtension);
         }
 
         public static Boolean IsMobileDevice()

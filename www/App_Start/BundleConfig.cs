@@ -216,6 +216,9 @@ namespace wwwDesignersGuild
 
             bundles.Add(new ScriptBundle("~/bundles/js/bootstrap")
               .Include($"{jsPrefix}/lib/bootstrap/dist/bootstrap.bundle{jsSuffix}", sourceMapTransform)
+            );
+
+            bundles.Add(new ScriptBundle("~/bundles/js/bootstrap-onload")
               .Include($"{jsPrefix}/lib/bootstrap/custom/bootstrap.onload{jsSuffix}", sourceMapTransform)
             );
 

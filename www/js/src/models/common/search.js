@@ -127,7 +127,6 @@
         bootstrap.Dropdown.getOrCreateInstance(self.dropdownToggleElement).hide();
     }
 
-
     self.productType.subscribe(nv => {
         //if (window.hasOwnProperty('pageModel') && window.pageModel.ContentID == 76) {
         //    window.pageModel.fixedPage().productPageGrid.productType(nv);

@@ -256,6 +256,9 @@
 .modules-container .card .card-body .btn {
   flex: 1;
 }
+.modules-container .card + .card {
+  margin-top: 1rem;
+}
 .modules-container .module-btn {
   display: flex;
   justify-content: flex-start;
