@@ -1174,7 +1174,8 @@ namespace wwwDesignersGuild.ViewModels
                         "KendoPagerNextPage",
                         "KendoPagerPreviousPage",
                         "KendoPagerRefresh",
-                        "KendoPagerMorePages"
+                        "KendoPagerMorePages",
+                        "IncludeSamples"
                     });
                     break;
                 case (int)dgFixedPage.tradeProformaInvoices:

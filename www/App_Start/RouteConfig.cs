@@ -21,6 +21,12 @@ namespace wwwDesignersGuild
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/furniturepdfs/)(.*).pdf" });
 
             routes.MapRoute(
+                name: "GiftVoucherViewer",
+                url: "gift-voucher",
+                defaults: new { controller = "GiftVoucher", action = "View" }
+            );
+
+            routes.MapRoute(
                 name: "TwitterMoodboardCallback",
                 url: "moodboard/twittercallback",
                 defaults: new { controller = "Moodboard", action = "TwitterCallback" }

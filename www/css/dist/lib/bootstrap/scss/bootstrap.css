@@ -1255,6 +1255,21 @@ progress {
     grid-column-start: 11;
   }
 }
+.grid .row-gap-1 {
+  gap: 1em;
+}
+.grid .row-gap-2 {
+  gap: 2em;
+}
+.grid .row-gap-3 {
+  gap: 3em;
+}
+.grid .row-gap-4 {
+  gap: 4em;
+}
+.grid .row-gap-5 {
+  gap: 5em;
+}
 
 .table {
   --bs-table-bg: transparent;

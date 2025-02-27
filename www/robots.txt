@@ -40,3 +40,6 @@ Disallow: */h291$ # checkoutPayPalExpress
 Disallow: */h300$ # checkoutSessionExpired
 Disallow: */api/* # do not crawl our API endpoints
 Disallow: */ni/* # do not crawl our non-index endpoints
+Disallow: *?*redirect=* # do not index queryString parameter "redirect"
+Disallow: *?*productCode=* # do not index queryString parameter "productCode"
+Disallow: *?*dateOverride=* # do not index queryString parameter "dateOverride" 

@@ -232,6 +232,11 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="QRCoder, Version=1.6.0.0, Culture=neutral, PublicKeyToken=c4ed5b9ae8358a28, processorArchitecture=MSIL">
+      <HintPath>..\packages\QRCoder.1.6.0\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleImpersonation, Version=4.2.0.0, Culture=neutral, PublicKeyToken=2558a0becb966f83, processorArchitecture=MSIL">
       <HintPath>..\packages\SimpleImpersonation.4.2.0\lib\net461\SimpleImpersonation.dll</HintPath>
     </Reference>
@@ -434,6 +439,7 @@
     <Compile Include="Controllers\CheckoutPartController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\FormController.cs" />
+    <Compile Include="Controllers\GiftVoucherController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Controllers\LifeStyleController.cs" />
@@ -474,6 +480,9 @@
     <Compile Include="Models\CoverageCalculator\CoverageCalculator.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombination.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombinationCacheProvider.cs" />
+    <Compile Include="Models\GiftVoucher\cmsGiftVoucher.cs" />
+    <Compile Include="Models\GiftVoucher\giftVoucherDb.cs" />
+    <Compile Include="Models\GiftVoucher\GiftVoucher_SelectResult.cs" />
     <Compile Include="Models\Hotspot\Hotspot.cs" />
     <Compile Include="Models\Hotspot\ImageHotspot.cs" />
     <Compile Include="Models\Hotspot\PassHotspotFetch.cs" />
@@ -733,6 +742,7 @@
     <Compile Include="Util\AccessControlAllowOriginAttribute.cs" />
     <Compile Include="Util\BasketLineTypeAttribute.cs" />
     <Compile Include="Util\Extensions.cs" />
+    <Compile Include="Util\GiftVoucherPDFWriter.cs" />
     <Compile Include="Util\PageNotFoundException.cs" />
     <Compile Include="Util\PageSectionClassAttribute.cs" />
     <Compile Include="Util\PageSectionViewModelAttribute.cs" />
@@ -803,6 +813,8 @@
     <Content Include="bundleconfig.notes.txt">
       <DependentUpon>bundleconfig.json</DependentUpon>
     </Content>
+    <Content Include="Content\images\backgrounds\gift-voucher-background-greyscale.jpg" />
+    <Content Include="Content\images\backgrounds\gift-voucher-background.jpg" />
     <Content Include="Content\images\basket\credit-no-amazon.jpg" />
     <Content Include="Content\images\basket\credit-no-amazon.webp" />
     <Content Include="Content\images\checkout\amazon-pay.png" />
@@ -1864,8 +1876,12 @@
     <Content Include="Content\images\logo\christian-lacroix.webp" />
     <Content Include="Content\images\logo\designers-guild-clearance.png" />
     <Content Include="Content\images\logo\designers-guild-clearance.webp" />
+    <Content Include="Content\images\logo\designers-guild-transparent-grey-lg.png" />
     <Content Include="Content\images\logo\designers-guild-logo.gif" />
     <Content Include="Content\images\logo\designers-guild-logo.webp" />
+    <Content Include="Content\images\logo\designers-guild-transparent-inversion-lg.png" />
+    <Content Include="Content\images\logo\designers-guild-transparent-beige-lg.png" />
+    <Content Include="Content\images\logo\designers-guild-transparent-lg.png" />
     <Content Include="Content\images\logo\designers-guild.png" />
     <Content Include="Content\images\logo\designers-guild.webp" />
     <Content Include="Content\images\logo\DESIGNERS_GUILD_BLACK_BIG.tif" />
@@ -2237,17 +2253,6 @@
     <Content Include="css\dist\models\furniture-modular-mobile-new.min.css" />
     <Content Include="css\dist\models\furniture-modular-new.css" />
     <Content Include="css\dist\models\furniture-modular-new.min.css" />
-    <Content Include="css\src\common\collection.scss" />
-    <Content Include="css\src\common\common.scss" />
-    <Content Include="css\src\common\debug.scss" />
-    <Content Include="css\src\common\desktop.scss" />
-    <Content Include="css\src\common\forms.scss" />
-    <Content Include="css\src\common\landing-page.scss" />
-    <Content Include="css\src\common\mixins.scss" />
-    <Content Include="css\src\common\mobile.scss" />
-    <Content Include="css\src\common\trade-mobile.scss" />
-    <Content Include="css\src\common\trade.scss" />
-    <Content Include="css\src\common\variables.scss" />
     <Content Include="css\dist\fonts\src\5353122\44f98f55-29b4-4bb1-99b3-e9298ecfec9b.woff2" />
     <Content Include="css\dist\fonts\src\5353122\b6b699e9-0a3b-472f-bc11-f5149f484b39.woff" />
     <Content Include="css\dist\fonts\src\5355143\6cf41c94-9d69-4b4a-a169-4766cb7fb880.woff" />
@@ -2294,23 +2299,60 @@
     <Content Include="css\dist\fonts\src\verdana-400.woff2" />
     <Content Include="css\dist\fonts\src\verdana-700.woff2" />
     <Content Include="css\dist\fonts\src\wash-care-symbols-m54.woff2" />
+    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\fonts\glyphs\WebComponentsIcons.ttf" />
+    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\fonts\glyphs\WebComponentsIcons.woff" />
+    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\images\kendoui.ttf" />
+    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\images\kendoui.woff" />
+    <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
+    <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
+    <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
+    <Content Include="Content\images\social\icon-tiktok.webp" />
+    <Content Include="css\src\common\collection.scss" />
+    <Content Include="css\src\common\common.scss" />
+    <Content Include="css\src\common\debug.scss" />
+    <Content Include="css\src\common\desktop.scss" />
+    <Content Include="css\src\common\forms.scss" />
+    <Content Include="css\src\common\landing-page.scss" />
+    <Content Include="css\src\common\mixins.scss" />
+    <Content Include="css\src\common\mobile.scss" />
+    <Content Include="css\src\common\trade-common.scss" />
+    <Content Include="css\src\common\trade-mobile.scss" />
+    <Content Include="css\src\common\trade.scss" />
+    <Content Include="css\src\common\variables.scss" />
+    <Content Include="css\src\fonts\bootstrap-icons.scss" />
+    <Content Include="css\src\fonts\font-awesome.scss" />
+    <Content Include="css\src\fonts\fonts.scss" />
+    <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.css.map" />
+    <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.min.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.min.css.map" />
+    <Content Include="css\src\lib\bootstrap\dist\bootstrap.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap.css.map" />
+    <Content Include="css\src\lib\bootstrap\dist\bootstrap.min.css" />
     <Content Include="css\src\lib\bootstrap\dist\bootstrap.min.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.min.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.min.css.map" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.scss" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.min.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.min.css.map" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.scss" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.min.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.min.css.map" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.scss" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.min.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.min.css.map" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.scss" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap.css.map" />
+    <Content Include="css\src\lib\bootstrap\scss\bootstrap.min.css" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap.min.css.map" />
     <Content Include="css\src\lib\bootstrap\scss\bootstrap.scss" />
     <Content Include="css\src\lib\bootstrap\scss\forms\_floating-labels.scss" />
@@ -2400,16 +2442,17 @@
     <Content Include="css\src\lib\bootstrap\scss\_utilities.scss" />
     <Content Include="css\src\lib\bootstrap\scss\_variables-mobile.scss" />
     <Content Include="css\src\lib\bootstrap\scss\_variables.scss" />
+    <Content Include="css\src\lib\intl-tel-input\dist\intl-tel-input.scss" />
+    <Content Include="css\src\lib\intl-tel-input\img\flags%402x.png" />
+    <Content Include="css\src\lib\intl-tel-input\img\flags.png" />
     <Content Include="css\src\lib\kendo\dist-datepicker\datepicker.scss" />
-    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\fonts\glyphs\WebComponentsIcons.ttf" />
-    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\fonts\glyphs\WebComponentsIcons.woff" />
-    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\images\kendoui.ttf" />
-    <Content Include="css\dist\lib\kendo\dist\2018.3.1017\images\kendoui.woff" />
     <Content Include="css\src\lib\kendo\dist\2018.3.1017\kendo.bootstrap.scss" />
     <Content Include="css\src\lib\kendo\dist\2018.3.1017\kendo.common-bootstrap.scss" />
     <Content Include="css\src\lib\kendo\dist\2018.3.1017\kendo.common.scss" />
     <Content Include="css\src\lib\kendo\dist\2018.3.1017\kendo.default.scss" />
     <Content Include="css\src\lib\material\dist\material-components-web.scss" />
+    <Content Include="css\src\lib\material\mdc-custom.css" />
+    <Content Include="css\src\lib\material\mdc-custom.min.css" />
     <Content Include="css\src\lib\material\mdc-custom.min.css.map" />
     <Content Include="css\src\models\article-mobile.scss" />
     <Content Include="css\src\models\article.scss" />
@@ -2421,7 +2464,9 @@
     <Content Include="css\src\models\change-country.scss" />
     <Content Include="css\src\models\checkout-page-mobile.scss" />
     <Content Include="css\src\models\checkout-page.scss" />
+    <Content Include="css\src\models\furniture-modular-mobile-new.scss" />
     <Content Include="css\src\models\furniture-modular-mobile.scss" />
+    <Content Include="css\src\models\furniture-modular-new.scss" />
     <Content Include="css\src\models\furniture-modular.scss" />
     <Content Include="css\src\models\furniture-wholesale-mobile.scss" />
     <Content Include="css\src\models\furniture-wholesale.scss" />
@@ -2439,30 +2484,9 @@
     <Content Include="css\src\models\stockists-mobile.scss" />
     <Content Include="css\src\models\stockists.scss" />
     <Content Include="css\src\models\trade-document-wrapper.scss" />
-    <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.css.map" />
-    <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
-    <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
-    <Content Include="Content\images\social\icon-tiktok.webp" />
     <Content Include="ExternalDependencies\MertexerV2.pdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.css" />
-    <Content Include="css\src\lib\bootstrap\dist\bootstrap-mobile.min.css" />
-    <Content Include="css\src\lib\bootstrap\dist\bootstrap.css" />
-    <Content Include="css\src\lib\bootstrap\dist\bootstrap.min.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-grid.min.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-mobile.min.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-reboot.min.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap-utilities.min.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap.css" />
-    <Content Include="css\src\lib\bootstrap\scss\bootstrap.min.css" />
-    <Content Include="css\src\lib\intl-tel-input\dist\intl-tel-input.scss" />
-    <Content Include="css\src\lib\intl-tel-input\img\flags%402x.png" />
-    <Content Include="css\src\lib\intl-tel-input\img\flags.png" />
     <Content Include="css\dist\lib\jquery-ui\images\animated-overlay.gif" />
     <Content Include="css\dist\lib\jquery-ui\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="css\dist\lib\jquery-ui\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -2492,8 +2516,6 @@
     <Content Include="css\dist\lib\jquery-ui\minified\images\ui-icons_888888_256x240.png" />
     <Content Include="css\dist\lib\jquery-ui\minified\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="css\dist\lib\kendo\dist\2018.3.1017\default\loading-image.gif" />
-    <Content Include="css\src\lib\material\mdc-custom.css" />
-    <Content Include="css\src\lib\material\mdc-custom.min.css" />
     <Content Include="css\dist\common\collection.css" />
     <Content Include="css\dist\common\collection.min.css" />
     <Content Include="css\dist\common\common.css" />
@@ -2906,22 +2928,30 @@
     <Content Include="js\src\view-model-template.txt" />
     <Content Include="js\src\lib\kendo\dist\kendo.2018.3.1017.all.js" />
     <Content Include="js\dist\lib\jszip\dist\jszip.min.js.map" />
-    <Content Include="css\src\common\trade-common.scss" />
     <Content Include="css\dist\common\trade-common.css.map" />
     <Content Include="css\dist\common\trade-common.min.css.map" />
     <Content Include="js\dist\models\common\modals\contact-customer-services-modal.min.js.map" />
     <Content Include="css\dist\fonts\src\gill-sans-light.ttf" />
     <Content Include="Content\images\icon\icon-x.webp" />
     <Content Include="Content\images\social\icon-x.webp" />
-    <Content Include="css\src\models\furniture-modular-mobile-new.scss" />
-    <Content Include="css\src\models\furniture-modular-new.scss" />
     <Content Include="css\dist\models\furniture-modular-mobile-new.css.map" />
     <Content Include="css\dist\models\furniture-modular-mobile-new.min.css.map" />
     <Content Include="css\dist\models\furniture-modular-new.css.map" />
     <Content Include="css\dist\models\furniture-modular-new.min.css.map" />
-    <Content Include="css\src\fonts\fonts.scss" />
-    <Content Include="css\src\fonts\font-awesome.scss" />
-    <Content Include="css\src\fonts\bootstrap-icons.scss" />
+    <Content Include="Content\fonts\CascadiaCode.ttf" />
+    <Content Include="Content\fonts\Gill-Sans-MT.TTF" />
+    <Content Include="Content\fonts\kunstler.ttf" />
+    <Content Include="Content\fonts\trixie\5353122\44f98f55-29b4-4bb1-99b3-e9298ecfec9b.woff2" />
+    <Content Include="Content\fonts\trixie\5353122\b6b699e9-0a3b-472f-bc11-f5149f484b39.woff" />
+    <Content Include="Content\fonts\trixie\5355143\6cf41c94-9d69-4b4a-a169-4766cb7fb880.woff" />
+    <Content Include="Content\fonts\trixie\5355143\c3ade7ce-98e9-4a5d-9eae-a8fb74f4e6ef.woff2" />
+    <Content Include="Content\fonts\trixie\5355145\7b581bfb-fe90-4438-9589-f44b3f85e5e1.woff2" />
+    <Content Include="Content\fonts\trixie\5355145\ca03da7f-d1b0-4654-b7f8-4f0a1c136c18.woff" />
+    <Content Include="Content\fonts\trixie\5359239\7f82a185-5c73-4e05-ba9c-b95c5bbca830.woff" />
+    <Content Include="Content\fonts\trixie\5359239\acb8e019-6e8d-486d-9222-15170d9657c1.woff2" />
+    <Content Include="Content\fonts\trixie\5765071\74572880-e6d7-4e5e-a995-ceae23631322.woff" />
+    <Content Include="Content\fonts\trixie\5765071\acabe057-a581-46f6-ae2a-0541e2873b47.woff2" />
+    <Content Include="Content\fonts\trixie\5353122\TrixieRoughOTW05-Heavy.ttf" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -3181,6 +3211,7 @@
     <Folder Include="PDFs\Returns\" />
     <Folder Include="TradeDownloads\" />
     <Folder Include="Uploads\" />
+    <Folder Include="Views\" />
     <Folder Include="WebReferences\" />
   </ItemGroup>
   <ItemGroup>

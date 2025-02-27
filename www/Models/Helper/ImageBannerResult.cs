@@ -47,6 +47,8 @@ namespace wwwDesignersGuild.Models.Helper
                 contentType = "image/webp";
             }
 
+            // Not-free upgrades!
+
             if (Width == "512")
             {
                 if (File.Exists(_filePath.Replace("512", "1024")))
@@ -56,6 +58,18 @@ namespace wwwDesignersGuild.Models.Helper
                 if (File.Exists(_gifFilePath.Replace("512", "1024")))
                 {
                     _gifFilePath = _gifFilePath.Replace("512", "1024");
+                }
+            }
+
+            if (Width == "1024")
+            {
+                if (File.Exists(_filePath.Replace("1024", "1546")))
+                {
+                    _filePath = _filePath.Replace("1024", "1024");
+                }
+                if (File.Exists(_gifFilePath.Replace("1024", "1024")))
+                {
+                    _gifFilePath = _gifFilePath.Replace("1024", "1024");
                 }
             }
 

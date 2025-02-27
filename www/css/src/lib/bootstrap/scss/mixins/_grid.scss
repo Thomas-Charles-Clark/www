@@ -127,29 +127,34 @@
 }
 
 @mixin make-cssgrid($columns: $grid-columns, $breakpoints: $grid-breakpoints) {
-  @each $breakpoint in map-keys($breakpoints) {
-    $infix: breakpoint-infix($breakpoint, $breakpoints);
+    @each $breakpoint in map-keys($breakpoints) {
+        $infix: breakpoint-infix($breakpoint, $breakpoints);
 
-    @include media-breakpoint-up($breakpoint, $breakpoints) {
-      @if $columns > 0 {
-        @for $i from 1 through $columns {
-          //@if $infix != "" {
-            .g-col#{$infix}-#{$i} {
-              grid-column: auto / span $i;
+        @include media-breakpoint-up($breakpoint, $breakpoints) {
+            @if $columns > 0 {
+                @for $i from 1 through $columns {
+                    //@if $infix != "" {
+                    .g-col#{$infix}-#{$i} {
+                        grid-column: auto / span $i;
+                    }
+                    //}
+                }
+                // Start with `1` because `0` is and invalid value.
+                // Ends with `$columns - 1` because offsetting by the width of an entire row isn't possible.
+                @for $i from 1 through ($columns - 1) {
+                    //@if $infix != "" {
+                    .g-start#{$infix}-#{$i} {
+                        grid-column-start: $i;
+                    }
+                    //}
+                }
             }
-          //}
         }
-
-        // Start with `1` because `0` is and invalid value.
-        // Ends with `$columns - 1` because offsetting by the width of an entire row isn't possible.
-        @for $i from 1 through ($columns - 1) {
-          //@if $infix != "" {
-            .g-start#{$infix}-#{$i} {
-              grid-column-start: $i;
-            }
-          //}
-        }
-      }
     }
-  }
+
+    @for $i from 1 through 5 {
+        .row-gap-#{$i} {
+            gap: calc($i * 1em);
+        }
+    }
 }

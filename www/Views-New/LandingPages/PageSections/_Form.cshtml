@@ -235,7 +235,7 @@
                 </div>
                 <span id="store-event-date-error" class="validation-message" data-bind="validationMessage: appointmentDate"></span>
             </div>
-            <div class="mb-3"
+            @*<div class="mb-3"
                  data-bind="validationOptions: { insertMessages: false }">
                 <label for="appointment-location" class="form-label">
                     @HtmlHelperExtra.Resource("FormsPreferredShop", l, c, d)
@@ -249,18 +249,15 @@
                                    attr: {
                                     'aria-invalid': !appointmentLocation.isValid()
                                    }">
-                    <option value="" selected>
+                    <option value="">
                         @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
                     </option>
-                    <option value="Kings Road">
+                    <option value="Kings Road" selected>
                         King's Road
-                    </option>
-                    <option value="Marylebone">
-                        Marylebone High Street
                     </option>
                 </select>
                 <span id="appointment-location-error" class="validation-message" data-bind="validationMessage: appointmentLocation"></span>
-            </div>
+            </div>*@
             <div class="mb-3"
                  data-bind="validationOptions: { insertMessages: false }">
                 <label for="appointment-comments" class="form-label">

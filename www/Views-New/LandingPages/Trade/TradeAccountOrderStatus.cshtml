@@ -77,6 +77,7 @@ else
         <div class="invoice-search-controls">
             <div>
                 <div class="select-group">
+                    <div class="select-checkbox" data-bind="component: { name: 'mdc-checkbox-component', params: includeSampleOrdersParams }"></div>
                     <select class="form-select" data-bind="value: dateRangeType, options: availableDateRangeTypes, optionsValue: 'dateRangeTypeId', optionsText: 'name'"></select>
                     <select class="form-select" data-bind="value: dateRange, options: dateRanges, optionsValue: 'dateRangeId', optionsText: 'name'"></select>
                 </div>

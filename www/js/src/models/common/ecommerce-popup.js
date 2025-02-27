@@ -1,10 +1,29 @@
-﻿const ecommercePopupViewModel = ((resources, banner) => {
+﻿const ecommercePopupViewModel = ({
+    resources,
+    banner,
+    cookieIdentifier,
+    showOnPageView,
+    cookieExpiryDate
+} = {
+    resources: [],
+    banner: {},
+    cookieIdentifier: null,
+    showOnPageView: 0,
+    cookieExpiryDate: 'Fri, 31 Dec 9999 23:59:59 GMT'
+}) => {
+
     let self = {
         resources: resources,
-        banner: banner
+        banner: banner,
+        cookieIdentifier: cookieIdentifier,
+        showOnPageView: showOnPageView,
+        cookieExpiryDate: cookieExpiryDate
     };
 
     //#region Properties
+
+    // banner might be undefined if there is no banner delivered for this particular instance
+    self.bannerLocationId = self.banner?.bannerLocationId;
 
     // Are we busy?
     self.busy = ko.observable(false);
@@ -93,11 +112,11 @@
     });
 
     // the modal element
-    self.modalElement = document.querySelector('#ecommerce-pop-modal');
+    self.modalElement = document.querySelector(self.bannerLocationId == 54 ? '#ecommerce-general-pop-modal' : '#ecommerce-pop-modal');
 
     // the bootstrap modal itself
     self.modal = bootstrap.Modal.getOrCreateInstance(self.modalElement);
-
+     
     // This must be determined based on the below user related properties and/or the user's response to marketingPermission checks
     self.mustResubscribe = ko.observable(false);
 
@@ -156,7 +175,7 @@
     //#region Methods
 
     self.alreadyDone = () => {
-        let result = document.cookie.split('; ').find(row => row.startsWith('page-visit-counter='))?.split('=')[1] === 'done';
+        let result = document.cookie.split('; ').find(row => row.startsWith(`${self.cookieIdentifier}=`))?.split('=')[1] === 'done';
         //console.log('ecommerce-popup alreadyDone returns', result);
         return result;
     }
@@ -164,27 +183,42 @@
     self.setDone = () => {
         self.modal._config.backdrop = true;
         self.modal._config.keyboard = true;
-        document.cookie = `page-visit-counter=done; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax; Secure; Path=/`;
-        //console.log('ecommerce-popup setDone called');
+        document.cookie = `${self.cookieIdentifier}=done; expires=${self.cookieExpiryDate}; SameSite=Lax; Secure; Path=/`;
+
+        console.log(`${self.cookieIdentifier} was set to "done"`);
     }
 
     self.checkCookie = () => {
-        let result = document.cookie.split('; ').some((item) => item.includes("page-visit-counter=2"));
+        let result = document.cookie.split('; ').some((item) => item.includes(`${self.cookieIdentifier}=done`));
         //console.log('ecommerce-popup checkCookie returns', result);
         return result;
     }
 
     self.setOrIncrementCookie = () => {
-        let count = document.cookie.split('; ').find(row => row.startsWith('page-visit-counter='))?.split('=')[1];
+        let count = document.cookie.split('; ').find(row => row.startsWith(`${self.cookieIdentifier}=`))?.split('=')[1];
 
         //console.log('ecommerce-popup setOrIncrementCookie count was', count);
 
-        if (count === 'done')
+        if (count === 'done') {
+
+            console.log(`${self.cookieIdentifier} was found to equal "done"`);
+
+            document.cookie = `${self.cookieIdentifier}=${count}; expires=${self.cookieExpiryDate}; SameSite=Lax; Secure; Path=/`;
+
+            console.log(`${self.cookieIdentifier} was set to expire "${self.cookieExpiryDate}"`);
+
             return;
+        }
 
         count = count ? +(++count) : 1;
 
-        document.cookie = `page-visit-counter=${count}; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax; Secure; Path=/`;
+        document.cookie = `${self.cookieIdentifier}=${count}; expires=${self.cookieExpiryDate}; SameSite=Lax; Secure; Path=/`;
+
+        console.log(`${self.cookieIdentifier} was set to "${count}"`);
+
+        if (count >= self.showOnPageView) {
+            self.fetch();
+        }
 
         //console.log('ecommerce-popup setOrIncrementCookie count is', count);
     }
@@ -200,38 +234,52 @@
     // the one that does the loading
     self.load = () => {
         if (self.alreadyDone() == false) {
-            if (self.checkCookie() == true) {
-                self.fetch();
-            } else {
-                self.setOrIncrementCookie();
-            }
-        } else {
+
             self.setOrIncrementCookie();
+
+        } else {
+
+            console.log(`${self.cookieIdentifier} was found to equal "done"`);
+
+            document.cookie = `${self.cookieIdentifier}=done; expires=${self.cookieExpiryDate}; SameSite=Lax; Secure; Path=/`;
+
+            console.log(`${self.cookieIdentifier} was set to expire "${self.cookieExpiryDate}"`);
+
         }
     }
 
     self.fetch = () => {
-        fetch('/api/form/LoadECPop', {
-            method: 'POST',
-            headers: window.fetchHeaders,
-            cache: 'no-store',
-            credentials: 'same-origin',
-            body: JSON.stringify({
-                countryId: getCountryId(),
-                languageId: getLanguageId()
+
+        // eCommerce Email Capture Popup loads this:
+
+        if (self.bannerLocationId == 55) {
+
+            fetch('/api/form/LoadECPop', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                cache: 'no-store',
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    countryId: getCountryId(),
+                    languageId: getLanguageId()
+                })
             })
-        })
-            .then(window.handleFetchResponse)
-            .then(data => {
-                console.trace(data);
-                self.pageSectionForm(data.objForm);
-                self.availableCountries(data.availableCountries);
-                self.availableLanguages(data.availableLanguages);
-                self.marketingCountryId(data.defaultCountryForDropDown);
-                self.showModal();
-                self.setDone();
-            })
-            .catch(window.catchFetchErrors)
+                .then(window.handleFetchResponse)
+                .then(data => {
+                    console.trace(data);
+                    self.pageSectionForm(data.objForm);
+                    self.availableCountries(data.availableCountries);
+                    self.availableLanguages(data.availableLanguages);
+                    self.marketingCountryId(data.defaultCountryForDropDown);
+                    self.showModal();
+                    self.setDone();
+                })
+                .catch(window.catchFetchErrors)
+
+        } else {
+            self.showModal();
+            self.setDone();
+        }
     }
 
     self.submit = () => {
@@ -366,7 +414,7 @@
     //#endregion
 
     return self;
-});
+};
 
 window.addLoadFunction(() => {
     window.fetchResources(['FormsErrorEmailFormat',
@@ -378,12 +426,48 @@ window.addLoadFunction(() => {
     ])
     .then(window.handleResourcesArray)
     .then(resources => {
-        window.ecommercePopModel = ecommercePopupViewModel(resources, window.ecommercePopBanners[0].banners[0]);
 
-        if (document.querySelector('#ecommerce-pop-modal')) {
-            ko.applyBindings(window.ecommercePopModel, document.querySelector('#ecommerce-pop-modal'));
+
+        if (window.ecommerceEmailCapturePopupBanners && window.ecommerceEmailCapturePopupBanners.length) {
+
+            let banner = window.ecommerceEmailCapturePopupBanners[0].banners[0];
+
+            window.ecommerceEmailCapturePopupModel = ecommercePopupViewModel({
+                resources: resources,
+                banner: banner,
+                cookieIdentifier: `banner-${banner.bannerId}-visit-counter`,
+                showOnPageView: 3,
+                cookieExpiryDate: 'Fri, 31 Dec 9999 23:59:59 GMT'
+            });
+
+            if (document.querySelector('#ecommerce-pop-modal')) {
+                ko.applyBindings(window.ecommerceEmailCapturePopupModel, document.querySelector('#ecommerce-pop-modal'));
+            }
+
+            window.ecommerceEmailCapturePopupModel.load();
         }
 
-        window.ecommercePopModel.load();
+
+
+        if (window.ecommerceGeneralPopupBanners && window.ecommerceGeneralPopupBanners.length) {
+
+            let banner = window.ecommerceGeneralPopupBanners[0].banners[0];
+
+            window.ecommerceGeneralPopupModel = ecommercePopupViewModel({
+                resources: resources,
+                banner: banner,
+                cookieIdentifier: `banner-${banner.bannerId}-visit-counter`,
+                showOnPageView: 1,
+                cookieExpiryDate: window.addMinutes(new Date(), 60).toUTCString()
+            });
+
+            if (document.querySelector('#ecommerce-general-pop-modal')) {
+                ko.applyBindings(window.ecommerceGeneralPopupModel, document.querySelector('#ecommerce-general-pop-modal'));
+            }
+
+            window.ecommerceGeneralPopupModel.load();
+        }
+
+
     });
 });

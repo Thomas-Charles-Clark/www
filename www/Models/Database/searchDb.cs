@@ -52,7 +52,7 @@ namespace wwwDesignersGuild.Models.Database
                     cmd.Parameters.AddWithValue("@LanguageID", languageId);
                     cmd.Parameters.AddWithValue("@CountryID", countryId);
                     cmd.Parameters.AddWithValue("@Date", date);
-                    cmd.Parameters.AddWithValue("@EmptySearch", emptySearch);
+                    cmd.Parameters.AddWithValue("@EmptySearch", emptySearch); // @EmptySearch = 1 if it's an empty search!
                     cmd.Parameters.AddWithValue("@IsTrade", isTrade);
                     cmd.Parameters.AddWithValue("@TradeAccountID", tradeAccountId);
 

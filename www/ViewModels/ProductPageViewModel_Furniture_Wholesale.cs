@@ -64,6 +64,9 @@ namespace wwwDesignersGuild.ViewModels
 
             Carousel.PermitLargeImageModal = false;
 
+            // Let images be bigly
+            Carousel.Images.ForEach(i => i.ImageSize = ImageSize.Twelve);
+
             SecondaryCarousel = new CarouselViewModel(
                 carouselId: $"#product-page-{MasterDefinition.UrlBreakdown.ContentId}-carousel",
                 wrapperCssClass: null,
@@ -76,7 +79,7 @@ namespace wwwDesignersGuild.ViewModels
                 this
             )
             {
-                DisplayThumbnails = false
+                DisplayThumbnails = false,
             };
         }
 

@@ -30,7 +30,7 @@ namespace wwwDesignersGuild.ViewModels
             {
                 var breadcrumbs = String.Join("", Definition.collectionPageBreadcrumbs.Select(b =>
                 {
-                    var heading = ti.ToTitleCase(b.Heading.ToLowerInvariant());
+                    var heading = ti.ToTitleCase(b.Heading?.ToLowerInvariant());
 
                     var url = $"/{MasterDefinition.UrlBreakdown.countryDetails.URL}/{b.URLKeywords}/l{b.PageID}";
 

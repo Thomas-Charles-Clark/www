@@ -228,7 +228,7 @@ namespace wwwDesignersGuild.Controllers
 
                 if (objPurge.templateId.HasValue)
                 {
-                    _ = cmspp.invalidateProductPageSetExplicitCacheExpiry(objPurge.templateId.Value, objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate, objPurge.TradeSwitch ?? false, objPurge.ExplicitExpiry.Value);
+                    _ = cmspp.invalidateProductPageSetExplicitCacheExpiry(objPurge.templateId.Value, objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate, objPurge.TradeSwitch ?? false, dgFramework.IsMobileDevice(), objPurge.ExplicitExpiry.Value);
                 }
             }
             else
@@ -239,11 +239,11 @@ namespace wwwDesignersGuild.Controllers
                 {
                     case true:
                     case false:
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.TradeSwitch.Value, objPurge.ContentDate);
+                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.TradeSwitch.Value, objPurge.PlatformSwitch, objPurge.ContentDate);
                         break;
                     case null:
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, false, objPurge.ContentDate);
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, true, objPurge.ContentDate);
+                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, false, objPurge.PlatformSwitch, objPurge.ContentDate);
+                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, true, objPurge.PlatformSwitch, objPurge.ContentDate);
                         break;
                 }
             }

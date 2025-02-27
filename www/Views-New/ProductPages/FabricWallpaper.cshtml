@@ -13,6 +13,35 @@
 }
 @Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
 <div id="ko-wrapper">
+    @if (Model.Definition.Banners?.Where(b => b.BannerLocationID == 71).Any() == true)
+    {
+        var banner = Model.Definition.Banners.Where(b => b.BannerLocationID == 71).First();
+
+        <div class="product-page-header-banner" data-banner-location-id="71">
+            <a href="@banner.LinkURL"
+               target="@(banner.NewWindow ? "_blank" : "_self")"
+               title="@(banner.TitleText)"
+               alt="@(banner.AltText)"
+               class="header-banner @(banner.FontClass)"
+               style="color: @(String.IsNullOrEmpty(banner.ForegroundColour) ? "inherit" : banner.ForegroundColour);
+          background-color: @(String.IsNullOrEmpty(banner.BackgroundColour) ? "inherit" : banner.BackgroundColour)">
+
+                @if (!String.IsNullOrEmpty(banner.OverlayText))
+                {
+                    <h3 class="banner-overlay-text pb-1 ps-3 pt-1 pe-3">
+                        @(banner.OverlayText?.Replace(">", "").Trim())
+                    </h3>
+                }
+                else
+                {
+                    <img src="/imagebanner@(Framework.WebPFallback)/1024/@(banner.BannerID)?v=@(banner.Version)"
+                         alt="@banner.AltText"
+                         title="@banner.TitleText"
+                         @HtmlHelperExtra.BannerImageSourceSetSizes((long)banner.BannerID, banner.Version, ImageSize.Twelve) />
+                }
+            </a>
+        </div>
+    }
     @if (Model.AllProductsUnavailable)
     {
         <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
@@ -125,24 +154,24 @@
                             </div>
                         </div>
                     </div>*@
-                
-           @if (!String.IsNullOrEmpty(Model.Definition.deliveryHTMLSection))
-            {
-                <div class="accordion-item">
-                    <h6 class="accordion-header" id="delivery-html-section-panel-heading">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#delivery-panel" aria-expanded="false" aria-controls="delivery-panel">
-                            @HtmlHelperExtra.Resource("Delivery", l, c, d)
-                        </button>
-                    </h6>
-                    <div id="delivery-panel" class="accordion-collapse collapse" aria-labelledby="delivery-panel" data-bs-parent="#product-page-accordion">
-                        <div class="accordion-body">
-                            <div class="page-section html-section">
-                                @Html.Raw(Model.Definition.deliveryHTMLSection)
+
+                @if (!String.IsNullOrEmpty(Model.Definition.deliveryHTMLSection))
+                {
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="delivery-html-section-panel-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#delivery-panel" aria-expanded="false" aria-controls="delivery-panel">
+                                @HtmlHelperExtra.Resource("Delivery", l, c, d)
+                            </button>
+                        </h6>
+                        <div id="delivery-panel" class="accordion-collapse collapse" aria-labelledby="delivery-panel" data-bs-parent="#product-page-accordion">
+                            <div class="accordion-body">
+                                <div class="page-section html-section">
+                                    @Html.Raw(Model.Definition.deliveryHTMLSection)
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
             </div>
         </div>
     </div>

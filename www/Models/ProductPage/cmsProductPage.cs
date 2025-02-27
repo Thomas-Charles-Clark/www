@@ -21,32 +21,32 @@ namespace wwwDesignersGuild.Models.ProductPage
     {
 
 
-        public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
+        public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
         {
             //  Is page in cache?
             cmsProductPageDefinition productPageStore;
             ProductPageCacheProvider objProductPageCache = new ProductPageCacheProvider();
-            productPageStore = objProductPageCache.Get(productPageId, languageId, countryId, isTrade, useDate);
+            productPageStore = objProductPageCache.Get(productPageId, languageId, countryId, isTrade, platformSwitch, useDate);
 
             if (productPageStore == null)
             {
-                productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade));
+                productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch));
 
-                objProductPageCache.Set(productPageId, languageId, countryId, isTrade, useDate, productPageStore);
+                objProductPageCache.Set(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, productPageStore);
             }
 
             return productPageStore;
         }
 
-        public async Task<cmsProductPageDefinition> invalidateProductPageSetExplicitCacheExpiry(byte templateId, int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, DateTimeOffset expiration)
+        public async Task<cmsProductPageDefinition> invalidateProductPageSetExplicitCacheExpiry(byte templateId, int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch, DateTimeOffset expiration)
         {
             var objProductPageCache = new ProductPageCacheProvider();
             
-            objProductPageCache.Invalidate(productPageId, languageId, countryId, isTrade, useDate);
+            objProductPageCache.Invalidate(productPageId, languageId, countryId, isTrade, platformSwitch, useDate);
 
-            var productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade));
+            var productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch));
 
-            objProductPageCache.ExplicitSet(productPageId, languageId, countryId, isTrade, useDate, productPageStore, expiration);
+            objProductPageCache.ExplicitSet(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, productPageStore, expiration);
 
             if (templateId == 2)
             {
@@ -66,11 +66,11 @@ namespace wwwDesignersGuild.Models.ProductPage
         }
 
 
-        private cmsProductPageDefinition loadProductPageFromCmsDatabase(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
+        private cmsProductPageDefinition loadProductPageFromCmsDatabase(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
         {
             var dataContext = new databaseDataContext();
 
-            var results = dataContext.ProductPage_Select(productPageId, languageId, countryId, useDate, isTrade);
+            var results = dataContext.ProductPage_Select(productPageId, languageId, countryId, useDate, isTrade, platformSwitch);
 
             var productPageStore = new cmsProductPageDefinition
             {

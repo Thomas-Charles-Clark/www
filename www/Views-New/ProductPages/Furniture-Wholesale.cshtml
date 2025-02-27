@@ -24,6 +24,35 @@
 }
 @Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
 <div id="ko-wrapper">
+    @if (Model.Definition.Banners?.Where(b => b.BannerLocationID == 71).Any() == true)
+    {
+        var banner = Model.Definition.Banners.Where(b => b.BannerLocationID == 71).First();
+
+        <div class="product-page-header-banner" data-banner-location-id="71">
+            <a href="@banner.LinkURL"
+               target="@(banner.NewWindow ? "_blank" : "_self")"
+               title="@(banner.TitleText)"
+               alt="@(banner.AltText)"
+               class="header-banner @(banner.FontClass)"
+               style="color: @(String.IsNullOrEmpty(banner.ForegroundColour) ? "inherit" : banner.ForegroundColour);
+          background-color: @(String.IsNullOrEmpty(banner.BackgroundColour) ? "inherit" : banner.BackgroundColour)">
+
+                @if (!String.IsNullOrEmpty(banner.OverlayText))
+                {
+                    <h3 class="banner-overlay-text pb-1 ps-3 pt-1 pe-3">
+                        @(banner.OverlayText?.Replace(">", "").Trim())
+                    </h3>
+                }
+                else
+                {
+                    <img src="/imagebanner@(Framework.WebPFallback)/1024/@(banner.BannerID)?v=@(banner.Version)"
+                         alt="@banner.AltText"
+                         title="@banner.TitleText"
+                         @HtmlHelperExtra.BannerImageSourceSetSizes((long)banner.BannerID, banner.Version, ImageSize.Twelve) />
+                }
+            </a>
+        </div>
+    }
     <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
         @JsonConvert.SerializeObject(Model)
     </div>

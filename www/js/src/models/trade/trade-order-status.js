@@ -21,7 +21,7 @@
 
     self.ready = ko.observable(false);
 
-    self.outstandingOrdersBusy = ko.observable(false);
+    self.outstandingOrdersBusy = ko.observable(true);
     self.backOrdersBusy = ko.observable(false);
     self.reserveOrdersBusy = ko.observable(false);
     self.despatchedOrdersBusy = ko.observable(false);
@@ -309,7 +309,7 @@
                                             }
 
                                             // we create a formula hyperlink
-                                            sheet.rows[j].cells[i + ctr].formula = '=HYPERLINK("' + url + '","' + self.resources.Track + '")';
+                                            sheet.rows[j].cells[i + ctr].formula = '=HYPERLINK("' + url.split('\n')[0] + '","' + self.resources.Track + '")';
 
                                             // We set the color property as blue, underlined and right aligned to make it look like a link
                                             sheet.rows[j].cells[i + ctr - hiddenColsShift].format = '[Blue]';
@@ -318,7 +318,7 @@
                                         }
                                     } else {
                                         // we create a formula hyperlink
-                                        sheet.rows[j].cells[i].formula = '=HYPERLINK("' + url + '","' + self.resources.Track + '")';
+                                        sheet.rows[j].cells[i].formula = '=HYPERLINK("' + url.split('\n')[0] + '","' + self.resources.Track + '")';
 
                                         // We set the color property as blue, underlined and right aligned to make it look like a link
                                         sheet.rows[j].cells[i - hiddenColsShift].format = '[Blue]';
@@ -345,6 +345,14 @@
 
 
     //#region Components
+
+    self.includeSampleOrdersParams = {
+        checkboxId: 'include-sample-params',
+        label: self.resources.IncludeSamples,
+        observable: self.sampleOrders,
+        useNativeValidation: false,
+        disabled: false
+    }
 
     self.customFromDatePicker = {
         widget: ko.observable(),
@@ -1185,6 +1193,7 @@
                         affectingGrid = self.outstandingOrdersGrid.widget;
                         affectingArray = self.outstandingOrders;
                         affectingBusy = self.outstandingOrdersBusy;
+                        data.sampleOrders = self.sampleOrders();
                         break;
                     case 'backOrders':
                         affectingGrid = self.backOrdersGrid.widget;
@@ -1196,6 +1205,7 @@
                         affectingGrid = self.reserveOrdersGrid.widget;
                         affectingArray = self.reserveOrders;
                         affectingBusy = self.reserveOrdersBusy;
+                        data.sampleOrders = self.sampleOrders();
                         break;
                     case 'despatchedOrders':
                         affectingGrid = self.despatchedOrdersGrid.widget;

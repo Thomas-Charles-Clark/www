@@ -219,7 +219,7 @@
             <!-- /ko -->
             <!-- ko if: displayValue() -->
             <!-- ko if: description -->
-            <p data-bind="text: description">
+            <p data-bind="html: description">
                 @Model.Definition.PromotionCodeDetails.Description
             </p>
             <!-- /ko -->
@@ -495,7 +495,7 @@
                             <!-- /ko -->
                             <!-- ko if: displayValue() -->
                             <!-- ko if: description -->
-                            <p data-bind="text: description">
+                            <p data-bind="html: description">
                                 @Model.Definition.PromotionCodeDetails.Description
                             </p>
                             <!-- /ko -->

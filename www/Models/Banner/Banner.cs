@@ -30,6 +30,7 @@ namespace wwwDesignersGuild.Models.Banner
 
     public class bannerLocationGroup
     {
+        public byte id { get; set; }
         public string name { get; set; }
         public bannerLocation bannerLocations { get; set; }
     }
@@ -49,6 +50,7 @@ namespace wwwDesignersGuild.Models.Banner
     public class templateBanner
     {
         public int bannerId { get; set; }
+        public byte bannerLocationId { get; set; }
         public string name { get; set; }
         public short version { get; set; }
         public byte sortOrder { get; set; }

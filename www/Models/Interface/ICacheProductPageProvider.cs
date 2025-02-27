@@ -9,9 +9,9 @@ namespace wwwDesignersGuild.Models.Interface
 {
     public interface ICacheProductPageProvider
     {
-        cmsProductPageDefinition Get(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate);
-        void Set(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate, cmsProductPageDefinition data);
-        bool IsSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate);
-        void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate);
+        cmsProductPageDefinition Get(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate);
+        void Set(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate, cmsProductPageDefinition data);
+        bool IsSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate);
+        void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate);
     }
 }

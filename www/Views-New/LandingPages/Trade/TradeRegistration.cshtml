@@ -44,58 +44,70 @@ else
                 </h4>
             </div>
             <div id="trade-registration" style="display: none" data-bind="visible: true">
-                <div id="registration-preamble" data-bind="visible: tradeCheckResultText() == null">
-                    <h4>
-                        @HtmlHelperExtra.Resource("TradeRegistrationTitle", l, c, d)
-                    </h4>
-                    <span>
-                        @HtmlHelperExtra.Resource("TradeRegistrationSubTitle", l, c, d)
-                    </span>
-                    <div id="next-step" class="customer" style="display: none;">
-                        <form class="customer-form">
-                            <div>
-                                @HtmlHelperExtra.Resource("RegistrationCompleteMessage", l, c, d)
-                            </div>
-                        </form>
+                @if (Model.Data?.Result == false)
+                {
+                    <div class="alert @(Model.Data.Class) mb-4">
+                        <h4 class="alert-heading mb-0">
+                            @HtmlHelperExtra.Resource(Model.Data.ResourceName, l, c, d)
+                        </h4>
                     </div>
-                    <div>
-                        <p class="trade-check-result-text" data-bind="html: resources.TradeLoginHeadingText"></p>
-                        <div class="summary-help" data-bind="visible: !tradeComplete()">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <th>
-                                            @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d):
-                                        </th>
-                                        <td>
-                                            @if (Model.Data?.CustomerServicesPhoneNumber != null)
-                                            {
-                                                <a class="summary-help-phone me-5" href="tel:@(Model.Data?.CustomerServicesPhoneNumber)">@(Model.Data?.CustomerServicesPhoneNumber)</a>
-                                            }
-                                            @if (Model.Data?.CustomerServicesEmail != null)
-                                            {
-                                                <a class="summary-help-email" href="mailto:@(Model.Data?.CustomerServicesEmail)">@(Model.Data?.CustomerServicesEmail)</a>
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <h4 class="mb-4">
+                        @HtmlHelperExtra.Resource("TradeRegistrationPricingInfo", l, c, d)
+                    </h4>
+                }
+                else
+                {
+                    <div class="alert alert-danger mb-4" style="display: none;" data-bind="visible: tradeCheckResultErrorText() != null">
+                        <h4 class="alert-heading mb-0" data-bind="html: tradeCheckResultErrorText"></h4>
+                    </div>
+                    <div id="registration-preamble" data-bind="visible: tradeCheckResultText() == null">
+                        <h4>
+                            @HtmlHelperExtra.Resource("TradeRegistrationTitle", l, c, d)
+                        </h4>
+                        <span>
+                            @HtmlHelperExtra.Resource("TradeRegistrationSubTitle", l, c, d)
+                        </span>
+                        <div id="next-step" class="customer" style="display: none;">
+                            <form class="customer-form">
+                                <div>
+                                    @HtmlHelperExtra.Resource("RegistrationCompleteMessage", l, c, d)
+                                </div>
+                            </form>
+                        </div>
+                        <div>
+                            <p class="trade-check-result-text" data-bind="html: resources.TradeLoginHeadingText"></p>
+                            <div class="summary-help" data-bind="visible: !tradeComplete()">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                @HtmlHelperExtra.Resource("CheckoutCustomerServicesBody", l, c, d):
+                                            </th>
+                                            <td>
+                                                @if (Model.Data?.CustomerServicesPhoneNumber != null)
+                                                {
+                                                    <a class="summary-help-phone me-5" href="tel:@(Model.Data?.CustomerServicesPhoneNumber)">@(Model.Data?.CustomerServicesPhoneNumber)</a>
+                                                }
+                                                @if (Model.Data?.CustomerServicesEmail != null)
+                                                {
+                                                    <a class="summary-help-email" href="mailto:@(Model.Data?.CustomerServicesEmail)">@(Model.Data?.CustomerServicesEmail)</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id="registration-complete" style="display: none" data-bind="visible: tradeCheckResultText()">
-                    <div class="alert alert-success">
-                        <h4 class="alert-heading">
-                            @HtmlHelperExtra.Resource("ThankYou", l, c, d)
-                        </h4>
-                        <p class="mb-0" data-bind="html: tradeCheckResultText"></p>
+                    <div id="registration-complete" style="display: none" data-bind="visible: tradeCheckResultText()">
+                        <div class="alert alert-success">
+                            <h4 class="alert-heading">
+                                @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                            </h4>
+                            <p class="mb-0" data-bind="html: tradeCheckResultText"></p>
+                        </div>
                     </div>
-                </div>
-                <div class="alert alert-danger mt-4" style="display: none;" data-bind="visible: tradeCheckResultErrorText() != null">
-                    <h4 class="alert-heading mb-0" data-bind="html: tradeCheckResultErrorText"></h4>
-                </div>
-                @if (Model.Data?.Result == true)
-                {
+
                     <div id="trade-registration-inner" style="display: none" data-bind="visible: tradeCheckResultText() == null">
                         <div class="address-form">
                             <div class="page-blocker" data-bind="flexVisible: tradeSubmitBusy, toggleOpacity: tradeSubmitBusy">
@@ -167,18 +179,11 @@ else
                             </div>
                         </div>
                     </div>
+                    <h4>
+                        @HtmlHelperExtra.Resource("TradeRegistrationPricingInfo", l, c, d)
+                    </h4>
+
                 }
-                else
-                {
-                    <div class="alert alert-danger mt-3">
-                        <h4 class="alert-heading mb-0">
-                            @HtmlHelperExtra.Resource("ManageAccountErrorTradeAccountNumberConfiguration", l, c, d)
-                        </h4>
-                    </div>
-                }
-                <h4>
-                    @HtmlHelperExtra.Resource("TradeRegistrationPricingInfo", l, c, d)
-                </h4>
             </div>
         </div>
     </div>

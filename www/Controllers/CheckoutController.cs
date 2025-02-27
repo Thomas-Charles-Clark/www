@@ -1377,13 +1377,13 @@ namespace wwwDesignersGuild.Controllers
             cmsCountry objCountry = new cmsCountry();
             cmsCountryDefinition objCountryData = await objCountry.countryLanguageSelect(useDate);
 
-            if (dgFramework.doesCountryExistFromText(objDeliveryAddress.country, objCountryData)) { }
+            if (dgFramework.doesCountryExistFromCode(objDeliveryAddress.country, objCountryData)) { }
             else
             {
                 dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidCountry);
             }
 
-            _ = dgFramework.getCountryFromText(objDeliveryAddress.country, objCountryData);
+            _ = dgFramework.getCountryFromCode(objDeliveryAddress.country, objCountryData);
             if (session["visitorIdFromDatabase"] == null)
             {
                 dgFramework.raiseErrorNotHandled(webapiUnhandledError.MissingSessionParameter);

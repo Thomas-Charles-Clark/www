@@ -364,7 +364,7 @@
         disableDates: ['su', 'mo']
     };
 
-    self.appointmentLocation = ko.observable().extend({
+    self.appointmentLocation = ko.observable(self.sourceId() == 71 ? 'Kings Road' : undefined).extend({
         postable: true,
         required: {
             params: true,
@@ -595,6 +595,10 @@
                 ko.applyBindings(self, phoneElement);
             }
         }, 0);
+
+        if (self.Form.SourceID == 71) { // If this is an appointment request form
+            self.appointmentLocation('Kings Road'); // force the location to KR; we no longer have > 1 locations and digging it out is harder than just hiding the control and setting the value.
+        }
 
         self.buildErrorGroups();
     }

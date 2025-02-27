@@ -82,13 +82,23 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
-        public IEnumerable<bannerLocation> EcommercePopupBanners { get; set; }
+        public IEnumerable<bannerLocation> EcommerceEmailCaptureBanners { get; set; }
 
-        public bool HasEcommercePopupBanners
+        public IEnumerable<bannerLocation> EcommerceGeneralPopupBanners { get; set; }
+
+        public bool HasEcommerceEmailCapturePopupBanners
         {
             get
             {
-                return EcommercePopupBanners.Where(bl => bl.banners?.Any() == true).Any();
+                return EcommerceEmailCaptureBanners.Where(bl => bl.banners?.Any() == true).Any();
+            }
+        }
+
+        public bool HasEcommerceGeneralPopupBanners
+        {
+            get
+            {
+                return EcommerceGeneralPopupBanners.Where(bl => bl.banners?.Any() == true).Any();
             }
         }
 
@@ -237,7 +247,8 @@ namespace wwwDesignersGuild.ViewModels
 
             HeaderBanners = new List<bannerLocation>();
             FooterBanners = new List<bannerLocation>();
-            EcommercePopupBanners = new List<bannerLocation>();
+            EcommerceEmailCaptureBanners = new List<bannerLocation>();
+            EcommerceGeneralPopupBanners = new List<bannerLocation>();
             Banners = new List<bannerLocation>();
             Hotspots = new List<ImageHotspot>();
             ShowRecentlyViewed = true;
@@ -257,7 +268,8 @@ namespace wwwDesignersGuild.ViewModels
             RecentlyViewed = new List<ProductPagePodViewModel>();
             HeaderBanners = new List<bannerLocation>();
             FooterBanners = new List<bannerLocation>();
-            EcommercePopupBanners = new List<bannerLocation>();
+            EcommerceEmailCaptureBanners = new List<bannerLocation>();
+            EcommerceGeneralPopupBanners = new List<bannerLocation>();
             Banners = new List<bannerLocation>();
             Hotspots = new List<ImageHotspot>();
             ShowRecentlyViewed = true;
@@ -277,7 +289,8 @@ namespace wwwDesignersGuild.ViewModels
             RecentlyViewed = bvm.RecentlyViewed;
             HeaderBanners = bvm.HeaderBanners;
             FooterBanners = bvm.FooterBanners;
-            EcommercePopupBanners = bvm.EcommercePopupBanners;
+            EcommerceEmailCaptureBanners = bvm.EcommerceEmailCaptureBanners;
+            EcommerceGeneralPopupBanners = bvm.EcommerceGeneralPopupBanners;
             Banners = bvm.Banners;
             Hotspots = bvm.Hotspots;
             ShowRecentlyViewed = bvm.ShowRecentlyViewed;
@@ -296,7 +309,8 @@ namespace wwwDesignersGuild.ViewModels
 
             HeaderBanners = new List<bannerLocation>();
             FooterBanners = new List<bannerLocation>();
-            EcommercePopupBanners = new List<bannerLocation>();
+            EcommerceEmailCaptureBanners = new List<bannerLocation>();
+            EcommerceGeneralPopupBanners = new List<bannerLocation>();
             Banners = new List<bannerLocation>();
             Hotspots = new List<ImageHotspot>();
             ShowRecentlyViewed = true;
@@ -607,32 +621,60 @@ namespace wwwDesignersGuild.ViewModels
             });
 
 
-            var ecommerceBanners = bannerStore.result.bannerLocationGroups.Where(p => p.name == "Pop-up Email Capture").Select(p => p.bannerLocations).ToList();
+            var ecommerceGeneralPopupBanners = bannerStore.result.bannerLocationGroups.Where(p => p.id == 54).Select(p => p.bannerLocations).ToList();
 
-            var ecommerceBannersUnrestrictedBySiteSection = ecommerceBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.siteSectionIds == null)).ToList();
+            var ecommerceGeneralPopupBannersUnrestrictedBySiteSection = ecommerceGeneralPopupBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.siteSectionIds == null)).ToList();
 
-            var ecommerceBannersRestrictedToSiteSections = ecommerceBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.siteSectionIds != null)).ToList();
+            var ecommerceGeneralPopupBannersRestrictedToSiteSections = ecommerceGeneralPopupBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.siteSectionIds != null)).ToList();
 
             if (SiteSectionID != null)
             {
-                ecommerceBannersRestrictedToSiteSections.ForEach(c =>
+                ecommerceGeneralPopupBannersRestrictedToSiteSections.ForEach(c =>
                 {
                     c.banners = c.banners == null ? new List<templateBanner>() : c.banners.Where(p => p.restrictions.siteSectionIds == null || p.restrictions.siteSectionIds.Contains(SiteSectionID.Value)).ToList();
                 });
             }
 
-            var availableEcommerceBanners = ecommerceBannersUnrestrictedBySiteSection.Concat(ecommerceBannersRestrictedToSiteSections);
+            var availableEcommerceGeneralPopupBanners = ecommerceGeneralPopupBannersUnrestrictedBySiteSection.Concat(ecommerceGeneralPopupBannersRestrictedToSiteSections);
 
-            var ecommerceBannersUnrestrictedByPage = availableEcommerceBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.pageIds == null)).ToList();
+            var ecommerceGeneralPopupBannersUnrestrictedByPage = availableEcommerceGeneralPopupBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.pageIds == null)).ToList();
 
-            var ecommerceBannersRestrictedByPage = availableEcommerceBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.pageIds != null)).ToList();
+            var ecommerceGeneralPopupBannersRestrictedByPage = availableEcommerceGeneralPopupBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.pageIds != null)).ToList();
 
-            ecommerceBannersRestrictedByPage.ForEach(c =>
+            ecommerceGeneralPopupBannersRestrictedByPage.ForEach(c =>
             {
                 c.banners = c.banners == null ? new List<templateBanner>() : c.banners.Where(p => p.restrictions.pageIds == null || p.restrictions.pageIds.Contains(MasterDefinition.UrlBreakdown.ContentId)).ToList();
             });
 
-            EcommercePopupBanners = ecommerceBannersUnrestrictedByPage.Concat(ecommerceBannersRestrictedByPage).OrderBy(bl => bl.id).ToList();
+
+            var ecommerceEmailCaptureBanners = bannerStore.result.bannerLocationGroups.Where(p => p.id == 55).Select(p => p.bannerLocations).ToList();
+
+            var ecommerceEmailCaptureBannersUnrestrictedBySiteSection = ecommerceEmailCaptureBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.siteSectionIds == null)).ToList();
+
+            var ecommerceEmailCaptureBannersRestrictedToSiteSections = ecommerceEmailCaptureBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.siteSectionIds != null)).ToList();
+
+            if (SiteSectionID != null)
+            {
+                ecommerceEmailCaptureBannersRestrictedToSiteSections.ForEach(c =>
+                {
+                    c.banners = c.banners == null ? new List<templateBanner>() : c.banners.Where(p => p.restrictions.siteSectionIds == null || p.restrictions.siteSectionIds.Contains(SiteSectionID.Value)).ToList();
+                });
+            }
+
+            var availableEcommerceEmailCaptureBanners = ecommerceEmailCaptureBannersUnrestrictedBySiteSection.Concat(ecommerceEmailCaptureBannersRestrictedToSiteSections);
+
+            var ecommerceEmailCaptureBannersUnrestrictedByPage = availableEcommerceEmailCaptureBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.All(q => q.restrictions.pageIds == null)).ToList();
+
+            var ecommerceEmailCaptureBannersRestrictedByPage = availableEcommerceEmailCaptureBanners.Where(p => p.banners != null && p.banners.Count != 0 && p.banners.Any(q => q.restrictions.pageIds != null)).ToList();
+
+            ecommerceEmailCaptureBannersRestrictedByPage.ForEach(c =>
+            {
+                c.banners = c.banners == null ? new List<templateBanner>() : c.banners.Where(p => p.restrictions.pageIds == null || p.restrictions.pageIds.Contains(MasterDefinition.UrlBreakdown.ContentId)).ToList();
+            });
+
+            EcommerceEmailCaptureBanners = ecommerceEmailCaptureBannersUnrestrictedByPage.Concat(ecommerceEmailCaptureBannersRestrictedByPage).OrderBy(bl => bl.id).ToList();
+
+            EcommerceGeneralPopupBanners = ecommerceGeneralPopupBannersUnrestrictedByPage.Concat(ecommerceGeneralPopupBannersRestrictedByPage).OrderBy(bl => bl.id).ToList();
 
             HeaderBanners = headerBannersUnrestrictedByPage.Concat(headerBannersRestrictedByPage).OrderBy(bl => bl.id).ToList();
 
@@ -643,7 +685,8 @@ namespace wwwDesignersGuild.ViewModels
             if (dgFramework.IsBot)
             {
                 // Make 100% sure you remove the eComm popup banners: bannerLocationIds 54 and 55.
-                EcommercePopupBanners = new List<bannerLocation>();
+                EcommerceEmailCaptureBanners = new List<bannerLocation>();
+                EcommerceGeneralPopupBanners = new List<bannerLocation>();
                 HeaderBanners = HeaderBanners.Where(hb => hb.id != 54 && hb.id != 55).ToList();
                 FooterBanners = FooterBanners.Where(hb => hb.id != 54 && hb.id != 55).ToList();
                 Banners = Banners.Where(hb => hb.id != 54 && hb.id != 55).ToList();

@@ -171,6 +171,7 @@ namespace wwwDesignersGuild.Controllers
                 (objBase.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
                  objBase.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
                  searchTerm,
+                 objBase.MasterDefinition.ProductTypeDropDown.ProductTypes.SingleOrDefault(p => p.FormValue == objBase.ProductType)?.ProductTypeID,
                  objBase.MasterDefinition.UrlBreakdown.ContentDate).Result;
 
 #if DEBUG

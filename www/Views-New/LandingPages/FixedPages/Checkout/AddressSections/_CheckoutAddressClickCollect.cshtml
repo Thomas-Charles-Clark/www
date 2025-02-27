@@ -53,7 +53,7 @@
             @HtmlHelperExtra.Resource("CheckoutAddressCollectDeliver", l, c, d)
         </button>
     </div>
-    <div class="store">
+    @*<div class="store">
        @if (!Model.deliveryOptions.collectFromMarylebone)
         {
             <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.65); display: flex; align-items: center; justify-content: center">
@@ -88,7 +88,7 @@
         <button class="btn btn-secondary mb-3" data-bind="click: function () { collectFromStore('marylebone') }">
             @HtmlHelperExtra.Resource("CheckoutAddressCollectDeliver", l, c, d)
         </button>
-    </div>
+    </div>*@
 }
 <div class="store">
    @if (!Model.deliveryOptions.collectFromWarehouse)

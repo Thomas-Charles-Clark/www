@@ -547,7 +547,7 @@
 
         @Html.Partial("/Views-New/LandingPages/FixedPages/Checkout/AddressSections/_AddressCollection.cshtml", Model)
     }
-    @if (Model.checkoutMethod != dgCheckoutType.Paypal && Model.checkoutMethod != dgCheckoutType.Amazon)
+    @if (Model.checkoutMethod != dgCheckoutType.Amazon)
     {
         <!-- ko if: addressConfirmed() == false -->
         <div class="delivery-address" data-bind="template: { name: 'member-address-template', data: $data }"></div>

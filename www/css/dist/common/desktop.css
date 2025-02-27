@@ -1275,7 +1275,7 @@ a:hover {
 }
 .page-section.animation-section + .page-section,
 .page-section.slideshow-section + .page-section {
-  z-index: 0;
+  z-index: 1;
 }
 
 .page-section.animation-section > .grid,
@@ -2566,6 +2566,43 @@ footer #change-country:focus-within {
   right: 1rem;
 }
 
+#ecommerce-general-pop-modal .modal-dialog {
+  min-width: auto;
+  max-width: 952px;
+}
+#ecommerce-general-pop-modal .modal-dialog .modal-body {
+  padding: 0;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid {
+  --bs-columns: 1;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:first-child img {
+  width: 100%;
+  height: auto;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) {
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) p:first-of-type {
+  font-size: 18px;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) > div {
+  width: 100%;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) > div > .btn {
+  width: 100%;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) .validation-message {
+  display: block;
+  margin-top: 0.5rem;
+}
+#ecommerce-general-pop-modal .modal-dialog .btn-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
 .page-heading-panel p:first-of-type {
   max-height: 15em;
   padding-right: 0.5rem;
@@ -2692,5 +2729,10 @@ footer #change-country:focus-within {
 
 #trade-login-prompt p {
   line-height: 35px;
+}
+
+#ecommerce-pop-modal .btn-close-wrapper .btn-close-wrapper-inner .btn-close,
+#ecommerce-general-pop-modal .btn-close-wrapper .btn-close-wrapper-inner .btn-close {
+  padding: 1em;
 }
 /*# sourceMappingURL=desktop.css.map */

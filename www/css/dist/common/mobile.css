@@ -789,6 +789,43 @@ ul.breadcrumb li {
   right: 1rem;
 }
 
+#ecommerce-general-pop-modal .modal-dialog .modal-body {
+  padding: 0;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid {
+  --bs-columns: 1;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:first-child img {
+  width: 100%;
+  height: auto;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) {
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) p:first-of-type {
+  font-size: 18px;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) > div {
+  width: 100%;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) > div > .btn {
+  width: 100%;
+}
+#ecommerce-general-pop-modal .modal-dialog .grid > div:nth-child(2) .validation-message {
+  display: block;
+  margin-top: var(--sm-gutter);
+}
+#ecommerce-general-pop-modal .modal-dialog #popup-complete img {
+  width: 100%;
+  height: auto;
+}
+#ecommerce-general-pop-modal .modal-dialog .btn-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
 #cookie-notice p {
   display: flex;
   flex-direction: column;

@@ -1115,7 +1115,8 @@ namespace wwwDesignersGuild.Controllers
                         urlData.countryDetails.LanguageID,
                         urlData.countryDetails.CountryID,
                         urlData.ContentDate,
-                        Session["memberTradeAccountID"] != null);
+                        Session["memberTradeAccountID"] != null,
+                        dgFramework.IsMobileDevice());
 
                 if (objProductData.objCacheSelect == null)
                 {
@@ -2158,12 +2159,18 @@ namespace wwwDesignersGuild.Controllers
             return PartialView("~/Views-New/Shared/Components/_trackingJson.cshtml", objReturn);
         }
 
-        public async Task<ViewResult> ReturnGeneric404(
+        public async Task<ActionResult> ReturnGeneric404(
             urlBreakdown urlBreakdown,
             decimal basketTotalQuantity,
             VisitorSelect objVisitorSelect
             )
         {
+            if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true &&
+                (string)Session["loginStatus"] == dgLoginStatus.currentLogin.ToString())
+            {
+                return new RedirectResult("/l0", false);
+            }
+
             var generic404model = await GenericViewModel_404.CreateAsync(
                 redirectUrl: $"/{urlBreakdown.countryDetails.URL}/l0",
                 objMaster: await NewMasterDefinition.CreateAsync(

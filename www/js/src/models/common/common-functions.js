@@ -184,17 +184,23 @@ window.lazyImages();
 
 window.keepAliveTimer = 0;
 
+window.keepAliveFn = function (event) {
+    fetch('/api/member/keepSessionAlive', {
+        method: 'POST',
+        headers: window.fetchHeaders,
+        cache: 'no-store',
+        credentials: 'same-origin',
+        body: null
+    });
+
+    if (window.ecommerceGeneralPopupModel) {
+        window.ecommerceGeneralPopupModel.cookieExpiryDate = window.addMinutes(new Date(), 60).toUTCString();
+    }
+};
+
 window.keepAlive = (() => {
     clearTimeout(keepAliveTimer);
-    keepAliveTimer = setInterval(function (event) {
-        fetch('/api/member/keepSessionAlive', {
-            method: 'POST',
-            headers: window.fetchHeaders,
-            cache: 'no-store',
-            credentials: 'same-origin',
-            body: null
-        });
-    }, 600000);
+    keepAliveTimer = setInterval(window.keepAliveFn, 600000);
 })();
 
 // Thanks to: https://stackoverflow.com/questions/19305821/multiple-modals-overlay
@@ -286,4 +292,14 @@ window.elementPercentInViewport = (div) => {
     const divsize = dimension.w * dimension.h;
     const overlap = window.elementIntersection(dimension, viewport);
     return overlap / divsize;
+}
+
+window.addDays = (date, days) => {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
+
+window.addMinutes = (date, minutes) => {
+    return new Date(date.getTime() + minutes * 60000);
 }

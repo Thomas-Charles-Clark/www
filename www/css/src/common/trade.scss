@@ -1,4 +1,5 @@
-﻿@import "../lib/bootstrap/scss/mixins/breakpoints";
+﻿@import "common.scss";
+@import "../lib/bootstrap/scss/mixins/breakpoints";
 @import "../lib/bootstrap/scss/functions";
 @import "../lib/bootstrap/scss/variables";
 @import "variables";
@@ -619,6 +620,7 @@
 
     .input-group {
         border: 1px solid $gray-400;
+        height: 40px;
 
         input[type=text] {
             border: 0;
@@ -1174,4 +1176,50 @@ textarea.mdc-text-field__input:focus-within {
 .previously-known-as {
     margin-bottom: 0;
     font-weight: 300;
+}
+
+.exporting-progress {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    border: 1px solid white;
+    border-radius: 4px;
+    transition: border 300ms ease-in-out;
+    padding: $m-gutter $l-gutter;
+    background-color: $white;
+    position: relative;
+    width: 50%;
+    opacity: 0.8;
+
+    .barberpole {
+        background-color: $gray-300;
+        background-image: repeating-linear-gradient(-45deg, transparent, transparent 1rem, white 1rem, white 2rem);
+        transition: background-color 300ms ease-in-out;
+        background-size: 200% 200%;
+        animation: barberpole 5s linear reverse infinite;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .cover {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 2;
+        height: 100%;
+        background-color: $white;
+        will-change: width;
+        transition: width 0.3s linear;
+    }
+
+    .progress {
+        justify-content: center;
+        background-color: transparent;
+        font-size: $font-size-lg;
+        z-index: 3;
+        height: auto;
+    }
 }

@@ -184,15 +184,15 @@
             <div class="g-col-1">
                 <button data-bs-target="@(Model.CarouselID)"
                         data-bs-slide-to="@(index)"
-                        class="btn btn-link @(index == 0 ? "active" : "")"
+                        class="btn btn-link @(index == 0 ? "active" : "") w-100"
                         aria-current="@(index == 0 ? "true" : "")"
                         aria-label="@HtmlHelperExtra.Resource("ImageSlide", l, c, d) @(index + 1)">
                     <img src="/image@(Framework.WebPFallback)/90/@(image.ImageID)"
                          alt="@(image.AltText ?? Model.Heading)"
-                         width="90"
+                         width="9"
                          height="90"
-                         srcset="/image@(Framework.WebPFallback)/90/@(image.ImageID) 90w, /image@(Framework.WebPFallback)/156/@(image.ImageID) 156w"
-                         sizes="(max-width: 767px) 156px, 90px" />
+                         srcset="/image@(Framework.WebPFallback)/239/@(image.ImageID) 239w, /image@(Framework.WebPFallback)/488/@(image.ImageID) 488w"
+                         sizes="(max-width: 767px) 488px, 239px" />
                 </button>
             </div>
         }

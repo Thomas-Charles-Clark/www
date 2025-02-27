@@ -37,14 +37,14 @@ namespace wwwDesignersGuild.Models.Search
         #region Server Search
 
 
-        public async Task<serverSearchDatabase> buildSearchResultsDb(byte languageId, short countryId, string searchText, DateTime useDate)
+        public async Task<serverSearchDatabase> buildSearchResultsDb(byte languageId, short countryId, string searchText, byte? productTypeId, DateTime useDate)
         {
-            serverSearchDatabase storeResults = await buildSearchResultsAsyncDb(languageId, countryId, searchText, useDate);            
+            serverSearchDatabase storeResults = await buildSearchResultsAsyncDb(languageId, countryId, searchText, productTypeId, useDate);            
             return storeResults;
         }
 
 
-        private async Task<serverSearchDatabase> buildSearchResultsAsyncDb(byte languageId, short countryId, string searchTerm, DateTime useDate)
+        private async Task<serverSearchDatabase> buildSearchResultsAsyncDb(byte languageId, short countryId, string searchTerm, byte? productTypeId, DateTime useDate)
         {
 
 #if DEBUG
@@ -54,113 +54,124 @@ namespace wwwDesignersGuild.Models.Search
             sw.Start();
 
 #endif
-            var dtSearchIndexThesaurusPath = System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"];
+            // Ducks, align!
 
-
-            if (!Directory.Exists(dtSearchIndexThesaurusPath)) 
-            {
-                Directory.CreateDirectory(dtSearchIndexThesaurusPath);
-            }
-
-            //  Call dtSearch
-            var dtSearchThesaurusPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\Thesaurus\\thesaur.xml";
-
-            var dtSearchProductCodeIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\ProductCodeIndex";
-
-            var dtSearchMainIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\MainIndex";
-
-            Options options = new Options
-            {
-                UserThesaurusFile = dtSearchThesaurusPath.Replace(@"\\", @"\")
-            };
-            //options.Save();
-
-
-            //  SEARCH: Product code
-            var searchJobProductCodeIndex = new SearchJob();
-            searchJobProductCodeIndex.IndexesToSearch.Add(dtSearchProductCodeIndexPath.Replace(@"\\", @"\"));
-            searchJobProductCodeIndex.Request = searchTerm;
-            searchJobProductCodeIndex.SearchFlags = SearchFlags.dtsSearchPositionalScoring | SearchFlags.dtsSearchTypeAllWords;
-
-            searchJobProductCodeIndex.Execute();
-
-            var tempProductCodeSearchResults = new List<searchResultDefinition>();
-            using (var results = searchJobProductCodeIndex.Results)
-            {
-                results.Sort(SortFlags.dtsSortByRelevanceScore, "");
-
-                for (int i = 0; i < results.Count; ++i)
-                {
-                    results.GetNthDoc(i);
-                    tempProductCodeSearchResults.Add(new searchResultDefinition { productPageID = Convert.ToInt32(results.DocName), ScorePercent = results.CurrentItem.ScorePercent });
-                }
-            }
-
-
-
-            //  SEARCH: Main text
-            //  Note:   SearchFlags.dtsSearchPhonic has been removed as it made the search results too general
-            var searchJobMainIndex = new SearchJob();
-            searchJobMainIndex.IndexesToSearch.Add(dtSearchMainIndexPath.Replace(@"\\", @"\"));
-            searchJobMainIndex.Request = searchTerm;
-            searchJobMainIndex.SearchFlags = SearchFlags.dtsSearchStemming |
-                                    //SearchFlags.dtsSearchFuzzy |          // no longer fuzzy 
-                                    SearchFlags.dtsSearchSynonyms |
-                                    SearchFlags.dtsSearchUserSynonyms |
-                                    SearchFlags.dtsSearchPositionalScoring |
-                                    SearchFlags.dtsSearchTypeAllWords;
-
-            //searchJobMainIndex.Fuzziness = 1;
-            
-            searchJobMainIndex.Execute();
-
-            var tempMainSearchResults = new List<searchResultDefinition>();
-            using (SearchResults results = searchJobMainIndex.Results)
-            {
-                results.Sort(SortFlags.dtsSortByRelevanceScore, "");
-
-                for (int i = 0; i < results.Count; ++i)
-                {
-                    results.GetNthDoc(i);
-                    tempMainSearchResults.Add(new searchResultDefinition { productPageID = Convert.ToInt32(results.DocName), ScorePercent = results.CurrentItem.ScorePercent });
-                }
-            }
-
-
-            //  Merge the two search results (product code takes priority)
             var objSearchResults = new List<searchResultDefinition>();
-            foreach (var objProductResult in tempProductCodeSearchResults)
-            {
-                objProductResult.ScorePercent = 100;    //  Product code matches always get 100% as they appear first in the search results
-                objSearchResults.Add(objProductResult);
-            }
-            foreach (var objMainResult in tempMainSearchResults)
-            {
-                bool productPageFound = false;
-                foreach (var objProductResult in tempProductCodeSearchResults)
-                {
-                    if (objProductResult.productPageID == objMainResult.productPageID)
-                    {
-                        productPageFound = true;
-                        break;
-                    }
-                }
-                if (productPageFound == true) { }
-                else
-                {
-                    objSearchResults.Add(objMainResult);
-                }
-            }
 
             var productPageTable = new DataTable();
+            
             productPageTable.Columns.Add("ProductPageID", typeof(int));
             productPageTable.Columns.Add("ScorePercentage", typeof(int));
 
-            foreach (var searchResult in objSearchResults)
+            if (!String.IsNullOrEmpty(searchTerm))
             {
-                productPageTable.Rows.Add(searchResult.productPageID, searchResult.ScorePercent);
-                // replaced 0 with searchResult.ScorePercent: forever and a day the ServerSearchResults_Generate procedure wanted nothing to do with manipulating the relevance scoring
-                // now maybe it does, eh?
+                var dtSearchIndexThesaurusPath = System.Web.Configuration.WebConfigurationManager.AppSettings["dtSearchIndexThesaurusPath"];
+
+
+                if (!Directory.Exists(dtSearchIndexThesaurusPath))
+                {
+                    Directory.CreateDirectory(dtSearchIndexThesaurusPath);
+                }
+
+                //  Call dtSearch
+                var dtSearchThesaurusPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\Thesaurus\\thesaur.xml";
+
+                var dtSearchProductCodeIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\ProductCodeIndex";
+
+                var dtSearchMainIndexPath = $"{dtSearchIndexThesaurusPath}\\{languageId}\\MainIndex";
+
+                Options options = new Options
+                {
+                    UserThesaurusFile = dtSearchThesaurusPath.Replace(@"\\", @"\")
+                };
+                //options.Save();
+
+
+                //  SEARCH: Product code
+                var searchJobProductCodeIndex = new SearchJob();
+                searchJobProductCodeIndex.IndexesToSearch.Add(dtSearchProductCodeIndexPath.Replace(@"\\", @"\"));
+                searchJobProductCodeIndex.Request = searchTerm;
+                searchJobProductCodeIndex.SearchFlags = SearchFlags.dtsSearchPositionalScoring | SearchFlags.dtsSearchTypeAllWords;
+
+                searchJobProductCodeIndex.Execute();
+
+                var tempProductCodeSearchResults = new List<searchResultDefinition>();
+                using (var results = searchJobProductCodeIndex.Results)
+                {
+                    results.Sort(SortFlags.dtsSortByRelevanceScore, "");
+
+                    for (int i = 0; i < results.Count; ++i)
+                    {
+                        results.GetNthDoc(i);
+                        tempProductCodeSearchResults.Add(new searchResultDefinition { productPageID = Convert.ToInt32(results.DocName), ScorePercent = results.CurrentItem.ScorePercent });
+                    }
+                }
+
+
+
+                //  SEARCH: Main text
+                //  Note:   SearchFlags.dtsSearchPhonic has been removed as it made the search results too general
+                var searchJobMainIndex = new SearchJob();
+                searchJobMainIndex.IndexesToSearch.Add(dtSearchMainIndexPath.Replace(@"\\", @"\"));
+                searchJobMainIndex.Request = searchTerm;
+                searchJobMainIndex.SearchFlags = SearchFlags.dtsSearchStemming |
+                                        //SearchFlags.dtsSearchFuzzy |          // no longer fuzzy 
+                                        SearchFlags.dtsSearchSynonyms |
+                                        SearchFlags.dtsSearchUserSynonyms |
+                                        SearchFlags.dtsSearchPositionalScoring |
+                                        SearchFlags.dtsSearchTypeAllWords;
+
+                //searchJobMainIndex.Fuzziness = 1;
+
+                searchJobMainIndex.Execute();
+
+                var tempMainSearchResults = new List<searchResultDefinition>();
+                using (SearchResults results = searchJobMainIndex.Results)
+                {
+                    results.Sort(SortFlags.dtsSortByRelevanceScore, "");
+
+                    for (int i = 0; i < results.Count; ++i)
+                    {
+                        results.GetNthDoc(i);
+                        tempMainSearchResults.Add(new searchResultDefinition { productPageID = Convert.ToInt32(results.DocName), ScorePercent = results.CurrentItem.ScorePercent });
+                    }
+                }
+
+
+                //  Merge the two search results (product code takes priority)
+                foreach (var objProductResult in tempProductCodeSearchResults)
+                {
+                    objProductResult.ScorePercent = 100;    //  Product code matches always get 100% as they appear first in the search results
+                    objSearchResults.Add(objProductResult);
+                }
+                foreach (var objMainResult in tempMainSearchResults)
+                {
+                    bool productPageFound = false;
+                    foreach (var objProductResult in tempProductCodeSearchResults)
+                    {
+                        if (objProductResult.productPageID == objMainResult.productPageID)
+                        {
+                            productPageFound = true;
+                            break;
+                        }
+                    }
+                    if (productPageFound == true) { }
+                    else
+                    {
+                        objSearchResults.Add(objMainResult);
+                    }
+                }
+                foreach (var searchResult in objSearchResults)
+                {
+                    productPageTable.Rows.Add(searchResult.productPageID, searchResult.ScorePercent);
+                    // replaced 0 with searchResult.ScorePercent: forever and a day the ServerSearchResults_Generate procedure wanted nothing to do with manipulating the relevance scoring
+                    // now maybe it does, eh?
+                }
+
+            }
+            else
+            {
+
             }
 
             int? tradeAccountId = null;

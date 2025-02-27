@@ -14,6 +14,7 @@ using wwwDesignersGuild.Controllers;
 using System.Data;
 using System.Threading.Tasks;
 using System.Web;
+using wwwDesignersGuild.Models.Helper;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -26,9 +27,10 @@ namespace wwwDesignersGuild.Models.Database
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] byte languageID,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryID", DbType = "SmallInt")] short countryID,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "Date", DbType = "Date")] DateTime date,
-                                                                    [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "IsTrade", DbType = "Bit")] bool isTrade)
+                                                                    [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "IsTrade", DbType = "Bit")] bool isTrade,
+                                                                    [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "PlatformSwitch", DbType = "Bit")] bool? platformSwitch)
         {
-            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), productPageID, languageID, countryID, date, isTrade);
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), productPageID, languageID, countryID, date, isTrade, platformSwitch);
             return (IMultipleResults)result.ReturnValue;
         }
 

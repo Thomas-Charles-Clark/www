@@ -872,11 +872,7 @@ namespace wwwDesignersGuild.ViewModels
 
             NoIndex = Definition.noIndex;
 
-            NoIndex = true;
-
             NoFollow = Definition.noFollow;
-
-            NoFollow = true;
 
 #if DEBUG
             sw.Stop();

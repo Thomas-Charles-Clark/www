@@ -70,7 +70,9 @@
         }
     });
 
-    self.vatRegistered = ko.observable(false);
+    self.vatRegistered = ko.observable([41, 237, 238].indexOf(getCountryId()) > -1 ? true : false);
+
+    self.vatRegisteredVisible = ko.observable([41, 237, 238].indexOf(getCountryId()) > -1 ? false : true);
 
     self.vatCountryId = ko.observable();
 
@@ -310,12 +312,13 @@
         }
     });
 
-    // Lowered because requires invoiceAddress, sorry. US Only.
+    // Lowered because requires invoiceAddress, sorry.
+    // US Minor Outlying Islands, US Mainland, Canada
     self.usSalesTaxExemptionCertificate = ko.observable().extend({
       required: {
         params: true,
         onlyIf: () => {
-          return self.vatRegistered() && self.invoiceAddress.countryId() == 238;
+            return self.invoiceAddress.countryId() == 237 || self.invoiceAddress.countryId() == 238 || self.invoiceAddress.countryId() == 41;
         },
         message: self.resources.USSalesTaxExemptionCertificationRequired
       }
@@ -1529,7 +1532,7 @@
                     companyRegistration: self.companyRegistration(),
                     companyVATNumber: self.companyVATNumber(),
                     vatCountryId: self.vatCountryId(),
-                    vatNumberDisplay: getCountryId() == 238 ? null : self.vatNumberDisplay(),
+                    vatNumberDisplay: [41, 237, 238].indexOf(getCountryId()) > -1 ? null : self.vatNumberDisplay(),
                     taxId: self.taxId(),
                     usSalesTaxExemptionCertificate: self.usSalesTaxExemptionCertificate(),
                     autoCorrespondenceLanguageCode: self.autoCorrespondenceLanguageCode(),

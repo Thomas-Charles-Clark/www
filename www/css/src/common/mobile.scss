@@ -877,6 +877,64 @@ ul.breadcrumb {
 }
 
 
+#ecommerce-general-pop-modal {
+    .modal-dialog {
+
+        .modal-body {
+            padding: 0;
+        }
+
+        .grid {
+            --bs-columns: 1;
+
+            > div:first-child {
+                img {
+                    width: 100%;
+                    height: auto;
+                }
+            }
+
+            > div:nth-child(2) {
+                padding: $modal-inner-padding;
+                font-size: $small-font-size;
+
+                p:first-of-type {
+                    font-size: $font-size-md
+                }
+
+                > div {
+                    width: 100%;
+
+                    > .btn {
+                        width: 100%;
+                    }
+                }
+
+                .validation-message {
+                    display: block;
+                    margin-top: var(--sm-gutter);
+                }
+
+                > p:last-of-type {
+                }
+            }
+        }
+
+        #popup-complete {
+            img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .btn-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+    }
+}
+
 #cookie-notice {
     p {
         display: flex;

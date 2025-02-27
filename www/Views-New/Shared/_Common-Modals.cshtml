@@ -115,9 +115,9 @@
                 <p class="mb-0">
                     @HtmlHelperExtra.Resource(isCheckoutPage ? "MajorErrorCheckout" : tradeUser ? "MajorErrorTrade" : "MajorError", l, c, d)
                 </p>
-               @if (isCheckoutPage)
+                @if (isCheckoutPage)
                 {
-                      <button class="btn btn-secondary mt-3 w-100" onclick="window.location.reload();">
+                    <button class="btn btn-secondary mt-3 w-100" onclick="window.location.reload();">
                         @HtmlHelperExtra.Resource("ReloadPage", l, c, d)
                     </button>
                 }
@@ -176,7 +176,7 @@
                                                 aria-selected="true">
                                             <span>
                                                 @HtmlHelperExtra.Resource("InStock", l, c, d)
-                                                <br/>
+                                                <br />
                                                 (<span data-bind="text: totalInStock"></span>)
                                             </span>
                                         </button>
@@ -665,9 +665,9 @@
     }
 }
 @if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
-    Model.HasEcommercePopupBanners)
+    Model.HasEcommerceEmailCapturePopupBanners)
 {
-    var b = Model.EcommercePopupBanners.First().banners[0];
+    var b = Model.EcommerceEmailCaptureBanners.First().banners[0];
     <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="ecommerce-pop-modal">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
@@ -678,7 +678,11 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="btn-close-wrapper">
+                        <div class="btn-close-wrapper-inner">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
                     <div class="grid" data-bind="visible: !complete()">
                         <div>
                             <img width="512"
@@ -786,6 +790,40 @@
                             src: '/imagebanner@(Framework.WebPFallback)/1024/' + bannerId + '-B?v=' + version,
                             alt: altText
                          }" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
+    Model.HasEcommerceGeneralPopupBanners)
+{
+    var b = Model.EcommerceGeneralPopupBanners.First().banners[0];
+    <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="ecommerce-general-pop-modal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                    <div class="spinner-border"></div>
+                    <h4>
+                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-close-wrapper">
+                        <div class="btn-close-wrapper-inner">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="grid" data-bind="visible: !complete()">
+                        <div data-bind="click: hideModal">
+                            <img width="512"
+                                 height="749"
+                                 class="d-block w-100"
+                                 alt="@(b.altText ?? b.overlayText)"
+                                 src="/imagebanner@(Framework.WebPFallback)/1024/@(b.bannerId)?v=@(b.version)"
+                                 @HtmlHelperExtra.BannerImageSourceSetSizes(b.bannerId, b.version, ImageSize.Five) />
+                        </div>
                     </div>
                 </div>
             </div>

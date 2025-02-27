@@ -77,7 +77,7 @@
                     <div class="mb-3" data-bind="visible: invoiceAddress.countryId() === 46">
                         <div data-bind="component: { name: 'mdc-text-field-component', params: taxIdParams }"></div>
                     </div>
-                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
+                    <div class="mb-3" data-bind="visible: vatRegisteredVisible, component: { name: 'mdc-checkbox-component', params: areYouVATRegisteredParams }"></div>
                     @* But anyone could have a VAT Number *@
                     <div class="mb-3" data-bind="visible: vatRegistered">
                         <!-- ko if: invoiceAddress.countryId() != 238 -->
@@ -101,7 +101,11 @@
                         </div>
                         <!-- /ko -->
                     </div>
-                    <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
+                    @* Don't need to be trying to gather EORI numbers for US applications - confirmed with SW 11/02/2025 *@
+                    @if (c != 238)
+                    {
+                        <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouHaveEORIParams }"></div>
+                    }
                     <div class="mb-3" data-bind="visible: eoriRegistered, component: { name: 'mdc-text-field-component', params: eoriNumberParams }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-kendo-dropdown-component', params: companyTypeDropDownList }"></div>
                     <div class="mb-3" data-bind="component: { name: 'mdc-checkbox-component', params: doYouSellOnlineParams }"></div>

@@ -223,5 +223,6 @@ namespace wwwDesignersGuild.Util
         public DateTimeOffset? ExplicitExpiry { get; set; }
         public IEnumerable<long> PageSectionIDs { get; set; }
         public string CountryURL { get; set; }
+        public bool? PlatformSwitch { get; set; }
     }
 }

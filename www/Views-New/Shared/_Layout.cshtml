@@ -361,141 +361,154 @@
     <link rel="apple-touch-startup-image" href="~/content/images/icon/apple-touch-icon/dg-icon-512.png">
 
 </head>
-    <body>
-        @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
-        @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
-        <div id="body-content">
-           @if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
-            {
-                <div id="body-inner">
-                    @if (!ViewBag.Partial)
-                    {
-                        @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
-                        @Html.Partial("~/Views-New/Shared/_TradeLoginPrompt.cshtml")
-                    }
-                    @if (!ViewBag.Partial && !dgFramework.IsMobileDevice())
-                    {
-                        @Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
-                    }
-                    @if (!dgFramework.IsMobileDevice())
-                    {
-                        if (!ViewBag.Partial)
-                        {
-                            @Html.Partial("~/Views-New/Shared/_Menu-Desktop.cshtml")
-                        }
-                        else
-                        {
-                            @Render.Script("~/bundles/js/menu-scripts")
-                        }
-                        <div id="body-proper" class="py-2 container mb-4">
-                            @RenderBody()
-                            @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
-                            {
-                                @* productPages render this in their own templates because of relatedSearches *@
-                                if (Model.ShowRecentlyViewed)
-                                {
-                                    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-                                }
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        if (!ViewBag.Partial)
-                        {
-                            @Html.Partial("~/Views-New/Shared/_Menu-Mobile.cshtml")
-                        }
-                        else
-                        {
-                            @Render.Script("~/bundles/js/menu-scripts")
-                        }
-                        <div id="body-proper" class="py-2 container mb-4">
-                            <div id="menu-underlay"
-                                 class="page-blocker"
-                                 data-bs-toggle="collapse"
-                                 data-bs-target="#navbar-content"
-                                 onclick="this.classList.remove('show')"></div>
-                            @RenderBody()
-                            @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
-                            {
-                                if (!Request.IsLocal && Model.ShowRecentlyViewed)
-                                {
-                                    @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-                                }
-                            }
-                        </div>
-                    }
-                </div>
-                if (!ViewBag.Partial)
+<body>
+    @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
+    @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
+    <div id="body-content">
+        @if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
+        {
+            <div id="body-inner">
+                @if (!ViewBag.Partial)
                 {
-                    <footer>
-                        @if (!dgFramework.IsMobileDevice())
-                        {
-                            @Html.Partial("~/Views-New/Shared/_Footer-Desktop.cshtml")
-                        }
-                        else
-                        {
-                            @Html.Partial("~/Views-New/Shared/_Footer-Mobile.cshtml")
-                        }
-                    </footer>
+                    @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+                    @Html.Partial("~/Views-New/Shared/_TradeLoginPrompt.cshtml")
                 }
-            }
-            else
-            {
-                <div id="body-inner" style="min-height: 101vh">
+                @if (!ViewBag.Partial && !dgFramework.IsMobileDevice())
+                {
                     @Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
-                   @if (Model.ContentID == (int)dgFixedPage.checkoutLogin)
+                }
+                @if (!dgFramework.IsMobileDevice())
+                {
+                    if (!ViewBag.Partial)
                     {
-                        @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
-                    }
-                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Common.cshtml")
-                   @if (!dgFramework.IsMobileDevice())
-                    {
-                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Desktop.cshtml")
+                        @Html.Partial("~/Views-New/Shared/_Menu-Desktop.cshtml")
                     }
                     else
                     {
-                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Mobile.cshtml")
+                        @Render.Script("~/bundles/js/menu-scripts")
                     }
-                    <div class="py-2 container mb-4">
+                    <div id="body-proper" class="py-2 container mb-4">
                         @RenderBody()
+                        @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
+                        {
+                            @* productPages render this in their own templates because of relatedSearches *@
+                            if (Model.ShowRecentlyViewed)
+                            {
+                                @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+                            }
+                        }
                     </div>
-                </div>
+                }
+                else
+                {
+                    if (!ViewBag.Partial)
+                    {
+                        @Html.Partial("~/Views-New/Shared/_Menu-Mobile.cshtml")
+                    }
+                    else
+                    {
+                        @Render.Script("~/bundles/js/menu-scripts")
+                    }
+                    <div id="body-proper" class="py-2 container mb-4">
+                        <div id="menu-underlay"
+                             class="page-blocker"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#navbar-content"
+                             onclick="this.classList.remove('show')"></div>
+                        @RenderBody()
+                        @if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
+                        {
+                            if (!Request.IsLocal && Model.ShowRecentlyViewed)
+                            {
+                                @Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+                            }
+                        }
+                    </div>
+                }
+            </div>
+            if (!ViewBag.Partial)
+            {
                 <footer>
                     @if (!dgFramework.IsMobileDevice())
                     {
-                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Desktop.cshtml")
+                        @Html.Partial("~/Views-New/Shared/_Footer-Desktop.cshtml")
                     }
                     else
                     {
-                        @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Mobile.cshtml")
+                        @Html.Partial("~/Views-New/Shared/_Footer-Mobile.cshtml")
                     }
                 </footer>
             }
-        </div>
-        @Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
-       @if (true)
-        {
-            @Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
         }
-       @if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+        else
         {
-            @(MiniProfiler.Current?.RenderIncludes())
+            <div id="body-inner" style="min-height: 101vh">
+                @Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
+                @if (Model.ContentID == (int)dgFixedPage.checkoutLogin)
+                {
+                    @Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+                }
+                @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Common.cshtml")
+                @if (!dgFramework.IsMobileDevice())
+                {
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Desktop.cshtml")
+                }
+                else
+                {
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Mobile.cshtml")
+                }
+                <div class="py-2 container mb-4">
+                    @RenderBody()
+                </div>
+            </div>
+            <footer>
+                @if (!dgFramework.IsMobileDevice())
+                {
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Desktop.cshtml")
+                }
+                else
+                {
+                    @Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Mobile.cshtml")
+                }
+            </footer>
         }
-       @if (!ViewBag.Partial &&
-            Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
-            Model.HasEcommercePopupBanners)
+    </div>
+
+    @Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
+
+    @Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
+
+    @if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+    {
+        @(MiniProfiler.Current?.RenderIncludes())
+    }
+
+    @if (!ViewBag.Partial)
+    {
+        if (Model.HasEcommerceEmailCapturePopupBanners && Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
         {
-           <script type="text/javascript">
-               window.ecommercePopBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommercePopupBanners));
-           </script>
-           @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
+            <script type="text/javascript">
+               window.ecommerceEmailCapturePopupBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommerceEmailCaptureBanners));
+            </script>
         }
 
-        @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
+        if (Model.HasEcommerceGeneralPopupBanners)
+        {
+            <script type="text/javascript">
+                window.ecommerceGeneralPopupBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommerceGeneralPopupBanners));
+            </script>
+        }
 
-        @RenderSection("LateTemplateScripts", required: false)
+        if (Model.HasEcommerceEmailCapturePopupBanners || Model.HasEcommerceGeneralPopupBanners)
+        {
+            @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
+        }
+    }
 
-        @Render.ScriptDefer("~/bundles/js/bootstrap-onload")
-    </body>
+    @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
+
+    @RenderSection("LateTemplateScripts", required: false)
+
+    @Render.ScriptDefer("~/bundles/js/bootstrap-onload")
+</body>
 </html>

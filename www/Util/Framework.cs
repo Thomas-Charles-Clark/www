@@ -9,7 +9,7 @@ using System.Web;
 
 namespace wwwDesignersGuild.Util
 {
-    public static class Framework
+    public static partial class Framework
     {
         public static readonly string InkyEndpoint = "https://vm-web2:8091/inkyUpdated/inkyUpdated.s";
         public static readonly string WebServerHostname = "vm-web2";
@@ -144,6 +144,25 @@ namespace wwwDesignersGuild.Util
                 }
             }
             return result;
+        }
+
+        public static string GetDaySuffix(int day)
+        {
+            switch (day)
+            {
+                case 1:
+                case 21:
+                case 31:
+                    return "st";
+                case 2:
+                case 22:
+                    return "nd";
+                case 3:
+                case 23:
+                    return "rd";
+                default:
+                    return "th";
+            }
         }
 
         public static bool ServeWebP

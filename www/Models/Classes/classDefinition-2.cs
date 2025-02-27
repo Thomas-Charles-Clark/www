@@ -1449,6 +1449,27 @@ namespace wwwDesignersGuild.Models.Classes
             }
         }
 
+        public List<pageSectionBanner> Banners
+        {
+            set
+            {
+
+            }
+            get
+            {
+                return JObject.FromObject(json).SelectTokens("banners").Children().Select(p => {
+                    if (p.HasValues)
+                    {
+                        return p.ToObject<pageSectionBanner>();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).ToList();
+            }
+        }
+
         public string CustomCanonical
         {
             set

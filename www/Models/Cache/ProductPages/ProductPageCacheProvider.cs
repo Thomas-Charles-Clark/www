@@ -14,13 +14,13 @@ namespace wwwDesignersGuild.Models.Cache
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsProductPageDefinition Get(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate)
+        public cmsProductPageDefinition Get(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, useDate);
+            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
             return (cmsProductPageDefinition)Cache[key];
         }
 
-        public void Set(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate, cmsProductPageDefinition data)
+        public void Set(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate, cmsProductPageDefinition data)
         {
             Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool cacheEnabled);
 
@@ -36,40 +36,40 @@ namespace wwwDesignersGuild.Models.Cache
                     policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
                 }
 
-                var key = buildKey(productPageId, languageId, countryId, tradeSwitch, useDate);
+                var key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
 
                 Cache.Add(new CacheItem(key, data), policy);
             }
         }
 
-        public void ExplicitSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate, cmsProductPageDefinition data, DateTimeOffset expiration)
+        public void ExplicitSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate, cmsProductPageDefinition data, DateTimeOffset expiration)
         {
             CacheItemPolicy policy = new CacheItemPolicy
             {
                 AbsoluteExpiration = expiration
             };
 
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, useDate);
+            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
             Cache.Add(new CacheItem(key, data), policy);
         }
 
-        public bool IsSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate)
+        public bool IsSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, useDate);
+            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
             return (Cache[key] != null);
         }
 
 
-        public void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate)
+        public void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, useDate);
+            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
             Cache.Remove(key);
         }
 
 
-        private string buildKey(int productPageId, byte languageId, short countryId, bool tradeSwitch, DateTime useDate)
+        private string buildKey(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
-            return $"PRODUCTPAGE~{productPageId}~{languageId}~{countryId}~{tradeSwitch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+            return $"PRODUCTPAGE~{productPageId}~{languageId}~{countryId}~{tradeSwitch}~{platformSwitch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
         }
 
 
