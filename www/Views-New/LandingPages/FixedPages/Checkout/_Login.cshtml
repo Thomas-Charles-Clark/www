@@ -34,10 +34,8 @@
     <script>
         if (!window.ApplePaySession) {
             window.ApplePaySession = {
-                canMakePayments: () => true
-            }
-        } else if (window.ApplePaySession && !window.ApplePaySession.canMakePayments()) {
-            window.ApplePaySession = {
+                constructor: () => {},
+
                 canMakePayments: () => true
             }
         }
@@ -682,7 +680,9 @@
 
                 } else {
                     if (checkoutType != 5) {
+                        @* Feels like this next line should have a bit more of a fanfare: into the checkout you go, dear customer! *@
                         window.location.href = data.redirect;
+                        @* Ta-daaaa! *@
                     } else {
                         // Apple Pay remains on the Welcome screen
                         document.body.dispatchEvent(new Event('appleGo'));

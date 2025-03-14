@@ -125,17 +125,19 @@ class ApplePayViewModel {
     init() {
         console.log('applePayViewModel init called');
 
-        this.activeApplePaySession = new ApplePaySession(3, this.applePaymentRequest);
+        if (typeof ApplePaySession === 'function') {
+            this.activeApplePaySession = new ApplePaySession(3, this.applePaymentRequest);
 
-        this.activeApplePaySession.onvalidatemerchant = this.onValidateMerchant;
+            this.activeApplePaySession.onvalidatemerchant = this.onValidateMerchant;
 
-        this.activeApplePaySession.onshippingcontactselected = this.onShippingContactSelected;
+            this.activeApplePaySession.onshippingcontactselected = this.onShippingContactSelected;
 
-        this.activeApplePaySession.onshippingmethodselected = this.onShippingMethodSelected;
+            this.activeApplePaySession.onshippingmethodselected = this.onShippingMethodSelected;
 
-        this.activeApplePaySession.onpaymentauthorized = this.onPaymentAuthorized;
+            this.activeApplePaySession.onpaymentauthorized = this.onPaymentAuthorized;
 
-        this.activeApplePaySession.oncancel = this.onCancel;
+            this.activeApplePaySession.oncancel = this.onCancel;
+        }
     }
 
     // to log things with

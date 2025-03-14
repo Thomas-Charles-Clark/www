@@ -524,6 +524,10 @@ a:hover {
         }
     }
 }
+.page-section.animation-section,
+.page-section.slideshow-section {
+    z-index: 2;
+}
 
 .page-section.animation-section + .page-section,
 .page-section.slideshow-section + .page-section {
@@ -757,7 +761,6 @@ ul.breadcrumb {
             min-width: 135px;
 
             ul.dropdown {
-                width: 135px;
 
                 li {
                     a {

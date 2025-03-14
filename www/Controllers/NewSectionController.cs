@@ -195,6 +195,11 @@ namespace wwwDesignersGuild.Controllers
 
             var objCheckout = new checkoutDb();
 
+            if (dgFramework.doesUserHaveACheckoutId(Session["checkoutId"]) == true)
+            {
+                return PartialView($"~/Views-New/Shared/Error/_returnToBasket.cshtml", objBase.MasterDefinition);
+            }
+
             var basketPreflightResult = await objCheckout.validateBasket(
                 objBase.Visitor.visitorDbId,
                 objBase.Visitor.memberId,

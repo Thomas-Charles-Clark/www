@@ -595,7 +595,7 @@
                    rel="@(item.NoFollow ? "nofollow noopener" : "")"
                    @if (item.FontClass?.Contains("menu-spacer") == true) { <text>
                    tabindex="-1" ;
-                   </text>  }>
+                   </text> }>
                     @if (item.Header)
                     {
                         <strong>
@@ -605,8 +605,9 @@
                     else
                     {
                         @Html.Raw(item.Name)
-                        if (item.QueryStringParameters?.Contains("product-type") == true)
+                        if (item.QueryStringParameters?.Contains("product-type") == true && (item.MenuItemID == 11793 || item.MenuItemID == 11794))
                         {
+                            @* Fabric and Wallpaper menu items only get the magnifying glass *@
                             <i class="bi bi-search"></i>
                         }
                     }

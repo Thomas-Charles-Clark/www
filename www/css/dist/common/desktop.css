@@ -1273,6 +1273,11 @@ a:hover {
     grid-column-start: 11 !important;
   }
 }
+.page-section.animation-section,
+.page-section.slideshow-section {
+  z-index: 2;
+}
+
 .page-section.animation-section + .page-section,
 .page-section.slideshow-section + .page-section {
   z-index: 1;
@@ -1461,9 +1466,6 @@ ul.breadcrumb li {
 }
 #shortcuts-navbar > .container li#signin-menu {
   min-width: 135px;
-}
-#shortcuts-navbar > .container li#signin-menu ul.dropdown {
-  width: 135px;
 }
 #shortcuts-navbar > .container li#signin-menu ul.dropdown li a {
   white-space: normal;

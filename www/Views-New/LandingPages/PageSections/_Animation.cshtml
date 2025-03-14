@@ -68,35 +68,38 @@ var multiple = carousel.Images.Count() > 1;
 
 var hotspotIndex = 0;
 
-<div id="page-section-@(pageSectionId)-carousel"
+var carouselId = $"page-section-{pageSectionId}-carousel";
+
+<div id="@(carouselId)"
      class="carousel slide carousel-fade carousel-dark"
      data-bs-ride="carousel"
      data-bs-interval="4000"
      data-bind="keepElement: images">
     <div class="carousel-inner" data-bind="foreachInit: { name: 'ko-blank-template', data: images, createElement: createImage }">
-       @for (var i = 0; i < carousel.Images.Count(); i++)
-       {
-           var image = carousel.Images[i];
-           var ctas = carousel.CallsToAction.Where(p => p.SlideID == image.SlideID).ToList();
-           
+        @for (var i = 0; i < carousel.Images.Count(); i++)
+        {
+            var image = carousel.Images[i];
+            var ctas = carousel.CallsToAction.Where(p => p.SlideID == image.SlideID).ToList();
+
             <div class="carousel-item @(i == 0 ? "active" : "")">
                 @if (image.Hotspots.Any() && !dgFramework.IsMobileDevice())
                 {
                     <div class="collapse hotspot-collapse" id="image-@(image.ImageID)-hotspot-collapse">
                         <!-- ko foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup } -->
-                        @foreach(var hotspot in image.Hotspots)
+                        @foreach (var hotspot in image.Hotspots)
                         {
                             ViewBag.OrderFormPrefix = $"-hotspot-{++hotspotIndex}";
                             <div class="hotspot-marker" style="left: @(hotspot.x); top: @(hotspot.y)"
                                  data-init>
-                                <div class="hotspot-overlay @(hotspot.OverlayPosition)"> @* @(hotspot.OverlayPosition) *@
+                                <div class="hotspot-overlay @(hotspot.OverlayPosition)">
+                                    @* @(hotspot.OverlayPosition) *@
                                     <div class="hotspot-overlay-inner">
                                         @*<div class="hotspot-pin"></div>*@
                                         <div class="order-form-group">
                                             @Html.Partial("~/Views-New/ProductPages/Shared/_Hotspot.cshtml", hotspot.Product)
                                         </div>
                                     </div>
-                                </div> 
+                                </div>
                             </div>
                         }
                         <!-- /ko -->
@@ -112,161 +115,140 @@ var hotspotIndex = 0;
                          width="@(width)"
                          height="@(height)"
                          @HtmlHelperExtra.ImageSourceSetSizes(image.ImageID, new List<BootstrapBreakpointImageSize>() { new BootstrapBreakpointImageSize(BootstrapBreakpoint.xs, ImageSize.Twelve), new BootstrapBreakpointImageSize(BootstrapBreakpoint.lg, carousel.ImageSize) }, image.MaxWidth)
-                         @if (dgFramework.IsMobileDevice() && i > 0)
-                          {
-                            @:loading="lazy"
-                          } 
-                         >
+                         @if (dgFramework.IsMobileDevice() && i > 0) { @: loading="lazy"
+                         }>
                     <table class="call-to-action-table position-absolute w-100 h-100 top-0 start-0">
                         <tr>
                             <td class="slide-area-1">
                                 <div class="call-to-action-wrapper position-absolute top-5 w-100 d-flex flex-column justify-content-left align-items-start">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 1))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 1))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-2">
                                 <div class="call-to-action-wrapper position-absolute top-5 w-100 d-flex justify-content-center">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 2))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 2))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-3">
                                 <div class="call-to-action-wrapper position-absolute top-5 w-100 d-flex flex-column justify-content-start align-items-end">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 3))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 3))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class="slide-area-4">
                                 <div class="call-to-action-wrapper d-flex w-100 flex-column justify-content-start align-items-start">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 4))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 4))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-5">
                                 <div class="call-to-action-wrapper d-flex w-100 flex-column justify-content-center align-items-center">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 5))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 5))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-6">
                                 <div class="call-to-action-wrapper d-flex w-100 flex-column justify-content-start align-items-end">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 6))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 6))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class="slide-area-7">
                                 <div class="call-to-action-wrapper position-absolute bottom-5 d-flex w-100 flex-column justify-content-left align-items-start">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 7))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 7))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-8">
                                 <div class="call-to-action-wrapper position-absolute bottom-5 d-flex w-100 justify-content-center">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 8))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 8))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                             <td class="slide-area-9">
                                 <div class="call-to-action-wrapper position-absolute bottom-5 d-flex w-100 flex-column justify-content-start align-items-end">
-                                @foreach (var cta in ctas.Where(p => p.SlideAreaID == 9))
-                                {
-                                    <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
-                                        @(cta.Text)
-                                    </a>
-                                }
+                                    @foreach (var cta in ctas.Where(p => p.SlideAreaID == 9))
+                                    {
+                                        <a class="call-to-action" href="@(Framework.URLFixup(cta.URL))" target="@(cta.NewWindow ? "_blank" : "_self")" style="@dgFramework.CallToActionStyleString(cta)">
+                                            @(cta.Text)
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>
                     </table>
                     <i class="btn btn-link btn-scrapbook position-absolute"
-                            data-bind="click: basketModel.toggleScrapbook">
+                       data-bind="click: basketModel.toggleScrapbook">
                         <span class="visually-hidden">
                             @HtmlHelperExtra.Resource("AddToScrapbook", l, c, d)
                         </span>
                         <i class="bi @(Model.Base.IsImageInScrapbook(image.ImageID) ? "bi-bookmark-heart" : "bi-bookmark-plus")"></i>
                     </i>
                 </a>
-               @if (multiple)
-                {
-                    <button class="carousel-control-prev" type="button" aria-controls="page-section-@(pageSectionId)-carousel" data-bs-target="#page-section-@(pageSectionId)-carousel" data-bs-slide="prev">
-                        <span class="carousel-control-icon-wrapper">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        </span>
-                        <span class="visually-hidden">
-                            @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
-                        </span>
-                    </button>
-                    <button class="carousel-control-next" type="button" aria-controls="page-section-@(pageSectionId)-carousel" data-bs-target="#page-section-@(pageSectionId)-carousel" data-bs-slide="next">
-                        <span class="carousel-control-icon-wrapper">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        </span>
-                        <span class="visually-hidden">
-                            @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
-                        </span>
-                    </button>
-                }
                 @if (image.Hotspots.Any() && dgFramework.IsMobileDevice())
                 {
                     <div class="hotspot-products-btn-wrapper">
                         <i class="btn btn-link hotspot-products-btn"
-                                data-bs-target="#image-@(image.ImageID)-hotspot-collapse"
-                                data-bs-toggle="collapse"
-                                data-bind="click: $parent.toggleCarousel">
+                           data-bs-target="#image-@(image.ImageID)-hotspot-collapse"
+                           data-bs-toggle="collapse"
+                           data-bind="click: $parent.toggleCarousel">
                             @HtmlHelperExtra.Resource("ShowImageProducts", l, c, d)
                         </i>
                     </div>
                     <div class="collapse hotspot-collapse" id="image-@(image.ImageID)-hotspot-collapse">
                         <!-- ko foreachInit: { data: orderFormGroups, createElement: createOrderFormGroup } -->
-                        @foreach(var hotspot in image.Hotspots)
+                        @foreach (var hotspot in image.Hotspots)
                         {
                             ViewBag.OrderFormPrefix = $"-hotspot-{++hotspotIndex}";
                             <div class="hotspot-marker" style="left: @(hotspot.x); top: @(hotspot.y)"
                                  data-init>
-                                <div class="hotspot-overlay @(hotspot.OverlayPosition)"> @* @(hotspot.OverlayPosition) *@
+                                <div class="hotspot-overlay @(hotspot.OverlayPosition)">
+                                    @* @(hotspot.OverlayPosition) *@
                                     <div class="hotspot-overlay-inner">
                                         @*<div class="hotspot-pin"></div>*@
                                         <div class="order-form-group">
                                             @Html.Partial("~/Views-New/ProductPages/Shared/_Hotspot.cshtml", hotspot.Product)
                                         </div>
                                     </div>
-                                </div> 
+                                </div>
                             </div>
                         }
                         <!-- /ko -->
@@ -275,17 +257,32 @@ var hotspotIndex = 0;
             </div>
         }
     </div>
-   @if (multiple)
-   {
+    @if (carousel.Images.Count > 1)
+    {
+        <button class="carousel-control-prev" type="button" data-bs-target="#@(carouselId)" data-bs-slide="prev">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#@(carouselId)" data-bs-slide="next">
+            <span class="carousel-control-icon-wrapper">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="display: inline-block"></span>
+            </span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    }
+    @if (multiple)
+    {
         <div class="carousel-indicators">
-           @for (var i = 0; i < carousel.Images.Count; i++)
+            @for (var i = 0; i < carousel.Images.Count; i++)
             {
-               <button type="button" data-bs-target="#page-section-@(pageSectionId)-carousel" data-bs-slide-to="@(i)" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "")" aria-label="@HtmlHelperExtra.Resource("ImageSlide", l, c, d) @(i + 1)"></button>
+                <button type="button" data-bs-target="#@(carouselId)" data-bs-slide-to="@(i)" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "")" aria-label="@HtmlHelperExtra.Resource("ImageSlide", l, c, d) @(i + 1)"></button>
             }
         </div>
     }
     else
-                {
+    {
         <div class="mb-2"></div>
     }
 </div>

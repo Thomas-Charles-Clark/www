@@ -2407,28 +2407,51 @@ namespace wwwDesignersGuild.Controllers
 
             passCheckoutPayment objPayReturn = new passCheckoutPayment();
 
-            Session["checkoutEmail"] = null;
+            var overrideId = Request.QueryString["id"];
 
             Int64 visitorDbId = -1;
-            if (Session["visitorIdFromDatabase"] != null)
+
+            Int64 checkoutId = -1;
+
+            if (String.IsNullOrEmpty(overrideId))
             {
-                visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
+                Session["checkoutEmail"] = null;
+
+                if (Session["visitorIdFromDatabase"] != null)
+                {
+                    visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
+                }
+                if (dgFramework.doesUserHaveACheckoutId(Session["checkoutId"]) == false)
+                {
+                    return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
+                }
+                else if (dgFramework.isCheckoutSessionValid(Session["checkoutExpiry"]) == false)
+                {
+                    return View("~/Views-New/LandingPages/FixedPages/Checkout/_Expired.cshtml", objBase);
+                }
+                else if (await objCheckout.preflightCheckPay(Convert.ToInt64(Session["checkoutId"].ToString()), objMaster.UrlBreakdown.countryDetails.CountryID) == false)
+                {
+                    return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
+                }
+
+                if (Session["checkoutId"] != null)
+                {
+                    checkoutId = Convert.ToInt64(Session["checkoutId"].ToString());
+                }
             }
-            if (dgFramework.doesUserHaveACheckoutId(Session["checkoutId"]) == false)
+            else
             {
-                return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
-            }
-            else if (dgFramework.isCheckoutSessionValid(Session["checkoutExpiry"]) == false)
-            {
-                return View("~/Views-New/LandingPages/FixedPages/Checkout/_Expired.cshtml", objBase);
-            }
-            else if (await objCheckout.preflightCheckPay(Convert.ToInt64(Session["checkoutId"].ToString()), objMaster.UrlBreakdown.countryDetails.CountryID) == false)
-            {
-                return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
+                if (Int64.TryParse(dgCrypto.Decrypt(overrideId), out checkoutId))
+                {
+
+                }
+                else
+                {
+                    return View("~/Views-New/Shared/Error/_returnToBasket.cshtml", objMaster);
+                }
             }
 
-            Int64 checkoutId = Convert.ToInt64(Session["checkoutId"].ToString());
-            
+
             CheckoutPayment objCheckoutPayments = await objCheckout.checkoutPayGenerate(checkoutId, objMaster.UrlBreakdown.countryDetails.CountryID, objMaster.UrlBreakdown.countryDetails.LanguageID, "SectionController._checkoutConfirm");
 
             String token = "";

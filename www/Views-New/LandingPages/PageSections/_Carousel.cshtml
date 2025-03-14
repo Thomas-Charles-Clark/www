@@ -99,21 +99,6 @@
                         <!-- /ko -->
                     </div>
                 }
-                @if ((Model.DisplayThumbnails == false) && (multiple == true) && (!dgFramework.IsMobileDevice()))
-                {
-                    <button class="carousel-control-prev" type="button" aria-controls="@(Model.CarouselID)" data-bs-target="@(Model.CarouselID)" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">
-                            @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
-                        </span>
-                    </button>
-                    <button class="carousel-control-next" type="button" aria-controls="@(Model.CarouselID)" data-bs-target="@(Model.CarouselID)" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">
-                            @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
-                        </span>
-                    </button>
-                }
             </div>
         }
         @if (!String.IsNullOrEmpty(Model.VideoURL))

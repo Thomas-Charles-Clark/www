@@ -125,6 +125,13 @@ namespace wwwDesignersGuild.ViewModels
                 }
             }
 
+            if (HttpContext.Current.Session["guestCheckoutMemberId"] != null)
+            {
+                // memberDetails must be pulled with a memberId!
+                // because of the need to set null to the pub.Checkout_Address_Generate earlier
+                memberId = (int?)HttpContext.Current.Session["guestCheckoutMemberId"];
+            }
+
             if (HttpContext.Current.Session["memberTradeAccountID"] != null)
             {
                 tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
@@ -240,14 +247,6 @@ namespace wwwDesignersGuild.ViewModels
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
             passCheckoutPay.checkoutMethod = checkoutType;
-
-            if (HttpContext.Current.Session["guestCheckoutMemberId"] != null)
-            {
-                // memberDetails must be pulled with a memberId!
-                // because of the need to set null to the pub.Checkout_Address_Generate earlier
-                memberId = (int?)HttpContext.Current.Session["guestCheckoutMemberId"];
-            }
-
 
 
             var memberStore = await memberStoreTask;

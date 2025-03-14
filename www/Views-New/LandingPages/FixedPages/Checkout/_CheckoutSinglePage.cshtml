@@ -376,13 +376,13 @@
                                         <a class="summary-help-email" href="mailto:@(CustomerServiceEmail)">@(CustomerServiceEmail)</a>
                                     </p>
                                 }
+                                <!-- ko if: typeof $ZSIQChatWindow !== 'undefined' && $ZSIQChatWindow && $ZSIQChatWindow.openChatWindow -->
+                                <p>
+                                    <a href="javascript:;" data-bind="text: resources.LiveChatNow, click: function () { $ZSIQChatWindow.openChatWindow(); }"></a>
+                                </p>
+                                <!-- /ko -->
                             </div>
                         }
-                        <!-- ko if: typeof $ZSIQChatWindow !== 'undefined' && $ZSIQChatWindow && $ZSIQChatWindow.openChatWindow -->
-                        <p>
-                            <a href="javascript:;" data-bind="text: resources.LiveChatNow, click: function () { $ZSIQChatWindow.openChatWindow(); }"></a>
-                        </p>
-                        <!-- /ko -->
                     </div>
                 }
             </div>
