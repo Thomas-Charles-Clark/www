@@ -20,6 +20,7 @@ using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
 
 using wwwDesignersGuild.Models.Returns;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -312,8 +313,15 @@ namespace wwwDesignersGuild.Controllers
                 true,
                 false);
 
+            var guid = Request.QueryString["unsub"];
+
+            if (String.IsNullOrEmpty(guid))
+            {
+                return PartialView("~/Views-New/Shared/Error/_returnToHome.cshtml", objBase.MasterDefinition);
+            }
+
             var viewModel = await FixedPageViewModel_MemberUnsubscribe.CreateAsync(objReasonData,
-                Request.QueryString["unsub"],
+                guid,
                 objBase);
 
             return PartialView("~/Views-New/LandingPages/FixedPages/Member/_MemberUnsubscribe.cshtml", viewModel);
@@ -370,6 +378,159 @@ namespace wwwDesignersGuild.Controllers
         public async Task<ActionResult> CheckoutProblem(BaseViewModel objBase)
         {
             return PartialView("~/Views-New/LandingPages/FixedPages/Checkout/_ReturnToBasket.cshtml", objBase);
+        }
+
+        public ActionResult DotDigitalDataCleanseNegative(BaseViewModel objBase)
+        {
+            string email = null;
+
+            try
+            {
+                email = dgCrypto.Decrypt(Uri.UnescapeDataString(Request.QueryString["id"]));
+
+                if (String.IsNullOrEmpty(email))
+                {
+                    throw new Exception("Cleanse failed to identify");
+                }
+            }
+            catch (Exception exc)
+            {
+
+
+                //  Get exception details
+                var exceptionType = exc.GetType().ToString();
+                var exceptionMessage = exc.Message;
+                var exceptionSource = exc.Source;
+                var stackTrace = "";
+                var innerExceptionType = exc.GetType().ToString();
+                var innerExceptionMessage = exc.Message;
+                var innerExceptionSource = exc.Source;
+                var innerExceptionStackTrace = "";
+
+                if (exc.StackTrace != null)
+                {
+                    stackTrace = exc.StackTrace;
+                }
+
+                //  Get inner exception details
+                if (exc.InnerException == null) { }
+                else
+                {
+                    innerExceptionType = exc.InnerException.GetType().ToString();
+                    innerExceptionMessage = exc.InnerException.Message;
+                    innerExceptionSource = exc.InnerException.Source;
+
+                    if (exc.InnerException.StackTrace != null)
+                    {
+                        innerExceptionStackTrace = exc.InnerException.StackTrace;
+                    }
+                }
+
+                var objError = new Models.Database.errorDB();
+
+                long visitorId = -1;
+                if (Session["visitorIdFromDatabase"] != null)
+                {
+                    visitorId = Convert.ToInt64(Session["visitorIdFromDatabase"]);
+                }
+
+                var detailsString = $"Failed to execute DotDigitalDataCleanseNegative";
+
+                objError.saveToErrorLog(visitorId, exceptionType, exceptionMessage, exceptionSource, stackTrace,
+                                        innerExceptionType, innerExceptionMessage, innerExceptionSource, innerExceptionStackTrace,
+                                        detailsString, dgFramework.getUserAgent(), dgFramework.getIPAddress());
+
+                ViewBag.FailedToIdentify = dgCrypto.Decrypt(Uri.UnescapeDataString(Request.QueryString["id"]));
+            }
+
+            //  Get unsubscribe page
+            var objUnsubscribe = new cmsUnsubscribePage();
+
+            var objReasonData = objUnsubscribe.loadUnsubscribePageFromCms(
+                objBase.LanguageID,
+                objBase.CountryID,
+                objBase.Date,
+                true,
+                false).Result;
+
+            var memberDetails = new VisitorFactory().callMemberFetch(email).Result;
+
+            var viewModel = FixedPageViewModel_MemberUnsubscribe.CreateAsync(objReasonData,
+                memberDetails.GUID,
+                objBase).Result;
+
+            return PartialView("~/Views-New/LandingPages/FixedPages/Member/_DotDigitalDataCleanseNegative.cshtml", viewModel);
+        }
+
+        public ActionResult DotDigitalDataCleansePositive(BaseViewModel objBase)
+        {
+            try
+            {
+                var email = dgCrypto.Decrypt(Uri.UnescapeDataString(Request.QueryString["id"]));
+
+                if (String.IsNullOrEmpty(email))
+                {
+                    throw new Exception("Cleanse failed to identify");
+                }
+
+                _ = new Models.Database.databaseDataContext().RejoinMarketingList(new Models.DTOs.PassGUID()
+                    {
+                        Email = email,
+                        CountryID = objBase.CountryID,
+                        LanguageID = objBase.LanguageID,
+                        URL = Request.Url.OriginalString,
+                    },
+                    source: "Cleanse");
+            }
+            catch (Exception exc)
+            {
+                //  Get exception details
+                var exceptionType = exc.GetType().ToString();
+                var exceptionMessage = exc.Message;
+                var exceptionSource = exc.Source;
+                var stackTrace = "";
+                var innerExceptionType = exc.GetType().ToString();
+                var innerExceptionMessage = exc.Message;
+                var innerExceptionSource = exc.Source;
+                var innerExceptionStackTrace = "";
+
+                if (exc.StackTrace != null)
+                {
+                    stackTrace = exc.StackTrace;
+                }
+
+                //  Get inner exception details
+                if (exc.InnerException == null) { }
+                else
+                {
+                    innerExceptionType = exc.InnerException.GetType().ToString();
+                    innerExceptionMessage = exc.InnerException.Message;
+                    innerExceptionSource = exc.InnerException.Source;
+
+                    if (exc.InnerException.StackTrace != null)
+                    {
+                        innerExceptionStackTrace = exc.InnerException.StackTrace;
+                    }
+                }
+
+                var objError = new Models.Database.errorDB();
+
+                long visitorId = -1;
+                if (Session["visitorIdFromDatabase"] != null)
+                {
+                    visitorId = Convert.ToInt64(Session["visitorIdFromDatabase"]);
+                }
+
+                var detailsString = $"Failed to execute DotDigitalDataCleansePositive";
+
+                objError.saveToErrorLog(visitorId, exceptionType, exceptionMessage, exceptionSource, stackTrace,
+                                        innerExceptionType, innerExceptionMessage, innerExceptionSource, innerExceptionStackTrace,
+                                        detailsString, dgFramework.getUserAgent(), dgFramework.getIPAddress());
+
+                ViewBag.FailedToIdentify = $"{Uri.UnescapeDataString(Request.QueryString["id"])} {dgCrypto.Decrypt(HttpUtility.UrlDecode(Request.QueryString["id"]))} {exc}";
+            }
+
+            return PartialView("~/Views-New/LandingPages/FixedPages/Member/_DotDigitalDataCleansePositive.cshtml", objBase);
         }
     }
 }

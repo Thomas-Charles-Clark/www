@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Http.Results;
+
+using Braintree;
+
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Country;
+using wwwDesignersGuild.Models.Resource;
+using wwwDesignersGuild.Models.ResourceFetch;
 using wwwDesignersGuild.Models.Visitor;
 
 namespace wwwDesignersGuild.ViewModels
@@ -45,6 +51,38 @@ namespace wwwDesignersGuild.ViewModels
         {
             #region Preamble
 
+            var resourceDefinition = new cmsResource().loadResourceFromCms(
+                    LanguageID,
+                    CountryID,
+                    Date).Result;
+
+            var resources = new List<ResourceResult>();
+
+            var required = new [] {
+                "UnsubscribeHeadingSorry",
+                "UnsubscribeHeadingYou'reThinking",
+                "UnsubscribeLessFrequentTouching",
+                "UnsubscribeOnceAWeek",
+                "UnsubscribeToSayThankYou",
+                "UnsubscribeSoundsGood",
+                "UnsubscribeSendMeMoreSelective",
+                "UnsubscribeNoThanks",
+                "UnsubscribeI'dLikeToUnsubscribe"
+            };
+
+            foreach (var r in required)
+            {
+                resources.Add(new ResourceResult()
+                {
+                    Name = r,
+                    Value = resourceDefinition.resourceSelects
+                                            .Where(p => p.Name == r)
+                                            .Select(p => p.Value)
+                                            .SingleOrDefault()
+                });
+            }
+
+            this.BaseViewModel.PrefetchedResources.AddRange(resources);
 
             #endregion
 

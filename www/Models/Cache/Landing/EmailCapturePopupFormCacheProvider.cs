@@ -5,6 +5,7 @@ using System.Runtime.Caching;
 using System.Web;
 using System.Web.Configuration;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.Models.EmailCapturePopupForm;
 using wwwDesignersGuild.Models.Interface;
 
 namespace wwwDesignersGuild.Models.Cache

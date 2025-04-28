@@ -78,44 +78,134 @@
 
     //#region Methods
 
-    self.save = (onComplete, sources) => {
-        self.validateEmailNow(false);
-        self.validateEmailNow(true);
-        self.errors.showAllMessages(false);
-        if (self.errors().length) {
-            self.errors.showAllMessages(true);
-            self.errors.filter(x => {
-                x.isValid.notifySubscribers(x.isValid());
-            });
-        } else {
-            self.busy(true);
-            let data = {
-                emailName: self.emailName(),
-                email: self.email.observable(),
-                guid: self.guid(),
-                reasonId: self.unsubscribeReasonId()
-            };
-            fetch('/api/form/UnsubscribeMember', {
-                method: 'POST',
-                headers: window.fetchHeaders,
-                cache: 'no-store',
-                credentials: 'same-origin',
-                body: JSON.stringify(data)
-            })
-                .then(window.handleFetchResponse)
-                .then(response => {
-                    if (response.error) {
-                        window.showError();
-                    } else {
-                        self.success(true);
-                    }
-                    self.busy(false);
-                })
-                .catch(err => {
-                    self.busy(false);
+    self.unsubscribe = () => {
+        self.busy(true);
+
+        let data = {
+            guid: getGuid(),
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            url: window.location.href
+        };
+
+        fetch('/api/form/LeaveMarketingListUnsubscribe', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then(response => {
+                if (response.error) {
                     window.showError();
-                })
-        }
+                } else {
+                    bootstrap.Carousel.getOrCreateInstance(document.querySelector('#unsubscribe-carousel')).to(1);
+                }
+                self.busy(false);
+            })
+            .catch(err => {
+                self.busy(false);
+                window.showError();
+            })
+    }
+
+    self.leaveListCleanse = () => {
+        self.busy(true);
+
+        let data = {
+            guid: getGuid(),
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            url: window.location.href
+        };
+
+        fetch('/api/form/LeaveMarketingListCleanse', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then(response => {
+                if (response.error) {
+                    window.showError();
+                } else {
+                    bootstrap.Carousel.getOrCreateInstance(document.querySelector('#unsubscribe-carousel')).to(1);
+                }
+                self.busy(false);
+            })
+            .catch(err => {
+                self.busy(false);
+                window.showError();
+            })
+    }
+
+    self.reduceFrequency = (onComplete, sources) => {
+
+        self.busy(true);
+
+        let data = {
+            guid: self.guid(),
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            url: window.location.href
+        };
+
+        fetch('/api/form/RejoinMarketingListUnsubscribe', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then(response => {
+                if (response.error) {
+                    window.showError();
+                } else {
+                    self.busy(false);
+                    bootstrap.Carousel.getOrCreateInstance(document.querySelector('#unsubscribe-carousel')).to(2);
+                }
+            })
+            .catch(err => {
+                self.busy(false);
+                window.showError();
+            })
+    }
+
+    self.reduceFrequencyCleanse = (onComplete, sources) => {
+
+        self.busy(true);
+
+        let data = {
+            guid: self.guid(),
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            url: window.location.href
+        };
+
+        fetch('/api/form/RejoinMarketingListCleanse', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-store',
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then(response => {
+                if (response.error) {
+                    window.showError();
+                } else {
+                    self.busy(false);
+                    bootstrap.Carousel.getOrCreateInstance(document.querySelector('#unsubscribe-carousel')).to(2);
+                }
+            })
+            .catch(err => {
+                self.busy(false);
+                window.showError();
+            })
     }
 
     //#endregion

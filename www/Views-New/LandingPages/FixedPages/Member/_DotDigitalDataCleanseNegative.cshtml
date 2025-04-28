@@ -1,0 +1,137 @@
+@model FixedPageViewModel_MemberUnsubscribe
+@{
+    var objMaster = Model.MasterDefinition;
+
+    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+    var d = objMaster.UrlBreakdown.ContentDate;
+    var ci = objMaster.UrlBreakdown.countryDetails;
+}
+@Render.StylesPreload("~/bundles/css/member-login-details")
+@Render.StylesPreload("~/bundles/css/unsubscribe")
+@if (dgFramework.IsMobileDevice())
+{
+    @Render.StylesPreload("~/bundles/css/member-login-details-mobile")
+    @Render.StylesPreload("~/bundles/css/unsubscribe-mobile")
+}
+@Html.Partial("~/Views-New/LandingPages/Shared/_KnockoutKendoComponents.cshtml", Model.BaseViewModel)
+<script type="text/javascript">
+    window.getUnsubscribeReasons = () => {
+        return @(Html.Raw(JsonConvert.SerializeObject(Model.Definition.unsubscribeReasons)))
+    }
+    window.getEmail = () => {
+        return '@(Model.Member?.Email)';
+    }
+    window.getEmailName = () => {
+        return '@(Model.EmailName)';
+    }
+    window.getGuid = () => {
+        return '@(Model.Guid)';
+    }
+</script>
+<div class="page-section-grid" data-bind="stopBinding">
+    <div class="member-wrapper relative p-3 mt-4">
+        <div class="page-blocker" style="display: flex; opacity: 1.0" data-bind="flexVisible: busy, toggleOpacity: busy">
+            <div class="spinner-border"></div>
+            <h4>
+                @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+            </h4>
+        </div>
+        <div id="unsubscribe-outer-wrapper">
+            <div>
+                <img class="card-img-top"
+                     width="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Eight)"
+                     height="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Eight)"
+                     alt="Unsubscribe"
+                     title="Unsubscribe"
+                     src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Eight)/174561"
+                     @HtmlHelperExtra.ImageSourceSetSizes(174561, ImageSize.Eight) />
+            </div>
+            <div>
+                <div id="unsubscribe-carousel"
+                     class="carousel slide carousel-fade carousel-dark"
+                     data-bs-ride="carousel"
+                     data-bs-interval="false"
+                     data-bs-touch="false">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <h1 class="fw-700 fs-2 mb-0">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeHeading", l, c, d)
+                                </h1>
+                                <h2 class="fs-3 mb-4">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeSubHeading", l, c, d)
+                                </h2>
+                                <p class="mb-0">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeParagraphOne", l, c, d).
+                                </p>
+                                <p class="mb-4">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeParagraphTwoLineOne", l, c, d).
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeParagraphTwoLineTwo", l, c, d).
+                                </p>
+                                <p id="that-sounds-good" class="mb-3">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativePositiveButtonPrelude", l, c, d),
+                                </p>
+                                <button class="btn btn-dark btn-lg mb-5" data-bind="click: reduceFrequencyCleanse">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativePositiveButtonText", l, c, d)
+                                </button>
+                                <p id="no-thanks" class="mb-3">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeNegativeButtonPrelude", l, c, d),
+                                </p>
+                                <button class="btn btn-lg btn-outline-dark" data-bind="click: leaveListCleanse">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeNegativeButtonText", l, c, d)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="d-flex justify-content-center align-items-center">
+                               
+                                <div class="alert alert-success d-flex align-items-center mb-0">
+                                    <i class="material-icons">
+                                        check
+                                    </i>
+                                    <p class="mb-0 ms-3">
+                                        @HtmlHelperExtra.Resource("DataCleanseNegativeThankYou", l, c, d)
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div>
+                                <div class="alert alert-success">
+                                    <p class="mb-0">
+                                        @HtmlHelperExtra.Resource("ThankYouContinuedLoyalty", l, c, d)
+                                        <b>@HtmlHelperExtra.Resource("FifteenDiscountNextFull", l, c, d)</b>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Render.Script("~/bundles/js/member-unsubscribe")
+
+@if (String.IsNullOrEmpty(ViewBag.FailedToIdentify) == false)
+{
+    if (!Framework.ProductionVersion)
+    {
+        <h1 class="fs-3 text-red-600">
+            DEBUG: ViewBag.FailedToIdentify = "@ViewBag.FailedToIdentify"
+        </h1>
+    }
+    <script>
+        window.addLoadFunction(() => {
+            document.querySelector('.page-section-grid').innerHTML = `
+            <div class="page-section html-section g-col-12">
+                <div class="d-flex flex-column justify-content-center align-items-center fs-5 py-6">
+                    <h1>@(HtmlHelperExtra.Resource("Sorry", l, c, d))</h1>
+                    <h4>@(HtmlHelperExtra.Resource("CouldntIdentifyYou", l, c, d))</h4>
+                </div>
+            </div>`
+        });
+    </script>
+}

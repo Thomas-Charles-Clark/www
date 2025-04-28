@@ -62,6 +62,7 @@ namespace wwwDesignersGuild.Models.Classes
     public class memberFetchResult
     {
         public int? MemberID { get; set; }
+        public string GUID { get; set; }
     }
 
     public class webapiMemberId
@@ -1159,6 +1160,18 @@ namespace wwwDesignersGuild.Models.Classes
         public string ImageURL { get; set; }
         public string ProductURL { get; set; }
     }
+
+    public class checkoutReceiptAddendum
+    {
+        public bool ClickForPromoCode { get; set; }
+        public string HeroSectionHTML { get; set; }
+        public string HeroSectionThanksHTML { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public long BackgroundImageID { get; set; }
+        public string CheckoutCulture { get; set; }
+    }
+
     #endregion
 
     #region DotDigital JSON Basket Return

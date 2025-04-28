@@ -32,28 +32,33 @@
             </div>
         </nav>
     }
-    <div>
-    @if(!tradeUser)
+<div>
+    @if (!tradeUser)
     {
-        <form method="get" 
-                action="/join-our-mailing-list/l100"
-                target="_self"
-              class="py-2 container">
-            <h5 class="text-uppercase mt-1">
-                @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
-            </h5>
-            <div class="input-group">
-                <input name="mailing-email"
-                       class="form-control"
-                       type="text"
-                       aria-label="@HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)"
-                       placeholder="@HtmlHelperExtra.Resource("EnterEmailAddress", l, c, d)" />
-                <button type="submit"
-                        class="btn btn-secondary">
-                    @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
-                </button>
-            </div>
-        </form>
+        if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
+        {
+            <form method="get"
+                  url="/"
+                  target="_self"
+                  onsubmit="ecommerceEmailCapturePopupModel.loadFetch(); return false;"
+                  class="py-2 container">
+                <h5 class="text-uppercase mt-1">
+                    @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
+                </h5>
+                <div class="input-group">
+                    <input id="footer-mailing-email"
+                           name="mailing-email"
+                           class="form-control"
+                           type="text"
+                           aria-label="@HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)"
+                           placeholder="@HtmlHelperExtra.Resource("EnterEmailAddress", l, c, d)" />
+                    <button type="submit"
+                            class="btn btn-secondary">
+                        @HtmlHelperExtra.Resource("SubmitProperCase", l, c, d)
+                    </button>
+                </div>
+            </form>
+        }
     }
     <ul class="d-flex flex-row justify-content-center align-items-center">
         <li>
@@ -113,8 +118,8 @@
     </ul>
     <div class="footer-copy">
         <a id="change-country"
-            href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.countryPicker, cd)"
-            target="_self">
+           href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.countryPicker, cd)"
+           target="_self">
             <img class="country-img country-list" src="~/Content/images/country/@(c)@(Framework.WebpOrPngExtension)?v=1" alt="@cd.Name" title="@HtmlHelperExtra.Resource("ChangeCountry", l, c, d)" />
             <span>
                 @(cd.Name) @((c == 81 || c == 238) ? "" : "| " + cd.LanguageCode.ToUpper())
@@ -144,7 +149,7 @@
                  loading="lazy" />
         </a>
     }
-    </div>
+</div>
 </div>
 
 @helper BuildMenuColumn(BaseViewModel model, IGrouping<byte, menuItem> column)

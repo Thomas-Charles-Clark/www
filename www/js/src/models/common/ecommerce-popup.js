@@ -14,16 +14,17 @@
 
     let self = {
         resources: resources,
-        banner: banner,
+        banner: ko.observable(banner),
         cookieIdentifier: cookieIdentifier,
         showOnPageView: showOnPageView,
-        cookieExpiryDate: cookieExpiryDate
+        cookieExpiryDate: cookieExpiryDate,
+        loaded: ko.observable(false)
     };
 
     //#region Properties
 
     // banner might be undefined if there is no banner delivered for this particular instance
-    self.bannerLocationId = self.banner?.bannerLocationId;
+    self.bannerLocationId = self.banner()?.bannerLocationId;
 
     // Are we busy?
     self.busy = ko.observable(false);
@@ -248,7 +249,26 @@
         }
     }
 
-    self.fetch = () => {
+    self.loadFetch = () => {
+        self.complete(false);
+        self.validateNow(false);
+        self.email(document.querySelector('#footer-mailing-email').value);
+
+        let afterFetch = null;
+            
+        if (self.email() && self.email() != '') {
+            afterFetch = () => {
+                self.emailConfirmation.DOMElement.focus()
+            }
+        } else {
+            afterFetch = () => {
+                self.email.DOMElement.focus()
+            }
+        }
+        self.fetch(afterFetch);
+    }
+
+    self.fetch = (afterFetch) => {
 
         // eCommerce Email Capture Popup loads this:
 
@@ -271,14 +291,24 @@
                     self.availableCountries(data.availableCountries);
                     self.availableLanguages(data.availableLanguages);
                     self.marketingCountryId(data.defaultCountryForDropDown);
+                    self.banner(data.banner);
                     self.showModal();
                     self.setDone();
+                    self.loaded(true);
+                    window.lazyImages();
+                    if (typeof afterFetch === 'function') {
+                        window.setTimeout(() => {
+                            afterFetch();
+                        }, 300);
+                    }
                 })
                 .catch(window.catchFetchErrors)
 
         } else {
             self.showModal();
             self.setDone();
+            self.loaded(true);
+            window.lazyImages();
         }
     }
 
@@ -292,7 +322,7 @@
             });
         } else {
             self.busy(true);
-            fetch('/api/form/savePageSectionForm', {
+            fetch('/api/form/JoinMarketingListPopup', {
                 method: 'POST',
                 headers: window.fetchHeaders,
                 cache: 'no-store',
@@ -391,23 +421,25 @@
     self.toJS = () => {
         let objForm = ko.unwrap(self.pageSectionForm);
         return {
-            FormID: objForm.FormID,
+            //FormID: objForm.FormID,
             Email: self.email(),
-            MarketingCountryID: self.marketingCountryId(),
-            MarketingLanguageID: self.languageId(),
+            //MarketingCountryID: self.marketingCountryId(),
+            //MarketingLanguageID: self.languageId(),
             CountryID: getCountryId(),
             LanguageID: getLanguageId(),
-            AddressRequired: objForm.AddressRequired,
-            CaptchaRequired: objForm.CaptchaRequired,
-            SourceID: objForm.SourceID,
-            SubmitButtonText: objForm.SubmitButtonText,
-            HeaderText: objForm.HeaderText,
-            FooterText: objForm.FooterText,
-            PageSectionID: objForm.PageSectionID,
-            ThirdPartyID: objForm.ThirdPartyID,
-            CompetitionID: objForm.CompetitionID,
-            BrochureID: objForm.BrochureID,
-            MarketingPermissions: ko.toJS(self.marketingPermissionChecker.marketingPermissions())
+            Source: 'Popup',
+            URL: window.location.href
+            //AddressRequired: objForm.AddressRequired,
+            //CaptchaRequired: objForm.CaptchaRequired,
+            //SourceID: objForm.SourceID,
+            //SubmitButtonText: objForm.SubmitButtonText,
+            //HeaderText: objForm.HeaderText,
+            //FooterText: objForm.FooterText,
+            //PageSectionID: objForm.PageSectionID,
+            //ThirdPartyID: objForm.ThirdPartyID,
+            //CompetitionID: objForm.CompetitionID,
+            //BrochureID: objForm.BrochureID,
+            //MarketingPermissions: ko.toJS(self.marketingPermissionChecker.marketingPermissions())
         }
     }
 
@@ -428,9 +460,14 @@ window.addLoadFunction(() => {
     .then(resources => {
 
 
-        if (window.ecommerceEmailCapturePopupBanners && window.ecommerceEmailCapturePopupBanners.length) {
+        //if (window.ecommerceEmailCapturePopupBanners && window.ecommerceEmailCapturePopupBanners.length) {
+        // 31/03/3025 riding roughshod, hurrha
+        if (true) {
 
-            let banner = window.ecommerceEmailCapturePopupBanners[0].banners[0];
+            let banner = {
+                BannerID: 'ecom-email',
+                bannerLocationId: 55
+            };
 
             window.ecommerceEmailCapturePopupModel = ecommercePopupViewModel({
                 resources: resources,

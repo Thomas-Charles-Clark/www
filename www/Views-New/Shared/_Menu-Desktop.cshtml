@@ -15,12 +15,15 @@
     <ul class="container">
         @if (!tradeUser)
         {
-        <li>
-            <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.newsletter, cd)"
-               class="btn navbar-btn">
-                @HtmlHelperExtra.Resource("JoinOurMailingListSubmitButtonText", l, c, d)
-            </a>
-        </li>
+            if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
+            {
+                <li>
+                    <a href="javascript:;" onclick="ecommerceEmailCapturePopupModel.loadFetch()"
+                       class="btn navbar-btn">
+                        @HtmlHelperExtra.Resource("JoinOurMailingListSubmitButtonText", l, c, d)
+                    </a>
+                </li>
+            }
         }
         @if (objMaster.LoginStatus == dgLoginStatus.notLoggedIn)
         {
@@ -54,8 +57,8 @@
             {
                 <li>
                     <a class="btn navbar-btn"
-                        href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberMenu, cd)"
-                        target="_self">
+                       href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.memberMenu, cd)"
+                       target="_self">
                         @HtmlHelperExtra.Resource("Hello", l, c, d)
                         <span id="topnav-name">
                             @Session["memberName"],
@@ -88,42 +91,42 @@
             <ul class="dropdown" aria-label="submenu">
                 <li>
                     <a class="btn btn-link"
-                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeHomePage, cd, null, null, new[] { new KeyValuePair<string,string>("t", "1") }))">
+                       href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeHomePage, cd, null, null, new[] { new KeyValuePair<string,string>("t", "1") }))">
                         @HtmlHelperExtra.Resource("NewTradeWebsite", l, c, d)
                     </a>
                 </li>
-               @if (!tradeUser)
+                @if (!tradeUser)
                 {
-                <li>
-                    <a class="btn btn-link"
-                        href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeAccountRequest, cd))">
-                        @HtmlHelperExtra.Resource("RequestTradeAccount", l, c, d)
-                    </a>
-                </li>
+                    <li>
+                        <a class="btn btn-link"
+                           href="@(dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.tradeAccountRequest, cd))">
+                            @HtmlHelperExtra.Resource("RequestTradeAccount", l, c, d)
+                        </a>
+                    </li>
                 }
                 <li class="dropdown-divider"></li>
                 <li>
                     <a class="btn btn-link"
-                        target="_blank"
-                        rel="nofollow"
-                        href="https://trade.designersguild.com">
+                       target="_blank"
+                       rel="nofollow"
+                       href="https://trade.designersguild.com">
                         @HtmlHelperExtra.Resource("ExistingTradeWebsite", l, c, d)
                     </a>
                 </li>
                 <li>
                     <a class="btn btn-link"
-                        target="_blank"
-                        rel="nofollow"
-                        href="https://trade.designersguild.com">
+                       target="_blank"
+                       rel="nofollow"
+                       href="https://trade.designersguild.com">
                         @HtmlHelperExtra.Resource("ExistingTradeStatistics", l, c, d)
                     </a>
                 </li>
             </ul>
         </li>
-       @if (cd.ShopEnabled)
+        @if (cd.ShopEnabled)
         {
             <li id="basket-menu"
-                data-bind="event: {  mouseenter: showBasketSummary, mouseleave: hideBasketSummary }"> 
+                data-bind="event: {  mouseenter: showBasketSummary, mouseleave: hideBasketSummary }">
                 <a id="basket-menu-inner"
                    class="btn navbar-btn"
                    href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.maintainBasket, cd)"
@@ -174,7 +177,7 @@
                                 <p>
                                     <span data-bind="text: DisplayLine"></span>
                                     <span data-bind="text: `${ko.unwrap($parent.resources).Quantity}: ${Quantity}${StockMessaging.Unit}`"></span>
-                                   @if (tradeUser)
+                                    @if (tradeUser)
                                     {
                                         <span data-bind="text: BasketLineType"></span>
                                     }
@@ -196,7 +199,7 @@
                     </div>
                 </div>
             </li>
-        } 
+        }
         <li class="underlay"></li>
     </ul>
 </nav>

@@ -13,6 +13,10 @@ using wwwDesignersGuild.Models.Form;
 using static DevExpress.Utils.Drawing.Helpers.NativeMethods;
 using SimpleImpersonation;
 using System.Security.Principal;
+using wwwDesignersGuild.Models.DTOs;
+
+using Dapper;
+using wwwDesignersGuild.Models.EmailCapturePopupForm;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -323,7 +327,7 @@ namespace wwwDesignersGuild.Models.Database
             return (IMultipleResults)result.ReturnValue;
         }
         
-        [Function(Name = "pub.EmailCapturePopup_Form_Select")] 
+        [Function(Name = "pub.EmailCapturePopup_Form_Select")]
         [ResultType(typeof(cmsEmailCapturePopupForm))]
         public IMultipleResults EmailCapturePopup_Form_Select([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryID", DbType = "SmallInt")] System.Nullable<short> countryID,
                                                    [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] System.Nullable<byte> languageID,
@@ -630,6 +634,69 @@ namespace wwwDesignersGuild.Models.Database
                 }
 
                 conn.Close();
+            }
+
+            return result;
+        }
+
+        public bool JoinMarketingList(PassMarketingListJoin dto, string source)
+        {
+            var result = true;
+
+            //throw new NotImplementedException("pub.EmailMarketingFrequencyReductionSavePotato");
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                var results = conn.Query("mbr.[Member_EmailMarketing_JoinList]", new
+                {
+                    dto.Email,
+                    dto.CountryID,
+                    dto.LanguageID,
+                    dto.URL,
+                    dto.PreferenceEmailMarketingFrequencyID,
+                    Source = source // Receipt / Unsubscribe / Cleanse
+                }, null, false, 30, CommandType.StoredProcedure).ToList();
+            }
+
+            return result;
+        }
+
+        public bool RejoinMarketingList(PassGUID dto, string source)
+        {
+            var result = true;
+
+            //throw new NotImplementedException("pub.EmailMarketingFrequencyReductionSavePotato");
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                var results = conn.Query("mbr.[Member_EmailMarketing_RejoinList]", new
+                {
+                    dto.Email,
+                    dto.CountryID,
+                    dto.LanguageID,
+                    dto.URL,
+                    Source = source // Receipt / Unsubscribe / Cleanse
+                }, null, false, 30, CommandType.StoredProcedure).ToList();
+            }
+
+            return result;
+        }
+
+        public bool LeaveMarketingList(DTOs.PassGUID dto, string source)
+        {
+            var result = true;
+
+            //throw new NotImplementedException("pub.EmailMarketingFrequencyReductionSavePotato");
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                var results = conn.Query("mbr.[Member_EmailMarketing_LeaveList]", new
+                {
+                    dto.Email,
+                    dto.CountryID,
+                    dto.LanguageID,
+                    dto.URL,
+                    Source = source
+                }, null, false, 30, CommandType.StoredProcedure).ToList();
+
+
             }
 
             return result;

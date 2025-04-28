@@ -381,6 +381,16 @@ namespace wwwDesignersGuild.Models.Helper
         checkoutProblem = 301,
 
         [LoginRequired(false)]
+        [Action("DotDigitalDataCleansePositive")]
+        [PageSectionViewModel("DotDigitalDataCleanse")]
+        dotDigitalDataCleansePositive = 311,
+
+        [LoginRequired(false)]
+        [Action("DotDigitalDataCleanseNegative")]
+        [PageSectionViewModel("DotDigitalDataCleanse")]
+        dotDigitalDataCleanseNegative = 312,
+
+        [LoginRequired(false)]
         [Action("Stockists")]
         [PageSectionViewModel("Stockists")]
         stockists = 500,

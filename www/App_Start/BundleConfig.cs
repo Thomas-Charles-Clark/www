@@ -189,6 +189,12 @@ namespace wwwDesignersGuild
             bundles.Add(new StyleBundle("~/bundles/css/moodboards-mobile")
                 .Include($"{cssPrefix}/models/member-moodboards-mobile{cssSuffix}", cssTransforms));
 
+            bundles.Add(new StyleBundle("~/bundles/css/unsubscribe")
+                .Include($"{cssPrefix}/models/unsubscribe{cssSuffix}", cssTransforms));
+
+            bundles.Add(new StyleBundle("~/bundles/css/unsubscribe-mobile")
+                .Include($"{cssPrefix}/models/unsubscribe-mobile{cssSuffix}", cssTransforms));
+
             //  
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //
@@ -329,6 +335,9 @@ namespace wwwDesignersGuild
 
             bundles.Add(new ScriptBundle("~/bundles/js/checkout-login-page")
                 .Include($"{jsPrefix}/models/checkout/checkout-login{jsSuffix}", sourceMapTransform));
+
+            bundles.Add(new ScriptBundle("~/bundles/js/checkout-confirm")
+                .Include($"{jsPrefix}/models/checkout/checkout-confirm{jsSuffix}", sourceMapTransform));
 
             bundles.Add(new ScriptBundle("~/bundles/js/stockists")
                 .Include($"{jsPrefix}/models/stockists/stockists{jsSuffix}", sourceMapTransform));

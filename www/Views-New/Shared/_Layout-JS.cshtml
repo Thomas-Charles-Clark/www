@@ -113,6 +113,46 @@
         }
     }
 
+    window.bannerImageAttributeSourceSet = (imageId, imageSize = null, maxWidth = null) => {
+       @if (dgFramework.IsMobileDevice())
+        {
+            @:imageSize = null; // force the default to hit
+        }
+
+        switch (maxWidth) {
+            case 1024:
+                imageSize = imageSizeVeryLarge;
+                break;
+            case 1546:
+                imageSize = imageSizeExtraLarge;
+                break;
+            case 3092:
+                imageSize = imageSizeExtraLarge;
+                break;
+            default:
+                break;
+        }
+
+        switch (imageSize)
+        {
+            case imageSizeIcon:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w`;
+            case imageSizeXS:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w,/imagebanner@(Framework.WebPFallback)/256/${imageId} 256w`;
+            case imageSizeSmall:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w,/imagebanner@(Framework.WebPFallback)/256/${imageId} 256w,/imagebanner@(Framework.WebPFallback)/342/${imageId} 342w`;
+            case imageSizeMedium:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w,/imagebanner@(Framework.WebPFallback)/256/${imageId} 256w,/imagebanner@(Framework.WebPFallback)/342/${imageId} 342w,/imagebanner@(Framework.WebPFallback)/512/${imageId} 512w`;
+            case imageSizeLarge:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w,/imagebanner@(Framework.WebPFallback)/256/${imageId} 256w,/imagebanner@(Framework.WebPFallback)/342/${imageId} 342w,/imagebanner@(Framework.WebPFallback)/512/${imageId} 512w,/imagebanner@(Framework.WebPFallback)/1024/${imageId} 1024w`;
+            case imageSizeVeryLarge:
+            case imageSizeExtraLarge:
+            case imageSizeExtraExtraLarge:
+            default:
+                return `/imagebanner@(Framework.WebPFallback)/156/${imageId} 156w,/imagebanner@(Framework.WebPFallback)/256/${imageId} 256w,/imagebanner@(Framework.WebPFallback)/342/${imageId} 342w,/imagebanner@(Framework.WebPFallback)/512/${imageId} 512w,/imagebanner@(Framework.WebPFallback)/1024/${imageId} 1024w,/imagebanner@(Framework.WebPFallback)/1542/${imageId} 1542w`;
+        }
+    }
+
     window.imageAttributeSizes = (imageId, imageSize = null, maxWidth = null) => {
 
        @if (dgFramework.IsMobileDevice())
@@ -157,6 +197,35 @@
             //    return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,(max-width: 1024px) 1024px,(max-width: 1546px) 1546px,3092px`;
             default:
                 return `(max-width: 90px) 90px,(max-width: 156px) 156px,(max-width: 195px) 195px,(max-width: 239px) 239px,(max-width: 322px) 322px,(max-width: 480px) 480px,(max-width: 488px) 488px,(max-width: 600px) 600px,(max-width: 654px) 654px,(max-width: 986px) 986px,1024px`;
+        }
+    }
+
+
+    window.bannerImageAttributeSizes = (imageId, imageSize = null, maxWidth = null) => {
+
+       @if (dgFramework.IsMobileDevice())
+        {
+            @:imageSize = null; // force the default to hit
+        }
+
+        switch (imageSize)
+        {
+            case imageSizeIcon:
+            case imageSizeXS:
+            case imageSizeSmall:
+                return `(max-width: 156px) 156px`;
+            case imageSizeMedium:
+                return `(max-width: 156px) 156px,256px`;
+            case imageSizeLarge:
+                return `(max-width: 156px) 156px,(max-width: 256px) 256px,342px`;
+            case imageSizeVeryLarge:
+            case imageSizeExtraLarge:
+                return `(max-width: 156px) 156px,(max-width: 256px) 256px,(max-width: 342px) 342px,512px`;
+            case imageSizeExtraExtraLarge:
+                return `(max-width: 156px) 156px,(max-width: 256px) 256px,(max-width: 342px) 342px,(max-width: 512px) 512px,1024px`;
+            case imageSizeExtraExtraLarge:
+            default:
+                return `(max-width: 156px) 156px,(max-width: 256px) 256px,(max-width: 342px) 342px,(max-width: 512px) 512px,(max-width: 1024px) 1024px,1542px`;
         }
     }
 

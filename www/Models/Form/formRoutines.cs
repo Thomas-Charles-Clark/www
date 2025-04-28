@@ -8,6 +8,7 @@ using System.Data;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Interface;
+using wwwDesignersGuild.Models.DTOs;
 
 
 namespace wwwDesignersGuild.Models.Form

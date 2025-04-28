@@ -1563,6 +1563,7 @@ namespace wwwDesignersGuild.Models.Database
         [ResultTypeAttribute(typeof(checkoutReceiptTransactionDetail))]
         [ResultTypeAttribute(typeof(checkoutReceiptOrderLine))]
         [ResultTypeAttribute(typeof(brontoJSONBasketLine))]
+        [ResultTypeAttribute(typeof(checkoutReceiptAddendum))]
         public IMultipleResults GenerateReceipt_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "GUID", DbType = "UNIQUEIDENTIFIER")] System.Nullable<Guid> Guid,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "VisitorID", DbType = "BigInt")] System.Nullable<Int64> visitorId,
                                                                     [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CountryID", DbType = "SmallInt")] System.Nullable<short> countryID,

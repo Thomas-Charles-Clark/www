@@ -994,4 +994,128 @@ ul.address-autocomplete li:first-of-type {
   padding: 0;
   border: 0;
 }
+
+#checkout-receipt-panels {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+#checkout-receipt-panels #order-confirmation-title {
+  background-color: #343a40;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  padding: 2rem 3rem;
+  font-size: 2rem;
+  text-align: center;
+}
+#checkout-receipt-panels #order-confirmation-hero {
+  background-color: #efefef;
+  color: #212529;
+  margin: 0;
+  padding: 2rem 3rem;
+  text-align: center;
+}
+#checkout-receipt-panels #order-confirmation-hero #order-confirmation-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+#checkout-receipt-panels #order-confirmation-hero p {
+  font-size: 1.05rem;
+  font-weight: lighter;
+}
+#checkout-receipt-panels #order-confirmation-breakdown #order-total-title {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  text-align: center;
+}
+#checkout-receipt-panels #order-confirmation-breakdown > ul {
+  margin-bottom: 3rem;
+}
+#checkout-receipt-panels #order-confirmation-breakdown > ul .order-confirmation-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.05rem;
+}
+#checkout-receipt-panels #order-confirmation-breakdown > ul .order-confirmation-breakdown-row * + .order-confirmation-breakdown-row {
+  margin-top: 0.25rem;
+}
+#checkout-receipt-panels #order-confirmation-breakdown > ul .hr {
+  margin: 0.5rem 0;
+  background-color: #495057;
+  height: 2px;
+  width: 100%;
+}
+#checkout-receipt-panels .receipt-panel {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #map {
+  flex: 0 0 55%;
+  min-height: 250px;
+  height: 250px;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #order-confirmation-shipping-details {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #order-confirmation-shipping-details .shipping-address {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #order-confirmation-shipping-details .fullname {
+  display: block;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #order-confirmation-shipping-details .address-lines {
+  text-align: left;
+  font-size: 1rem;
+}
+#checkout-receipt-panels .receipt-panel #order-confirmation-shipping-wrapper #order-confirmation-shipping-details .address-lines > span {
+  display: block;
+}
+
+#checkout-hero {
+  width: 80%;
+  height: auto;
+  left: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 2rem 3rem;
+}
+#checkout-hero:not(.alert-success) {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+#checkout-hero.alert-success {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: #0e6012;
+}
+#checkout-hero p {
+  font-size: 1.05rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+#checkout-hero .btn {
+  margin-top: 1rem;
+}
 /*# sourceMappingURL=checkout-page.css.map */

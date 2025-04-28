@@ -28,14 +28,14 @@ namespace wwwDesignersGuild.Models.Database
             return (IMultipleResults)result.ReturnValue;
         }
 
-        public bool UnsubscribeMember (MemberUnsubscribe objUnsub)
+        public bool UnsubscribeMember(MemberUnsubscribe objUnsub)
         {
             var result = true;
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
             {
                 SqlCommand comm = conn.CreateCommand();
-                comm.CommandType = System.Data.CommandType.StoredProcedure;
+                comm.CommandType = CommandType.StoredProcedure;
 
                 comm.CommandText = "pub.Member_Unsubscribe";
 

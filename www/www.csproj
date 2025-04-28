@@ -478,6 +478,9 @@
     <Compile Include="Models\Country\Country.cs" />
     <Compile Include="Models\County\CountyItem.cs" />
     <Compile Include="Models\CoverageCalculator\CoverageCalculator.cs" />
+    <Compile Include="Models\DTOs\PassGUID.cs" />
+    <Compile Include="Models\DTOs\PassMarketingListJoin.cs" />
+    <Compile Include="Models\EmailCapturePopupForm\cmsEmailCapturePopupForm.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombination.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombinationCacheProvider.cs" />
     <Compile Include="Models\GiftVoucher\cmsGiftVoucher.cs" />
@@ -2307,6 +2310,10 @@
     <Content Include="css\dist\lib\intl-tel-input\dist\intl-tel-input.min.css.map" />
     <None Include=".well-known\apple-developer-merchantid-domain-association.appleid" />
     <Content Include="Content\images\social\icon-tiktok.webp" />
+    <Content Include="css\dist\models\unsubscribe-mobile.css" />
+    <Content Include="css\dist\models\unsubscribe-mobile.min.css" />
+    <Content Include="css\dist\models\unsubscribe.css" />
+    <Content Include="css\dist\models\unsubscribe.min.css" />
     <Content Include="css\src\common\collection.scss" />
     <Content Include="css\src\common\common.scss" />
     <Content Include="css\src\common\debug.scss" />
@@ -2857,6 +2864,7 @@
     <Content Include="js\src\models\basket-page\basket-item.js" />
     <Content Include="js\src\models\basket-page\basket-page.js" />
     <Content Include="js\src\models\checkout\checkout-apple.js" />
+    <Content Include="js\src\models\checkout\checkout-confirm.js" />
     <Content Include="js\src\models\checkout\checkout-login.js" />
     <Content Include="js\src\models\checkout\checkout-single-page.js" />
     <Content Include="js\src\models\collection\collection-page.js" />
@@ -2952,6 +2960,12 @@
     <Content Include="Content\fonts\trixie\5765071\74572880-e6d7-4e5e-a995-ceae23631322.woff" />
     <Content Include="Content\fonts\trixie\5765071\acabe057-a581-46f6-ae2a-0541e2873b47.woff2" />
     <Content Include="Content\fonts\trixie\5353122\TrixieRoughOTW05-Heavy.ttf" />
+    <Content Include="css\src\models\unsubscribe.scss" />
+    <Content Include="css\src\models\unsubscribe-mobile.scss" />
+    <Content Include="css\dist\models\unsubscribe-mobile.css.map" />
+    <Content Include="css\dist\models\unsubscribe-mobile.min.css.map" />
+    <Content Include="css\dist\models\unsubscribe.css.map" />
+    <Content Include="css\dist\models\unsubscribe.min.css.map" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -3182,6 +3196,8 @@
     <Content Include="Views-New\ProductPages\404.cshtml" />
     <Content Include="Views-New\Collections\404.cshtml" />
     <Content Include="Views-New\Shared\_404.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleansePositive.cshtml" />
+    <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleanseNegative.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">

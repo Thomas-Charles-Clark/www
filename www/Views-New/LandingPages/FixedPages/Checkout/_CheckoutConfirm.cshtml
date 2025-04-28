@@ -11,6 +11,8 @@
 
     var objReceipt = Model.PassCheckoutConfirm.checkoutReceipt;
 
+    var objAddendum = objReceipt?.checkoutAddendum;
+
     String urlDate = "";
 
     if (Request.QueryString["dateOverride"] == null) { }
@@ -57,70 +59,284 @@
         linesTotalExVAT = objReceipt.checkoutReceiptOrderLines.Select(p => p.PriceEx * p.Quantity).Sum().ToString("0.00");
     }
 
-    decimal grandTotal = objReceipt.checkoutReceiptTransactionDetails[0].Revenue.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Revenue.Value : 0;
-    
-    grandTotal += objReceipt.checkoutReceiptTransactionDetails[0].Shipping.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Shipping.Value : 0;
+    decimal subTotal = objReceipt.checkoutReceiptTransactionDetails[0].Revenue.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Revenue.Value : 0;
 
+    decimal tax = objReceipt.checkoutReceiptTransactionDetails[0].Tax.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Tax.Value : 0;
+    
+    var productTotal = objReceipt.checkoutReceiptTotalExVats[0].ProductTotal;
+
+    var discount = objReceipt.checkoutReceiptTotalExVats[0].DiscountTotal;
+
+    var shipping = objReceipt.checkoutReceiptTotalExVats[0].ShippingTotal;
+
+    var grandTotal = objReceipt.checkoutReceiptTotalExVats[0].GrandTotal;
+    
     var gbNFI = new System.Globalization.CultureInfo("en-GB").NumberFormat;
 
     gbNFI.NumberGroupSeparator = "";
+
+    var coNFI = new System.Globalization.CultureInfo(objAddendum.CheckoutCulture);
 }
 
+<style type="text/css">
+    #checkout-header {
+        display: none;
+    }
+</style>
+
+@Render.Script("~/bundles/js/checkout-confirm")
+
+@if (objAddendum.Latitude.HasValue && objAddendum.Longitude.HasValue)
+{
+    <script>
+        (g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a)
+            })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({ key: "AIzaSyA_d3HoXoCV7M85_xduYJUze1GOscDnjUw", v: "weekly" });</script>
+    <script>
+    /**
+    * license
+    * Copyright 2019 Google LLC. All Rights Reserved.
+    * SPDX-License-Identifier: Apache-2.0
+    */
+    // Initialize and add the map
+    let map;
+    async function initMap() {
+        const position = {
+            lat: @(objAddendum.Latitude),
+            lng: @(objAddendum.Longitude)
+        };
+      // Request needed libraries.
+      // ts-ignore
+      const { Map } = await google.maps.importLibrary("maps");
+      const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+      // The map, centered at Uluru
+      map = new Map(document.getElementById("map"), {
+        zoom: 16,
+        center: position,
+        mapId: "checkout-receipt-map",
+      });
+      // The marker, positioned at Uluru
+      const marker = new AdvancedMarkerElement({
+        map: map,
+        position: position,
+        title: "@(objReceipt.checkoutReceiptOrders[0].displayAddress)",
+      });
+    }
+        getCheckoutEmail = () => '@(objReceipt.checkoutReceiptOrders[0].Email)';
+        getThanksHtml = () => '@HtmlHelperExtra.EscapeForJS(objReceipt.checkoutAddendum.HeroSectionThanksHTML)';
+    </script>
+}
 <div id="ko-wrapper">
-    <div class="mt-2 mb-5">
-        <h4 class="mb-3">
-            @receiptThankyou
-        </h4>
-        @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
-        {
+    @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+    {
+        <div class="mt-2 mb-5">
+            <h4 class="mb-3">
+                @receiptThankyou
+            </h4>
             <p>
                 @HtmlHelperExtra.Resource("TradeCheckoutReceiptEmailNotification", l, c, d)
             </p>
-        }
-        else
+        </div>
+    }
+    @*else
         {
             <p>
                 @HtmlHelperExtra.Resource("CheckoutReceiptEmailNotification", l, c, d)
             </p>
-        }
-    </div>
-    <div class="mb-5">
-        @foreach (checkoutReceiptOrder objOrder in objReceipt.checkoutReceiptOrders)
-        {
-            var order = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderNumber", l, c, d), objOrder.OrderNumber.ToString());
-
-            var delivery = "";
-
-            if (objOrder.TotalQuantity == 1)
+        }*@
+    @if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true && tradeOrderingAllowed)
+    {
+        <div class="mb-5">
+            @foreach (checkoutReceiptOrder objOrder in objReceipt.checkoutReceiptOrders)
             {
-                delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivery", l, c, d), objOrder.displayAddress);
-            }
-            else
-            {
-                delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivies", l, c, d), objOrder.displayAddress);
-            }
+                var order = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderNumber", l, c, d), objOrder.OrderNumber.ToString());
 
-            var estimate = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderEstimate", l, c, d), objOrder.displayEstimatedDelivery);
+                var delivery = "";
 
-            <text>
-                <h4 class="mb-3">
-                    @Html.Raw(order)
-                </h4>
-                <p>
-                    @Html.Raw(delivery)
-                </p>
-                <p class="mb-5">
-                    @Html.Raw(estimate)
-                </p>
-            </text>
-        }
+                if (objOrder.TotalQuantity == 1)
+                {
+                    delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivery", l, c, d), objOrder.displayAddress);
+                }
+                else
+                {
+                    delivery = String.Format("{0} {1} {2}", String.Format("{0:0.##}", objOrder.TotalQuantity), HtmlHelperExtra.Resource("CheckoutReceiptOrderDelivies", l, c, d), objOrder.displayAddress);
+                }
+
+                var estimate = String.Format("{0} {1}", HtmlHelperExtra.Resource("CheckoutReceiptOrderEstimate", l, c, d), objOrder.displayEstimatedDelivery);
+
+                <text>
+                    <h4 class="mb-3">
+                        @Html.Raw(order)
+                    </h4>
+                    <p>
+                        @Html.Raw(delivery)
+                    </p>
+                    <p class="mb-5">
+                        @Html.Raw(estimate)
+                    </p>
+                </text>
+            }
+        </div>
+    }
+    else
+    {
+        <div id="checkout-receipt-panels">
+            <div class="receipt-panel">
+                <div>
+                    <h1 id="order-confirmation-title">
+                        @HtmlHelperExtra.Resource("OrderConfirmation", l, c, d)
+                    </h1>
+                    <div id="order-confirmation-hero">
+                        <h2 id="order-confirmation-subtitle">
+                            @(objReceipt.checkoutReceiptOrders[0].FullName), @HtmlHelperExtra.Resource("ThankYouForYourOrder", l, c, d)
+                        </h2>
+                        <p class="mb-0">
+                            @HtmlHelperExtra.Resource(objReceipt.checkoutReceiptOrders.Count > 1 ? "YourOrderNumbersAre" : "YourOrderNumberIs", l, c, d): <b>@(String.Join(", ", objReceipt.checkoutReceiptOrders.Select(p => p.OrderNumber)))</b>.
+                            @HtmlHelperExtra.Resource("WeShallSendConfirmation", l, c, d) @(objReceipt.checkoutReceiptOrders[0].Email).
+                        </p>
+                    </div>
+                    <div id="order-confirmation-breakdown">
+                        <h3 id="order-total-title">
+                            @HtmlHelperExtra.Resource("OrderTotal", l, c, d)
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <span class="order-confirmation-breakdown-row">
+                                    <span>
+                                        @HtmlHelperExtra.Resource("Subtotal", l, c, d)
+                                    </span>
+                                    <span>
+                                        @((productTotal ?? 0m).ToString("C2", coNFI))
+                                    </span>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="order-confirmation-breakdown-row">
+                                    <span>
+                                        @HtmlHelperExtra.Resource("Shipping", l, c, d)
+                                    </span>
+                                    <span>
+                                        @((shipping ?? 0.0m).ToString("C2", coNFI))
+                                    </span>
+                                </span>
+                            </li>
+                            @if (discount.HasValue)
+                            {
+                                <li>
+                                    <span class="order-confirmation-breakdown-row">
+                                        <span>
+                                            @HtmlHelperExtra.Resource("Discount", l, c, d)
+                                        </span>
+                                        <span class="discount">
+                                            -@(discount.Value.ToString("C2", coNFI))
+                                        </span>
+                                    </span>
+                                </li>
+                            }
+                            <li>
+                                <div class="hr"></div>
+                            </li>
+                            <li>
+                                <span class="order-confirmation-breakdown-row total-row">
+                                    <span>
+                                        @HtmlHelperExtra.Resource("Total", l, c, d)
+                                    </span>
+                                    <span>
+                                        @((grandTotal ?? 0m).ToString("C2", coNFI))
+                                    </span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="order-confirmation-shipping-wrapper">
+                    @if (objAddendum.Longitude.HasValue && objAddendum.Latitude.HasValue)
+                    {
+                        <div id="map"></div>
+                    }
+                    <div id="order-confirmation-shipping-details">
+                        <div>
+                            <h4 class="shipping-address">
+                                @HtmlHelperExtra.Resource("ShippingAddress", l, c, d)
+                            </h4>
+                            <div class="address-lines">
+                                <span class="fullname">
+                                    @(objReceipt.checkoutReceiptOrders[0].FullName)
+                                </span>
+                                <span>
+                                    @Html.Raw(objReceipt.checkoutReceiptOrders[0].AddressLine1)
+                                </span>
+                                @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].AddressLine2))
+                                {
+                                    <span>
+                                        @Html.Raw(objReceipt.checkoutReceiptOrders[0].AddressLine2)
+                                    </span>
+                                }
+                                @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].Town))
+                                {
+                                    <span>
+                                        @Html.Raw(objReceipt.checkoutReceiptOrders[0].Town)
+                                    </span>
+                                }
+                                @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].County))
+                                {
+                                    <span>
+                                        @Html.Raw(objReceipt.checkoutReceiptOrders[0].County)
+                                    </span>
+                                }
+                                @if (!String.IsNullOrEmpty(objReceipt.checkoutReceiptOrders[0].PostCode))
+                                {
+                                    <span>
+                                        @Html.Raw(objReceipt.checkoutReceiptOrders[0].PostCode)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="receipt-panel">
+                <div class="ratio ratio-1x1">
+                    <img class="card-img-top"
+                         width="1024"
+                         height="1024"
+                         width="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Twelve)"
+                         height="@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Twelve)"
+                         alt="Checkout Total"
+                         src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Twelve)/@(objReceipt.checkoutAddendum.BackgroundImageID)"
+                         @HtmlHelperExtra.ImageSourceSetSizes(objAddendum.BackgroundImageID, ImageSize.Twelve) />
+                    <div id="checkout-hero">
+                        @Html.Raw(objAddendum.HeroSectionHTML)
+                        @if (objAddendum.ClickForPromoCode)
+                        {
+                            <div class="page-blocker" style="display: none" data-bind="flexFadeVisible: checkoutConfirmViewModel.busy">
+                                <div class="spinner-border"></div>
+                                <h3 class="text-white">
+                                    Please Wait
+                                </h3>
+                            </div>
+                            <a class="btn btn-lg btn-dark w-100" href="#" data-bind="click: checkoutConfirmViewModel.submitSignup">
+                                @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a class="btn btn-lg btn-dark px-4 gap-3" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.home, ci)">
+            @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
+        </a>
     </div>
-    <a class="btn btn-lg btn-dark" href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.home, ci)">
-        @HtmlHelperExtra.Resource("ContinueShopping", l, c, d)
-    </a>
 </div>
 
 <script>
+
+    initMap();
 
     Number.prototype.formatCurrency = function () {
         return this.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -385,7 +601,7 @@
         window.addLoadFunction(() => {
             if(typeof fbq === 'function') {
                 fbq('track', 'Purchase', {
-                    value: @(grandTotal.ToString("N2", gbNFI)),
+                    value: @((grandTotal ?? 0m).ToString("N2", gbNFI)),
                     currency: "@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)"
                 });
             }
@@ -396,7 +612,7 @@
             "phase": "ORDER_COMPLETE",
             "customerOrderId": @(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID),
             "currency": "@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)",
-            "grandTotal": @(grandTotal.ToString("N2", gbNFI)),
+            "grandTotal": @((grandTotal ?? 0m).ToString("N2", gbNFI)),
             "taxAmount": @(objReceipt.checkoutReceiptTransactionDetails[0].Tax.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Tax.Value.ToString("N2", gbNFI) : "0"),
             "emailAddress": "@(objReceipt.checkoutReceiptOrders[0].Email)",
             "cartUrl": "@(Request.Url.OriginalString)",
@@ -449,7 +665,7 @@
 
                 _dmTrack('transactionId', '@(objReceipt.checkoutReceiptTransactionDetails[0].TransactionID)');
                 _dmTrack('currency', '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)');
-                _dmTrack('grandTotal', '@(grandTotal.ToString("N2", gbNFI))');
+                _dmTrack('grandTotal', '@((grandTotal ?? 0m).ToString("N2", gbNFI))');
                 _dmTrack('taxAmount', '@(objReceipt.checkoutReceiptTransactionDetails[0].Tax.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Tax.Value.ToString("N2", gbNFI) : "0")');
                 _dmTrack('shipping', '@(objReceipt.checkoutReceiptTransactionDetails[0].Shipping.HasValue ? objReceipt.checkoutReceiptTransactionDetails[0].Shipping.Value.ToString("N2", gbNFI) : "0")');
                 _dmTrack('emailAddress', '@(objReceipt.checkoutReceiptOrders[0].Email)');
@@ -460,7 +676,7 @@
 
     <script>
         window.uetq = window.uetq || [];
-        window.uetq.push({ 'gv': @(grandTotal.ToString("N2", gbNFI)), 'gc': '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)'});
+        window.uetq.push({ 'gv': @((grandTotal ?? 0m).ToString("N2", gbNFI)), 'gc': '@(objReceipt.checkoutReceiptTransactionDetails[0].CurrencyCode)'});
     </script>
 }
 

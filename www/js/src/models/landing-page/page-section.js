@@ -111,7 +111,9 @@
         }
         break;
         case 'CheckoutConfirm': {
-            self.checkoutConfirmViewModel = {};
+            self.checkoutConfirmViewModel = checkoutConfirmViewModel({
+                parent: self
+            });
         }
         break;
         case 'Stockists': {

@@ -75,10 +75,6 @@
   top: 24px;
 }
 
-#unsubscribe-wrapper .form-control {
-  min-width: 420px;
-}
-
 #resubscribe-wrapper {
   display: flex;
   justify-content: center;

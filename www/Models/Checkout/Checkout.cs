@@ -577,6 +577,7 @@ namespace wwwDesignersGuild.Models.Checkout
         public List<checkoutReceiptOrderLine> checkoutReceiptOrderLines { get; set; }
         public List<brontoJSONBasketLine> checkoutReceiptBrontoLines { get; set; }
         public List<checkoutReceiptOrderReference> checkoutReceiptOrderReferences { get; set; }
+        public checkoutReceiptAddendum checkoutAddendum { get; set; }
     }
 
     public class checkoutReceiptOrderReference
@@ -654,6 +655,10 @@ namespace wwwDesignersGuild.Models.Checkout
     public class checkoutReceiptTotalExVat
     {
         public decimal? TotalExVAT { get; set; }
+        public decimal? ProductTotal { get; set; }
+        public decimal? DiscountTotal { get; set; }
+        public decimal? ShippingTotal { get; set; }
+        public decimal? GrandTotal { get; set; }
     }
 
     public class checkoutReceiptTransactionDetail

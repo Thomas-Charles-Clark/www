@@ -309,14 +309,6 @@ namespace wwwDesignersGuild.Models.Classes
         public string description { get; set; }
     }
 
-    public class cmsEmailCapturePopupForm
-    {
-        public pageSectionForm objForm { get; set; }
-        public List<pageFormCountry> availableCountries { get; set; }
-        public List<Language> availableLanguages { get; set; }
-        public short defaultCountryForDropDown { get; set; }
-    }
-
     public class channel
     {
         public byte ChannelID { get; set; }

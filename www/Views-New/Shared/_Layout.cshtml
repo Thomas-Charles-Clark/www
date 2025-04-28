@@ -485,7 +485,7 @@
 
     @if (!ViewBag.Partial)
     {
-        if (Model.HasEcommerceEmailCapturePopupBanners && Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
+        if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
         {
             <script type="text/javascript">
                window.ecommerceEmailCapturePopupBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommerceEmailCaptureBanners));
@@ -499,10 +499,7 @@
             </script>
         }
 
-        if (Model.HasEcommerceEmailCapturePopupBanners || Model.HasEcommerceGeneralPopupBanners)
-        {
-            @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
-        }
+         @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
     }
 
     @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")

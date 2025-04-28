@@ -775,6 +775,7 @@ namespace wwwDesignersGuild.Models.Database
                 while (reader.Read())
                 {
                     result.MemberID = reader.GetInt32(0);
+                    result.GUID = reader.GetString(1);
                 }
             }
 
@@ -3094,6 +3095,21 @@ namespace wwwDesignersGuild.Models.Database
             }, null, null, CommandType.StoredProcedure);
 
             return 0;
+        }
+
+        internal bool DotDigitalDataCleanse_RecordResponse(string emailAddress, short countryId, byte languageId, bool response)
+        {
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
+            {
+                var result = conn.QuerySingle<bool>("pub.DotDigital_DataCleanse_RecordResponse", new { 
+                    emailAddress, 
+                    response,
+                    countryId,
+                    languageId
+                }, null, null, CommandType.StoredProcedure);
+
+                return result;
+            }
         }
     }
 

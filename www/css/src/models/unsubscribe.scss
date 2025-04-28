@@ -1,0 +1,97 @@
+﻿@import "../common/common.scss";
+
+#unsubscribe-outer-wrapper {
+    display: flex;
+    gap: $l-gutter;
+
+    > div {
+        flex: 0 1 50%;
+        font-size: 120%;
+
+        > img {
+            width: 100%;
+            height: auto;
+        }
+
+        &:nth-of-type(2) {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .btn {
+                width: auto;
+            }
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-weight: 500;
+        }
+
+        p {
+            padding: 0 $xxl-gutter;
+        }
+
+        #that-sounds-good,
+        #no-thanks {
+            font-size: 1.25rem;
+        }
+    }
+
+    #unsubscribe-carousel {
+        position: relative;
+        height: 100%;
+
+        .carousel-inner {
+            height: 100%;
+
+            .carousel-item {
+                height: 100%;
+
+                > div {
+                    height: 100%;
+                    align-self: stretch;
+                    background-color: $white;
+                    flex: 1;
+
+                    &:has(.alert-success) {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .alert-success {
+                        width: auto;
+                        margin-bottom: 0;
+
+                        p {
+                            margin-bottom: 0;
+                            b {
+                                display: inline;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #unsubscribe-wrapper {
+        max-width: 500px;
+
+        input {
+            width: 100%;
+        }
+
+        .form-control,
+        .form-select {
+            margin-bottom: $xl-gutter;
+        }
+    }
+}

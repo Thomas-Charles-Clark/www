@@ -13,11 +13,15 @@ using System.Web;
 using System.Web.Http;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Country;
+using wwwDesignersGuild.Models.DTOs;
 using wwwDesignersGuild.Models.Form;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.LandingPage;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
+
+using wwwDesignersGuild.Models.Database;
+using static Antlr.Runtime.Tree.TreeWizard;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -266,7 +270,7 @@ namespace wwwDesignersGuild.Controllers
             }
 
             // fudge to get registration to save from login & checkoutLogin pages
-            if (objForm.SourceID == 10 || objForm.FormID == 151 || objForm.FormID == 152)
+            if (objForm.SourceID == 10 || objForm.SourceID == 75 || objForm.FormID == 151 || objForm.FormID == 152)
             {
                 var earlySave = new pageSectionFormSave()
                 {
@@ -934,6 +938,104 @@ namespace wwwDesignersGuild.Controllers
             var result = await objFormRoutines.pageSectionFormSave(objSave, visitorId, memberId);
 
             return result;
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> JoinMarketingListPopup([FromBody] PassMarketingListJoin dto)
+        {
+            var db = new databaseDataContext();
+
+            dto.PreferenceEmailMarketingFrequencyID = 1; // ALL THE EMAILS!
+
+            _ = db.JoinMarketingList(dto, source: "Popup");
+
+            return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> RejoinMarketingListReceipt([FromBody] PassGUID dto)
+        {
+            var db = new databaseDataContext();
+
+            _ = db.RejoinMarketingList(dto, source: "Receipt");
+            
+            return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> RejoinMarketingListUnsubscribe([FromBody] PassGUID dto)
+        {
+            var db = new databaseDataContext();
+
+            var vf = new VisitorFactory();
+
+            if (Guid.TryParse(dto.GUID, out Guid g))
+            {
+                var fetchResult = await vf.getMemberByGuid(g);
+
+                dto.Email = fetchResult.Email;
+
+                _ = db.RejoinMarketingList(dto, source: "Unsubscribe");
+            }
+
+            return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> RejoinMarketingListCleanse([FromBody] PassGUID dto)
+        {
+            var db = new databaseDataContext();
+
+            var vf = new VisitorFactory();
+
+            if (Guid.TryParse(dto.GUID, out Guid g))
+            {
+                var fetchResult = await vf.getMemberByGuid(g);
+
+                dto.Email = fetchResult.Email;
+
+                _ = db.RejoinMarketingList(dto, source: "Cleanse");
+            }
+
+            return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> LeaveMarketingListCleanse([FromBody] PassGUID dto)
+        {
+            var db = new databaseDataContext();
+
+            var vf = new VisitorFactory();
+
+            if (Guid.TryParse(dto.GUID, out Guid g))
+            {
+                var fetchResult = await vf.getMemberByGuid(g);
+
+                dto.Email = fetchResult.Email;
+
+                _ = db.LeaveMarketingList(dto, source: "Cleanse");
+            }
+
+            return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> LeaveMarketingListUnsubscribe([FromBody] PassGUID dto)
+        {
+            var db = new databaseDataContext();
+
+            var vf = new VisitorFactory();
+
+            if (Guid.TryParse(dto.GUID, out Guid g))
+            {
+                var fetchResult = await vf.getMemberByGuid(g);
+
+                dto.Email = fetchResult.Email;
+
+                _ = db.LeaveMarketingList(dto, source: "Unsubscribe");
+            }
+
+            return Ok(new { });
         }
     }
 }

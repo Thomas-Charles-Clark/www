@@ -654,7 +654,8 @@ namespace wwwDesignersGuild.Models.Checkout
                 checkoutReceiptTransactionDetails = results.GetResult<checkoutReceiptTransactionDetail>().ToList(),
                 checkoutReceiptOrderLines = results.GetResult<checkoutReceiptOrderLine>().ToList(),
                 checkoutReceiptBrontoLines = results.GetResult<brontoJSONBasketLine>().ToList(),
-                checkoutReceiptOrderReferences = results.GetResult<checkoutReceiptOrderReference>().ToList()
+                checkoutReceiptOrderReferences = results.GetResult<checkoutReceiptOrderReference>().ToList(),
+                checkoutAddendum = results.GetResult<checkoutReceiptAddendum>().SingleOrDefault()
             };
 
             return objPaymentReceipt;

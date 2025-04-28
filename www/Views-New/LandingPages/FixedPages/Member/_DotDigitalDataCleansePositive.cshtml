@@ -1,0 +1,27 @@
+@model BaseViewModel
+@{
+    var l = Model.LanguageID;
+    var c = Model.CountryID;
+    var d = Model.Date;
+}
+
+@if (String.IsNullOrEmpty(ViewBag.FailedToIdentify) == false)
+{
+    if (!Framework.ProductionVersion)
+    {
+        <h1 class="fs-3 text-red-600">
+            DEBUG: ViewBag.FailedToIdentify = "@ViewBag.FailedToIdentify"
+        </h1>
+    }
+    <script>
+        window.addLoadFunction(() => {
+            document.querySelector('.page-section-grid').innerHTML = `
+            <div class="page-section html-section g-col-12">
+                <div class="d-flex flex-column justify-content-center align-items-center fs-5 py-6">
+                    <h1>@(HtmlHelperExtra.Resource("Sorry", l, c, d))</h1>
+                    <h4>@(HtmlHelperExtra.Resource("CouldntIdentifyYou", l, c, d))</h4>
+                </div>
+            </div>`
+        });
+    </script>
+}

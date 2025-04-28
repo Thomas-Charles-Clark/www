@@ -664,139 +664,145 @@
         </div>
     }
 }
-@if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
-    Model.HasEcommerceEmailCapturePopupBanners)
-{
-    var b = Model.EcommerceEmailCaptureBanners.First().banners[0];
-    <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="ecommerce-pop-modal">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
-                    <div class="spinner-border"></div>
-                    <h4>
-                        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
-                    </h4>
+<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="ecommerce-pop-modal">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="page-blocker" data-bind="flexVisible: busy, toggleOpacity: busy">
+                <div class="spinner-border"></div>
+                <h4>
+                    @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-close-wrapper">
+                    <div class="btn-close-wrapper-inner">
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="btn-close-wrapper">
-                        <div class="btn-close-wrapper-inner">
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
+                <div class="grid" data-bind="visible: !complete()">
+                    <!-- ko if: loaded -->
+                    <div data-bind="with: banner">
+                        <img id="ecommerce-email-pop-img-a"
+                             width="512"
+                             height="749"
+                             class="d-block w-100"
+                             alt=""
+                             loading="lazy"
+                             data-bind="attr: {
+                            src: `/imagebanner${getWebPFallback()}/512/${BannerID}?v=${Version}`,
+                            srcset: window.bannerImageAttributeSourceSet(BannerID, imageSizeExtraLarge),
+                            sizes: window.bannerImageAttributeSizes(BannerID, imageSizeExtraLarge)
+                            }" />
                     </div>
-                    <div class="grid" data-bind="visible: !complete()">
-                        <div>
-                            <img width="512"
-                                 height="749"
-                                 class="d-block w-100"
-                                 alt="@(b.altText ?? b.overlayText)"
-                                 loading="lazy"
-                                 src="/imagebanner@(Framework.WebPFallback)/512/@(b.bannerId)?v=@(b.version)"
-                                 @HtmlHelperExtra.BannerImageSourceSetSizes(b.bannerId, b.version, ImageSize.Five) />
+                    <!-- /ko -->
+                    <div class="d-flex flex-column justify-content-center align-items-center">
+                        <p class="text-center" data-bind="with: pageSectionForm">
+                            <span data-bind="html: HeaderText"></span>
+                        </p>
+                        <div class="mb-3"
+                                data-bind="validationOptions: { insertMessages: false }">
+                            <label for="email" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsEmail", l, c, d)
+                            </label>
+                            <input id="email"
+                                    name="email"
+                                    class="form-control"
+                                    type="text"
+                                    aria-errormessage="email-error"
+                                    data-bind="keepElement: email,
+                                            textInput: email,
+                                            attr:{
+                                            'aria-invalid': !email.isValid()
+                                            }" />
+                            <span id="email-error" class="validation-message" data-bind="validationMessage: email"></span>
                         </div>
-                        <div class="d-flex flex-column justify-content-center align-items-center">
-                            <p class="text-center" data-bind="with: pageSectionForm">
-                                <span data-bind="html: HeaderText"></span>
-                            </p>
-                            <div class="mb-3"
-                                 data-bind="validationOptions: { insertMessages: false }">
-                                <label for="email" class="form-label">
-                                    @HtmlHelperExtra.Resource("FormsEmail", l, c, d)
-                                </label>
-                                <input id="email"
-                                       name="email"
-                                       class="form-control"
-                                       type="text"
-                                       aria-errormessage="email-error"
-                                       data-bind="keepElement: email,
-                                              textInput: email,
-                                              attr:{
-                                                'aria-invalid': !email.isValid()
-                                              }" />
-                                <span id="email-error" class="validation-message" data-bind="validationMessage: email"></span>
-                            </div>
-                            <div class="mb-3"
-                                 data-bind="validationOptions: { insertMessages: false }">
-                                <label for="confirm-email" class="form-label">
-                                    @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
-                                </label>
-                                <input id="confirm-email"
-                                       name="confirm-email"
-                                       class="form-control"
-                                       aria-errormessage="confirm-email-error"
-                                       type="text"
-                                       data-bind="keepElement: emailConfirmation,
-                                              textInput: emailConfirmation" />
-                                <span id="confirm-email-error" class="validation-message" data-bind="validationMessage: emailConfirmation"></span>
-                            </div>
-                            <div class="mb-3"
-                                 data-bind="validationOptions: { insertMessages: false }">
-                                <label for="country" class="form-label">
-                                    @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
-                                </label>
-                                <select id="country"
-                                        name="country"
-                                        class="form-select"
-                                        data-bind="keepElement: marketingCountryId,
-                                               options: availableCountries,
-                                               optionsText: 'Name',
-                                               optionsValue: 'CountryID',
-                                               optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
-                                               value: marketingCountryId,
-                                               attr: {
-                                                  'aria-invalid': !marketingCountryId.isValid()
-                                               }">
-                                </select>
-                                <span id="country-error" class="validation-message" data-bind="validationMessage: marketingCountryId"></span>
-                            </div>
-                            <div style="display: none"
-                                 class="mb-3"
-                                 data-bind="visible: currentlyAvailableLanguages().length > 1">
-                                <label for="country" class="form-label">
-                                    @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
-                                </label>
-                                <select id="register-language"
-                                        class="form-select"
-                                        data-bind="value: languageId,
-                                    options: currentlyAvailableLanguages,
-                                    optionsText: 'Name',
-                                    optionsValue: 'LanguageID'">
-                                </select>
-                            </div>
-                            <!-- ko foreach: marketingPermissions -->
-                            <!-- ko ifnot: Hidden -->
-                            <div class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
-                                <input class="form-check-input" type="checkbox" data-bind="checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
-                                <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
-                                    <span data-bind="html: Label"></span>
-                                </label>
-                            </div>
-                            <!-- /ko -->
-                            <!-- /ko -->
-                            <div data-bind="with: pageSectionForm">
-                                <button type="button"
-                                        class="btn btn-dark"
-                                        data-bind="html: SubmitButtonText, click: $parent.submit"></button>
-                            </div>
-                            <p class="text-center mt-4 small" data-bind="with: pageSectionForm">
-                                <span data-bind="html: FooterText"></span>
-                            </p>
+                        <div class="mb-3"
+                                data-bind="validationOptions: { insertMessages: false }">
+                            <label for="confirm-email" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
+                            </label>
+                            <input id="confirm-email"
+                                    name="confirm-email"
+                                    class="form-control"
+                                    aria-errormessage="confirm-email-error"
+                                    type="text"
+                                    data-bind="keepElement: emailConfirmation,
+                                            textInput: emailConfirmation" />
+                            <span id="confirm-email-error" class="validation-message" data-bind="validationMessage: emailConfirmation"></span>
                         </div>
+                        <div class="mb-3"
+                                data-bind="validationOptions: { insertMessages: false }">
+                            <label for="country" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
+                            </label>
+                            <select id="country"
+                                    name="country"
+                                    class="form-select"
+                                    data-bind="keepElement: marketingCountryId,
+                                            options: availableCountries,
+                                            optionsText: 'Name',
+                                            optionsValue: 'CountryID',
+                                            optionsCaption: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("PleaseSelect", l, c, d))',
+                                            value: marketingCountryId,
+                                            attr: {
+                                                'aria-invalid': !marketingCountryId.isValid()
+                                            }">
+                            </select>
+                            <span id="country-error" class="validation-message" data-bind="validationMessage: marketingCountryId"></span>
+                        </div>
+                        <div style="display: none"
+                                class="mb-3"
+                                data-bind="visible: currentlyAvailableLanguages().length > 1">
+                            <label for="country" class="form-label">
+                                @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
+                            </label>
+                            <select id="register-language"
+                                    class="form-select"
+                                    data-bind="value: languageId,
+                                options: currentlyAvailableLanguages,
+                                optionsText: 'Name',
+                                optionsValue: 'LanguageID'">
+                            </select>
+                        </div>
+                        <!-- ko foreach: marketingPermissions -->
+                        <!-- ko ifnot: Hidden -->
+                        <div class="marketing-permission form-check mb-5" style="display: none;" data-bind="visible: true">
+                            <input class="form-check-input" type="checkbox" data-bind="checked: Checked, attr: { id: 'marketing-permission-' + MarketingPermissionID }" />
+                            <label class="form-check-label" data-bind="attr: { for: 'marketing-permission-' + MarketingPermissionID }">
+                                <span data-bind="html: Label"></span>
+                            </label>
+                        </div>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <div data-bind="with: pageSectionForm">
+                            <button type="button"
+                                    class="btn btn-dark"
+                                    data-bind="html: SubmitButtonText, click: $parent.submit"></button>
+                        </div>
+                        <p class="text-center mt-4 small" data-bind="with: pageSectionForm">
+                            <span data-bind="html: FooterText"></span>
+                        </p>
                     </div>
-                    <div id="popup-complete"
-                         data-bind="visible: complete, with: banner">
-                        <img width="1024"
+                </div>
+                <div id="popup-complete"
+                     data-bind="visible: complete">
+                    <!-- ko if: loaded -->
+                    <div data-bind="with: banner">
+                        <img id="ecommerce-email-pop-img-b"
+                             width="1024"
                              height="749"
                              data-bind="attr: {
-                            src: '/imagebanner@(Framework.WebPFallback)/1024/' + bannerId + '-B?v=' + version,
-                            alt: altText
+                            src: `/imagebanner${getWebPFallback()}/1024/${BannerID}-b?v=${Version}`
                          }" />
                     </div>
+                    <!-- /ko -->
                 </div>
             </div>
         </div>
     </div>
-}
+</div>
 @if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn &&
+    dgFramework.isPagePartOfCheckOutProcess(Model.MasterDefinition.UrlBreakdown.ContentType, Model.MasterDefinition.UrlBreakdown.ContentId) &&
     Model.HasEcommerceGeneralPopupBanners)
 {
     var b = Model.EcommerceGeneralPopupBanners.First().banners[0];
