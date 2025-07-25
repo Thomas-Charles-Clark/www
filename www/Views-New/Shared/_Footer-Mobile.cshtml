@@ -11,14 +11,16 @@
 @if(!tradeUser) 
 {
     <form method="get"
-          action="/join-our-mailing-list/l100"
-          target="_self"
-          class="container p-2">
+        url="/"
+        target="_self"
+        onsubmit="ecommerceEmailCapturePopupModel.loadFetch(); return false;"
+        class="container p-2">
         <h5>
             @Html.Raw(dgFramework.convertDescriptionForDisplay(HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d).ToString()))
         </h5>
         <div class="input-group">
-            <input name="mailing-email"
+            <input id="footer-mailing-email"
+                   name="mailing-email"
                    class="form-control"
                    type="text"
                    aria-label="@HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)"

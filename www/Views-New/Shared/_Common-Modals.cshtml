@@ -687,11 +687,8 @@
                              height="749"
                              class="d-block w-100"
                              alt=""
-                             loading="lazy"
                              data-bind="attr: {
-                            src: `/imagebanner${getWebPFallback()}/512/${BannerID}?v=${Version}`,
-                            srcset: window.bannerImageAttributeSourceSet(BannerID, imageSizeExtraLarge),
-                            sizes: window.bannerImageAttributeSizes(BannerID, imageSizeExtraLarge)
+                                src: `/imagebanner${getWebPFallback()}/512/${BannerID}?v=${Version}`
                             }" />
                     </div>
                     <!-- /ko -->
@@ -700,16 +697,16 @@
                             <span data-bind="html: HeaderText"></span>
                         </p>
                         <div class="mb-3"
-                                data-bind="validationOptions: { insertMessages: false }">
+                             data-bind="validationOptions: { insertMessages: false }">
                             <label for="email" class="form-label">
                                 @HtmlHelperExtra.Resource("FormsEmail", l, c, d)
                             </label>
                             <input id="email"
-                                    name="email"
-                                    class="form-control"
-                                    type="text"
-                                    aria-errormessage="email-error"
-                                    data-bind="keepElement: email,
+                                   name="email"
+                                   class="form-control"
+                                   type="text"
+                                   aria-errormessage="email-error"
+                                   data-bind="keepElement: email,
                                             textInput: email,
                                             attr:{
                                             'aria-invalid': !email.isValid()
@@ -717,21 +714,21 @@
                             <span id="email-error" class="validation-message" data-bind="validationMessage: email"></span>
                         </div>
                         <div class="mb-3"
-                                data-bind="validationOptions: { insertMessages: false }">
+                             data-bind="validationOptions: { insertMessages: false }">
                             <label for="confirm-email" class="form-label">
                                 @HtmlHelperExtra.Resource("FormsConfirmEmail", l, c, d)
                             </label>
                             <input id="confirm-email"
-                                    name="confirm-email"
-                                    class="form-control"
-                                    aria-errormessage="confirm-email-error"
-                                    type="text"
-                                    data-bind="keepElement: emailConfirmation,
+                                   name="confirm-email"
+                                   class="form-control"
+                                   aria-errormessage="confirm-email-error"
+                                   type="text"
+                                   data-bind="keepElement: emailConfirmation,
                                             textInput: emailConfirmation" />
                             <span id="confirm-email-error" class="validation-message" data-bind="validationMessage: emailConfirmation"></span>
                         </div>
                         <div class="mb-3"
-                                data-bind="validationOptions: { insertMessages: false }">
+                             data-bind="validationOptions: { insertMessages: false }">
                             <label for="country" class="form-label">
                                 @HtmlHelperExtra.Resource("FormsCountry", l, c, d)
                             </label>
@@ -751,8 +748,8 @@
                             <span id="country-error" class="validation-message" data-bind="validationMessage: marketingCountryId"></span>
                         </div>
                         <div style="display: none"
-                                class="mb-3"
-                                data-bind="visible: currentlyAvailableLanguages().length > 1">
+                             class="mb-3"
+                             data-bind="visible: currentlyAvailableLanguages().length > 1">
                             <label for="country" class="form-label">
                                 @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
                             </label>

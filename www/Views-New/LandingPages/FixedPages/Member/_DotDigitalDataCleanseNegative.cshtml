@@ -56,7 +56,7 @@
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <div class="d-flex flex-column justify-content-center align-items-center">
-                                <h1 class="fw-700 fs-2 mb-0">
+                                <h1 class="fw-700 fs-2 mb-3">
                                     @HtmlHelperExtra.Resource("DataCleanseNegativeHeading", l, c, d)
                                 </h1>
                                 <h2 class="fs-3 mb-4">
@@ -84,27 +84,32 @@
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="d-flex justify-content-center align-items-center">
-                               
-                                <div class="alert alert-success d-flex align-items-center mb-0">
-                                    <i class="material-icons">
-                                        check
-                                    </i>
-                                    <p class="mb-0 ms-3">
-                                        @HtmlHelperExtra.Resource("DataCleanseNegativeThankYou", l, c, d)
-                                    </p>
-                                </div>
-
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <h1 class="fw-700 fs-2 mb-3">
+                                    @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                                </h1>
+                                <h2 class="fs-4 mb-0">
+                                    @HtmlHelperExtra.Resource("DataCleanseNegativeThankYou", l, c, d)
+                                </h2>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div>
-                                <div class="alert alert-success">
-                                    <p class="mb-0">
-                                        @HtmlHelperExtra.Resource("ThankYouContinuedLoyalty", l, c, d)
-                                        <b>@HtmlHelperExtra.Resource("FifteenDiscountNextFull", l, c, d)</b>.
-                                    </p>
-                                </div>
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <h1 class="fw-700 fs-2 mb-3">
+                                    @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                                </h1>
+                                <h2 class="fs-4 mb-0">
+                                    @HtmlHelperExtra.Resource("ThankYouContinuedLoyalty", l, c, d)
+                                </h2>
+                                <p class="fs-4 mb-0">
+                                    @HtmlHelperExtra.Resource("FifteenDiscountNextFull", l, c, d).
+                                </p>
+                                @*<div class="alert alert-success">
+            <p class="mb-0">
+                @HtmlHelperExtra.Resource("ThankYouContinuedLoyalty", l, c, d)
+                <b>@HtmlHelperExtra.Resource("FifteenDiscountNextFull", l, c, d)</b>.
+            </p>
+        </div>*@
                             </div>
                         </div>
                     </div>

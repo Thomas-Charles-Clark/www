@@ -99,6 +99,7 @@ namespace wwwDesignersGuild.Models.Helper
 
                     //  Output image to browser
                     HttpResponseBase response = context.HttpContext.Response;
+                    response.Headers.Add("Cache-Tag", $"ImageID-{ImageID}");
                     response.ContentType = "image/webp";
                     response.BufferOutput = true;
                     response.Clear();
@@ -125,6 +126,7 @@ namespace wwwDesignersGuild.Models.Helper
 
                     //  Output image to browser
                     HttpResponseBase response = context.HttpContext.Response;
+                    response.Headers.Add("Cache-Tag", $"ImageID-{ImageID}");
                     response.ContentType = "image/jpeg";
                     response.BufferOutput = true;
                     response.Clear();

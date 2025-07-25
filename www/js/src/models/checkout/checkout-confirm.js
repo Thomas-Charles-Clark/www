@@ -60,8 +60,6 @@
                 //    });
 
                 window.setTimeout(() => {
-                    document.querySelector('#checkout-hero').classList.add('alert');
-                    document.querySelector('#checkout-hero').classList.add('alert-success');
                     document.querySelector('#checkout-hero').innerHTML = getThanksHtml();
                     self.busy(false);
 

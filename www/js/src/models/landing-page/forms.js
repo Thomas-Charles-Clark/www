@@ -809,7 +809,7 @@
                                         'ResubscribeFooter'])
                                         .then(window.handleResourcesArray)
                                         .then(resources => {
-                                            document.querySelector('#form-wrapper > .alert.alert-success').innerHTML
+                                            document.querySelector('#form-wrapper > div').innerHTML
                                                 = `<i class="material-icons text-success">error</i><div>${resources.ResubscribeNotice}<br/><br/>${resources.ResubscribeFooter}</div>`
                                         });
                                     break;

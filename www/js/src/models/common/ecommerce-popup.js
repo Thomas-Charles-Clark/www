@@ -295,7 +295,9 @@
                     self.showModal();
                     self.setDone();
                     self.loaded(true);
-                    window.lazyImages();
+                    window.setTimeout(() => {
+                        window.lazyImages();
+                    }, 0);
                     if (typeof afterFetch === 'function') {
                         window.setTimeout(() => {
                             afterFetch();
@@ -376,7 +378,7 @@
                                     'ResubscribeFooter'])
                                     .then(window.handleResourcesArray)
                                     .then(resources => {
-                                        document.querySelector('#form-wrapper > .alert.alert-success').innerHTML
+                                        document.querySelector('#form-wrapper > div').innerHTML
                                             = `<i class="material-icons text-success">error</i><div>${resources.ResubscribeNotice}<br/><br/>${resources.ResubscribeFooter}</div>`
                                     });
                                 break;
@@ -472,7 +474,7 @@ window.addLoadFunction(() => {
             window.ecommerceEmailCapturePopupModel = ecommercePopupViewModel({
                 resources: resources,
                 banner: banner,
-                cookieIdentifier: `banner-${banner.bannerId}-visit-counter`,
+                cookieIdentifier: `banner-${banner.BannerID}-visit-counter`,
                 showOnPageView: 3,
                 cookieExpiryDate: 'Fri, 31 Dec 9999 23:59:59 GMT'
             });

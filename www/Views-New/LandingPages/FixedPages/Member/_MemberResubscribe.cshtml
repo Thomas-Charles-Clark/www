@@ -17,14 +17,22 @@
     <div data-bind="stopBinding">
         <div class="member-wrapper relative p-3 mt-4">
             <div id="resubscribe-wrapper">
-                <div class="alert alert-success d-flex align-items-center mb-0">
+                <div class="d-flex justify-content-center align-items-center">
+                    <h1 class="fw-700 fs-2 mb-0">
+                        @HtmlHelperExtra.Resource("ThankYou", l, c, d)
+                    </h1>
+                    <h2 class="fs-4 mb-0">
+                        @HtmlHelperExtra.Resource("ResubscribeThankYou", l, c, d)
+                    </h2>
+                </div>
+                @*<div class="alert alert-success d-flex align-items-center mb-0">
                     <i class="material-icons">
                         check
                     </i>
                     <p class="mb-0 ms-3">
                         @HtmlHelperExtra.Resource("ResubscribeThankYou", l, c, d)
                     </p>
-                </div>
+                </div>*@
             </div>
         </div>
     </div>

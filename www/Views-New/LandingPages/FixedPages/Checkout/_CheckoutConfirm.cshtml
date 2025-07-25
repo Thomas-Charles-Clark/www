@@ -307,21 +307,24 @@
                          alt="Checkout Total"
                          src="/image@(Framework.WebPFallback)/@HtmlHelperExtra.InitialImageFolderSize(ImageSize.Twelve)/@(objReceipt.checkoutAddendum.BackgroundImageID)"
                          @HtmlHelperExtra.ImageSourceSetSizes(objAddendum.BackgroundImageID, ImageSize.Twelve) />
-                    <div id="checkout-hero">
-                        @Html.Raw(objAddendum.HeroSectionHTML)
-                        @if (objAddendum.ClickForPromoCode)
-                        {
-                            <div class="page-blocker" style="display: none" data-bind="flexFadeVisible: checkoutConfirmViewModel.busy">
-                                <div class="spinner-border"></div>
-                                <h3 class="text-white">
-                                    Please Wait
-                                </h3>
-                            </div>
-                            <a class="btn btn-lg btn-dark w-100" href="#" data-bind="click: checkoutConfirmViewModel.submitSignup">
-                                @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
-                            </a>
-                        }
-                    </div>
+                   @if (!String.IsNullOrEmpty(objAddendum.HeroSectionHTML))
+                    {
+                        <div id="checkout-hero">
+                            @Html.Raw(objAddendum.HeroSectionHTML)
+                           @if (objAddendum.ClickForPromoCode)
+                            {
+                                <div class="page-blocker" style="display: none" data-bind="flexFadeVisible: checkoutConfirmViewModel.busy">
+                                    <div class="spinner-border"></div>
+                                    <h3 class="text-white">
+                                        Please Wait
+                                    </h3>
+                                </div>
+                                <a class="btn btn-lg btn-dark w-100" href="#" data-bind="click: checkoutConfirmViewModel.submitSignup">
+                                    @HtmlHelperExtra.Resource("NewsletterSignUp", l, c, d)
+                                </a>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
         </div>
