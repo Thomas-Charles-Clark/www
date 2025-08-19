@@ -64,7 +64,7 @@
             })
                 .then(window.handleFetchResponse)
                 .then(data => {
-                    //console.trace(data.products);
+                    console.trace(data.products);
 
                     if (data.hasOwnProperty('products')) {
                         let results = data.products.flatMap(p => {

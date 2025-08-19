@@ -2739,7 +2739,7 @@ namespace wwwDesignersGuild.Controllers
                                         if (result.Transaction.ThreeDSecureInfo != null)
                                         {
                                             threeDSecureStatus = result.Transaction.ThreeDSecureInfo.Status;
-                                            threeDSecureEnrolled = result.Transaction.ThreeDSecureInfo.Enrolled.Substring(0, 1);
+                                            threeDSecureEnrolled = result.Transaction.ThreeDSecureInfo.Enrolled?.Substring(0, 1);
                                             liabilityShifted = result.Transaction.ThreeDSecureInfo.LiabilityShifted ?? false;
                                             liabilityShiftPossible = result.Transaction.ThreeDSecureInfo.LiabilityShiftPossible ?? false;
                                         }

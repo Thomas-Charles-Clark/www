@@ -242,6 +242,11 @@ namespace wwwDesignersGuild.Util
                 url = url.TrimEnd(new char[] { '?' });
             }
 
+            if (HttpContext.Current.Request.QueryString?.AllKeys.Contains("lifestyle") == true && !url.Contains("lifestyle"))
+            {
+                keysToAdd.Add("lifestyle");
+            }
+
             return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, keysToAdd.ToDictionary(k => k, k => HttpContext.Current.Request.QueryString[k]));
         }
 
