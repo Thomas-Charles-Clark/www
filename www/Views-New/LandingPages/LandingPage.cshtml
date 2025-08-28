@@ -472,13 +472,17 @@
     {
         <script type="text/javascript">
             window.loadQuickLook = (url, title) => {
-                console.trace(url);
                 let params = new URLSearchParams({
                     lifestyle: 1
                 });
                 if (url.indexOf('lifestyle=1') == -1) {
-                    url = `${url}?${params.toString()}`;
+                    if (url.indexOf('?') == -1) {
+                        url = `${url}?${params.toString()}`;
+                    } else {
+                        url = `${url}&${params.toString()}`;
+                    }
                 }
+                console.trace(url);
                 let modalElement = document.getElementById('quick-look-modal');
                 let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
                 let iframe = document.getElementById('quick-look-iframe');
@@ -503,14 +507,18 @@
 <script type="text/javascript">
     window.loadQuickLook = (url, title) => {
 
-        console.trace(url);
-
         let params = new URLSearchParams({
             lifestyle: 1
         });
         if (url.indexOf('lifestyle=1') == -1) {
-            url = `${url}?${params.toString()}`;
+            if (url.indexOf('?') == -1) {
+                url = `${url}?${params.toString()}`;
+            } else {
+                url = `${url}&${params.toString()}`;
+            }
         }
+
+        console.trace(url);
 
         let modalElement = document.getElementById('quick-look-modal');
         let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
