@@ -49,3 +49,7 @@ ko.components.register('mdc-checkbox-component', {
 ko.components.register('mdc-file-field-component', {
     template: { element: document.getElementById('mdc-file-field-component') }
 });
+
+ko.components.register('tempus-dominus-date-picker-component', {
+    template: { element: document.getElementById('tempus-dominus-datetimepicker-template') }
+});

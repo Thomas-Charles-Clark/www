@@ -122,6 +122,10 @@ namespace wwwDesignersGuild
                 .Include($"{cssPrefix}/lib/kendo/dist-datepicker/datepicker{cssSuffix}", cssTransforms)
                 );
 
+            bundles.Add(new StyleBundle("~/bundles/css/tempus-dominus")
+                .Include($"{cssPrefix}/lib/tempus-dominus/tempus-dominus{cssSuffix}", cssTransforms)
+                );
+
             bundles.Add(new StyleBundle("~/bundles/css/material")
                 .Include($"{cssPrefix}/lib/material/dist/material-components-web{cssSuffix}", cssTransforms)
             );
@@ -287,7 +291,14 @@ namespace wwwDesignersGuild
                 .Include($"{jsPrefix}/lib/kendo/dist-datepicker/kendo.popup{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/lib/kendo/dist-datepicker/kendo.datepicker{jsSuffix}", sourceMapTransform)
                 .Include($"{jsPrefix}/lib/knockout/dist/knockout-kendo{jsSuffix}", sourceMapTransform));
-                
+
+            bundles.Add(new ScriptBundle("~/bundles/js/tempus-dominus")
+                .Include($"{jsPrefix}/lib/popper-2.11.6/popper-2.11.6{jsSuffix}", sourceMapTransform)
+                .Include($"{jsPrefix}/lib/tempus-dominus/tempus-dominus{jsSuffix}", sourceMapTransform)
+                .Include($"{jsPrefix}/lib/tempus-dominus/custom-date-format{jsSuffix}", sourceMapTransform)
+                .Include($"{jsPrefix}/lib/tempus-dominus/tempus-dominus-knockout{jsSuffix}", sourceMapTransform)
+            );
+
             bundles.Add(new ScriptBundle("~/bundles/js/ko-components")
                 .Include($"{jsPrefix}/lib/knockout/custom/knockout-components{jsSuffix}", sourceMapTransform));
 

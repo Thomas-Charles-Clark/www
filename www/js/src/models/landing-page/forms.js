@@ -1,4 +1,48 @@
-﻿const formViewModel = ((pageSection) => {
+﻿const appointmentTimes = [{
+    label: '10:00',
+    value: '10:00'
+}, {
+    label: '10:30',
+    value: '10:30'
+}, {
+    label: '11:00',
+    value: '11:00'
+}, {
+    label: '11:30',
+    value: '11:30'
+}, {
+    label: '12:00',
+    value: '12:00'
+}, {
+    label: '12:30',
+    value: '12:30'
+}, {
+    label: '13:00',
+    value: '13:00'
+}, {
+    label: '13:30',
+    value: '13:30'
+}, {
+    label: '14:00',
+    value: '14:00'
+}, {
+    label: '14:30',
+    value: '14:30'
+}, {
+    label: '15:00',
+    value: '15:00'
+}, {
+    label: '15:30',
+    value: '15:30'
+}, {
+    label: '16:00',
+    value: '16:00'
+}, {
+    label: '16:30',
+    value: '16:30'
+}]
+
+const formViewModel = ((pageSection) => {
     let self = {
         parent: pageSection,
         resources: pageSection.resources
@@ -349,7 +393,8 @@
     self.appointmentDateFocus = ko.observable(false);
 
     let minDate = new Date();
-    minDate.setDate(minDate.getDate() - 1);
+
+    minDate.setDate(minDate.getDate() + 3);
 
     self.appointmentDatePicker = {
         widget: ko.observable(),
@@ -360,9 +405,67 @@
             self.appointmentDatePicker.widget().value(null);
             self.appointmentDatePicker.widget().trigger('change');
         },
-        minDate: minDate,
-        disableDates: ['su', 'mo']
+        min: minDate,
+        disableDates: ['su']
     };
+
+    let threeDaysMilliseconds = 1000 * 60 * 60 * 24 * 3;
+
+    self.appointmentDateParams = {
+        label: self.resources.FormsNotes, // actually reads "Preferred Date"
+        observable: self.appointmentDate,
+        originalValue: ko.observable(),
+        displayObservable: ko.observable(),
+        dateTimePickerOptions: {
+            localization: {
+                locale: 'en-GB',
+                format: 'dd/MM/yyyy'
+            },
+            display: {
+                sideBySide: false,
+                components: {
+                    clock: false,
+                    calendar: true,
+                    date: true,
+                    month: true,
+                    year: true,
+                    decades: false,
+                    clock: false,
+                    hours: false,
+                    minutes: false,
+                    seconds: false
+                },
+                viewMode: 'calendar',
+                cellSize: '2.5rem',
+                icons: {
+                    previous: 'bi bi-chevron-left',
+                    next: 'bi bi-chevron-right',
+                }
+            },
+            restrictions: {
+                minDate: new Date(new Date().getTime() + threeDaysMilliseconds)
+            },
+            allowInputToggle: true,
+            useCurrent: false,
+            keepInvalid: true,
+            debug: false
+        },
+        showClear: true,
+        clearFunction: () => {
+            self.appointmentDate(undefined);
+            self.appointmentDateParams.observable.tempusDominus.clear();
+            self.appointmentDateParams.observable.tempusDominus.updateOptions({
+                display: {
+                    viewMode: 'months'
+                }
+            })
+        },
+        disabled: false,
+        showCalendarButton: true,
+        useNativeValidation: false,
+        insertValidationMessages: false,
+        decorateInputElement: true
+    }
 
     self.appointmentLocation = ko.observable(self.sourceId() == 71 ? 'Kings Road' : undefined).extend({
         postable: true,

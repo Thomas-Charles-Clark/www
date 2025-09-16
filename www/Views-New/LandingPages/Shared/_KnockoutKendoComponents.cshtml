@@ -241,11 +241,11 @@
                 <div class="pca-search-result">
                     <div class="display-block address-block">
                         @*<!-- ko if: deliveryReference() -->
-                        <label class="delivery-reference-display mb-3">
-                            @HtmlHelperExtra.Resource("DeliveryReference", l, c, d):
-                            <span data-bind="text: deliveryReference"></span>
-                        </label>
-                        <!-- /ko -->*@
+                            <label class="delivery-reference-display mb-3">
+                                @HtmlHelperExtra.Resource("DeliveryReference", l, c, d):
+                                <span data-bind="text: deliveryReference"></span>
+                            </label>
+                            <!-- /ko -->*@
                         <!-- ko if: companyName.observable() -->
                         <label class="mb-3" data-bind="text: companyName.observable()"></label>
                         <!-- /ko -->
@@ -633,6 +633,63 @@
             <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
             <!-- /ko -->
         </div>
+    </div>
+</script>
+
+<script id="tempus-dominus-datetimepicker-template" type="text/html">
+    <div class="mdc-validating-field" data-bind="visible: $data.hasOwnProperty('visible') ? $data.visible : true">
+        <div class="mdc-text-field mdc-text-field--outlined pe-0" data-bind="
+                 mdcTextFieldComponent: {
+                    boundTo: observable,
+                    useNativeValidation: useNativeValidation,
+                    label: typeof label === 'undefined' ? null : label
+                 },
+                 validationOptions: {
+                    insertMessages: insertValidationMessages,
+                    decorateInputElement: decorateInputElement
+                 },
+                 css: {
+                    'busy': typeof busy === 'undefined' ? false : busy,
+                    'mdc-text-field--disabled': typeof disabled == 'undefined' ? false : disabled,
+                    'date-select--selected': observable() || observable() === 0 || observable() === false
+                 }">
+            <div class="tempus-dominus-wrapper">
+                <input type="text" class="mdc-text-field__input" data-bind="
+                        tempusDominus: observable,
+                        dateTimePickerOptions: dateTimePickerOptions
+                        keepElement: observable,
+                        value: displayObservable,
+                        attr: {
+                           'readonly': typeof readOnly === 'undefined' ? false : readOnly,
+                           'disabled': typeof disabled === 'undefined' ? false : disabled
+                        },
+                        css: {
+                            'busy': typeof busy === 'undefined' ? false : busy
+                        },
+                        click: function (data, event) { event.preventDefault(); return false; },
+                        clickBubble: false" />
+                <!-- ko if: Object.hasOwn($data, 'showCalendarButton') -->
+                <button type="button" class="btn tempus-dominus-calendar-btn"
+                        data-bind="disabled: typeof disabled === 'undefined' ? false : disabled, click: (data, event) => { if (ko.unwrap(disabled) == true) { return false; } else { observable.tempusDominus.toggle(); return false; } }, clickBubble: false">
+                    <i class="bi bi-calendar"></i>
+                </button>
+                <!-- /ko -->
+            </div>
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <!-- ko if: typeof label != 'undefined' -->
+                <div class="mdc-notched-outline__notch">
+                    <label for="input" class="mdc-floating-label">
+                        <span data-bind="text: label"></span>
+                    </label>
+                </div>
+                <!-- /ko -->
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <!-- ko if: typeof showClear != 'undefined' && showClear && typeof clearFunction === 'function' -->
+        <div class="btn-close" data-bind="click: clearFunction, css: { 'disabled':  typeof disabled == 'undefined' ? false : disabled }"></div>
+        <!-- /ko -->
     </div>
 </script>
 

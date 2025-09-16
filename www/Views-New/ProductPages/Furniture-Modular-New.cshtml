@@ -26,7 +26,7 @@
 }
 @Html.Partial("~/Views-New/ProductPages/Shared/_Templates.cshtml")
 <div id="ko-wrapper">
-    @if (Model.Definition.Banners?.Where(b => b.BannerLocationID == 71).Any() == true)
+    @if ((Model.IsLifestyle == false) && (Model.Definition.Banners?.Where(b => b.BannerLocationID == 71).Any() == true))
     {
         var banner = Model.Definition.Banners.Where(b => b.BannerLocationID == 71).First();
 

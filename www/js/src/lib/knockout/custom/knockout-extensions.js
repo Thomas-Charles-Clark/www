@@ -1828,3 +1828,14 @@ ko.bindingHandlers.flexFadeVisible = {
         }
     }
 }
+
+ko.validation.rules['validTempusDominusDate'] = {
+    validator: function (val) {
+
+        let value = ko.unwrap(val);
+
+        return moment.isDate(value);
+    },
+    message: 'Invalid Date'
+};
+ko.validation.addExtender('validTempusDominusDate');

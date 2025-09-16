@@ -177,11 +177,12 @@
                 </select>
                 <span id="appointment-type-error" class="validation-message" data-bind="validationMessage: appointmentTypeId"></span>
             </div>
+            <div class="mb-3" data-bind="validationOptions: { insertMessages: false }">
+                <div data-bind="component: { name: 'tempus-dominus-date-picker-component', params: appointmentDateParams }"></div>
+                <span id="store-event-date-error" class="validation-message" data-bind="validationMessage: appointmentDate"></span>
+            </div>
             <div class="mb-3"
                  data-bind="validationOptions: { insertMessages: false }">
-                <label for="appointment-time" class="form-label">
-                    @HtmlHelperExtra.Resource("FormsPreferredTime", l, c, d)
-                </label>
                 <select id="appointment-time"
                         name="appointment-time"
                         class="form-select"
@@ -192,7 +193,7 @@
                                     'aria-invalid': !appointmentTime.isValid()
                                    }">
                     <option value="" selected>
-                        @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
+                        @HtmlHelperExtra.Resource("FormsPreferredTime", l, c, d)
                     </option>
                     <option value="10:00">10:00</option>
                     <option value="10:30">10:30</option>
@@ -212,52 +213,6 @@
                 </select>
                 <span id="appointment-time-error" class="validation-message" data-bind="validationMessage: appointmentTime"></span>
             </div>
-            <div class="mb-3"
-                 data-bind="validationOptions: { insertMessages: false }">
-                <label for="appointment-date" class="form-label">
-                    @HtmlHelperExtra.Resource("FormsNotes", l, c, d) @* Actually reads Preferred Date *@
-                </label>
-                <div>
-                    <input id="appointment-date"
-                           name="appointment-date"
-                           class="date-picker form-control"
-                           aria-errormessage="appointment-date-error"
-                           data-bind="keepElement: appointmentDate,
-                                      hasFocus: appointmentDateFocus,
-                                      kendoDatePicker: appointmentDatePicker,
-                                      attr: {
-                                         'aria-invalid': !appointmentDate.isValid()
-                                      }"
-                           placeholder="DD/MM/YYYY" />
-                    <label class="date-clear" data-bind="click: function () { appointmentDatePicker.clear(); }">
-                        &times;
-                    </label>
-                </div>
-                <span id="store-event-date-error" class="validation-message" data-bind="validationMessage: appointmentDate"></span>
-            </div>
-            @*<div class="mb-3"
-                 data-bind="validationOptions: { insertMessages: false }">
-                <label for="appointment-location" class="form-label">
-                    @HtmlHelperExtra.Resource("FormsPreferredShop", l, c, d)
-                </label>
-                <select id="appointment-location"
-                        name="appointment-location"
-                        class="form-select"
-                        aria-errormessage="appointment-location-error"
-                        data-bind="keepElement: appointmentLocation,
-                                   value: appointmentLocation,
-                                   attr: {
-                                    'aria-invalid': !appointmentLocation.isValid()
-                                   }">
-                    <option value="">
-                        @HtmlHelperExtra.Resource("PleaseSelect", l, c, d)
-                    </option>
-                    <option value="Kings Road" selected>
-                        King's Road
-                    </option>
-                </select>
-                <span id="appointment-location-error" class="validation-message" data-bind="validationMessage: appointmentLocation"></span>
-            </div>*@
             <div class="mb-3"
                  data-bind="validationOptions: { insertMessages: false }">
                 <label for="appointment-comments" class="form-label">

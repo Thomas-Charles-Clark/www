@@ -2252,6 +2252,8 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="css\dist\common\trade-common.css" />
     <Content Include="css\dist\common\trade-common.min.css" />
+    <Content Include="css\dist\lib\tempus-dominus\tempus-dominus.css" />
+    <Content Include="css\dist\lib\tempus-dominus\tempus-dominus.min.css" />
     <Content Include="css\dist\models\furniture-modular-mobile-new.css" />
     <Content Include="css\dist\models\furniture-modular-mobile-new.min.css" />
     <Content Include="css\dist\models\furniture-modular-new.css" />
@@ -2860,6 +2862,10 @@
     <Content Include="js\src\lib\linq\dist\linq.js" />
     <Content Include="js\src\lib\material\dist\material-components-web.js" />
     <Content Include="js\src\lib\moment\dist\moment-with-locales.js" />
+    <Content Include="js\src\lib\popper-2.11.6\popper-2.11.6.js" />
+    <Content Include="js\src\lib\tempus-dominus\custom-date-format.js" />
+    <Content Include="js\src\lib\tempus-dominus\tempus-dominus-knockout.js" />
+    <Content Include="js\src\lib\tempus-dominus\tempus-dominus.js" />
     <Content Include="js\src\models\article-page\article-page.js" />
     <Content Include="js\src\models\basket-page\basket-item.js" />
     <Content Include="js\src\models\basket-page\basket-page.js" />
@@ -2966,6 +2972,14 @@
     <Content Include="css\dist\models\unsubscribe-mobile.min.css.map" />
     <Content Include="css\dist\models\unsubscribe.css.map" />
     <Content Include="css\dist\models\unsubscribe.min.css.map" />
+    <Content Include="css\src\lib\tempus-dominus\tempus-dominus.scss" />
+    <Content Include="css\src\lib\tempus-dominus\_variables.scss" />
+    <Content Include="css\dist\lib\tempus-dominus\tempus-dominus.css.map" />
+    <Content Include="css\dist\lib\tempus-dominus\tempus-dominus.min.css.map" />
+    <Content Include="js\dist\lib\popper-2.11.6\popper-2.11.6.min.js.map" />
+    <Content Include="js\dist\lib\tempus-dominus\custom-date-format.min.js.map" />
+    <Content Include="js\dist\lib\tempus-dominus\tempus-dominus-knockout.min.js.map" />
+    <Content Include="js\dist\lib\tempus-dominus\tempus-dominus.min.js.map" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />

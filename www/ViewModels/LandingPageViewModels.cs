@@ -1608,7 +1608,9 @@ namespace wwwDesignersGuild.ViewModels
                     "SearchForAddress",
                     "FormsCountry",
                     "Sorry",
-                    "PleaseTryAgain"
+                    "PleaseTryAgain",
+                    "FormsNotes", // actually reads "Preferred Date"
+                    "FormsPreferredTime"
                 });
             }
 

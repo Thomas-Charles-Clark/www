@@ -14,6 +14,7 @@
         if (Model.RequiresKendoDatePicker)
         {
             @Render.StylesPreload("~/bundles/css/kendo-datepicker")
+            @Render.StylesPreload("~/bundles/css/tempus-dominus")
         }
         @Render.StylesPreload("~/bundles/css/forms")
     }
@@ -28,6 +29,7 @@
         if (Model.RequiresKendoDatePicker)
         {
             @Render.Script("~/bundles/js/kendo-datepicker")
+            @Render.Script("~/bundles/js/tempus-dominus")
         }
     }
 
@@ -504,37 +506,37 @@
         var dateOverride = Request.QueryString["dateOverride"];
         var countryOverride = Request.QueryString["countryOverride"];
 
-<script type="text/javascript">
-    window.loadQuickLook = (url, title) => {
+        <script type="text/javascript">
+            window.loadQuickLook = (url, title) => {
 
-        let params = new URLSearchParams({
-            lifestyle: 1
-        });
-        if (url.indexOf('lifestyle=1') == -1) {
-            if (url.indexOf('?') == -1) {
-                url = `${url}?${params.toString()}`;
-            } else {
-                url = `${url}&${params.toString()}`;
+                let params = new URLSearchParams({
+                    lifestyle: 1
+                });
+                if (url.indexOf('lifestyle=1') == -1) {
+                    if (url.indexOf('?') == -1) {
+                        url = `${url}?${params.toString()}`;
+                    } else {
+                        url = `${url}&${params.toString()}`;
+                    }
+                }
+
+                console.trace(url);
+
+                let modalElement = document.getElementById('quick-look-modal');
+                let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                let iframe = document.getElementById('quick-look-iframe');
+                iframe.remove();
+                iframe = document.createElement('iframe');
+                iframe.id = 'quick-look-iframe';
+                iframe.src = url;
+                iframe.addEventListener('load', window.quickLookUnbusy);
+                modalElement.querySelector('.modal-body').appendChild(iframe);
+                window.quickLookBusy();
+                window.setTimeout(() => {
+                    modal.show();
+                }, 0);
             }
-        }
-
-        console.trace(url);
-
-        let modalElement = document.getElementById('quick-look-modal');
-        let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        let iframe = document.getElementById('quick-look-iframe');
-        iframe.remove();
-        iframe = document.createElement('iframe');
-        iframe.id = 'quick-look-iframe';
-        iframe.src = url;
-        iframe.addEventListener('load', window.quickLookUnbusy);
-        modalElement.querySelector('.modal-body').appendChild(iframe);
-        window.quickLookBusy();
-        window.setTimeout(() => {
-            modal.show();
-        }, 0);
-    }
-</script>
+        </script>
     }
     <script type="text/javascript">
         window.quickLookBusy = () => {
