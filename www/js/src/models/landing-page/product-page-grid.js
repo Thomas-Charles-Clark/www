@@ -83,7 +83,7 @@
 
     self.productTypeTextPlural = ko.observable();
 
-    self.originalTitle = ko.observable();
+    self.originalTitle = ko.observable(getFilterIndexingTitle());
 
     self.attributeSignatures = null;
 
@@ -180,7 +180,10 @@
                         });
                     }
 
-                    document.title = `${filterText} ${productTypeTextPlural} | Designers Guild`;
+                    // self.originalTitle will only ever be filled by FilterIndexCombination_Language if at all.
+                    if (!self.originalTitle()) {
+                        document.title = `${filterText} ${productTypeTextPlural} | Designers Guild`;
+                    }
 
                     self.allProductPages().forEach(pp => {
                         if (typeof pp === 'object') {

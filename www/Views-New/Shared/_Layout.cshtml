@@ -52,6 +52,19 @@
         }
     }
 
+    <script type="text/javascript">
+        window.getFilterIndexingTitle = () => {
+            @if (!String.IsNullOrEmpty(Model.FilterIndexingTitleTag))
+            {
+                @:return '@(Model.FilterIndexingTitleTag)';
+            }
+            else
+            {
+                @:return undefined;
+            }
+        }
+    </script>
+
     <!-- #region CSS Libraries -->
     @if (!dgFramework.IsMobileDevice())
     {

@@ -443,7 +443,8 @@ const formViewModel = ((pageSection) => {
                 }
             },
             restrictions: {
-                minDate: new Date(new Date().getTime() + threeDaysMilliseconds)
+                minDate: new Date(new Date().getTime() + threeDaysMilliseconds),
+                daysOfWeekDisabled: [0]
             },
             allowInputToggle: true,
             useCurrent: false,

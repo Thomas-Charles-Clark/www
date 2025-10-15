@@ -2176,6 +2176,11 @@ namespace wwwDesignersGuild.ViewModels
                 model.AttributeSignatureText = HtmlHelperExtra.ProcessHTMLImages(model.AttributeSignatureText, null, new long[] { }, new ImageHotspot[] { }, model);
             }
 
+            if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
+            {
+                model.FilterIndexingTitleTag = filterIndexCombination.TitleTag;
+            }
+
             if (attributesList.Any())
             {
                 result.MasterDefinition.GoogleHrefs = new databaseDataContext().Page_Hreflang_GenerateMultiple(model.ContentID, model.Date, JsonConvert.SerializeObject(attributesList.Select(al => new { id = al.AttributeID }).ToList())).ToList().ToList();
@@ -2197,43 +2202,69 @@ namespace wwwDesignersGuild.ViewModels
 
             if (result.FilterIndexingEnabled)
             {
+                if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
+                {
+                    result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} | Designers Guild";
+                }
+
+                if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
+                {
+                    result.MasterDefinition.MetaDescription = filterIndexCombination.MetaDescription;
+                }
+
                 if (!String.IsNullOrEmpty(model.AttributeFilterText))
                 {
-                    if (!String.IsNullOrEmpty(model.CategoryPageProductType?.NamePlural))
+                    if (String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
                     {
-                        result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {model.CategoryPageProductType.NamePlural} | Designers Guild";
-                    }
-                    else
-                    {
-                        result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {result.MasterDefinition.TitleTag}";
-                    }
-
-                    result.MasterDefinition.MetaDescription = HtmlHelperExtra.ProcessAttributeFilterText(
-                        input: result.MasterDefinition.MetaDescription ?? "",
-                        attributeFilterText: model.AttributeFilterText,
-                        productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
-                        attributeSignatureText: model.AttributeSignatureText,
-                        enabledByAttributeCombination: model.FilterIndexCombinationEnabled,
-                        useHtml: false);
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
-
-                    completeResultSet.ForEach(crs => 
-                    {
-                        if (!String.IsNullOrEmpty(crs.ShortHeading)) 
+                        if (!String.IsNullOrEmpty(model.CategoryPageProductType?.NamePlural))
                         {
-                            crs.Heading = $"{crs.ShortHeading} {model.AttributeFilterText} {crs.ProductType.Name}";
+                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {model.CategoryPageProductType.NamePlural} | Designers Guild";
                         }
-                    });
+                        else
+                        {
+                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {result.MasterDefinition.TitleTag}";
+                        }
+                    }
+
+if (String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
+{
+    result.MasterDefinition.MetaDescription = HtmlHelperExtra.ProcessAttributeFilterText(
+        input: result.MasterDefinition.MetaDescription ?? "",
+        attributeFilterText: model.AttributeFilterText,
+        productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
+        attributeSignatureText: model.AttributeSignatureText,
+        enabledByAttributeCombination: model.FilterIndexCombinationEnabled,
+        useHtml: false);
+
+    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
+
+    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+
+    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
+
+    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+
+    completeResultSet.ForEach(crs =>
+    {
+        if (!String.IsNullOrEmpty(crs.ShortHeading))
+        {
+            crs.Heading = $"{crs.ShortHeading} {model.AttributeFilterText} {crs.ProductType.Name}";
+        }
+    });
+}
                 }
                 else
                 {
+                    if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
+                    {
+                        result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} | Designers Guild";
+                    }
+
+                    if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
+                    {
+                        result.MasterDefinition.MetaDescription = filterIndexCombination.MetaDescription;
+                    }
+
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeStart}", "");
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeEnd}", "");
                     result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterStart}", "");

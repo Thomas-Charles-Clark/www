@@ -38,6 +38,7 @@ namespace wwwDesignersGuild.ViewModels
         public bool NoFollow { get; set; }
         public bool NoIndex { get; set; }
         public string CustomCanonical { get; set; }
+        public string FilterIndexingTitleTag { get; set; } // this comes from dbo.FilterIndexCombination_Language
         public string AttributeFilterText { get; set; } // this comes from dbo.FilterIndexCombination_Language
         public string AttributeSignatureText { get; set; } // this comes from dbo.FilterIndexCombination_Language
         public bool FilterIndexCombinationEnabled { get; set; } // this is true only if a matching record exists from FilterIndexCombination_Select

@@ -20,6 +20,8 @@ namespace wwwDesignersGuild.Models
         public string AttributeSignature { get; set; }
         public string AttributeDescription { get; set; }
         public string FooterText { get; set; }
+        public string TitleTag { get; set; }
+        public string MetaDescription { get; set; }
         public bool Enabled { get; set; }
     }
 
