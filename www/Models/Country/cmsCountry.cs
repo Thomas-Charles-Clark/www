@@ -31,7 +31,7 @@ namespace wwwDesignersGuild.Models.Country
 
             if (countryStore == null)
             {
-                countryStore = await Task.FromResult<cmsCountryDefinition>(countryLanguageSelectAsync(contentDate));
+                countryStore = await Task.FromResult(countryLanguageSelectAsync(contentDate));
                 objCountryCache.Set(countryStore);
             }
 
@@ -52,9 +52,9 @@ namespace wwwDesignersGuild.Models.Country
             //  Convert from IEnumerable to a List so a collection query can be run multiple times
             cmsCountryDefinition countryStore = new cmsCountryDefinition
             {
-                countryRegions = results.GetResult<countryRegion>().ToList<countryRegion>(),
-                countryItems = results.GetResult<countryItem>().ToList<countryItem>(),
-                countryTradePriceLists = results.GetResult<countryTradePriceList>().ToList<countryTradePriceList>()
+                countryRegions = results.GetResult<countryRegion>().ToList(),
+                countryItems = results.GetResult<countryItem>().ToList(),
+                countryTradePriceLists = results.GetResult<countryTradePriceList>().ToList()
             };
 
 

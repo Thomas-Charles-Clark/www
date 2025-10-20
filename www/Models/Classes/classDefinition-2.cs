@@ -75,6 +75,7 @@ namespace wwwDesignersGuild.Models.Classes
         public bool BuyOnlineRedirectAllowed { get; set; }
         public bool EcommerceEnabled { get; set; }
         public bool SamplesEnabled { get; set; }
+        public string TitleTagSuffix { get; set; }
     }
 
     public class countryTradePriceList

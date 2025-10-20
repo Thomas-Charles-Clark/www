@@ -236,6 +236,7 @@ namespace wwwDesignersGuild.ViewModels
         }
 
         // This sucks but is temporarily necessary to get the mobile menu updated throughout
+        [Obsolete("Unsure if this is ever called anywhere 20/10/2025")]
         public BaseViewModel(masterDefinition objMaster)
         {
             MasterDefinition = NewMasterDefinition.Create(objMaster.TitleTag,

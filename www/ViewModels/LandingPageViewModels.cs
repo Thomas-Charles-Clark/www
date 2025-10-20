@@ -211,7 +211,7 @@ namespace wwwDesignersGuild.ViewModels
 
             var page = Definition.PageDetails;
 
-            MasterDefinition.TitleTag = page.TitleTag;
+            MasterDefinition.TitleTag = $"{page.TitleTag} {MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
 
             MasterDefinition.MetaDescription = page.MetaDescription;
 
@@ -2204,7 +2204,7 @@ namespace wwwDesignersGuild.ViewModels
             {
                 if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
                 {
-                    result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} | Designers Guild";
+                    result.MasterDefinition.TitleTag = filterIndexCombination.TitleTag;
                 }
 
                 if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
@@ -2218,11 +2218,11 @@ namespace wwwDesignersGuild.ViewModels
                     {
                         if (!String.IsNullOrEmpty(model.CategoryPageProductType?.NamePlural))
                         {
-                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {model.CategoryPageProductType.NamePlural} | Designers Guild";
+                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {model.CategoryPageProductType.NamePlural} {result.MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
                         }
                         else
                         {
-                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {result.MasterDefinition.TitleTag}";
+                            result.MasterDefinition.TitleTag = $"{model.AttributeFilterText} {result.MasterDefinition.TitleTag} {result.MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
                         }
                     }
 
@@ -2257,7 +2257,7 @@ if (String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
                 {
                     if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
                     {
-                        result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} | Designers Guild";
+                        result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} {result.MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
                     }
 
                     if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))

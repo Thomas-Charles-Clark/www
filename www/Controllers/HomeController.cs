@@ -1044,7 +1044,7 @@ namespace wwwDesignersGuild.Controllers
                 }
                 else
                 {
-                    collectionModel.MasterDefinition.TitleTag = collectionModel.Definition.CollectionDetails.TitleTag;
+                    collectionModel.MasterDefinition.TitleTag = $"{collectionModel.Definition.CollectionDetails.TitleTag} {urlData.countryDetails.TitleTagSuffix}";
                     collectionModel.MasterDefinition.MetaDescription = collectionModel.Definition.CollectionDetails.MetaDescription;
                     collectionModel.MasterDefinition.GoogleHrefs = collectionModel.Definition.collectionGoogleHrefs;
                 }
@@ -1181,7 +1181,7 @@ namespace wwwDesignersGuild.Controllers
                         (
                             redirectUrl: objProductData.objUnavailabilityRedirect.redirectUrl,
                             objMaster: await NewMasterDefinition.CreateAsync(
-                                titleTag: objProductData.objCacheSelect?.titleTag,
+                                titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                 metaDescription: objProductData.objCacheSelect?.metaDescription,
                                 backInStockReminder: (int?)Session["backInStockReminder"],
                                 itemsInBasket: basketTotalData.TotalQuantity,
@@ -1205,7 +1205,7 @@ namespace wwwDesignersGuild.Controllers
                         var fabricWallpaperModel = await ProductPageViewModel_FabricWallpaper.CreateAsync
                         (
                             objMaster: await NewMasterDefinition.CreateAsync(
-                                titleTag: objProductData.objCacheSelect.titleTag,
+                                titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                 metaDescription: objProductData.objCacheSelect.metaDescription,
                                 backInStockReminder: (int?)Session["backInStockReminder"],
                                 itemsInBasket: basketTotalData.TotalQuantity,
@@ -1226,7 +1226,7 @@ namespace wwwDesignersGuild.Controllers
                         var shopModel = await ProductPageViewModel_Standard.CreateAsync
                             (
                                 objMaster: await NewMasterDefinition.CreateAsync(
-                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                     metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
@@ -1247,7 +1247,7 @@ namespace wwwDesignersGuild.Controllers
                         var furnitureModel = await ProductPageViewModel_Furniture_Wholesale.CreateAsync
                             (
                                 objMaster: await NewMasterDefinition.CreateAsync(
-                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                     metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
@@ -1268,7 +1268,7 @@ namespace wwwDesignersGuild.Controllers
                         var modularModel = await ProductPageViewModel_Furniture_Modular.CreateAsync
                             (
                                 objMaster: await NewMasterDefinition.CreateAsync(
-                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                     metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
@@ -1289,7 +1289,7 @@ namespace wwwDesignersGuild.Controllers
                         var consolidatedOrderFormViewModel = await ProductPageViewModel_Standard.CreateAsync
                             (
                                 objMaster: await NewMasterDefinition.CreateAsync(
-                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                     metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
@@ -1314,7 +1314,7 @@ namespace wwwDesignersGuild.Controllers
                         var paintModel = await ProductPageViewModel_Paint.CreateAsync
                         (
                             objMaster: await NewMasterDefinition.CreateAsync(
-                                titleTag: objProductData.objCacheSelect.titleTag,
+                                titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                 metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                 itemsInBasket: basketTotalData.TotalQuantity,
@@ -1335,7 +1335,7 @@ namespace wwwDesignersGuild.Controllers
                         var modularModelNew = await ProductPageViewModel_Furniture_Modular.CreateAsync
                             (
                                 objMaster: await NewMasterDefinition.CreateAsync(
-                                    titleTag: objProductData.objCacheSelect.titleTag,
+                                    titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                     metaDescription: objProductData.objCacheSelect.metaDescription,
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
@@ -1406,7 +1406,7 @@ namespace wwwDesignersGuild.Controllers
                 var articleViewModel = await ArticleViewModel.CreateAsync
                 (
                     objMaster: await NewMasterDefinition.CreateAsync(
-                        titleTag: objArticleData.ArticleDetails.TitleTag,
+                        titleTag: $"{objArticleData.ArticleDetails.TitleTag} {urlData.countryDetails.TitleTagSuffix}",
                         metaDescription: objArticleData.ArticleDetails.MetaDescription,
                         backInStockReminder: (int?)Session["backInStockReminder"],
                         itemsInBasket: basketTotalData.TotalQuantity,

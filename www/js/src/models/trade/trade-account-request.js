@@ -1470,7 +1470,7 @@
             self.deliveryAddress.isValid() &&
             self.visitAddress.isValid()) {
             if (!self.ignoreWarning()) {
-                if (!self.companyRegistration() || !self.companyVATNumber() || !self.companyEORINumber() || !self.website()) {
+                if (!self.companyRegistration() || !self.companyVATNumber() || (getCountryId() != 238 && !self.companyEORINumber()) || !self.website()) {
                     bootstrap.Modal.getOrCreateInstance(self.warningModalElement).show();
                     return;
                 }
