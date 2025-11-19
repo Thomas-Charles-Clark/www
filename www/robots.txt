@@ -1,5 +1,9 @@
 User-agent: *
 crawl-delay: 1
+User-agent: Googlebot
+Allow: /
+User-agent: Googlebot-image
+Allow: /
 Sitemap: https://www.designersguild.com/sitemap-index.xml
 Disallow: */l75$	# Search
 Disallow: */l76$ # ServerSearch
@@ -42,4 +46,5 @@ Disallow: */api/* # do not crawl our API endpoints
 Disallow: */ni/* # do not crawl our non-index endpoints
 Disallow: *?*redirect=* # do not index queryString parameter "redirect"
 Disallow: *?*productCode=* # do not index queryString parameter "productCode"
-Disallow: *?*dateOverride=* # do not index queryString parameter "dateOverride" 
+Disallow: *?*dateOverride=* # do not index queryString parameter "dateOverride"
+Allow: */p*?productCode=* # explicitly allow indexing of product pages arrived at via a specific product code

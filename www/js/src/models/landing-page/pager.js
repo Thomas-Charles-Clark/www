@@ -15,15 +15,17 @@
             self.page(self.pageCount());
             return;
         }
-        let koWrapper = document.querySelector('.page-section-grid-nav');
-        if (koWrapper && koWrapper.offsetTop < window.scrollY) {
-            console.log('pager.page.subscribe scrolling to ', koWrapper.offsetTop)
-            window.scrollTo({
-                top: koWrapper.offsetTop,
-                left: 0,
-                behavior: 'smooth'
-            });
-        }
+        window.setTimeout(() => {
+            let koWrapper = document.querySelector('.page-section-grid-nav');
+            if (koWrapper && koWrapper.offsetTop < window.scrollY) {
+                console.log('pager.page.subscribe scrolling to ', koWrapper.offsetTop)
+                window.scrollTo({
+                    top: koWrapper.offsetTop,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
     })
 
     self.pageSize.subscribe(nv => {

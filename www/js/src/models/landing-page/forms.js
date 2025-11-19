@@ -935,6 +935,10 @@ const formViewModel = ((pageSection) => {
                         window.scrollTo(0, document.querySelector('#form-wrapper').offsetTop);
 
                         self.mustResubscribe(false);
+
+                        if (getContentId() == '1997' && typeof fbq === 'function') {
+                            fbq('track', 'CompleteRegistration');
+                        }
                     }
                     else
                         showError();
