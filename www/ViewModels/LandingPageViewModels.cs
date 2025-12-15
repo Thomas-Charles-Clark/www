@@ -2226,55 +2226,52 @@ namespace wwwDesignersGuild.ViewModels
                         }
                     }
 
-if (String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
-{
-    result.MasterDefinition.MetaDescription = HtmlHelperExtra.ProcessAttributeFilterText(
-        input: result.MasterDefinition.MetaDescription ?? "",
-        attributeFilterText: model.AttributeFilterText,
-        productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
-        attributeSignatureText: model.AttributeSignatureText,
-        enabledByAttributeCombination: model.FilterIndexCombinationEnabled,
-        useHtml: false);
-
-    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
-
-    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
-
-    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
-
-    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
-
-    completeResultSet.ForEach(crs =>
-    {
-        if (!String.IsNullOrEmpty(crs.ShortHeading))
-        {
-            crs.Heading = $"{crs.ShortHeading} {model.AttributeFilterText} {crs.ProductType.Name}";
-        }
-    });
-}
-                }
-                else
-                {
-                    if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
+                    if (String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
                     {
-                        result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} {result.MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
+                        result.MasterDefinition.MetaDescription = HtmlHelperExtra.ProcessAttributeFilterText(
+                            input: result.MasterDefinition.MetaDescription ?? "",
+                            attributeFilterText: model.AttributeFilterText,
+                            productTypePluralPropercase: model.CategoryPageProductType?.NamePlural,
+                            attributeSignatureText: model.AttributeSignatureText,
+                            enabledByAttributeCombination: model.FilterIndexCombinationEnabled,
+                            useHtml: false);
+
+                        result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"filter-text\">", "");
+
+                        result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+
+                        result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("<span class=\"no-filter-text\">", "");
+
+                        result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("</span> ", "");
+
+                        completeResultSet.ForEach(crs =>
+                        {
+                            if (!String.IsNullOrEmpty(crs.ShortHeading))
+                            {
+                                crs.Heading = $"{crs.ShortHeading} {model.AttributeFilterText} {crs.ProductType.Name}";
+                            }
+                        });
                     }
-
-                    if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
-                    {
-                        result.MasterDefinition.MetaDescription = filterIndexCombination.MetaDescription;
-                    }
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterEnd}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterStart}", "");
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterEnd}", "");
-
-                    result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Trim();
                 }
-            }
+
+				if (!String.IsNullOrEmpty(filterIndexCombination?.TitleTag))
+				{
+					result.MasterDefinition.TitleTag = $"{filterIndexCombination.TitleTag} {result.MasterDefinition.UrlBreakdown.countryDetails.TitleTagSuffix}";
+				}
+
+				if (!String.IsNullOrEmpty(filterIndexCombination?.MetaDescription))
+				{
+					result.MasterDefinition.MetaDescription = filterIndexCombination.MetaDescription;
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeStart}", "");
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{ProductTypeEnd}", "");
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterStart}", "");
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{FilterEnd}", "");
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterStart}", "");
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Replace("{NoFilterEnd}", "");
+
+					result.MasterDefinition.MetaDescription = result.MasterDefinition.MetaDescription?.Trim();
+				}
+			}
 
             var overallSelection = result.AttributeGroups.Where(ag => ag.Selection.Any())
                 .SelectMany(ag => ag.Selection).Distinct().ToList();
