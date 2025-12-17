@@ -1,5 +1,4 @@
-﻿@model wwwDesignersGuild.Models.Trade.TradeAccountsInvoicesViewModel
-@using wwwDesignersGuild.Models.Classes;
+﻿@model wwwDesignersGuild.ViewModels.Trade.TradeAccountsInvoicesViewModel
 @using wwwDesignersGuild.Models.Helper;
 @{
     var objMaster = Model.BaseViewModel.MasterDefinition;
@@ -119,13 +118,13 @@ else
                 </ul>
                 <div class="tab-content">
                     <div id="account-balance" class="tab-pane fade @(firstTab == 0 ? "show active" : "")">
-                        <div class="page-blocker" data-bind="flexVisible: accountSummaryBusy, toggleOpacity: accountSummaryBusy">
+                        <div class="page-blocker" data-bind="flexVisible: accountBalanceBusy, toggleOpacity: accountBalanceBusy">
                             <div class="spinner-border"></div>
                             <h6>
                                 @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
                             </h6>
                         </div>
-                        <select class="value-display" data-bind="value: valueDisplay, visible: accountSummary().ColumnHeadings.length > 1">
+                        <select class="value-display" data-bind="value: valueDisplay, visible: accountBalance().length > 1">
                             <option value="0">
                                 @HtmlHelperExtra.Resource("Sterling", l, c, d)
                             </option>
@@ -135,85 +134,89 @@ else
                         </select>
                         <div id="account-summary-grid"
                              class="grid"
-                             data-bind="with: accountSummary">
+                             data-bind="with: accountBalance">
                             <div class="accounts-panel-inner">
-                                <ul class="undotted-list">
-                                    <li>
-                                        <h5 class="accounts-title">
-                                            @HtmlHelperExtra.Resource("AgeAnalysisByDocument", l, c, d)
-                                        </h5>
-                                        <h5 class="accounts-title" data-bind="text: ColumnHeadings[0]"></h5>
-                                    </li>
-                                    <!-- ko foreach: MonthsDocumentDate-->
-                                    <li>
-                                        <a href="javascript:;" data-bind="click: function () { $parentContext.$parent.accountSummaryDrilldown($parent.MonthsDocDateSelectionCriteria[$index()],
-                                            '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ByDocumentDate", l, c, d)) - ' + $data, 'DocumentNumber') }">
-                                            <span data-bind="text: $data"></span>
-                                            <!-- ko if: $index() == $parent.MonthsDocumentDate.length - 2 -->
-                                            *
-                                            <!-- /ko -->
-                                        </a>
-                                        <span data-bind="text: formatNumber($parent.AmountBaseDocDate[$index()], 2), css: { 'text-danger': $parent.AmountBaseDocDate[$index()] < 0 }"></span>
-                                    </li>
-                                    <!-- ko if: $index() == $parent.MonthsDocumentDate.length - 1 -->
-                                    <li>
-                                        @HtmlHelperExtra.Resource("SummaryTotal", l, c, d):
-                                        <span data-bind="text: formatNumber($parent.TotalBaseDoc, 2)"></span>
-                                    </li>
-                                    <!-- /ko -->
-                                    <!-- /ko -->
-                                </ul>
+								<ul class="undotted-list">
+									<li>
+										<h5 class="accounts-title">
+											@HtmlHelperExtra.Resource("AgeAnalysisByDocument", l, c, d)
+										</h5>
+										<h5 class="accounts-title" data-bind="text: CurrencyHeading"></h5>
+									</li>
+									<!-- ko foreach: RecordsByDocumentDate -->
+									<li>
+										<a href="javascript:;" data-bind="click: function () { $parentContext.$parent.accountBalanceDrilldown($data,
+                                            '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ByDocumentDate", l, c, d)) - ' + Label, 'DocumentNumber') }">
+											<span data-bind="text: Label"></span>
+											<!-- ko if: $index() == $parent.RecordsByDocumentDate.length - 1 -->
+											*
+											<!-- /ko -->
+										</a>
+										<span data-bind="text: formatNumber(Value, 2), css: { 'text-danger': Value < 0 }"></span>
+									</li>
+									<!-- /ko -->
+									<li>
+										<a href="javascript:;" data-bind="text: OnAccount.Label, click: function() { $parentContext.$parent.accountBalanceDrilldown(Object.assign({ OnAccount: true }, $data), OnAccount.Label, 'OnAccount')}"></a>
+										<span data-bind="text: formatNumber(OnAccount.Value, 2)"></span>
+									</li>
+									<li>
+										@HtmlHelperExtra.Resource("SummaryTotal", l, c, d):
+										<span data-bind="text: formatNumber(TotalByDocumentDate, 2)"></span>
+									</li>
+								</ul>
                                 <i>
                                     * @HtmlHelperExtra.Resource("IncludesPriorInvoices", l, c, d)
                                 </i>
                             </div>
                             <div class="accounts-panel-inner">
-                                <ul class="undotted-list">
-                                    <li>
-                                        <h5 class="accounts-title">
-                                            @HtmlHelperExtra.Resource("AgeAnalysisByDue", l, c, d)
-                                        </h5>
-                                        <h5 class="accounts-title" data-bind="text: ColumnHeadings[0]"></h5>
-                                    </li>
-                                    <!-- ko foreach: MonthsDueDate -->
-                                    <li>
-                                        <a href="javascript:;" data-bind="click: function () { $parentContext.$parent.accountSummaryDrilldown($parent.MonthsDueDateSelectionCriteria[$index()],
-                                            '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ByDueDate", l, c, d)) - ' + $data, 'DueDate') }">
-                                            <span data-bind="text: $data"></span>
-                                            <!-- ko if: $index() == 0 -->
-                                            *
-                                            <!-- /ko -->
-                                        </a>
-                                        <span data-bind="text: formatNumber($parent.AmountBaseDueDate[$index()], 2), css: { 'text-danger': $parent.AmountBaseDocDate[$index()] < 0 }"></span>
-                                    </li>
-                                    <!-- ko if: $index() == $parent.MonthsDueDate.length - 1 -->
-                                    <li>
-                                        @HtmlHelperExtra.Resource("SummaryTotal", l, c, d):
-                                        <span data-bind="text: formatNumber($parent.TotalBaseDoc, 2)"></span>
-                                    </li>
-                                    <!-- /ko -->
-                                    <!-- /ko -->
-                                </ul>
+								<ul class="undotted-list">
+									<li>
+										<h5 class="accounts-title">
+											@HtmlHelperExtra.Resource("AgeAnalysisByDue", l, c, d)
+										</h5>
+										<h5 class="accounts-title" data-bind="text: CurrencyHeading"></h5>
+									</li>
+									<!-- ko foreach: RecordsByDueDate -->
+									<li>
+										<a href="javascript:;" data-bind="click: function () { $parentContext.$parent.accountBalanceDrilldown($data,
+                                            '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("ByDueDate", l, c, d)) - ' + Label, 'DueDate') }">
+											<span data-bind="text: Label"></span>
+											<!-- ko if: $index() == 0 -->
+											*
+											<!-- /ko -->
+										</a>
+										<span data-bind="text: formatNumber(Value, 2), css: { 'text-danger': Value < 0 }"></span>
+									</li>
+									<!-- /ko -->
+									<li>
+										<a href="javascript:;" data-bind="text: OnAccount.Label, click: function() { $parentContext.$parent.accountBalanceDrilldown(Object.assign({ OnAccount: true }, $data), OnAccount.Label, 'OnAccount') }"></a>
+										<span data-bind="text: formatNumber(OnAccount.Value, 2)"></span>
+									</li>
+									<li>
+										@HtmlHelperExtra.Resource("SummaryTotal", l, c, d):
+										<span data-bind="text: formatNumber(TotalByDueDate, 2)"></span>
+									</li>
+								</ul>
                                 <i>
                                     * @HtmlHelperExtra.Resource("IncludesSubsequentInvoices", l, c, d)
                                 </i>
                             </div>
                         </div>
-                        <!-- ko if: showAccountSummaryInvoicesResult() -->
+                        <!-- ko if: showAccountBalanceInvoicesResult() -->
                         <h6 class="accounts-title">
-                            <span data-bind="text: accountSummaryGridTitle"></span>
+                            <span data-bind="text: accountBalanceGridTitle"></span>
                             <a data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
-                                click: function () { accountSummaryDrilldownGrid.widget().saveAsExcel(); }"></a>
+                                click: function () { accountBalanceDrilldownGrid.widget().saveAsExcel(); }"></a>
                         </h6>
-                        <div class="accounts-grid" data-bind="kendoGrid: accountSummaryDrilldownGrid"></div>
+                        <div class="accounts-grid" data-bind="kendoGrid: accountBalanceDrilldownGrid"></div>
                         <!-- /ko -->
-                        <!-- ko if: showAccountSummaryOnAccountResult() -->
+                        <!-- ko if: showAccountBalanceOnAccountResult() -->
                         <h6 class="accounts-title">
-                            <span data-bind="text: accountSummaryGridTitle"></span>
+                            <span data-bind="text: accountBalanceGridTitle"></span>
                             <a data-bind="attr: { href: 'javascript:;' }, text: '@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("DownloadToExcel", l, c, d))',
-                                click: function () { accountSummaryOnAccountDrilldownGrid.widget().saveAsExcel(); }"></a>
+                                click: function () { accountBalanceOnAccountDrilldownGrid.widget().saveAsExcel(); }"></a>
                         </h6>
-                        <div class="accounts-grid" data-bind="kendoGrid: accountSummaryOnAccountDrilldownGrid"></div>
+                        <div class="accounts-grid" data-bind="kendoGrid: accountBalanceOnAccountDrilldownGrid"></div>
                         <!-- /ko -->
                     </div>
                     <div id="outstanding-invoices" class="tab-pane fade @(firstTab == 1 ? "show active" : "")" data-refresh="summary">
@@ -428,20 +431,20 @@ else
     </div>
 
     <script type="text/javascript">
-        function getAccountSummary() {
-            return @Html.Raw(JsonConvert.SerializeObject(Model.accountSummary));
+        function getAccountBalance() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.accountBalance));
         }
 
         function getOutstandingInvoices() {
-            return @Html.Raw(JsonConvert.SerializeObject(Model.outstandingInvoices.Invoices));
+            return @Html.Raw(JsonConvert.SerializeObject(Model.outstandingInvoices?.Records ?? new List<Trade_Enquiry_InvoiceSearch_Record>()));
         }
 
-        function getAccountBalance() {
-            return @Html.Raw(JsonConvert.SerializeObject(Model.outstandingInvoices.OnAccountTotal));
+        function getOnAccountTotal() {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.outstandingInvoices?.OnAccount?.Value ?? 0.0m));
         }
 
         function getRecentPayments() {
-            return @Html.Raw(JsonConvert.SerializeObject(Model.recentPayments.PaymentsOnAccount));
+            return @Html.Raw(JsonConvert.SerializeObject(Model.recentPayments?.Records ?? new List<Trade_Enquiry_RecentPayments_Record>()));
         }
     </script>
 

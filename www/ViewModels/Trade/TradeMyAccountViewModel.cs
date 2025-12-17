@@ -8,9 +8,11 @@ using System.Web;
 using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.ProductPage;
+using wwwDesignersGuild.Models.Trade;
+using wwwDesignersGuild.Models.Trade.Accounting;
 using wwwDesignersGuild.ViewModels;
 
-namespace wwwDesignersGuild.Models.Trade
+namespace wwwDesignersGuild.ViewModels.Trade
 {
     public class PassTradeAccessRequest
     {
@@ -63,24 +65,24 @@ namespace wwwDesignersGuild.Models.Trade
         public string heading { get; set; }
         public bool permission { get; set; }
         public TradeAccountUsersModel tradeAccountModel { get; set; }
-        public AccountSummaryReturn accountSummary { get; set; }
-        public ListInvoicesReturn outstandingInvoices { get; set; }
-        public AccountSummaryRecentPaymentsReturn recentPayments { get; set; }
+        public Trade_Enquiry_AccountBalance_Result accountBalance { get; set; }
+        public Trade_Enquiry_InvoiceSearch_Result outstandingInvoices { get; set; }
+        public Trade_Enquiry_RecentPayments_Result recentPayments { get; set; }
 
         public TradeAccountsInvoicesViewModel (
             BaseViewModel bvm, 
             string h, 
             bool p,
             TradeAccountUsersModel tam,
-            AccountSummaryReturn asr, 
-            ListInvoicesReturn lir,
-            AccountSummaryRecentPaymentsReturn rpr)
+			Trade_Enquiry_AccountBalance_Result asr,
+			Trade_Enquiry_InvoiceSearch_Result lir,
+			Trade_Enquiry_RecentPayments_Result rpr)
         {
             BaseViewModel = bvm;
             heading = h;
             permission = p;
             tradeAccountModel = tam;
-            accountSummary = asr;
+            accountBalance = asr;
             outstandingInvoices = lir;
             recentPayments = rpr;
         }

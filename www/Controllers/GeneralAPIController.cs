@@ -32,6 +32,7 @@ using wwwDesignersGuild.Models.SearchRender;
 using wwwDesignersGuild.Models.Trade;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.ViewModels.Trade;
 
 namespace wwwDesignersGuild.Controllers
 {

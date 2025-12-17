@@ -77,3 +77,11 @@ a.stock-messaging {
 .reserve-popover {
     box-shadow: 0 0 8px -2px rgba(0, 0, 0, 0.35)
 }
+
+.invoice-search-controls {
+    div {
+        .input-group {
+            height: 35px;
+        }
+    }
+}

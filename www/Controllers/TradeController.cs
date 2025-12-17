@@ -20,6 +20,7 @@ using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.Models.Trade;
+using wwwDesignersGuild.Models.Trade.Accounting;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
@@ -156,6 +157,8 @@ namespace wwwDesignersGuild.Controllers
 
             var vf = new VisitorFactory();
 
+            var db = new databaseDataContext();
+            
             var tradeAccountModel = await vf.callTradeMemberSelect(
                     loginCheck.tradeAccountId.Value,
                     loginCheck.memberId.Value,
@@ -167,58 +170,72 @@ namespace wwwDesignersGuild.Controllers
 
             var permission = admin?.TradePermissionViewAccounts ?? user.TradePermissionViewAccounts;
 
-            AccountSummaryReturn accountSummary = null;
-            ListInvoicesReturn outstandingInvoices = null;
-            AccountSummaryRecentPaymentsReturn recentPayments = null;
+            Trade_Enquiry_AccountBalance_Result accountBalance = null;
+            Trade_Enquiry_InvoiceSearch_Result outstandingInvoices = null;
+            Trade_Enquiry_RecentPayments_Result recentPayments = null;
 
-            var retryCount = 0;
-
-            while (accountSummary == null && retryCount < 3)
+            var trade_Enquiry_AccountBalance_Request = new Trade_Enquiry_AccountBalance_Request()
             {
-                try
-                {
-                    accountSummary = AccountFunctions.AccountSummary(loginCheck.tradeDataSourceJson);
-                }
-                catch (Exception)
-                {
-                    retryCount++;
-                }
-            }
+                TradeAccountID = tradeAccountModel.AccountDetails.TradeAccountID,
+                CountryID = objBase.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+				LanguageID = objBase.MasterDefinition.UrlBreakdown.countryDetails.LanguageID
+			};
 
-            retryCount = 0;
+            accountBalance = db.Trade_Enquiry_AccountBalance(trade_Enquiry_AccountBalance_Request);
 
-            while (outstandingInvoices == null && retryCount < 3)
+            var trade_Enquiry_InvoiceSearch_Request = new Trade_Enquiry_InvoiceSearch_Request()
             {
-                try
-                {
-                    outstandingInvoices = AccountFunctions.OutstandingInvoices(loginCheck.tradeDataSourceJson);
-                }
-                catch (Exception)
-                {
-                    retryCount++;
-                }
-            }
+                TradeAccountID = tradeAccountModel.AccountDetails.TradeAccountID,
+                CountryID = objBase.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+                LanguageID = objBase.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+                Outstanding = true
+            };
 
-            retryCount = 0;
+			outstandingInvoices = db.Trade_Enquiry_InvoiceSearch(trade_Enquiry_InvoiceSearch_Request);
 
-            while (recentPayments == null && retryCount < 3)
-            {
-                try
-                {
-                    recentPayments = AccountFunctions.RecentPayments(loginCheck.tradeDataSourceJson);
-                }
-                catch (Exception)
-                {
-                    retryCount++;
-                }
-            }
+            var trade_Enquiry_RecentPayments_Request = new Trade_Enquiry_RecentPayments_Request()
+			{
+				TradeAccountID = tradeAccountModel.AccountDetails.TradeAccountID,
+				CountryID = objBase.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+				LanguageID = objBase.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+			};
+
+            recentPayments = db.Trade_Enquiry_RecentPayments(trade_Enquiry_RecentPayments_Request);
+
+            //var retryCount = 0;
+
+            //while (outstandingInvoices == null && retryCount < 3)
+            //{
+            //    try
+            //    {
+            //        outstandingInvoices = AccountFunctions.OutstandingInvoices(loginCheck.tradeDataSourceJson);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        retryCount++;
+            //    }
+            //}
+
+            //retryCount = 0;
+
+            //while (recentPayments == null && retryCount < 3)
+            //{
+            //    try
+            //    {
+            //        recentPayments = AccountFunctions.RecentPayments(loginCheck.tradeDataSourceJson);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        retryCount++;
+            //    }
+            //}
 
             var Model = new TradeAccountsInvoicesViewModel(
                 objBase, 
                 heading,
                 permission,
                 tradeAccountModel,
-                accountSummary,
+                accountBalance,
                 outstandingInvoices,
                 recentPayments);
 

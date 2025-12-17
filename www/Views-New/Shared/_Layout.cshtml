@@ -19,7 +19,7 @@
     <meta name="description" content="@(objMaster.MetaDescription ?? objMaster.TitleTag)" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    @if (String.IsNullOrEmpty(Model.CustomCanonical))
+   @if (String.IsNullOrEmpty(Model.CustomCanonical))
     {
         foreach (var href in objMaster.GoogleHrefs)
         {
@@ -29,7 +29,7 @@
 
     <link rel="canonical" href="@(Model.CustomCanonical ?? Request.Url.GetLeftPart(UriPartial.Path))" />
 
-    @if (Model.NoIndex)
+   @if (Model.NoIndex)
     {
         if (Model.NoFollow)
         {

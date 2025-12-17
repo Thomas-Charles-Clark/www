@@ -24,7 +24,7 @@
 
     self.ready = ko.observable(false);
 
-    self.accountSummaryBusy = ko.observable(false);
+    self.accountBalanceBusy = ko.observable(false);
 
     self.outstandingInvoicesBusy = ko.observable(false);
 
@@ -32,11 +32,11 @@
 
     self.recentPaymentsBusy = ko.observable(false);
 
-    self.accountSummary = ko.observable(getAccountSummary());
+    self.accountBalance = ko.observable(getAccountBalance());
 
     self.outstandingInvoices = ko.observableArray(getOutstandingInvoices());
 
-    self.outstandingInvoicesAccountBalance = ko.observable(getAccountBalance());
+    self.outstandingInvoicesAccountBalance = ko.observable(getOnAccountTotal());
 
     self.invoiceSearchResults = ko.observableArray([]);
 
@@ -121,20 +121,20 @@
         }
     });
 
-    self.showAccountSummaryInvoicesResult = ko.observable(false);
+    self.showAccountBalanceInvoicesResult = ko.observable(false);
 
-    self.accountSummaryDrilldownResult = ko.observableArray([]);
+    self.accountBalanceDrilldownResult = ko.observableArray([]);
 
-    self.showAccountSummaryOnAccountResult = ko.observable(false);
+    self.showAccountBalanceOnAccountResult = ko.observable(false);
 
-    self.accountSummaryOnAccountResult = ko.observableArray([]);
+    self.accountBalanceOnAccountResult = ko.observableArray([]);
 
-    self.accountSummaryGridTitle = ko.observable();
+    self.accountBalanceGridTitle = ko.observable();
 
     self.valueDisplay = ko.observable(0); // 0 = base, 1 = currency
 
     self.panBusy = ko.pureComputed(() => {
-        return self.accountSummaryBusy() ||
+        return self.accountBalanceBusy() ||
             self.invoiceSearchBusy() ||
             self.outstandingInvoicesBusy() ||
             self.recentPaymentsBusy() ||
@@ -142,34 +142,39 @@
     }, self);
 
     self.invoiceColumnsSummary = [{
-        field: 'DocumentNumber',
+        field: 'InvoiceHead',
         title: self.resources.InvoiceNo,
-        width: 120,
-        template: '<a href="javascript:;" onclick="tradeInvoicesModel.accountSummaryDrilldownGrid.widget().select($(event.srcElement).closest(\'tr\')[0])">#: DocumentNumber #</a>'
+        width: 140,
+        template: '<a href="javascript:;" onclick="tradeInvoicesModel.accountBalanceDrilldownGrid.widget().select($(event.srcElement).closest(\'tr\')[0])">#: InvoiceHead #</a>'
     }, {
-        field: 'DocumentDate',
+        field: 'InvoiceDT',
         title: self.resources.InvoiceDate,
         width: 140,
-        template: "#: DocumentDate ? kendo.toString(kendo.parseDate(DocumentDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+        template: "#: InvoiceDT ? kendo.toString(kendo.parseDate(InvoiceDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
     }, {
-        field: 'DueDate',
+        field: 'DueDT',
         title: self.resources.DueDate,
         width: 140,
-        template: "#: DueDate ? kendo.toString(kendo.parseDate(DueDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+        template: "#: DueDT ? kendo.toString(kendo.parseDate(DueDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
     }, {
-        field: 'OrderNumber',
+        field: 'DespatchedDT',
+        title: self.resources.ShipmentDate,
+        width: 140,
+        template: "#: DespatchedDT ? kendo.toString(kendo.parseDate(DespatchedDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+    }, {
+        field: 'OrderID',
         title: self.resources["OrderNo."],
-        width: 120,
-        template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderNumber #, \'#: DocumentDate #\')">#: OrderNumber #</a>'
+        width: 140,
+        template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderID #, \'#: InvoiceDT #\')">#: OrderID #</a>'
     }, {
         field: 'CustomerOrderReference',
         title: self.resources.CustOrderRef,
-        width: 180,
+        //width: 160,
         footerTemplate: '<span class="text-right text-bold display-block">' + self.resources.Total + ':</span>'
     }, {
-        field: 'OriginalValue',
+        field: 'OriginalValueInCurrency',
         title: self.resources["Orig.Value"],
-        width: 120,
+        width: 160,
         attributes: {
             'class': 'text-right'
         },
@@ -177,19 +182,19 @@
             'class': 'text-right'
         },
         template: function (dataItem) {
-            if (dataItem.OriginalValue <= 0) {
-                return '<span class="text-danger">' + formatNumber(dataItem.OriginalValue, 2) + '</span>'
+            if (dataItem.OriginalValueInCurrency <= 0) {
+                return '<span class="text-danger">' + formatNumber(dataItem.OriginalValueInCurrency, 2) + '</span>'
             } else {
-                return formatNumber(dataItem.OriginalValue, 2);
+                return formatNumber(dataItem.OriginalValueInCurrency, 2);
             }
         },
         footerTemplate: function () {
-            return '<span class="text-right display-block">' + formatNumber(self.accountSummaryDrilldownGridOriginalValueTotal(), 2) + '</span>'
+            return '<span class="text-right display-block">' + formatNumber(self.accountBalanceDrilldownGridOriginalValueTotal(), 2) + '</span>'
         }
     }, {
-        field: 'OutstandingAmount',
+        field: 'OutstandingValueInCurrency',
         title: self.resources.OutstandingAmount,
-        width: 120,
+        width: 160,
         attributes: {
             'class': 'text-right'
         },
@@ -197,19 +202,20 @@
             'class': 'text-right'
         },
         template: function (dataItem) {
-            if (dataItem.OutstandingAmount <= 0) {
-                return '<span class="text-danger">' + formatNumber(dataItem.OutstandingAmount, 2) + '</span>'
+            if (dataItem.OutstandingValueInCurrency <= 0) {
+                return '<span class="text-danger">' + formatNumber(dataItem.OutstandingValueInCurrency, 2) + '</span>'
             } else {
-                return formatNumber(dataItem.OutstandingAmount, 2);
+                return formatNumber(dataItem.OutstandingValueInCurrency, 2);
             }
         },
         footerTemplate: function () {
-            return '<span class="text-right display-block">' + formatNumber(self.accountSummaryDrilldownGridOustandingAmountTotal(), 2) + '</span>'
+            return '<span class="text-right display-block">' + formatNumber(self.accountBalanceDrilldownGridOustandingAmountTotal(), 2) + '</span>'
         }
     }, {
         field: 'Disputed',
         title: self.resources.Disputed,
         width: 120,
+        template: (e) => e.Disputed ? 'Yes' : 'No',
         attributes: {
             'class': 'text-right'
         },
@@ -220,24 +226,29 @@
 
 
     self.invoiceColumns = [{
-        field: 'DocumentNumber',
+        field: 'InvoiceHead',
         width: 120,
         title: self.resources.InvoiceNo
     }, {
-        field: 'DocumentDate',
+        field: 'InvoiceDT',
         title: self.resources.InvoiceDate,
         width: 140,
-        template: "#: kendo.toString(kendo.parseDate(DocumentDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') #"
+        template: "#: kendo.toString(kendo.parseDate(InvoiceDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') #"
     }, {
-        field: 'DueDate',
+        field: 'DueDT',
         title: self.resources.DueDate,
         width: 140,
-        template: "#: DueDate ? kendo.toString(kendo.parseDate(DueDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+        template: "#: DueDT ? kendo.toString(kendo.parseDate(DueDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
     }, {
-        field: 'OrderNumber',
-        title: self.resources["OrderNo."],
+        field: 'DespatchedDT',
+        title: self.resources.ShipmentDate,
+        width: 140,
+        template: "#: DespatchedDT ? kendo.toString(kendo.parseDate(DespatchedDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+    }, {
+        field: 'OrderID',
+        title: self.resources["OrderNo"],
         width: 120,
-        template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderNumber #, \'#: DocumentDate #\')">#: OrderNumber #</a>'
+        template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderID #, \'#: InvoiceDT #\')">#: OrderID #</a>'
     }, {
         field: 'CustomerOrderReference',
         title: self.resources.CustOrderRef,
@@ -249,8 +260,8 @@
 <span class="text-right text-bold display-block">' + self.resources.OnAccount + ':</span>\
 <span class="text-right text-bold display-block">' + self.resources.Outstanding + ':</span>'
     }, {
-        field: 'OriginalValue',
-        title: self.resources.OrigValue,
+        field: 'OriginalValueInCurrency',
+        title: self.resources.OriginalValue,
         width: 120,
         attributes: {
             'class': 'text-right'
@@ -262,23 +273,23 @@
             'style': 'vertical-align: top'
         },
         template: function (dataItem) {
-            if (dataItem.OriginalValue <= 0) {
-                return '<span class="text-danger">' + formatNumber(dataItem.OriginalValue, 2) + '</span>'
+            if (dataItem.OriginalValueInCurrency <= 0) {
+                return '<span class="text-danger">' + formatNumber(dataItem.OriginalValueInCurrency, 2) + '</span>'
             } else {
-                return formatNumber(dataItem.OriginalValue, 2);
+                return formatNumber(dataItem.OriginalValueInCurrency, 2);
             }
         },
         footerTemplate: function () {
-            if (self.outstandingInvoices()) {
+            if (self.outstandingInvoices().length) {
                 return '<span class="text-right display-block">' + formatNumber(Enumerable.From(self.outstandingInvoices()).Select(function (x) {
-                    return x.OriginalValue
+                    return x.OriginalValueInCurrency
                 }).Sum(), 2) + '</span>';
             } else {
                 return '';
             }
         }
     }, {
-        field: 'OutstandingAmount',
+        field: 'OutstandingValueInCurrency',
         title: self.resources.OutstandingAmount,
         width: 120,
         attributes: {
@@ -288,10 +299,10 @@
             'class': 'text-right'
         },
         template: function (dataItem) {
-            if (dataItem.OutstandingAmount <= 0) {
-                return '<span class="text-danger">' + formatNumber(dataItem.OutstandingAmount, 2) + '</span>'
+            if (dataItem.OutstandingValueInCurrency <= 0) {
+                return '<span class="text-danger">' + formatNumber(dataItem.OutstandingValueInCurrency, 2) + '</span>'
             } else {
-                return formatNumber(dataItem.OutstandingAmount, 2);
+                return formatNumber(dataItem.OutstandingValueInCurrency, 2);
             }
         },
         footerTemplate: function () {
@@ -307,6 +318,7 @@
         field: 'Disputed',
         title: self.resources.Disputed,
         width: 120,
+        template: (e) => e.Disputed ? 'Yes' : 'No',
         attributes: {
             'class': 'text-right'
         },
@@ -382,40 +394,40 @@
         }
     });
 
-    self.accountSummaryDrilldownGridOriginalValueTotal = ko.pureComputed(function () {
-        return Enumerable.From(self.accountSummaryDrilldownResult()).Select(function (x) {
-            return x.OriginalValue
+    self.accountBalanceDrilldownGridOriginalValueTotal = ko.pureComputed(function () {
+        return Enumerable.From(self.accountBalanceDrilldownResult()).Select(function (x) {
+            return x.OriginalValueInCurrency
         }).Sum();
     }, self);
 
-    self.accountSummaryDrilldownGridOustandingAmountTotal = ko.pureComputed(function () {
-        return Enumerable.From(self.accountSummaryDrilldownResult()).Select(function (x) {
-            return x.OriginalValue
+    self.accountBalanceDrilldownGridOustandingAmountTotal = ko.pureComputed(function () {
+        return Enumerable.From(self.accountBalanceDrilldownResult()).Select(function (x) {
+            return x.OutstandingValueInCurrency
         }).Sum();
     }, self);
 
     self.outstandingInvoicesOutstandingTotal = ko.pureComputed(function () {
         return Enumerable.From(self.outstandingInvoices()).Select(function (x) {
-            return x.OutstandingAmount
+            return x.OutstandingValueInCurrency
         }).Sum();
     }, self);
 
-    self.accountSummaryOnAccountOutstandingAmountTotal = ko.computed(function () {
-        return Enumerable.From(self.accountSummaryOnAccountResult()).Select(function (x) {
-            return x.OutstandingAmount
+    self.accountBalanceOnAccountOutstandingAmountTotal = ko.computed(function () {
+        return Enumerable.From(self.accountBalanceOnAccountResult()).Select(function (x) {
+            return x.OutstandingValueInCurrency
         }).Sum();
     }, self);
 
-    self.accountSummaryOnAccountOriginalValueTotal = ko.computed(function () {
-        return Enumerable.From(self.accountSummaryOnAccountResult()).Select(function (x) {
-            return x.OriginalValue
+    self.accountBalanceOnAccountOriginalValueTotal = ko.computed(function () {
+        return Enumerable.From(self.accountBalanceOnAccountResult()).Select(function (x) {
+            return x.OriginalValueInCurrency
         }).Sum();
     }, self);
 
     self.recentPaymentsOriginalValueTotal = ko.pureComputed(function () {
         if (self.recentPayments()) {
             return formatNumber(Enumerable.From(self.recentPayments()).Select(function (x) {
-                return x.OriginalValue
+                return x.OriginalValueInCurrency
             }).Sum(), 2)
         } else {
             return '';
@@ -449,9 +461,9 @@
         }
     };
 
-    self.accountSummaryDrilldownGrid = {
+    self.accountBalanceDrilldownGrid = {
         widget: ko.observable(),
-        data: self.accountSummaryDrilldownResult,
+        data: self.accountBalanceDrilldownResult,
         dataSource: new kendo.data.DataSource({
             schema: {
                 model: {
@@ -459,7 +471,7 @@
                     fields: {
                         DocumentNumber: {},
                         DocumentDate: { type: 'date' },
-                        DueDate: { type: 'date' },
+                        DueDT: { type: 'date' },
                         OrderNumber: {
                             type: 'string'
                         },
@@ -492,9 +504,9 @@
     };
 
 
-    self.accountSummaryOnAccountDrilldownGrid = {
+    self.accountBalanceOnAccountDrilldownGrid = {
         widget: ko.observable(),
-        data: self.accountSummaryOnAccountResult,
+        data: self.accountBalanceOnAccountResult,
         noRecords: {
             template: self.resources.NoRecordsToDisplay
         },
@@ -526,29 +538,29 @@
             messages: self.kendoGridPagerMessages
         },
         dataBound: function (e) {
-            $('#on-account-os-amount-total').text(formatNumber(self.accountSummaryOnAccountOutstandingAmountTotal(), 2));
+            $('#on-account-os-amount-total').text(formatNumber(self.accountBalanceOnAccountOutstandingAmountTotal(), 2));
 
-            if (self.accountSummaryOnAccountOutstandingAmountTotal() <= 0) {
+            if (self.accountBalanceOnAccountOutstandingAmountTotal() <= 0) {
                 $('#on-account-os-amount-total').addClass('text-danger');
             } else {
                 $('#on-account-os-amount-total').removeClass('text-danger');
             }
 
-            $('#on-account-ov-amount-total').text(formatNumber(self.accountSummaryOnAccountOriginalValueTotal(), 2));
+            $('#on-account-ov-amount-total').text(formatNumber(self.accountBalanceOnAccountOriginalValueTotal(), 2));
 
-            if (self.accountSummaryOnAccountOriginalValueTotal() <= 0) {
+            if (self.accountBalanceOnAccountOriginalValueTotal() <= 0) {
                 $('#on-account-ov-amount-total').addClass('text-danger');
             } else {
                 $('#on-account-ov-amount-total').removeClass('text-danger');
             }
         },
         columns: [{
-            field: 'DocumentReference',
+            field: 'InvoiceHead',
             title: self.resources.PaymentReference
         }, {
-            field: 'PaymentDate',
+            field: 'InvoiceDT',
             title: self.resources.PaymentDate,
-            template: "#: PaymentDate ? kendo.toString(kendo.parseDate(PaymentDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #",
+            template: "#: PaymentDate ? kendo.toString(kendo.parseDate(InvoiceDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #",
             headerAttributes: {
                 'class': 'text-bold display-block'
             },
@@ -557,7 +569,7 @@
             },
             footerTemplate: '<span class="text-right text-bold display-block">' + self.resources.Totals + ':</span>'
         }, {
-            field: 'OriginalValue',
+            field: 'OriginalValueInCurrency',
             title: self.resources.OriginalValue,
             attributes: {
                 'class': 'text-right'
@@ -566,10 +578,10 @@
                 'class': 'text-right'
             },
             template: function (dataItem) {
-                if (dataItem.OriginalValue <= 0) {
-                    return '<span class="text-danger">' + formatNumber(dataItem.OriginalValue, 2) + '</span>'
+                if (dataItem.OriginalValueInCurrency <= 0) {
+                    return '<span class="text-danger">' + formatNumber(dataItem.OriginalValueInCurrency, 2) + '</span>'
                 } else {
-                    return formatNumber(dataItem.OriginalValue, 2);
+                    return formatNumber(dataItem.OriginalValueInCurrency, 2);
                 }
             },
             footerTemplate: '<span id="on-account-ov-amount-total" class="text-right text-bold display-block"></span>'
@@ -583,10 +595,10 @@
                 'class': 'text-right'
             },
             template: function (dataItem) {
-                if (dataItem.OutstandingAmount <= 0) {
-                    return '<span class="text-danger">' + formatNumber(dataItem.OutstandingAmount, 2) + '</span>'
+                if (dataItem.OutstandingValueInCurrency <= 0) {
+                    return '<span class="text-danger">' + formatNumber(dataItem.OutstandingValueInCurrency, 2) + '</span>'
                 } else {
-                    return formatNumber(dataItem.OutstandingAmount, 2);
+                    return formatNumber(dataItem.OutstandingValueInCurrency, 2);
                 }
             },
             footerTemplate: '<span id="on-account-os-amount-total" class="text-right text-bold display-block"></span>'
@@ -596,7 +608,7 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            window.open('/downloads/trade-document?docref=' + dataItem.InvoiceHead + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
         },
         excelExport: self.exportToExcel
     };
@@ -606,20 +618,20 @@
         data: self.outstandingInvoices,
         dataSource: new kendo.data.DataSource({
             sort: {
-                field: 'DocumentDate',
+                field: 'InvoiceDT',
                 dir: 'asc'
             },
             schema: {
                 model: {
-                    id: 'DocumentNumber',
+                    id: 'InvoiceHead',
                     fields: {
-                        DocumentNumber: {},
-                        DocumentDate: { type: 'date' },
-                        DueDate: { type: 'date' },
-                        OrderNumber: {},
+                        InvoiceHead: {},
+                        InvoiceDT: { type: 'date' },
+                        DueDT: { type: 'date' },
+                        OrderID: {},
                         CustomerOrderReference: {},
-                        OriginalValue: {},
-                        OutstandingAmount: {},
+                        OriginalValueInCurrency: {},
+                        OutstandingValueInCurrency: {},
                         Disputed: {}
                     }
                 }
@@ -653,16 +665,16 @@
                 field: 'PaymentDate',
                 dir: 'desc'
             }, {
-                field: 'DocumentReference',
+                field: 'PaymentReference',
                 dir: 'desc'
             }],
             schema: {
                 model: {
-                    id: 'DocumentReference',
+                    id: 'PaymentReference',
                     fields: {
-                        DocumentReference: {},
+                        PaymentReference: { type: 'string' },
                         PaymentDate: { type: 'date' },
-                        OriginalValue: {}
+                        OriginalValueInCurrency: { type: 'number' }
                     }
                 }
             },
@@ -674,7 +686,7 @@
             messages: self.kendoGridPagerMessages
         },
         columns: [{
-            field: 'DocumentReference',
+            field: 'PaymentReference',
             title: self.resources.PaymentReference
         }, {
             field: 'PaymentDate',
@@ -682,16 +694,16 @@
             template: "#: PaymentDate ? kendo.toString(kendo.parseDate(PaymentDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #",
             footerTemplate: '<span class="text-bold display-block text-right">' + self.resources.Totals + ':</span>'
         }, {
-            field: 'OriginalValue',
+            field: 'OriginalValueInCurrency',
             title: self.resources.OriginalValue,
             headerAttributes: {
                 'class': 'text-right'
             },
             template: function (e) {
                 if (e.OriginalValue <= 0) {
-                    return '<span class="text-right text-danger display-block">' + formatNumber(e.OriginalValue, 2) + '</span>';
+                    return '<span class="text-right text-danger display-block">' + formatNumber(e.OriginalValueInCurrency, 2) + '</span>';
                 } else {
-                    return '<span class="text-right display-block">' + formatNumber(e.OriginalValue, 2) + '</span>';
+                    return '<span class="text-right display-block">' + formatNumber(e.OriginalValueInCurrency, 2) + '</span>';
                 }
             },
             footerTemplate: '<span class="text-right display-block text-bold">' + self.recentPaymentsOriginalValueTotal() + '</span>'
@@ -709,21 +721,21 @@
         data: self.invoiceSearchResults,
         dataSource: new kendo.data.DataSource({
             sort: [{
-                field: 'DocumentDate',
+                field: 'InvoiceDT',
                 dir: 'asc'
             }],
             schema: {
                 model: {
-                    id: 'DocumentNumber',
+                    id: 'InvoiceHead',
                     fields: {
-                        DocumentNumber: {},
-                        DocumentDate: { type: 'date' },
-                        DueDate: { type: 'date' },
-                        OrderNumber: {},
-                        CustomerOrderReference: {},
-                        OriginalValue: {},
-                        OutstandingAmount: {},
-                        Disputed: {}
+                        InvoiceHead: { type: 'string', editable: false },
+                        InvoiceDT: { type: 'date', editable: false },
+                        DueDT: { type: 'date', editable: false },
+                        OrderID: { type: 'string', editable: false },
+                        CustomerOrderReference: { type: 'string', editable: false },
+                        OriginalValueInCurrency: { type: 'number', editable: false },
+                        OutstandingValueInCurrency: { type: 'number', editable: false },
+                        Disputed: { type: 'boolean', editable: false  }
                     }
                 }
             },
@@ -735,31 +747,31 @@
             messages: self.kendoGridPagerMessages
         },
         columns: [{
-            field: 'DocumentNumber',
+            field: 'InvoiceHead',
             title: self.resources.InvoiceNo,
             width: 120
         }, {
-            field: 'DocumentDate',
+            field: 'InvoiceDT',
             title: self.resources.InvoiceDate,
             width: 140,
-            template: "#: DocumentDate ? kendo.toString(kendo.parseDate(DocumentDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+            template: "#: InvoiceDT ? kendo.toString(kendo.parseDate(InvoiceDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
         }, {
-            field: 'DueDate',
+            field: 'DueDT',
             title: self.resources.DueDate,
             width: 140,
-            template: "#: DueDate ? kendo.toString(kendo.parseDate(DueDate, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
+            template: "#: DueDT ? kendo.toString(kendo.parseDate(DueDT, 'yyyy-MM-ddTHH:mm:ss'), 'dd/MM/yyyy') : '' #"
         }, {
-            field: 'OrderNumber',
-            title: self.resources["OrderNo."],
+            field: 'OrderID',
+            title: self.resources["OrderNo"],
             width: 120,
-            template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderNumber #, \'#: DocumentDate #\')">#: OrderNumber #</a>'
+            template: '<a href="javascript:;" onclick="tradeInvoicesModel.fetchOrderDetails(#: OrderID #, \'#: InvoiceDT #\')">#: OrderID #</a>'
         }, {
             field: 'CustomerOrderReference',
             title: self.resources.CustOrderRef,
             width: 180,
             footerTemplate: '<span class="text-bold display-block text-right">' + self.resources.Totals + ':</span>'
         }, {
-            field: 'OriginalValue',
+            field: 'OriginalValueInCurrency',
             title: self.resources["Orig.Value"],
             width: 120,
             attributes: {
@@ -768,21 +780,21 @@
             headerAttributes: {
                 'class': 'text-right'
             },
-            template: '#: formatNumber(OriginalValue, 2) #',
+            template: '#: formatNumber(OriginalValueInCurrency, 2) #',
             footerAttributes: {
                 'class': 'text-bold'
             },
             footerTemplate: function () {
                 if (self.invoiceSearchResults()) {
                     return '<span class="text-right text-bold display-block">' + formatNumber(Enumerable.From(self.invoiceSearchResults()).Select(function (x) {
-                        return x.OriginalValue
+                        return x.OriginalValueInCurrency
                     }).Sum(), 2) + '</span>';
                 } else {
                     return '';
                 }
             }
         }, {
-            field: 'OutstandingAmount',
+            field: 'OutstandingValueInCurrency',
             title: self.resources.OutstandingAmount,
             width: 120,
             attributes: {
@@ -791,11 +803,11 @@
             headerAttributes: {
                 'class': 'text-right'
             },
-            template: '#: formatNumber(OutstandingAmount, 2) #',
+            template: '#: formatNumber(OutstandingValueInCurrency, 2) #',
             footerTemplate: function () {
                 if (self.invoiceSearchResults()) {
                     return '<span class="text-right text-bold display-block">' + formatNumber(Enumerable.From(self.invoiceSearchResults()).Select(function (x) {
-                        return x.OutstandingAmount
+                        return x.OutstandingValueInCurrency
                     }).Sum(), 2) + '</span>';
                 } else {
                     return '';
@@ -805,6 +817,7 @@
             field: 'Disputed',
             title: self.resources.Disputed,
             width: 120,
+            template: (e) => e.Disputed ? 'Yes' : 'No',
             attributes: {
                 'class': 'text-right'
             },
@@ -820,7 +833,8 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            //window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            window.open(`${dataItem.InvoiceURI}`, '_blank');
         },
         excelExport: self.exportToExcel
     };
@@ -989,20 +1003,22 @@
         self.customToDate,
     ]);
 
-    self.refreshAccountSummary = function () {
-        self.accountSummaryBusy(true);
-        self.showAccountSummaryInvoicesResult(false);
-        self.showAccountSummaryOnAccountResult(false);
-        self.accountSummaryDrilldownResult([]);
-        self.accountSummaryOnAccountResult([]);
+    self.refreshAccountBalance = function () {
+        self.accountBalanceBusy(true);
+        self.showAccountBalanceInvoicesResult(false);
+        self.showAccountBalanceOnAccountResult(false);
+        self.accountBalanceDrilldownResult([]);
+        self.accountBalanceOnAccountResult([]);
+        console.log('calling refreshAccountBalance');
         $.ajax({
-            url: '/api/tradeapi/refreshAccountSummary',
+            url: '/api/tradeapi/RefreshAccountBalance',
             type: 'POST',
             dataType: 'json',
             data: {},
             success: function (data) {
-                self.accountSummaryBusy(false);
-                self.accountSummary(data);
+                console.log('calling refreshAccountReturned');
+                self.accountBalanceBusy(false);
+                self.accountBalance(data);
             },
             error: function (xhr, s, a) {
                 window.location.href = '/l102?redirect=112'
@@ -1010,33 +1026,54 @@
         });
     }
 
-    self.accountSummaryDrilldown = (item, title, sort) => {
-        self.showAccountSummaryInvoicesResult(false);
-        self.showAccountSummaryOnAccountResult(false);
-        self.accountSummaryDrilldownResult([]);
-        self.accountSummaryOnAccountResult([]);
-        self.accountSummaryBusy(true);
-        data = {
-            criteria: item
+    self.accountBalanceDrilldown = (item, title, sort) => {
+        self.showAccountBalanceInvoicesResult(false);
+        self.showAccountBalanceOnAccountResult(false);
+        self.accountBalanceDrilldownResult([]);
+        self.accountBalanceOnAccountResult([]);
+        self.accountBalanceBusy(true);
+        /*
+        
+		public int TradeAccountID { get; set; }
+		public short CountryID { get; set; }
+		public byte LanguageID { get; set; }
+		public string DateQualifier { get; set; }
+		public DateTime? DateRangeStart { get; set; }
+		public DateTime? DateRangeEnd { get; set; }
+		public string SearchTerm { get; set; }
+
+        */
+        let data = {
+            tradeAccountId: 0,
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            dateQualifier: 'DocumentDate',
+            dateRangeStart: item.RangeStartDate ? new Date(Date.parse(item.RangeStartDate)) : null,
+            dateRangeEnd: item.RangeEndDate ? new Date(Date.parse(item.RangeEndDate)) : null,
+            searchTerm: null,
+            outstanding: item.OnAccount ?? false
         };
-        console.log('calling accountSummaryDrilldown with', data);
-        $.ajax({
-            url: '/api/tradeapi/accountSummaryDrilldown',
-            type: 'POST',
-            dataType: 'json',
-            data: data,
-            success: function (data) {
-                console.log('accountSummaryDrilldown returned', data);
-                self.accountSummaryBusy(false);
-                self.accountSummaryGridTitle(title);
-                if (data.hasOwnProperty('Invoices')) {
-                    self.showAccountSummaryOnAccountResult(false);
-                    self.showAccountSummaryInvoicesResult(true);
-                    self.accountSummaryDrilldownResult(data.Invoices);
+        console.log('calling accountBalanceDrilldown with', data);
+        fetch('/api/tradeapi/AccountBalanceDrilldown', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            credentials: 'same-origin',
+            cache: 'no-cache',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then((data) => {
+                console.log('accountBalanceDrilldown returned', data);
+                self.accountBalanceBusy(false);
+                self.accountBalanceGridTitle(title);
+                if (data.hasOwnProperty('Records')) {
+                    self.showAccountBalanceOnAccountResult(false);
+                    self.showAccountBalanceInvoicesResult(true);
+                    self.accountBalanceDrilldownResult(data.Records);
                     window.setTimeout(function () {
-                        self.accountSummaryDrilldownGrid.widget().dataSource.query({
+                        self.accountBalanceDrilldownGrid.widget().dataSource.query({
                             page: 1,
-                            pageSize: self.accountSummaryDrilldownGrid.widget().dataSource.pageSize(),
+                            pageSize: self.accountBalanceDrilldownGrid.widget().dataSource.pageSize(),
                             sort: {
                                 field: sort,
                                 dir: 'asc'
@@ -1044,15 +1081,15 @@
                         });
                     }, 0);
                 } else {
-                    self.showAccountSummaryInvoicesResult(false);
-                    self.showAccountSummaryOnAccountResult(true);
-                    self.accountSummaryOnAccountResult(data.PaymentsOnAccount);
+                    self.showAccountBalanceInvoicesResult(false);
+                    self.showAccountBalanceOnAccountResult(true);
+                    self.accountBalanceOnAccountResult(data.PaymentsOnAccount);
                 }
-            },
-            error: function (xhr, s, a) {
+            }).catch(err => {
+                self.busy(false);
+                window.catchFetchError(err);
                 window.location.href = '/l102?redirect=112'
-            }
-        });
+            });
     }
 
     self.refreshRecentPayments = () => {
@@ -1074,16 +1111,32 @@
 
     self.refreshOutstandingInvoices = () => {
         self.outstandingInvoicesBusy(true);
-        $.ajax({
-            url: '/api/tradeapi/refreshOutstandingInvoices',
-            type: 'POST',
-            dataType: 'json',
-            data: {},
-            success: function (data) {
+
+        var data = {
+            dateQualifier: 'InvoiceDate',
+            countryId: getCountryId(),
+            languageId: getLanguageId(),
+            dateRangeStart: null,
+            dateRangeEnd: null,
+            searchTerm: null,
+            outstanding: true
+        }
+
+        console.log('calling refreshOutstandingInvoices with', data);
+
+        fetch('/api/tradeapi/RefreshOutstandingInvoices', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        })
+            .then(window.handleFetchResponse)
+            .then(data => {
                 console.log('refreshOutstandingInvoices returned', data);
                 self.outstandingInvoicesBusy(false);
-                self.outstandingInvoices(data.Invoices);
-                self.outstandingInvoicesAccountBalance(data.OnAccountTotal)
+                self.outstandingInvoices(data.Records);
+                self.outstandingInvoicesAccountBalance(data.OnAccount.Value)
                 window.setTimeout(function () {
                     self.outstandingInvoicesGrid.widget().dataSource.query({
                         page: 1,
@@ -1094,11 +1147,11 @@
                         }
                     });
                 }, 0);
-            },
-            error: function (xhr, s, a) {
-                window.location.href = '/l102?redirect=112'
-            }
-        });
+            })
+            .catch(err => {
+                self.busy(false);
+                window.catchFetchError(err);
+            })
     }
 
     self.performInvoiceSearch = () => {
@@ -1108,30 +1161,40 @@
             self.invoiceSearchErrors.showAllMessages(true);
         } else {
             self.invoiceSearchBusy(true);
+
             var data = {
+                dateQualifier: self.dateRangeTypes.find(d => d.dateRangeTypeId == self.dateRangeType()).name.replace(/\s/gm, ''),
                 dateRange: self.dateRange(),
                 dateRangeType: self.dateRangeType(),
-                searchTerm: self.searchTerm() || ''
+                searchTerm: self.searchTerm() == '' ? null : self.searchTerm(),
+                countryId: getCountryId(),
+                languageId: getLanguageId(),
+                outstanding: null
             }
+
             if (self.dateRange() == -1) {
-                data.fromDate = self.customFromDate() ? self.customFromDate().toISOString() : null;
-                data.toDate = self.customToDate() ? self.customToDate().toISOString() : null;
+                data.dateRangeStart = self.customFromDate() ? self.customFromDate().toISOString() : null;
+                data.dateRangeEnd = self.customToDate() ? self.customToDate().toISOString() : null;
             }
             console.log('calling invoiceSearch with', data);
-            $.ajax({
-                url: '/api/tradeapi/invoiceSearch',
-                type: 'POST',
-                dataType: 'json',
-                data: data,
-                success: function (data) {
+
+            fetch('/api/tradeapi/InvoiceSearch', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                credentials: 'same-origin',
+                cache: 'no-cache',
+                body: JSON.stringify(data)
+            })
+                .then(window.handleFetchResponse)
+                .then(data => {
                     console.log('invoiceSearch returned', data);
-                    self.invoiceSearchResults(data.SearchResults);
+                    self.invoiceSearchResults(data.Records);
                     self.invoiceSearchBusy(false);
-                },
-                error: function (xhr, s, a) {
-                    window.location.href = '/l102?redirect=112'
-                }
-            });
+                })
+                .catch(err => {
+                    self.busy(false);
+                    window.catchFetchError(err);
+                })
         }
     }
 
@@ -1152,7 +1215,7 @@
                 affectingBusy = self.outstandingInvoicesBusy;
                 break;
             case 'summary':
-                affectingBusy = self.accountSummaryBusy;
+                affectingBusy = self.accountBalanceBusy;
                 break;
             case 'invoice':
                 affectingBusy = self.invoiceSearchBusy;

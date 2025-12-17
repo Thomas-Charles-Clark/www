@@ -23,6 +23,7 @@ using wwwDesignersGuild.Util;
 using SimpleImpersonation;
 using Braintree;
 using System.Runtime.CompilerServices;
+using wwwDesignersGuild.ViewModels.Trade;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -2709,9 +2710,9 @@ namespace wwwDesignersGuild.Models.Database
             });
         }
 
-        internal IEnumerable<Models.Trade.TradeCountry> GetCountries()
+        internal IEnumerable<ViewModels.Trade.TradeCountry> GetCountries()
         {
-            var results = new List<Models.Trade.TradeCountry>();
+            var results = new List<ViewModels.Trade.TradeCountry>();
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
             {
@@ -2738,7 +2739,7 @@ namespace wwwDesignersGuild.Models.Database
 
                 while (reader.Read())
                 {
-                    results.Add(new Trade.TradeCountry()
+                    results.Add(new ViewModels.Trade.TradeCountry()
                     {
                         CountryID = reader.GetInt16(0),
                         Code = reader.GetString(1),

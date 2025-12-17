@@ -29,6 +29,9 @@ using MertexerV2SQL.Models.Accounts;
 using System.Net.Http.Headers;
 using System.Xml.Linq;
 using MertexerV2.Utilities;
+using wwwDesignersGuild.Models.Trade.Accounting;
+using wwwDesignersGuild.ViewModels.Trade;
+using DevExpress.Web;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -200,7 +203,7 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [HttpPost]
-        public IHttpActionResult refreshAccountSummary()
+        public IHttpActionResult RefreshAccountBalance()
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
@@ -210,40 +213,41 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [HttpPost]
-        public IHttpActionResult accountSummaryDrilldown([FromBody]PassAccountSummaryDrilldown objDrilldown)
+        public IHttpActionResult AccountBalanceDrilldown([FromBody]Trade_Enquiry_InvoiceSearch_Request dto)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
-            if (objDrilldown.Criteria == "OnAccount")
-            {
-                // RECENT_PAYMENTS
-                return Ok(AccountFunctions.AccountSummaryRecentPayments(loginCheck.tradeDataSourceJson));
-            }
-            else
-            {
-                // LIST_INVOICES
-                return Ok(AccountFunctions.ListInvoices(loginCheck.tradeDataSourceJson, objDrilldown.Criteria));
-            }
+            dto.TradeAccountID = loginCheck.tradeAccountId.Value;
+
+			var db = new databaseDataContext();
+
+			var results = db.Trade_Enquiry_AccountBalance_Drilldown(dto);
+
+			return Ok(results);
         }
 
         [HttpPost]
-        public IHttpActionResult refreshOutstandingInvoices()
+        public IHttpActionResult RefreshOutstandingInvoices([FromBody]Trade_Enquiry_InvoiceSearch_Request dto)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
-            return Ok(AccountFunctions.OutstandingInvoices(loginCheck.tradeDataSourceJson));
+            dto.TradeAccountID = loginCheck.tradeAccountId.Value;
+
+            return Ok(new databaseDataContext().Trade_Enquiry_InvoiceSearch(dto));
         }
 
         [HttpPost]
-        public IHttpActionResult refreshRecentPayments()
+        public IHttpActionResult RefreshRecentPayments([FromBody]Trade_Enquiry_RecentPayments_Request dto)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
-            return Ok(AccountFunctions.RecentPayments(loginCheck.tradeDataSourceJson));
+			dto.TradeAccountID = loginCheck.tradeAccountId.Value;
+
+			return Ok(new databaseDataContext().Trade_Enquiry_RecentPayments(dto));
         }
 
         [HttpPost]
-        public IHttpActionResult proformaInvoiceSearch([FromBody]PassProformaInvoiceSearch objSearch)
+        public IHttpActionResult ProformaInvoiceSearch([FromBody]PassProformaInvoiceSearch objSearch)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
@@ -254,14 +258,40 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [HttpPost]
-        public IHttpActionResult InvoiceSearch([FromBody]PassInvoiceSearch objSearch)
+        public IHttpActionResult InvoiceSearch([FromBody]Trade_Enquiry_InvoiceSearch_DetailedRequest dto)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, true);
 
-            if (objSearch.searchTerm == null)
-                objSearch.searchTerm = "";
+            dto.TradeAccountID = loginCheck.tradeAccountId.Value;
 
-            return Ok(AccountFunctions.InvoiceSearch(loginCheck.tradeDataSourceJson, objSearch));
+			DateTime? fromDt = null;
+			DateTime? toDt = null;
+
+			switch (dto.DateRange)
+			{
+				case 12:
+					fromDt = DateTime.Now.AddYears(-1);
+					break;
+				case 6:
+					fromDt = DateTime.Now.AddMonths(-6);
+					break;
+				case 1:
+					fromDt = DateTime.Now.AddDays(-DateTime.Now.Day).AddDays(1);// DateTime.Now.AddMonths(-1);
+					break;
+				case -1:
+					fromDt = dto.DateRangeStart ?? DateTime.Now.AddMonths(-1);
+					toDt = dto.DateRangeEnd ?? DateTime.Now;
+					break;
+			}
+
+            dto.DateRangeStart = fromDt;
+            dto.DateRangeEnd = toDt;
+
+			var results = new databaseDataContext().Trade_Enquiry_InvoiceSearch(dto);
+
+            return Ok(results);
+
+            //return Ok(AccountFunctions.InvoiceSearch(loginCheck.tradeDataSourceJson, objSearch));
         }
 
         [HttpPost]
