@@ -84,9 +84,7 @@ namespace wwwDesignersGuild.Models.Database
                 premiumPartner,
                 qr);
             return (IMultipleResults)result.ReturnValue;
-
         }
-
 
         [Function(Name = "pub.Stockist_SelectDetails")]
         [ResultTypeAttribute(typeof(StockistDetail))]
@@ -96,8 +94,6 @@ namespace wwwDesignersGuild.Models.Database
 
             IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), StockistID, date);
             return (ISingleResult<StockistDetail>)result.ReturnValue;
-
         }
-
     }
 }

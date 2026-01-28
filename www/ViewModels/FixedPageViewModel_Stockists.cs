@@ -95,10 +95,12 @@ namespace wwwDesignersGuild.ViewModels
             {
                 SelectedProductTypes = new List<string>();
 
-                if (CountryID == 238)
-                {
-                    SelectedProductTypes.Add("fabric");
-                }
+                // This was removed 28/01/2026, whatever the reasoning behind this has been forgotten
+                // and a Contracts user was dismayed to not find their Palavela Home result in Scottsdale at the top of the list!
+                //if (CountryID == 238)
+                //{
+                //    SelectedProductTypes.Add("fabric");
+                //}
             }
             else
             {
