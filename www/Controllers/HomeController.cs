@@ -1181,7 +1181,7 @@ namespace wwwDesignersGuild.Controllers
                         (
                             redirectUrl: objProductData.objUnavailabilityRedirect.redirectUrl,
                             objMaster: await NewMasterDefinition.CreateAsync(
-                                titleTag: $"{objProductData.objCacheSelect.titleTag} {urlData.countryDetails.TitleTagSuffix}",
+                                titleTag: $"{objProductData.objCacheSelect?.titleTag} {urlData.countryDetails.TitleTagSuffix}",
                                 metaDescription: objProductData.objCacheSelect?.metaDescription,
                                 backInStockReminder: (int?)Session["backInStockReminder"],
                                 itemsInBasket: basketTotalData.TotalQuantity,
