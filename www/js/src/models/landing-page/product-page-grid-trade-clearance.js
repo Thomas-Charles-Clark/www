@@ -151,7 +151,8 @@
         self.selectedAttributes.subscribe(nv => {
             self.selectMode(false);
             self.filteredContent().forEach(pp => pp.selected(false));
-            bootstrap.Collapse.getOrCreateInstance(document.querySelector('#trade-clearance-control-panel')).hide();
+            // Tom 21/04/2026 - why was the below line written? It appears to be extremely unhelpful.
+            // bootstrap.Collapse.getOrCreateInstance(document.querySelector('#trade-clearance-control-panel')).hide();
         }, self, 'arrayChange');
 
         //self.getFileNameFromContentDispostionHeader = (header) => {

@@ -1,5 +1,7 @@
 ﻿using MertexerV2.Utilities;
 
+using Microsoft.Ajax.Utilities;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.Models.Films;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.ProductReview;
 using wwwDesignersGuild.ViewModels;
@@ -36,6 +39,8 @@ namespace wwwDesignersGuild.Helpers
         {
             return new JsonLD(type, objData, description, currencyCode);
         }
+
+        public static readonly Regex VideoArrayRegex = new Regex(@"(\[[^\]]+])", RegexOptions.Compiled);
     }
 
     public class JsonLD : IHtmlString
@@ -100,6 +105,69 @@ namespace wwwDesignersGuild.Helpers
 }]
 ";
                         break;
+                    #endregion
+
+                    #region Films Page
+                    case "LandingPage":
+
+                        result += @"
+[{
+    ""@context"": ""http://schema.org"",
+    ""@type"": ""Organization"",
+    ""name"": ""Designers Guild"",
+    ""url"": ""https://www.designersguild.com"",
+    ""logo"": {
+        ""@type"": ""ImageObject"",
+        ""url"": ""https://www.designersguild.com/Content/images/logo/designers_guild_logo.png"",
+        ""width"": ""350"",
+        ""height"": ""25""
+    },
+    ""sameAs"": [""//www.instagram.com/designersguild"", ""//www.facebook.com/designersguildgroup"", ""//www.youtube.com/user/DesignersGuildGroup""]
+}, {
+    ""@context"": ""http://schema.org"",
+    ""@type"": ""WebSite"",
+    ""name"": ""Designers Guild"",
+    ""url"": ""https://www.designersguild.com""
+}";
+						var mod = (LandingPageViewModel)objModel;
+
+                        var htmlPs = mod?.PageSections.FirstOrDefault(p => p.PageSectionType == PageSectionType.HTML && ((HtmlPageSection)p.Definition).HtmlSectionID == 7132)?.Definition as HtmlPageSection;
+
+						if (htmlPs != null)
+                        {
+                            var data = JsonLDHelper.VideoArrayRegex.Match(htmlPs.Contents);
+
+                            if (data.Success)
+                            {
+                                var array = JsonConvert.DeserializeObject<IEnumerable<FilmStub>>(data.Value);
+
+                                result += @",
+";
+
+                                result += JsonConvert.SerializeObject(array.Select(s => new VideoObjectJSONLD
+								( 
+                                    s.VideoID,
+                                    "https://schema.org",
+                                    "VideoObject",
+                                    s.Title,
+                                    s.Description,
+                                    s.WatchURL,
+                                    s.UploadDate
+                                )), Formatting.Indented).TrimStart('[');//$@"{{ ""@context"": ""https://schema.org"", ""@type"": ""VideoObject"", ""name"": ""{s.Title}"", ""description"": ""{s.Description}"", ""contentUrl"": ""{s.WatchURL}"" }}"))}]";
+							}
+							else
+							{
+								result += @"]
+";
+							}
+						}
+                        else
+                        {
+                            result += @"]
+";
+                        }
+                        break;
+
                     #endregion
 
                     #region Primary Products

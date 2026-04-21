@@ -482,6 +482,9 @@
     <Compile Include="Models\DTOs\PassGUID.cs" />
     <Compile Include="Models\DTOs\PassMarketingListJoin.cs" />
     <Compile Include="Models\EmailCapturePopupForm\cmsEmailCapturePopupForm.cs" />
+    <Compile Include="Models\Films\FilmStub.cs" />
+    <Compile Include="Models\Films\VideoObjectJSONLD.cs" />
+    <Compile Include="Models\Films\VimeoVideoStub.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombination.cs" />
     <Compile Include="Models\FilterIndexRestriction\FilterIndexAttributeCombinationCacheProvider.cs" />
     <Compile Include="Models\GiftVoucher\cmsGiftVoucher.cs" />
@@ -1922,6 +1925,7 @@
     <Content Include="Content\images\logo\dg-unlimited.webp" />
     <Content Include="Content\images\logo\english-heritage.jpg" />
     <Content Include="Content\images\logo\english-heritage.png" />
+    <Content Include="Content\images\logo\feefo-2026.jpg" />
     <Content Include="Content\images\logo\feefo-us.jpg" />
     <Content Include="Content\images\logo\feefo.jpg" />
     <Content Include="Content\images\logo\feefo.png" />

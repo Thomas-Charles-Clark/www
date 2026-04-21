@@ -26,212 +26,221 @@
     @Html.Partial("~/Views-New/Shared/_SocialMediaDrop.cshtml", Model.SocialMediaViewModel)
 </nav>
 <div id="ko-wrapper">
-    @if (dgFramework.IsMobileDevice())
-    {
-        <div class="my-3">
-            <h1 class="text-uppercase my-4">
-                @HtmlHelperExtra.Resource("WorldOfDGHeading", l, c, d)
-            </h1>
-            @if (Model.ArticleTypes.Any())
-            {
-                var art = Model.ArticleTypes.Where(a => a.ArticleTypeID == Model.ArticleTypeID).Single();
-                <div class="dropdown mb-4">
-                    <button class="btn btn-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        @art.Name
-                    </button>
-                    <ul class="dropdown-menu bg-light w-100">
-                        @foreach (var at in Model.ArticleTypes.Where(p => p.ArticleTypeID != Model.ArticleTypeID))
-                        {
-                            <li>
-                                <a class="dropdown-item" href="@at.URL">
-                                    @(at.Name)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
-            @if (Model.ArticleSubTypes.Any())
-            {
-                var ast = Model.ArticleSubTypes.Where(a => a.ArticleSubTypeID == Model.ArticleSubTypeID).Single();
-                <div class="dropdown">
-                    <button class="btn btn-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        @ast.Name
-                    </button>
-                    <ul class="dropdown-menu bg-light w-100">
-                        @foreach (var at in Model.ArticleSubTypes.Where(p => p.ArticleSubTypeID != Model.ArticleSubTypeID))
-                        {
-                            <li>
-                                <a class="dropdown-item" href="@at.URL">
-                                    @(at.Name)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="my-3">
-            <h1 class="text-uppercase my-4">
-                @HtmlHelperExtra.Resource("WorldOfDGHeading", l, c, d)
-            </h1>
-            @if (Model.ArticleTypes.Any())
-            {
-                <nav class="article-type-nav nav-justified" aria-label="@HtmlHelperExtra.Resource("ArticleTypes", l, c, d)">
-                    <ul class="nav">
-                        @foreach (var at in Model.ArticleTypes)
-                        {
-                            <li class="nav-item @(Model.ArticleTypeID == at.ArticleTypeID ? "active" : "")">
-                                <a class="nav-link" href="@at.URL">
-                                    @(at.Name)
-                                    @if (Model.ArticleTypeID == at.ArticleTypeID)
-                                    {
-                                        <i class="bi bi-chevron-down"></i>
-                                    }
-                                </a>
-                            </li>
-                            @*if (at != Model.ArticleTypes.Last())
-                                {
-                                    <li class="vr"></li>
-                                }*@
-                        }
-                    </ul>
-                </nav>
-            }
-        </div>
-        if (Model.ArticleSubTypes.Any())
-        {
-            <div class="my-3">
-                <nav class="article-type-nav article-sub-type-nav nav-justified" aria-label="@HtmlHelperExtra.Resource("ArticleSubTypes", l, c, d)">
-                    <ul class="nav">
-                        @foreach (var ast in Model.ArticleSubTypes)
-                        {
-                            <li class="nav-item @(Model.ArticleSubTypeID == ast.ArticleSubTypeID ? "active" : "")">
-                                <a class="nav-link" href="@ast.URL">
-                                    @(ast.Name)
-                                </a>
-                            </li>
-                            @*if (ast != Model.ArticleSubTypes.Last())
-                                {
-                                    <li class="vr"></li>
-                                }*@
-                        }
-                    </ul>
-                </nav>
-            </div>
-        }
-    }
-    <div id="article-main"
-         class="grid">
-        <article style="@(Model.ArticleTemplateID == 1 ? "grid-column: auto/span 12" : "")">
-            <h1 class="text-uppercase my-3">
-                @Model.Heading
-            </h1>
-            @if (Model.ShowArticleNavButtons)
-            {
-                <nav id="article-prev-next"
-                     class="nav nav-pills">
-                    @if (Model.ShowPreviousArticle)
-                    {
-                        <a class="nav-link btn-link"
-                           href="@dgFramework.buildUrl(dgContentType.articlePage, (int)Model.PreviousArticle.ArticleID, ci)"
-                           target="_self">
-                            @HtmlHelperExtra.Resource("ArticlePrevious", l, c, d)
-                        </a>
-                    }
-                    @if (Model.ShowNextArticle)
-                    {
-                        <a class="nav-link btn-link"
-                           href="@dgFramework.buildUrl(dgContentType.articlePage, (int)Model.NextArticle.ArticleID, ci)"
-                           target="_self">
-                            @HtmlHelperExtra.Resource("ArticleNext", l, c, d)
-                        </a>
-                    }
-                </nav>
-            }
-            @if (!String.IsNullOrEmpty(Model.SubHeading))
-            {
-                <h5 class="article-heading mb-3">
-                    @Model.SubHeading
-                </h5>
-            }
-            @if (Model.Video == null)
-            {
-                if (Model.ArticleTemplateID != 4)
-                {
-                    if (Model.Carousel.Images.Any())
-                    {
-                        <div class="mb-5">
-                            @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
-                        </div>
-                    }
-                    <div class="mb-6">
-                        @Html.Raw(Model.Contents)
-                    </div>
-                }
-                else
-                {
-                    @*<div id="article-main"
-                        class="grid">*@
-                    <div>
-                        @if (Model.Carousel.Images.Any())
-                        {
-                            <div class="mb-5">
-                                @Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
-                            </div>
-                        }
-                        <div class="mb-6 w-75">
-                            @Html.Raw(Model.Contents)
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="mb-5">
-                    @Html.Partial("~/Views-New/LandingPages/PageSections/_Video.cshtml", Model.Video)
-                </div>
-                <div class="mb-6 w-75">
-                    @Html.Raw(Model.Contents)
-                </div>
-            }
-        </article>
-        <div>
-            @if (Model.RelatedArticles.Any())
-            {
-                <h5 class="my-3 text-uppercase">
-                    @HtmlHelperExtra.Resource("articleRelated", l, c, d)
-                </h5>
-                <div class="related-articles mb-5">
-                    @foreach (var rp in Model.RelatedArticles)
-                    {
-                        <a class="pod-card"
-                           href="@(rp.URLKeywords)">
-                            <div class="card">
-                                <img class="card-img-top"
-                                     width="488"
-                                     height="488"
-                                     alt="@(rp.Heading)"
-                                     title="@(rp.Heading)"
-                                     src="/image@(Framework.WebPFallback)/488/@(rp.ImageID)"
-                                     @HtmlHelperExtra.ImageSourceSetSizes(rp.ImageID, ImageSize.Three)
-                                     @*loading="lazy"*@ />
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">
-                                    @Html.Raw(rp.Heading)
-                                </p>
-                                <p class="card-text">
-                                    @Html.Raw(rp.SubHeading)
-                                </p>
-                            </div>
-                        </a>
-                    }
-                </div>
-            }
-        </div>
-    </div>
+	@if (dgFramework.IsMobileDevice())
+	{
+		<div class="my-3">
+			<h1 class="text-uppercase my-4">
+				@HtmlHelperExtra.Resource("WorldOfDGHeading", l, c, d)
+			</h1>
+			@if (Model.ArticleTypes.Any())
+			{
+				var art = Model.ArticleTypes.Where(a => a.ArticleTypeID == Model.ArticleTypeID).Single();
+				<div class="dropdown mb-4">
+					<button class="btn btn-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						@art.Name
+					</button>
+					<ul class="dropdown-menu bg-light w-100">
+						@foreach (var at in Model.ArticleTypes.Where(p => p.ArticleTypeID != Model.ArticleTypeID))
+						{
+							<li>
+								<a class="dropdown-item" href="@at.URL">
+									@(at.Name)
+								</a>
+							</li>
+						}
+					</ul>
+				</div>
+			}
+			@if (Model.ArticleSubTypes.Any())
+			{
+				var ast = Model.ArticleSubTypes.Where(a => a.ArticleSubTypeID == Model.ArticleSubTypeID).Single();
+				<div class="dropdown">
+					<button class="btn btn-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						@ast.Name
+					</button>
+					<ul class="dropdown-menu bg-light w-100">
+						@foreach (var at in Model.ArticleSubTypes.Where(p => p.ArticleSubTypeID != Model.ArticleSubTypeID))
+						{
+							<li>
+								<a class="dropdown-item" href="@at.URL">
+									@(at.Name)
+								</a>
+							</li>
+						}
+					</ul>
+				</div>
+			}
+		</div>
+	}
+	else
+	{
+		<div class="my-3">
+			<h1 class="text-uppercase my-4">
+				@HtmlHelperExtra.Resource("WorldOfDGHeading", l, c, d)
+			</h1>
+			@if (Model.ArticleTypes.Any())
+			{
+				<nav class="article-type-nav nav-justified" aria-label="@HtmlHelperExtra.Resource("ArticleTypes", l, c, d)">
+					<ul class="nav">
+						@foreach (var at in Model.ArticleTypes)
+						{
+							<li class="nav-item @(Model.ArticleTypeID == at.ArticleTypeID ? "active" : "")">
+								<a class="nav-link" href="@at.URL">
+									@(at.Name)
+									@if (Model.ArticleTypeID == at.ArticleTypeID)
+									{
+										<i class="bi bi-chevron-down"></i>
+									}
+								</a>
+							</li>
+							@*if (at != Model.ArticleTypes.Last())
+								{
+									<li class="vr"></li>
+								}*@
+						}
+					</ul>
+				</nav>
+			}
+		</div>
+		if (Model.ArticleSubTypes.Any())
+		{
+			<div class="my-3">
+				<nav class="article-type-nav article-sub-type-nav nav-justified" aria-label="@HtmlHelperExtra.Resource("ArticleSubTypes", l, c, d)">
+					<ul class="nav">
+						@foreach (var ast in Model.ArticleSubTypes)
+						{
+							<li class="nav-item @(Model.ArticleSubTypeID == ast.ArticleSubTypeID ? "active" : "")">
+								<a class="nav-link" href="@ast.URL">
+									@(ast.Name)
+								</a>
+							</li>
+							@*if (ast != Model.ArticleSubTypes.Last())
+								{
+									<li class="vr"></li>
+								}*@
+						}
+					</ul>
+				</nav>
+			</div>
+		}
+	}
+	@if (Model.ArticleTemplateID != 5)
+	{
+		<div id="article-main"
+			 class="grid">
+			<article style="@(Model.ArticleTemplateID == 1 ? "grid-column: auto/span 12" : "")">
+				<h1 class="text-uppercase my-3">
+					@Model.Heading
+				</h1>
+				@if (Model.ShowArticleNavButtons)
+				{
+					<nav id="article-prev-next"
+						 class="nav nav-pills">
+						@if (Model.ShowPreviousArticle)
+						{
+							<a class="nav-link btn-link"
+							   href="@dgFramework.buildUrl(dgContentType.articlePage, (int)Model.PreviousArticle.ArticleID, ci)"
+							   target="_self">
+								@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d)
+							</a>
+						}
+						@if (Model.ShowNextArticle)
+						{
+							<a class="nav-link btn-link"
+							   href="@dgFramework.buildUrl(dgContentType.articlePage, (int)Model.NextArticle.ArticleID, ci)"
+							   target="_self">
+								@HtmlHelperExtra.Resource("ArticleNext", l, c, d)
+							</a>
+						}
+					</nav>
+				}
+				@if (!String.IsNullOrEmpty(Model.SubHeading))
+				{
+					<h5 class="article-heading mb-3">
+						@Model.SubHeading
+					</h5>
+				}
+				@if (Model.Video == null)
+				{
+					if (Model.ArticleTemplateID != 4)
+					{
+						if (Model.Carousel.Images.Any())
+						{
+							<div class="mb-5">
+								@Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+							</div>
+						}
+						<div class="mb-6">
+							@Html.Raw(Model.Contents)
+						</div>
+					}
+					else
+					{
+						@*<div id="article-main"
+							class="grid">*@
+						<div>
+							@if (Model.Carousel.Images.Any())
+							{
+								<div class="mb-5">
+									@Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", Model.Carousel)
+								</div>
+							}
+							<div class="mb-6 w-75">
+								@Html.Raw(Model.Contents)
+							</div>
+						</div>
+					}
+				}
+				else
+				{
+					<div class="mb-5">
+						@Html.Partial("~/Views-New/LandingPages/PageSections/_Video.cshtml", Model.Video)
+					</div>
+					<div class="mb-6 w-75">
+						@Html.Raw(Model.Contents)
+					</div>
+				}
+			</article>
+			<div>
+				@if (Model.RelatedArticles.Any())
+				{
+					<h5 class="my-3 text-uppercase">
+						@HtmlHelperExtra.Resource("articleRelated", l, c, d)
+					</h5>
+					<div class="related-articles mb-5">
+						@foreach (var rp in Model.RelatedArticles)
+						{
+							<a class="pod-card"
+							   href="@($"{rp.URLKeywords}/a{rp.ArticleID}")">
+								<div class="card">
+									<img class="card-img-top"
+										 width="488"
+										 height="488"
+										 alt="@(rp.Heading)"
+										 title="@(rp.Heading)"
+										 src="/image@(Framework.WebPFallback)/488/@(rp.ImageID)"
+										 @HtmlHelperExtra.ImageSourceSetSizes(rp.ImageID, ImageSize.Three)
+										 @*loading="lazy"*@ />
+								</div>
+								<div class="card-body">
+									<p class="card-text">
+										@Html.Raw(rp.Heading)
+									</p>
+									<p class="card-text">
+										@Html.Raw(rp.SubHeading)
+									</p>
+								</div>
+							</a>
+						}
+					</div>
+				}
+			</div>
+		</div>
+	}
+	else
+	{
+		<div id="article-main">
+			@Html.Raw(Model.RawContents)
+		</div>
+	}
 </div>

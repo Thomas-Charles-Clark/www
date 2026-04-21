@@ -107,6 +107,14 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public string RawContents
+        {
+            get
+			{
+				return Definition.ArticleDetails.Contents;
+			}
+        }
+
         public string Heading
         {
             get
