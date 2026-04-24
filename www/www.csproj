@@ -496,6 +496,8 @@
     <Compile Include="Models\ImageSize\ImageSize.cs" />
     <Compile Include="Models\JsonLD\JsonLD.cs" />
     <Compile Include="Models\LandingPage\LandingPage.cs" />
+    <Compile Include="Models\LandingPage\ProductPageGrid_AttributeDTO.cs" />
+    <Compile Include="Models\LandingPage\ProductPageGrid_PagingDTO.cs" />
     <Compile Include="Models\Language\Language.cs" />
     <Compile Include="Models\Login\PassEmail.cs" />
     <Compile Include="Models\Login\PassNewMember.cs" />
