@@ -65,9 +65,9 @@
     </h4>
 </div>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
-    <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+    @*<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
         @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
-    </span>
+    </span>*@
     <span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText, remove">
         @Model.Base.AttributeFilterText
     </span>
@@ -302,7 +302,7 @@
         <span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable, remove">
             @grid.Searchable
         </span>
-       @if (!grid.Searchable)
+       @*@if (!grid.Searchable)
         {
             <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
                 @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>()))
@@ -313,10 +313,11 @@
             <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
                 @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>().Select(p => p.ProductPageID)))
             </span>
-        }
+        }*@
        @if (Model.PageSection.Paging || Model.PageSection.Filter)
         {
-            <div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
+            @*<div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">*@
+            <div class="product-page-grid grid" data-bind="foreach: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
               @if (Model.PageSection.PreviewColourways)
                {
 

@@ -39,7 +39,7 @@
 {
     <script id="ko-pager-template" type="text/html">
         <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
                        data-bind="enable: backEnabled, click: () => navigatePrevious(), css: { 'disabled': !backEnabled() }">
                     <span class="material-icons">
@@ -54,7 +54,7 @@
         </li>
         <!-- ko if: leftEllipsisVisible -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) - 2">
                     <span>
                         &#8230;
@@ -69,7 +69,7 @@
         <!-- /ko -->
         <!-- ko foreach: visiblePages -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false, 'active': $parent.page() == $data.page }">
-            <a data-bind="class: `page-section-${$parent.parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${$parent.parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)">
                     <span data-bind="text: $data.page"></span>
                     <span class="visually-hidden">
@@ -82,7 +82,7 @@
         <!-- /ko -->
         <!-- ko if: rightEllipsisVisible -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) + 2">
                     <span>
                         &#8230;
@@ -96,7 +96,7 @@
         </li>
         <!-- /ko -->
         <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
                        data-bind="enable: forwardEnabled, click: () => navigateNext(), css: { 'disabled': !forwardEnabled() }">
                     <span class="material-icons">

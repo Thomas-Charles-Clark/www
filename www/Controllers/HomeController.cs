@@ -38,13 +38,14 @@ namespace wwwDesignersGuild.Controllers
 
         public bool IsShop { get; set; }
 
-        /// <summary>
-        /// CatchAll route handler.
-        /// </summary>
-        /// <param name="urlParameter">Everything after the .com/</param>
-        /// <returns></returns>
-        /// 
-        public async Task<ActionResult> CatchAll(string urlParameter)
+		/// <summary>
+		/// CatchAll route handler.
+		/// </summary>
+		/// <param name="urlParameter">Everything after the .com/</param>
+		/// <returns></returns>
+		/// 
+		[AsyncTimeout(60000)]
+		public async Task<ActionResult> CatchAll(string urlParameter)
         {
             #region Redirectioneering
 

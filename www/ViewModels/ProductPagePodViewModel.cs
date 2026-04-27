@@ -73,12 +73,15 @@ namespace wwwDesignersGuild.ViewModels
             bool useLifestyleGalleryBehaviour,
             ImageSize? imageSize = null)
         {
-            MasterDefinition = objMaster;
-            ProductPage = objProductPage;
-            UseLifestyleGalleryBehaviour = useLifestyleGalleryBehaviour;
-            ImageSize = imageSize ?? (dgFramework.IsMobileDevice() ? ImageSize.Six : ImageSize.Three);
-            NoFollow = objProductPage.NoFollow;
-            NoIndex = objProductPage.NoIndex;
+            if (objMaster != null)
+			{
+				MasterDefinition = objMaster;
+				ProductPage = objProductPage;
+				UseLifestyleGalleryBehaviour = useLifestyleGalleryBehaviour;
+				ImageSize = imageSize ?? (dgFramework.IsMobileDevice() ? ImageSize.Six : ImageSize.Three);
+				NoFollow = objProductPage.NoFollow;
+				NoIndex = objProductPage.NoIndex;
+			}
         }
     }
 }

@@ -237,6 +237,10 @@
         alert('@HtmlHelperExtra.EscapeForJS(HtmlHelperExtra.Resource("OperaMiniWarning", l, c, d))');
     }
 
+    window.getBase = () => {
+        return @Html.Raw(JsonConvert.SerializeObject(Model))
+    }
+
     window.getMasterDefinition = () => {
         return @Html.Raw(JsonConvert.SerializeObject(objMaster));
     }
