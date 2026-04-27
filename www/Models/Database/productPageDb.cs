@@ -183,6 +183,7 @@ namespace wwwDesignersGuild.Models.Database
 
                 comm.CommandText = @"cache.ProductPageGrid_Select";
                 comm.CommandType = System.Data.CommandType.StoredProcedure;
+                comm.CommandTimeout = 600;
 
                 comm.Parameters.AddWithValue("@PageSectionID", pageSectionId);
                 comm.Parameters.AddWithValue("@LanguageID", languageId);

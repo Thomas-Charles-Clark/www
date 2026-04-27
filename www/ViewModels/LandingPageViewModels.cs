@@ -2411,7 +2411,13 @@ namespace wwwDesignersGuild.ViewModels
 
             #endregion
 
-            result.Contents = completeResultSet.Cast<object>()
+            #region Perform Paging
+
+            // ....??? ???????
+
+			#endregion
+
+			result.Contents = completeResultSet.Cast<object>()
                                                .ToList();
 
             if (result.Contents.Count() < result.PageSize)
