@@ -146,46 +146,40 @@
     </script>
     <script id="ups-ap-detail-template" type="text/html">
         <div class="ap-detail" data-bind="keepElement: infoDomHolder">
-            <!-- ko if: accessPointInformationField.imageURLField -->
-            <img class="ap-thumb" data-bind="click: showLargeImage, attr: { src: accessPointInformationField.imageURLField }" />
+            <!-- ko if: AccessPointInformation.ImageURL -->
+            <img class="ap-thumb" data-bind="click: showLargeImage, attr: { src: AccessPointInformation.ImageURL }" />
             <!-- /ko -->
-            <h6 data-bind="text: addressKeyFormatField.consigneeNameField"></h6>
-            <div class="ap-address" data-bind="with: addressKeyFormatField">
-                <!-- ko if: addressLineField -->
-                <span data-bind="text: addressLineField"></span>
-                <!-- /ko -->
-                <!-- ko if: addressLine2Field -->
-                <span data-bind="text: addressLine2Field"></span>
-                <!-- /ko -->
-                <!-- ko if: addressLine3Field -->
-                <span data-bind="text: addressLine3Field"></span>
-                <!-- /ko -->
-                <!-- ko if: politicalDivision1Field -->
-                <span data-bind="text: politicalDivision1Field"></span>
-                <!-- /ko -->
-                <!-- ko if: politicalDivision2Field -->
-                <span data-bind="text: politicalDivision2Field"></span>
-                <!-- /ko -->
-                <!-- ko if: politicalDivision3Field -->
-                <span data-bind="text: politicalDivision3Field"></span>
-                <!-- /ko -->
-                <!-- ko if: postcodePrimaryLowField -->
-                <span>
-                    <span data-bind="text: postcodePrimaryLowField"></span>
-                    <!-- ko if: postcodeExtendedLowField -->
-                    <span data-bind="text: postcodeExtendedLowField"></span>
-                    <!-- /ko -->
-                </span>
-                <!-- /ko -->
-                <!-- ko if: postcodePrimaryLowField -->
-                <span data-bind="text: countryCodeField"></span>
-                <!-- /ko -->
-            </div>
-            <!-- ko if: commentsField -->
-            <i class="ups-comments display-block" data-bind="text: commentsField"></i>
+            <h6 data-bind="text: AddressKeyFormat.ConsigneeName"></h6>
+			<div class="ap-address" data-bind="with: AddressKeyFormat">
+				<!-- ko if: AddressLine -->
+				<span data-bind="text: AddressLine"></span>
+				<!-- /ko -->
+				<!-- ko if: PoliticalDivision1 -->
+				<span data-bind="text: PoliticalDivision1"></span>
+				<!-- /ko -->
+				<!-- ko if: PoliticalDivision2 -->
+				<span data-bind="text: PoliticalDivision2"></span>
+				<!-- /ko -->
+				<!-- ko if: PoliticalDivision3 -->
+				<span data-bind="text: PoliticalDivision3"></span>
+				<!-- /ko -->
+				<!-- ko if: PostcodePrimaryLow -->
+				<span>
+					<span data-bind="text: PostcodePrimaryLow"></span>
+					<!-- ko if: PostcodeExtendedLow -->
+					<span data-bind="text: PostcodeExtendedLow"></span>
+					<!-- /ko -->
+				</span>
+				<!-- /ko -->
+				<!-- ko if: CountryCode -->
+				<span data-bind="text: CountryCode"></span>
+				<!-- /ko -->
+			</div>
+            <!-- ko if: Comments -->
+            <i class="ups-comments display-block" data-bind="text: Comments"></i>
             <!-- /ko -->
-            <!-- ko if: standardHoursOfOperationField -->
-            <span class="ups-open-hrs display-block" data-bind="html: standardHoursOfOperationField.replace(/; /g, '<br/>')"></span>
+            <!-- ko if: StandardHoursOfOperation -->
+            <span class="ups-open-hrs display-block" data-bind="html: StandardHoursOfOperation.replace(/; /g, '<br/>')"></span>
             <!-- /ko -->
             <button class="btn btn-secondary btn-sm btn-ups-select" data-bind="click: function () { parent.selectUpsAp($data) }">
                 @HtmlHelperExtra.Resource("ModularSelect", l, c, d)

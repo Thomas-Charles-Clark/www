@@ -661,25 +661,25 @@ const deliveryAddressFactory = ((parent) => {
         }
         var result = checkoutDeliveryAddress(
             self,
-            addr.addressKeyFormatField.countryCodeField,
+            addr.AddressKeyFormat.CountryCode,
             false,
             3,
             null,
             null,
             null,
-            addr.addressKeyFormatField.consigneeNameField,
-            addr.addressKeyFormatField.addressLineField,
-            addr.addressKeyFormatField.addressLine2Field,
-            addr.addressKeyFormatField.politicalDivision1Field ||
-            addr.addressKeyFormatField.politicalDivision2Field,
-            addr.addressKeyFormatField.politicalDivision3Field,
-            addr.addressKeyFormatField.postcodePrimaryLowField + (addr.addressKeyFormatField.postcodeExtendedLowField ? ' ' + postcodeExtendedLowField : ''),
-            addr.accessPointInformationField.publicAccessPointIDField,
+            addr.AddressKeyFormat.ConsigneeName,
+            addr.AddressKeyFormat.AddressLine,
+            addr.AddressKeyFormat.AddressLine2,
+            addr.AddressKeyFormat.PoliticalDivision1 ||
+            addr.AddressKeyFormat.PoliticalDivision2,
+            addr.AddressKeyFormat.PoliticalDivision3,
+            addr.AddressKeyFormat.PostcodePrimaryLow + (addr.AddressKeyFormat.PostcodeExtended ? ' ' + addr.AddressKeyFormat.PostcodeExtendedLow : ''),
+            addr.AccessPointInformation.PublicAccessPointIDField,
             null,
             false,
             false);
 
-        if (addr.accessPointInformationField.publicAccessPointIDField) {
+        if (addr.AccessPointInformation.PublicAccessPointID) {
             self.isUPSDelivery(true);
         }
 
@@ -1537,20 +1537,25 @@ const deliveryAddressFactory = ((parent) => {
                                 //console.log('upsLocatorSearch returned', data);
                                 self.upsBusy(false);
                                 var results = [];
-                                if (data.hasOwnProperty('searchResultsField')) {
-                                    if (data.searchResultsField.hasOwnProperty('itemsField')) {
-                                        ko.utils.arrayForEach(data.searchResultsField.itemsField, function (sr) {
-                                            results.push(upsApMarker({
-                                                upsLocatorResult: sr,
-                                                map: self.upsApMap,
-                                                parent: self
-                                            }));
-                                        });
+                                if (data) {
+                                    if (Object.hasOwn(data, 'LocatorResponse') && Object.hasOwn(data.LocatorResponse, 'SearchResults')) {
+                                        if (Array.isArray(data.LocatorResponse?.SearchResults?.DropLocation)) {
+                                            data.LocatorResponse.SearchResults.DropLocation.forEach(sr => {
+                                                results.push(upsApMarker({
+                                                    upsLocatorResult: sr,
+                                                    map: self.upsApMap,
+                                                    parent: self
+                                                }))
+                                            });
+                                        }
                                     }
+                                    self.upsLocatorResults(results);
+                                } else {
+                                    window.showError();
                                 }
-                                self.upsLocatorResults(results);
                             },
                             error: function (xhr, s, a) {
+                                bootstrap.Modal.getOrCreateInstance(document.querySelector('#collection-modal')).hide();
                                 window.showError();
                             }
                         });
@@ -6458,12 +6463,12 @@ function upsApMarker({
     parent
 } = {
         upsLocatorResult: {
-            geocodeField: {
-                latitudeField: 0,
-                longitudeField: 0
+            Geocode: {
+                Latitude: 0,
+                Longitude: 0
             },
-            addressKeyFormatField: {
-                consigneeNameField: 'error'
+            AddressKeyFormat: {
+                ConsigneeName: 'error'
             }
         },
         map: null,
@@ -6479,16 +6484,16 @@ function upsApMarker({
 
     self.marker = new google.maps.Marker({
         position: {
-            lat: Number(upsLocatorResult.geocodeField.latitudeField),
-            lng: Number(upsLocatorResult.geocodeField.longitudeField)
+            lat: Number(upsLocatorResult.Geocode.Latitude),
+            lng: Number(upsLocatorResult.Geocode.Longitude)
         },
         map: self.map,
-        title: upsLocatorResult.addressKeyFormatField.consigneeNameField
+        title: upsLocatorResult.AddressKeyFormat.ConsigneeName
     });
 
     self.showLargeImage = function () {
-        if (self.accessPointInformationField.imageURLField)
-            window.showInfo(self.addressKeyFormatField.consigneeNameField, `<img class="ap-img-lg" src="${self.accessPointInformationField.imageURLField}" />`);
+        if (self.AccessPointInformation.ImageURL)
+            window.showInfo(self.AddressKeyFormat.ConsigneeName, `<img class="ap-img-lg" src="${self.AccessPointInformation.ImageURL}" />`);
     }
 
     let frag = document.createDocumentFragment();

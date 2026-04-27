@@ -6,6 +6,8 @@ using System.Data.Linq;
 using System.Reflection;
 using System.Data.Linq.Mapping;
 using wwwDesignersGuild.Models.Classes;
+
+using Dapper;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
@@ -15,31 +17,24 @@ namespace wwwDesignersGuild.Models.Database
 {
     public partial class databaseDataContext
     {
-        public UPSAPICredential FetchUPSAPICredential()
+        public UPSAccessPointLocatorClientKeys FetchUPSAPICredential()
         {
-            var result = new UPSAPICredential();
-
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
             {
-                SqlCommand comm = conn.CreateCommand();
-                comm.CommandType = System.Data.CommandType.Text;
+				var result = conn.QuerySingle<UPSAccessPointLocatorClientKeys>(
+                    @"SELECT Name, 
+                             ClientID, 
+                             ClientSecret,
+                             AccountNumber
+                      FROM ups.App 
+                      WHERE AppID = 3",
+                    null,
+                    null,
+                    null,
+                    CommandType.Text);
 
-                comm.CommandText = "SELECT UserID, Password FROM ups.APICredential WHERE APICredentialID = 1";
-
-                conn.Open();
-
-                var reader = comm.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    result.UserID = reader.GetString(0);
-                    result.Password = reader.GetString(1);
-                }
-
-                conn.Close();
-            }
-
-            return result;
+				return result;
+			}
         }
     }
 }

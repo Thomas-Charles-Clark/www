@@ -680,12 +680,13 @@
     <Compile Include="Models\Trade\PassTradeLoginUnregisteredRequest.cs" />
     <Compile Include="Models\Trade\TradeDownloadFile.cs" />
     <Compile Include="Models\Trade\Trade.cs" />
+    <Compile Include="Models\UPS\LocatorRequest.cs" />
+    <Compile Include="Models\UPS\LocatorResponse.cs" />
+    <Compile Include="Models\UPS\OAuthResponse.cs" />
     <Compile Include="ViewModels\Trade\TradeMyAccountViewModel.cs" />
     <Compile Include="Models\Twitter\Twitter.cs" />
     <Compile Include="Models\UnsubscribePage\cmsUnsubscribePage.cs" />
     <Compile Include="Models\UPS\AccessRequest.cs" />
-    <Compile Include="Models\UPS\LocatorRequest.cs" />
-    <Compile Include="Models\UPS\LocatorResponse.cs" />
     <Compile Include="Models\UPS\Other.cs" />
     <Compile Include="Models\Visitors\VisitorFactory.cs" />
     <Compile Include="Models\Attribute\cmsAttribute.cs" />

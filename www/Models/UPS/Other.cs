@@ -6,10 +6,12 @@ using System.Xml.Serialization;
 
 namespace wwwDesignersGuild.Models.UPS
 {
-    public class UPSAPICredential
+    public class UPSAccessPointLocatorClientKeys
     {
-        public string UserID { get; set; }
-        public string Password { get; set; }
+        public string Name { get; set; }
+        public string ClientID { get; set; }
+        public string ClientSecret { get; set; }
+        public string AccountNumber { get; set; }
     }
 
     public class PassUPSLocatorSearch
