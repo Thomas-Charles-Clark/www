@@ -230,48 +230,5 @@
         }
     }
 
-    //self.changePage = () => {
-    //    if (self.skipRender()) {
-    //        self.skipRender(false);
-    //    } else {
-    //        self.busy(true);
-
-    //        let data = {
-    //            pageSectionId: self.parent.PageSectionID,
-    //            languageId: window.getLanguageId(),
-    //            countryId: window.getCountryId(),
-    //            page: self.page(),
-    //            pageSize: self.pageSize(),
-    //            sort: self.sort(),
-    //            productTypeId: self.parent.productTypeId(),
-    //            attributes: self.parent.selectedAttributeItems.map(a => {
-    //                return {
-    //                    AttributeID: a.AttributeID,
-    //                    AttributeGroupID: a.AttributeGroupID,
-    //                    AttributeOperator: a.AttributeGroup.Operator
-    //                }
-    //            })
-    //        }
-
-    //        console.log('ProductPageGrid_Page calling with', data);
-
-    //        fetch('/api/ProductPagesAPI/ProductPageGrid_Page', {
-    //            method: 'POST',
-    //            headers: window.fetchHeaders,
-    //            cache: 'no-store',
-    //            credentials: 'same-origin',
-    //            body: JSON.stringify(data)
-    //        })
-    //            .then(window.handleFetchResponse)
-    //            .then(data => {
-    //                console.log('ProductPageGrid_Page returned', data);
-    //            })
-    //            .catch(err => {
-    //                self.busy(false);
-    //                window.catchFetchErrors(err);
-    //            })
-    //    }
-    //}
-
     return self;
 })
