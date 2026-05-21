@@ -839,7 +839,7 @@
                         return self.allProductPages().indexOf(a) - self.allProductPages().indexOf(b)
                     });
                 } else {
-                    return self.allProductPages().filter(pp => result.has(pp.productPageId));
+                    return self.allProductPages().filter(pp => result.has(pp.ProductPageID));
                 }
             }
         }
@@ -1144,42 +1144,43 @@
 
     //#region Computeds
 
-    self.selectedAttributeItems = ko.pureComputed(() => {
-        return self.attributes().filter(a => pageModel.pageSections[3].productPageGrid.selectedAttributes().indexOf(a.FormValue) > -1);
-    }, self);
+    //self.selectedAttributeItems = ko.pureComputed(() => {
+    //    return self.attributes().filter(a => pageModel.pageSections[3].productPageGrid.selectedAttributes().indexOf(a.FormValue) > -1);
+    //}, self);
 
-    self.fetchDefinition = () => {
+    //self.fetchDefinition = () => {
 
-        var data = {
-            pageId: pageModel.MasterDefinition.UrlBreakdown.ContentId,
-            pageSectionId: self.parent.pageSectionId,
-            countryId: window.getCountryId(),
-            languageId: window.getLanguageId(),
-            baseViewModel: window.getBase()
-        };
+    //    var data = {
+    //        pageId: pageModel.MasterDefinition.UrlBreakdown.ContentId,
+    //        pageSectionId: self.parent.pageSectionId,
+    //        countryId: window.getCountryId(),
+    //        languageId: window.getLanguageId(),
+    //        baseViewModel: window.getBase()
+    //    };
 
-        console.log('FetchPageSectionDefinition calling with', data)
+    //    console.log('FetchPageSectionDefinition calling with', data)
 
-        fetch('/api/ProductPageAPI/FetchPageSectionDefinition', {
-            method: 'POST',
-            headers: window.fetchHeaders,
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-        })
-            .then(window.handleFetchResponse)
-            .then(data => {
-                console.log('FetchPageSectionDefinition returned', data);
-                self.parent.data(data);
-                self.parent.productPageGrid.allProductPages(data.Definition.Json.json.productPages);
-                self.parent.productPageGrid.allProductPagesInitialised();
-            })
-            .catch(err => {
-                window.catchFetchErrors(err);
-                window.showError();
-            })
-    }
+    //    fetch('/api/ProductPageAPI/FetchPageSectionDefinition', {
+    //        method: 'POST',
+    //        headers: window.fetchHeaders,
+    //        credentials: 'same-origin',
+    //        body: JSON.stringify(data)
+    //    })
+    //        .then(window.handleFetchResponse)
+    //        .then(data => {
+    //            console.log('FetchPageSectionDefinition returned', data);
+    //            self.parent.data(data);
+    //            self.productTypes(data.Definition.ProductTypes.map(pt => productTypeViewModel(self, pt.ProductPageIDs)))
+    //            self.parent.productPageGrid.allProductPages(data.Definition.Json.json.productPages);
+    //            self.parent.productPageGrid.allProductPagesInitialised();
+    //        })
+    //        .catch(err => {
+    //            window.catchFetchErrors(err);
+    //            window.showError();
+    //        })
+    //}
 
-    self.fetchDefinition();
+    //self.fetchDefinition();
 
     //#endregion
 

@@ -141,79 +141,79 @@ namespace wwwDesignersGuild.Controllers
             });
         }
 
-        [HttpPost]
-        public async Task<IHttpActionResult> FetchPageSectionDefinition([FromBody]ProductPageGrid_PagingDTO dto)
-        {
-			var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
+   //     [HttpPost]
+   //     public async Task<IHttpActionResult> FetchPageSectionDefinition([FromBody]ProductPageGrid_PagingDTO dto)
+   //     {
+			//var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
 
-			var session = HttpContext.Current.Session;
+			//var session = HttpContext.Current.Session;
 
-			Int32? memberId = null;
+			//Int32? memberId = null;
 
-			if (session["memberIdFromDatabase"] == null)
-			{
+			//if (session["memberIdFromDatabase"] == null)
+			//{
 
-			}
-			else
-			{
-				memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
-			}
+			//}
+			//else
+			//{
+			//	memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
+			//}
 
-			int? tradeAccountId = null;
+			//int? tradeAccountId = null;
 
-			if (session["memberTradeChecksPassed"] != null)
-			{
-				if (Convert.ToBoolean(session["memberTradeChecksPassed"]) == true)
-				{
-					tradeAccountId = Convert.ToInt32(session["memberTradeAccountID"].ToString());
-				}
-			}
+			//if (session["memberTradeChecksPassed"] != null)
+			//{
+			//	if (Convert.ToBoolean(session["memberTradeChecksPassed"]) == true)
+			//	{
+			//		tradeAccountId = Convert.ToInt32(session["memberTradeAccountID"].ToString());
+			//	}
+			//}
 
-            var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+   //         var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
             
-            var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
+   //         var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
 
-			dto.TradeAccountID = tradeAccountId;
-            dto.IsTrade = dto.TradeAccountID.HasValue;
-            dto.DisplayTradePrice = displayTradePrice;
-            dto.MemberID = memberId;
-            dto.IsMember = dto.MemberID.HasValue;
-            dto.UseDate = useDate;
-            dto.CountryMatch = countryMatched;
-            dto.DebugProductCode = null;
-			dto.Debug = false;
+			//dto.TradeAccountID = tradeAccountId;
+   //         dto.IsTrade = dto.TradeAccountID.HasValue;
+   //         dto.DisplayTradePrice = displayTradePrice;
+   //         dto.MemberID = memberId;
+   //         dto.IsMember = dto.MemberID.HasValue;
+   //         dto.UseDate = useDate;
+   //         dto.CountryMatch = countryMatched;
+   //         dto.DebugProductCode = null;
+			//dto.Debug = false;
 
-			var Definition = await new cmsLandingPage().loadLandingPageFromCms(
-			   memberId: dto.MemberID,
-			   pageId: dto.PageID,
-			   languageId: dto.LanguageID,
-			   countryId: dto.CountryID,
-			   useDate: dto.UseDate,
-			   isMember: dto.IsMember,
-			   isTrade: dto.IsTrade,
-			   countryMatch: dto.CountryMatch,
-			   displayTradePrice: dto.DisplayTradePrice,
-			   tradeAccountId: dto.TradeAccountID);
+			//var Definition = await new cmsLandingPage().loadLandingPageFromCms(
+			//   memberId: dto.MemberID,
+			//   pageId: dto.PageID,
+			//   languageId: dto.LanguageID,
+			//   countryId: dto.CountryID,
+			//   useDate: dto.UseDate,
+			//   isMember: dto.IsMember,
+			//   isTrade: dto.IsTrade,
+			//   countryMatch: dto.CountryMatch,
+			//   displayTradePrice: dto.DisplayTradePrice,
+			//   tradeAccountId: dto.TradeAccountID);
 
-            var ppg = Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID);
+   //         var ppg = Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID);
 
-            var pageSection = Definition.pageSectionSelects.Single(p => p.PageSectionID == dto.PageSectionID);
+   //         var pageSection = Definition.pageSectionSelects.Single(p => p.PageSectionID == dto.PageSectionID);
 
-            var ps = new PageSectionViewModel(
-                pageSection: pageSection,
-                baseViewModel: null,
-                sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
-                    originalUrlKeywords: Definition.PageDetails.URLKeywords,
-                    productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
-                    pagingEnabled: pageSection.Paging || pageSection.Filter,
-                    filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-                    isShop: Definition.PageDetails.IsShop,
-                    isLifestyleGallery: pageSection.IsLifestyleGallery,
-                    model: dto.BaseViewModel
-                ),
-                isShop: Definition.PageDetails.IsShop);
+   //         var ps = new PageSectionViewModel(
+   //             pageSection: pageSection,
+   //             baseViewModel: null,
+   //             sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
+   //                 originalUrlKeywords: Definition.PageDetails.URLKeywords,
+   //                 productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
+   //                 pagingEnabled: pageSection.Paging || pageSection.Filter,
+   //                 filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+   //                 isShop: Definition.PageDetails.IsShop,
+   //                 isLifestyleGallery: pageSection.IsLifestyleGallery,
+   //                 model: dto.BaseViewModel
+   //             ),
+   //             isShop: Definition.PageDetails.IsShop);
 
-			return Ok(ps);
-        }
+			//return Ok(ps);
+   //     }
     }
 }
