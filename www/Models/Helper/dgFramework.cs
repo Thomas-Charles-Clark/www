@@ -27,6 +27,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using wwwDesignersGuild.Controllers;
 using Microsoft.Owin.Security.Provider;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -1863,7 +1864,7 @@ namespace wwwDesignersGuild.Models.Helper
 
         #region Other Routines
 
-        public static string CallToActionStyleString(pageSectionAnimationSlideCallToAction call)
+        public static string CallToActionStyleString(PageSectionAnimationSlideCallToAction call)
         {
             var result = "";
 

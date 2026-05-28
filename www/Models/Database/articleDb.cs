@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -17,7 +18,7 @@ namespace wwwDesignersGuild.Models.Database
         [ResultTypeAttribute(typeof(articleImageHotspotSelect))]
         [ResultTypeAttribute(typeof(articleRelatedArticleSelect))]
         [ResultTypeAttribute(typeof(articleVideoSelect))]
-        [ResultTypeAttribute(typeof(googleHref))]
+        [ResultTypeAttribute(typeof(GoogleHref))]
         [ResultTypeAttribute(typeof(articleNextArticleSelect))]
         [ResultTypeAttribute(typeof(articlePreviousArticleSelect))]
         public IMultipleResults Article_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "ArticleID", DbType = "Int")] System.Nullable<int> articleID,

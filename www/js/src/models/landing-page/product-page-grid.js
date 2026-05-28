@@ -10,6 +10,8 @@
 
     //self.domElement.skipScroll = true;
 
+    self.totalCount = ko.observable();
+
     self.productType = ko.observable();
 
     self.productTypes = ko.observableArray([]);
@@ -591,6 +593,8 @@
     self.parentSub = self.parent.data.subscribe(d => {
         self.attributeCount(self.parent.Definition.AttributeGroups.flatMap(ag => ag.Attributes).length);
 
+        self.totalCount(self.parent.Definition.Json.totals.TotalCount);
+
         if (self.parent.Definition.Searchable) {
             console.log('searchable');
             self.pager.sort.subscribe(nv => {
@@ -718,7 +722,7 @@
             }
         });
 
-        attributes = attributes.sort((a, b) => {
+        let attributes = attributes.sort((a, b) => {
             return a.lexicographicalSortOrder < b.lexicographicalSortOrder ? -1 : 1;
         }).map(a => a.selection);
 
@@ -735,112 +739,18 @@
 
     self.determineAvailableProductPages = ko.computed(() => {
         console.log('determineAvailableProductPages computing');
+
         // We're only ready once we've built all attributes
-        if (self.readyToCalculateAvailability()) {
+        let ready = self.readyToCalculateAvailability();
+
+        let productType = self.selectedProductType();
+
+        let selectedAttributes = self.selectedAttributes();
+
+        if (ready) {
             // Wait for a product type to be selected (one always will be)
-            if (self.selectedProductType()) {
-                // Then use that product type as the basis.
-                let initialProductPageIds = self.selectedProductType().ProductPageIDs;
-
-                let attributeProductPageIds = [];
-
-                self.selectedAttributes().forEach(a => {
-                    // Finding the attribute group whose selection contains this attribute (self.selectedAttributes contains FormValues)
-                    let attributeGroup = self.attributeGroups.peek().flatMap(attrGrp => attrGrp.selection().indexOf(a) > -1 ? [attrGrp] : [])[0];
-
-                    // Find the full attribute object corresponding to this selectedAttribute (a)
-                    let attribute = attributeGroup.attributes.peek().flatMap(attr => attr.FormValue == a ? [attr] : [])[0];
-
-                    switch (attributeGroup.logicalOperator()) {
-                        // if this attributeGroup is using AND
-                        case 'AND':
-                            // gather the product page ids from this attribute in separate sets
-                            attributeProductPageIds.push({
-                                attributeGroupId: attributeGroup.attributeGroupId(),
-                                productPageIds: new Set(attribute.allProductPageIds())
-                            });
-                            break;
-                        // if this attributeGroup is using OR
-                        case 'OR':
-                            // if this attributeGroupId is already in the array we're putting together
-                            let extant = attributeProductPageIds.filter(appid => appid.attributeGroupId == attributeGroup.attributeGroupId());
-
-                            if (extant.length == 1) {
-                                // concatenate
-                                attributeProductPageIds[attributeProductPageIds.indexOf(extant[0])].productPageIds = new Set([...extant[0].productPageIds].concat(attribute.allProductPageIds()))
-                            } else {
-                                // if not, add to the array as normal
-                                attributeProductPageIds.push({
-                                    attributeGroupId: attributeGroup.attributeGroupId(),
-                                    productPageIds: new Set(attribute.allProductPageIds())
-                                });
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                });
-
-                // The final resultant set of results is the product type set intersected with all our attribute groups
-                let result = new Set(initialProductPageIds).multipleIntersect(...attributeProductPageIds.flatMap(p => p.productPageIds));
-
-                self.attributeGroups.peek().forEach(ag => {
-                    // Product Type selection affects all attribute groups
-                    let productPageIdsAffectingThisAttributeGroup = [];
-
-                    // this is the internal interaction operation (between attributes of the same group)
-                    switch (ag.logicalOperator()) {
-                        case 'AND':
-                            // this attribute group's attributes can be affected by ALL attributes regardless of what group
-                            productPageIdsAffectingThisAttributeGroup = new Set(initialProductPageIds)
-                                .multipleIntersect(...attributeProductPageIds
-                                    .flatMap(p => p.productPageIds)
-                                );
-                            break;
-                        case 'OR':
-                            // this attribute group's attributes cannot be affected by their siblings, only by other attribute groups' attributes
-                            productPageIdsAffectingThisAttributeGroup = new Set(initialProductPageIds)
-                                .multipleIntersect(...attributeProductPageIds
-                                    .filter(f => f.attributeGroupId != ag.attributeGroupId())
-                                    .flatMap(p => p.productPageIds)
-                                );
-                            break;
-                        default: break;
-                    }
-
-                    // at this point we have the correct list of product page ids which are permitted to affect this attribute group
-                    ag.attributes.peek().forEach(a => {
-                        a.availableProductPageIds(a.ProductPageIDs.filter(ppid => productPageIdsAffectingThisAttributeGroup.has(ppid)));
-                    });
-                });
-
-                if (result.size === 0) {
-                    // find which attribute has 0 available product pages
-                    let problemAttributes = self.attributeGroups().filter(ag => ag.selection() != '').flatMap(ag =>
-                        ag.selectedAttributes().flatMap(a => a.availableProductPageIds().length == 0 ? [a] : [])
-                    );
-                    let deselectedAttributeNames = problemAttributes.flatMap(pa => pa.Name).join(', ');
-                    window.showInfo(self.resources.Sorry, `${self.resources.ThereWereNoResultsForThatCombination} ${self.resources.WeHaveDeselectedTheFollowing}: <strong>${deselectedAttributeNames}</strong>`)
-                    problemAttributes.forEach(pa => {
-                        if (pa.parent.singular()) {
-                            pa.parent.selection('');
-                        } else {
-                            pa.parent.selection.remove(s => s === pa.FormValue);
-                        }
-                    });
-                    window.setTimeout(() => {
-                        self.selectedAttributes.valueHasMutated();
-                    }, 0);
-                    return [];
-                }
-
-                if (self.searchable()) {
-                    return [...result].sort((a, b) => {
-                        return self.allProductPages().indexOf(a) - self.allProductPages().indexOf(b)
-                    });
-                } else {
-                    return self.allProductPages().filter(pp => result.has(pp.ProductPageID));
-                }
+            if (productType) {
+                return self.actuallyDetermineAvailableProductPages(selectedAttributes);
             }
         }
         return [];
@@ -850,6 +760,114 @@
             method: 'notifyWhenChangesStop'
         }
     });
+
+    self.actuallyDetermineAvailableProductPages = (selectedAttributes) => {
+        // Then use that product type as the basis.
+        let initialProductPageIds = self.selectedProductType()?.ProductPageIDs;
+
+        let attributeProductPageIds = [];
+
+        selectedAttributes.forEach(a => {
+            // Finding the attribute group whose selection contains this attribute (self.selectedAttributes contains FormValues)
+            let attributeGroup = self.attributeGroups.peek().flatMap(attrGrp => attrGrp.selection().indexOf(a) > -1 ? [attrGrp] : [])[0];
+
+            // Find the full attribute object corresponding to this selectedAttribute (a)
+            let attribute = attributeGroup.attributes.peek().flatMap(attr => attr.FormValue == a ? [attr] : [])[0];
+
+            switch (attributeGroup.logicalOperator()) {
+                // if this attributeGroup is using AND
+                case 'AND':
+                    // gather the product page ids from this attribute in separate sets
+                    attributeProductPageIds.push({
+                        attributeGroupId: attributeGroup.attributeGroupId(),
+                        productPageIds: new Set(attribute.allProductPageIds())
+                    });
+                    break;
+                // if this attributeGroup is using OR
+                case 'OR':
+                    // if this attributeGroupId is already in the array we're putting together
+                    let extant = attributeProductPageIds.filter(appid => appid.attributeGroupId == attributeGroup.attributeGroupId());
+
+                    if (extant.length == 1) {
+                        // concatenate
+                        attributeProductPageIds[attributeProductPageIds.indexOf(extant[0])].productPageIds = new Set([...extant[0].productPageIds].concat(attribute.allProductPageIds()))
+                    } else {
+                        // if not, add to the array as normal
+                        attributeProductPageIds.push({
+                            attributeGroupId: attributeGroup.attributeGroupId(),
+                            productPageIds: new Set(attribute.allProductPageIds())
+                        });
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // The final resultant set of results is the product type set intersected with all our attribute groups
+        let result = new Set(initialProductPageIds).multipleIntersect(...attributeProductPageIds.flatMap(p => p.productPageIds));
+
+        self.attributeGroups.peek().forEach(ag => {
+            // Product Type selection affects all attribute groups
+            let productPageIdsAffectingThisAttributeGroup = [];
+
+            // this is the internal interaction operation (between attributes of the same group)
+            switch (ag.logicalOperator()) {
+                case 'AND':
+                    // this attribute group's attributes can be affected by ALL attributes regardless of what group
+                    productPageIdsAffectingThisAttributeGroup = new Set(initialProductPageIds)
+                        .multipleIntersect(...attributeProductPageIds
+                            .flatMap(p => p.productPageIds)
+                        );
+                    break;
+                case 'OR':
+                    // this attribute group's attributes cannot be affected by their siblings, only by other attribute groups' attributes
+                    productPageIdsAffectingThisAttributeGroup = new Set(initialProductPageIds)
+                        .multipleIntersect(...attributeProductPageIds
+                            .filter(f => f.attributeGroupId != ag.attributeGroupId())
+                            .flatMap(p => p.productPageIds)
+                        );
+                    break;
+                default: break;
+            }
+
+            // at this point we have the correct list of product page ids which are permitted to affect this attribute group
+            ag.attributes.peek().forEach(a => {
+                a.availableProductPageIds(a.ProductPageIDs.filter(ppid => productPageIdsAffectingThisAttributeGroup.has(ppid)));
+            });
+        });
+
+        if (result.size === 0) {
+            // find which attribute has 0 available product pages
+            let problemAttributes = self.attributeGroups().filter(ag => ag.selection() != '').flatMap(ag =>
+                ag.selectedAttributes().flatMap(a => a.availableProductPageIds().length == 0 ? [a] : [])
+            );
+            let deselectedAttributeNames = problemAttributes.flatMap(pa => pa.Name).join(', ');
+
+            if (deselectedAttributeNames != "") {
+                window.showInfo(self.resources.Sorry, `${self.resources.ThereWereNoResultsForThatCombination} ${self.resources.WeHaveDeselectedTheFollowing}: <strong>${deselectedAttributeNames}</strong>`)
+                problemAttributes.forEach(pa => {
+                    if (pa.parent.singular()) {
+                        pa.parent.selection('');
+                    } else {
+                        pa.parent.selection.remove(s => s === pa.FormValue);
+                    }
+                });
+                window.setTimeout(() => {
+                    self.selectedAttributes.valueHasMutated();
+                }, 0);
+                return [];
+            }
+        }
+
+        if (self.searchable()) {
+            return [...result].sort((a, b) => {
+                return self.allProductPages().indexOf(a) - self.allProductPages().indexOf(b)
+            });
+        } else {
+            return self.allProductPages().filter(pp => result.has(pp));
+        }
+    }
 
     // this because we want to skip the first re-render: the server has already done that render.
     self.skipProductPageRenderer = ko.observable(true);
@@ -867,12 +885,18 @@
 
             let pageSize = self.pager.pageSize();
 
+            let totalCount = self.pager.totalCount();
+
+            let availableProductPages = self.actuallyDetermineAvailableProductPages(self.selectedAttributes());
+
             console.log('productPageRenderer page', page);
             console.log('productPageRenderer pageSize', pageSize);
+            console.log('productPageRenderer totalCount', totalCount);
+            console.log('productPageRenderer availableProductPages', availableProductPages);
 
             let sort = self.searchable() ? self.pager.sort.peek() : self.pager.sort();
 
-            let results = [...self.determineAvailableProductPages()];
+            let results = [...availableProductPages];
 
             // searchable grid does not want sorting client side
             if (!self.searchable()) {
@@ -1144,43 +1168,7 @@
 
     //#region Computeds
 
-    //self.selectedAttributeItems = ko.pureComputed(() => {
-    //    return self.attributes().filter(a => pageModel.pageSections[3].productPageGrid.selectedAttributes().indexOf(a.FormValue) > -1);
-    //}, self);
 
-    //self.fetchDefinition = () => {
-
-    //    var data = {
-    //        pageId: pageModel.MasterDefinition.UrlBreakdown.ContentId,
-    //        pageSectionId: self.parent.pageSectionId,
-    //        countryId: window.getCountryId(),
-    //        languageId: window.getLanguageId(),
-    //        baseViewModel: window.getBase()
-    //    };
-
-    //    console.log('FetchPageSectionDefinition calling with', data)
-
-    //    fetch('/api/ProductPageAPI/FetchPageSectionDefinition', {
-    //        method: 'POST',
-    //        headers: window.fetchHeaders,
-    //        credentials: 'same-origin',
-    //        body: JSON.stringify(data)
-    //    })
-    //        .then(window.handleFetchResponse)
-    //        .then(data => {
-    //            console.log('FetchPageSectionDefinition returned', data);
-    //            self.parent.data(data);
-    //            self.productTypes(data.Definition.ProductTypes.map(pt => productTypeViewModel(self, pt.ProductPageIDs)))
-    //            self.parent.productPageGrid.allProductPages(data.Definition.Json.json.productPages);
-    //            self.parent.productPageGrid.allProductPagesInitialised();
-    //        })
-    //        .catch(err => {
-    //            window.catchFetchErrors(err);
-    //            window.showError();
-    //        })
-    //}
-
-    //self.fetchDefinition();
 
     //#endregion
 

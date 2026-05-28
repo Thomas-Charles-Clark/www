@@ -7,6 +7,8 @@
         sort: ko.observable()
     };
 
+    self.totalCount = grid.totalCount;
+
     self.page.subscribe(nv => {
 
         console.log('pager.page subscribe hit', nv);
@@ -56,18 +58,19 @@
 
     self.pageCount = ko.pureComputed({
         read: () => {
-            if (self.parent.filteredContent().length) {
+            //if (self.parent.filteredContent().length) {
 
-                let count = self.parent.filteredContent().length;
-                let size = self.pageSize();
+            let count = self.totalCount();
+            let size = self.pageSize();
 
-                if (count < size)
-                    return 1;
-                else
-                    return Math.ceil(count / size);
-            } else {
-                return self.pages();
-            }
+            if (count < size)
+                return 1;
+            else
+                return Math.ceil(count / size);
+
+            //} else {
+            //    return self.pages();
+            //}
         }
     }, self).extend({
         rateLimit: {
@@ -202,21 +205,44 @@
         if (self.skipRender()) {
             self.skipRender(false);
         } else {
-            self.busy(true);
+            self.busy(true); 
+
+            let data = {
+                pageSectionId: self.parent.parent.pageSectionId,
+                languageId: window.getLanguageId(),
+                countryId: window.getCountryId(),
+                page: self.page(),
+                pageSize: self.pageSize(),
+                sort: self.sort(),
+                productTypeId: self.parent.productTypeId(),
+                attributes: self.parent.selectedAttributes()?.map(a => {
+                    return {
+                        AttributeID: a.AttributeID,
+                        AttributeGroupID: a.AttributeGroupID,
+                        AttributeOperator: a.AttributeGroup.Operator
+                    }
+                }) ?? [],
+                visitor: window.getBase().Visitor,
+                masterDefinition: window.getMasterDefinition()
+            }
+
             fetch(self.ajaxEndpoint(), {
                 method: 'POST',
                 headers: window.fetchHeaders,
                 cache: 'no-store',
                 credentials: 'same-origin',
                 credentials: 'include',
-                body: JSON.stringify({
-                    productPageIds: page,
-                    objMaster: getMasterDefinition()
-                })
+                body: JSON.stringify(data)
             })
             .then(window.handleFetchResponse)
             .then(renderedResults => {
                 self.busy(false);
+
+                window.setTimeout(() => {
+                    self.parent.filterText.notifySubscribers();
+                    self.parent.updateUrl();
+                }, 0);
+
                 completeFn(renderedResults.map(r => {
                     let a = productPagePodViewModel(self.parent);
                     a.data(r);

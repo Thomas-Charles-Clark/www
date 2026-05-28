@@ -32,6 +32,7 @@ using wwwDesignersGuild.Models.SearchRender;
 using wwwDesignersGuild.Models.Trade;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 using wwwDesignersGuild.ViewModels.Trade;
 
 namespace wwwDesignersGuild.Controllers
@@ -461,7 +462,7 @@ namespace wwwDesignersGuild.Controllers
                 .Select(p => new
                 {
                     productPageId = p.SelectToken("productPageId").Value<int>(),
-                    price = p.SelectToken("productPagePrice").ToObject<productPagePodPrice>(serializer)
+                    price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
                 });
 
             var results = objPage.productPageIds

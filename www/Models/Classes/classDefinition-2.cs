@@ -20,6 +20,7 @@ using wwwDesignersGuild.Models.Source;
 using wwwDesignersGuild.Models.Trade;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Classes
 {
@@ -831,12 +832,12 @@ namespace wwwDesignersGuild.Models.Classes
         //public int pageSectionProductPagesTotalCount { get; set; }
         //public List<pageSectionProductPageStub> pageSectionAllProductPageStubs { get; set; }
         public cmsAttributeDefinition attributeDefinitions { get; set; }
-        public List<pageRelated> pageRelateds { get; set; }
+        public List<PageRelated> pageRelateds { get; set; }
         //public List<searchResultRenderCore> usePageSectionProductPages { get; set; }
         //public List<searchResultRenderImage> usePageSectionProductPageImages { get; set; }
         public List<pageSectionAttribute> usePageSectionAttributes { get; set; }
         public cmsAttributeDefinition useAttributeDefinitions { get; set; }
-        public List<pageRelated> usePageRelateds { get; set; }
+        public List<PageRelated> usePageRelateds { get; set; }
         public bool IsShop { get; set; }
         public bool Paging { get; set; }
         public bool IsLifestyleGallery { get; set; }
@@ -905,7 +906,7 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionHtml> pageSectionHtmls { get; set; }
+        public List<PageSectionHTML> pageSectionHtmls { get; set; }
     }
 
     public class passVideo
@@ -914,7 +915,7 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionVideo> pageSectionVideos { get; set; }
+        public List<PageSectionVideo> pageSectionVideos { get; set; }
     }
 
     public class passAnimation
@@ -926,11 +927,12 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public bool IsHeader { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionAnimation> pageSectionAnimations { get; set; }
-        public List<pageSectionAnimationSlide> pageSectionAnimationSlides { get; set; }
-        public List<pageSectionAnimationSlideCallToAction> pageSectionAnimationSlideCallsToAction { get; set; }
+        public List<PageSectionAnimation> pageSectionAnimations { get; set; }
+        public List<PageSectionAnimationSlide> pageSectionAnimationSlides { get; set; }
+        public List<PageSectionAnimationSlideCallToAction> pageSectionAnimationSlideCallsToAction { get; set; }
         public string DiscountMessage { get; set; }
     }
+
     public class passSlideShow
     {
         public masterDefinition masterDefinition { get; set; }
@@ -938,8 +940,8 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public bool HalfWidth { get; set; }
         public bool IsLifestyleGallery { get; set; }
-        public List<pageSectionSlideShow> pageSectionSlideShows { get; set; }
-        public List<pageSectionSlideShowAspect> pageSectionSlideShowAspects { get; set; }
+        public List<PageSectionSlideShow> pageSectionSlideShows { get; set; }
+        public List<PageSectionSlideShowAspect> pageSectionSlideShowAspects { get; set; }
     }
 
     public class passBranding
@@ -967,8 +969,8 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionPageSelect> pageSectionPageSelects { get; set; }
-        public List<pageSectionPageSelectImage> pageSectionPageSelectImages { get; set; }
+        public List<PageSectionPageSelect> pageSectionPageSelects { get; set; }
+        public List<PageSectionPageSelectImage> pageSectionPageSelectImages { get; set; }
     }
 
 
@@ -978,8 +980,8 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionCollection> pageSectionCollections { get; set; }
-        public List<pageSectionCollectionImage> pageSectionCollectionImages { get; set; }
+        public List<PageSectionCollection> pageSectionCollections { get; set; }
+        public List<PageSectionCollectionImage> pageSectionCollectionImages { get; set; }
     }
 
     public class passArticleGrid
@@ -988,8 +990,8 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionArticle> pageSectionArticles { get; set; }
-        public List<pageSectionArticleImage> pageSectionArticleImages { get; set; }
+        public List<PageSectionArticle> pageSectionArticles { get; set; }
+        public List<PageSectionArticleImage> pageSectionArticleImages { get; set; }
         public List<articleTypeSelect> pageSectionArticleTypes { get; set; }
         public List<articleSubTypeSelect> pageSectionArticleSubTypes { get; set; }
     }
@@ -999,13 +1001,13 @@ namespace wwwDesignersGuild.Models.Classes
         public masterDefinition masterDefinition { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        public List<pageSectionForm> pageSectionForms { get; set; }
-        public List<pageSectionFormRetailAppointmentAgenda> pageSectionFormRetailAppointmentAgendas { get; set; }
-        public List<pageSectionFormRetailAppointmentType> pageSectionFormRetailAppointmentTypes { get; set; }
+        public List<PageSectionForm> pageSectionForms { get; set; }
+        public List<PageSectionFormRetailAppointmentAgenda> pageSectionFormRetailAppointmentAgendas { get; set; }
+        public List<PageSectionFormRetailAppointmentType> pageSectionFormRetailAppointmentTypes { get; set; }
         public List<Language> languages { get; set; }
         public short? defaultCountryForDropDown { get; set; }
-        public List<pageFormCountry> pageFormCountrys { get; set; }
-        public List<pageSectionStoreEvent> pageSectionStoreEvents { get; set; }
+        public List<PageFormCountry> pageFormCountrys { get; set; }
+        public List<PageSectionStoreEvent> pageSectionStoreEvents { get; set; }
     }
 
 
@@ -1014,8 +1016,7 @@ namespace wwwDesignersGuild.Models.Classes
         public masterDefinition masterDefinition { get; set; }
         public string Heading { get; set; }
         public bool HalfWidth { get; set; }
-        //public List<pageSectionBanner> pageSectionBanners { get; set; }
-        public pageSectionBannerJson pageSectionBannerJson { get; set; }
+        public PageSectionBannerJSON pageSectionBannerJson { get; set; }
         public long PageSectionID { get; set; }
     }
 
@@ -1089,7 +1090,7 @@ namespace wwwDesignersGuild.Models.Classes
     public class passResubscribePage
     {
         public NewMasterDefinition MasterDefinition { get; set; }
-        public pageLanguageSelect pageLanguageSelect { get; set; }
+        public PageLanguageSelect pageLanguageSelect { get; set; }
         public MemberDetail member { get; internal set; }
         public Guid? guid { get; internal set; }
         public string emailName { get; set; }
@@ -1366,7 +1367,7 @@ namespace wwwDesignersGuild.Models.Classes
 
         public IEnumerable<ImageHotspot> productTypeHtmlSectionImageHotspots { get; set; } = new List<ImageHotspot>();
 
-        public List<googleHref> googleHrefs 
+        public List<GoogleHref> googleHrefs 
         { 
             set
             {
@@ -1374,7 +1375,7 @@ namespace wwwDesignersGuild.Models.Classes
             }
             get 
             {
-                return JObject.FromObject(json).SelectTokens("hreflangs").Children().Select(p => new googleHref() 
+                return JObject.FromObject(json).SelectTokens("hreflangs").Children().Select(p => new GoogleHref() 
                 { 
                     href = p["href"].Value<string>(),
                     hreflang = p["hreflang"].Value<string>()
@@ -2088,7 +2089,7 @@ namespace wwwDesignersGuild.Models.Classes
         public List<collectionRelatedCollectionSelect> collectionRelatedCollectionSelects { get; set; }
         public List<collectionBrochureSelect> collectionBrochureSelects { get; set; }
         public List<collectionVideo> collectionVideos { get; set; }
-        public List<googleHref> collectionGoogleHrefs { get; set; }
+        public List<GoogleHref> collectionGoogleHrefs { get; set; }
         public List<collectionBreadcrumb> collectionPageBreadcrumbs { get; set; }
         public PageSectionJSON productPageJson { get; set; }
 
@@ -2370,7 +2371,7 @@ namespace wwwDesignersGuild.Models.Classes
         public List<articleImageHotspotSelect> articleImageHotspotSelects { get; set; }
         public List<articleRelatedArticleSelect> articleRelatedArticleSelects { get; set; }
         public List<articleVideoSelect> articleVideoSelects { get; set; }
-        public List<googleHref> articleGoogleHrefs { get; set; }
+        public List<GoogleHref> articleGoogleHrefs { get; set; }
         public List<articleNextArticleSelect> articleNextArticleSelects { get; set; }
         public List<articlePreviousArticleSelect> articlePreviousArticleSelects { get; set; }
         public List<articleTypeSelect> articleTypeSelects { get; set; }

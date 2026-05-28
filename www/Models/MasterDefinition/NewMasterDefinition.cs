@@ -7,6 +7,7 @@ using System.Web;
 using wwwDesignersGuild.Models.Country;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.LandingPage;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Classes
 {
@@ -18,7 +19,7 @@ namespace wwwDesignersGuild.Models.Classes
         public int? BackInStockReminder { get; set; }
         public decimal ItemsInBasket { get; set; }
         public urlBreakdown UrlBreakdown { get; set; }
-        public List<googleHref> GoogleHrefs { get; set; }
+        public List<GoogleHref> GoogleHrefs { get; set; }
 
         [JsonIgnore]
         public cmsMenuDefinition Menu { get; set; }
@@ -74,7 +75,7 @@ namespace wwwDesignersGuild.Models.Classes
             int? backInStockReminder,
             decimal itemsInBasket,
             urlBreakdown urlBreakdown,
-            List<googleHref> googleHrefs,
+            List<GoogleHref> googleHrefs,
             bool tradeMember)
         {
             var result = new NewMasterDefinition(titleTag,
@@ -96,7 +97,7 @@ namespace wwwDesignersGuild.Models.Classes
             int? backInStockReminder,
             decimal itemsInBasket,
             urlBreakdown urlBreakdown,
-            List<googleHref> googleHrefs,
+            List<GoogleHref> googleHrefs,
             bool tradeMember)
         {
             var result = new NewMasterDefinition(titleTag,
@@ -118,7 +119,7 @@ namespace wwwDesignersGuild.Models.Classes
             int? backInStockReminder,
             decimal itemsInBasket,
             urlBreakdown urlBreakdown,
-            List<googleHref> googleHrefs,
+            List<GoogleHref> googleHrefs,
             bool tradeMember)
         {
             TitleTag = titleTag;
@@ -155,9 +156,9 @@ namespace wwwDesignersGuild.Models.Classes
             switch (UrlBreakdown.ContentType)
             {
                 case dgContentType.landingPage:
-                        siteSectionTask = new cmsLandingPage().loadSiteSectionFromCms(
-                            UrlBreakdown.ContentId,
-                            UrlBreakdown.ContentDate
+                        siteSectionTask = new LandingPage.cmsLandingPage().loadSiteSectionFromCms(
+							UrlBreakdown.ContentId,
+							UrlBreakdown.ContentDate
                         );
                     break;
                 case dgContentType.articlePage:

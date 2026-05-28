@@ -6,6 +6,7 @@ using System.Web;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.ImgSize;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.ViewModels
 {

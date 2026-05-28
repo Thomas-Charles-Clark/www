@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Configuration;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Cache.Collection
 {

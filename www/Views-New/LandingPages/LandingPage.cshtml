@@ -39,7 +39,7 @@
 {
     <script id="ko-pager-template" type="text/html">
         <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
-           <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+           <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
                        data-bind="enable: backEnabled, click: () => navigatePrevious(), css: { 'disabled': !backEnabled() }">
                     <span class="material-icons">
@@ -54,7 +54,7 @@
         </li>
         <!-- ko if: leftEllipsisVisible -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) - 2">
                     <span>
                         &#8230;
@@ -69,7 +69,7 @@
         <!-- /ko -->
         <!-- ko foreach: visiblePages -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false, 'active': $parent.page() == $data.page }">
-            <a data-bind="class: `page-section-${$parent.parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${$parent.parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)">
                     <span data-bind="text: $data.page"></span>
                     <span class="visually-hidden">
@@ -82,7 +82,7 @@
         <!-- /ko -->
         <!-- ko if: rightEllipsisVisible -->
         <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection.PageSectionID}-submitter`">
+            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
                 <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) + 2">
                     <span>
                         &#8230;
@@ -326,55 +326,64 @@
     }
     @if (Model.PageSections.Any())
     {
-        <div class="page-section-grid grid">
-            <!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
-            @foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
-            {
-                var section = pageSection.section;
-                var index = pageSection.index;
-                var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
+		<div class="page-section-grid grid">
+			<!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
+			@foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
+			{
+				var section = pageSection.section;
+				var index = pageSection.index;
+				var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
 
-                if (section.PageSection.PlatformSwitch == null ||
-                   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
-                   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
-                {
-                    <div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
-                        <!-- ko with: pageSections[@(index)] -->
-                        @if ((section.PageSection.TradeSwitch == null) ||
-                         (section.PageSection.TradeSwitch == false && !tradeUser) ||
-                         (section.PageSection.TradeSwitch == true && tradeUser))
-                        {
-                            var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
+				if (section.PageSection.PlatformSwitch == null ||
+				   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
+				   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
+				{
+					if (sectionClass == "product-page-grid-section")
+					{
+						<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
+							<div class="spinner-border" role="status"></div>
+							<h4>
+								@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+							</h4>
+						</div>
+					}
+					<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
+						<!-- ko with: pageSections[@(index)] -->
+						@if ((section.PageSection.TradeSwitch == null) ||
+						 (section.PageSection.TradeSwitch == false && !tradeUser) ||
+						 (section.PageSection.TradeSwitch == true && tradeUser))
+						{
+							var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
 
-                            switch (section.PageSectionType)
-                            {
-                                case PageSectionType.Slideshow:
-                                    @Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
-                                    break;
-                                case PageSectionType.BespokeContent:
-                                    if (section.BespokeContentPageSection != null)
-                                    {
-                                        var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
-                                        if (attr.RequiresBase)
-                                        {
-                                            @Html.Action(attr.Action, attr.Controller, Model)
-                                        }
-                                        else
-                                        {
-                                            @Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    @Html.Partial(viewPath, section)
-                                    break;
-                            }
-                        }
-                        <!-- /ko -->
-                    </div>
-                }
-            }
-        </div>
+							switch (section.PageSectionType)
+							{
+								case PageSectionType.Slideshow:
+									@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
+									break;
+								case PageSectionType.BespokeContent:
+									if (section.BespokeContentPageSection != null)
+									{
+										var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
+										if (attr.RequiresBase)
+										{
+											@Html.Action(attr.Action, attr.Controller, Model)
+										}
+										else
+										{
+											@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
+										}
+									}
+									break;
+								default:
+									@Html.Partial(viewPath, section)
+									break;
+							}
+						}
+						<!-- /ko -->
+					</div>
+				}
+			}
+		</div>
     }
 
     @if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)

@@ -8,6 +8,7 @@ using wwwDesignersGuild.Models.Carousel;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.ImgSize;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.ViewModels
 {
@@ -250,9 +251,9 @@ namespace wwwDesignersGuild.ViewModels
             if (Definition.articleVideoSelects.Any())
             {
                 Video = new PageSectionViewModel(
-                    pageSection: new pageSectionSelect(),
+                    pageSection: new PageSectionSelect(),
                     baseViewModel: this,
-                    sectionDefinition: new VideoPageSection(new pageSectionVideo()
+                    sectionDefinition: new VideoPageSection(new PageSectionVideo()
                     {
                         PageSectionID = 0,
                         VideoEmbedCode = Definition.articleVideoSelects[0].EmbedCode,

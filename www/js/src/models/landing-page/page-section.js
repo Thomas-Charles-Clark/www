@@ -48,6 +48,10 @@
             self.form = formViewModel(self, resources);
             break;
         case 'ProductPageGrid':
+            // This is necessary for product page grids doing massive index filtering
+            self.PageSection = {
+                PageSectionID: self.pageSectionId
+            }
             self.productPageGrid = productPageGridViewModel(self);
             break;
         case 'CollectionGrid':

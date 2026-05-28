@@ -19,6 +19,7 @@ using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.ViewModels
 {
@@ -462,7 +463,7 @@ namespace wwwDesignersGuild.ViewModels
                     .Select(p => new
                     {
                         productPageId = p.SelectToken("productPageId").Value<int>(),
-                        price = p.SelectToken("productPagePrice").ToObject<productPagePodPrice>(serializer)
+                        price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
                     });
 
                 #endregion
@@ -570,7 +571,7 @@ namespace wwwDesignersGuild.ViewModels
             }
 
             ProductPageGridPageSection = new PageSectionViewModel(
-                new pageSectionSelect()
+                new PageSectionSelect()
                 {
                     PageSectionID = -1,
                     PageSectionTypeID = 4,

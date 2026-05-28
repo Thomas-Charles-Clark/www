@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using wwwDesignersGuild.Models.Country;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Stockists;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Classes
 {
@@ -23,7 +24,7 @@ namespace wwwDesignersGuild.Models.Classes
         public int? BackInStockReminder { get; set; } // added to avoid fishing for and modifying a Session variable in view
         public decimal ItemsInBasket { get; set; }
         public urlBreakdown UrlBreakdown { get; set; }
-        public List<googleHref> googleHrefs { get; set; }
+        public List<GoogleHref> googleHrefs { get; set; }
     }
 
     public class urlBreakdown

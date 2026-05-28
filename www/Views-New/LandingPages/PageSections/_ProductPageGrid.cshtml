@@ -58,12 +58,6 @@
     //    }
     //});
 </script>
-<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: productPageGrid.pager.busy">
-    <div class="spinner-border" role="status"></div>
-    <h4>
-        @HtmlHelperExtra.Resource("PleaseWait", l, c, d)
-    </h4>
-</div>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
     <span class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
         @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
@@ -298,56 +292,62 @@
             <input type="hidden" name="countryOverride" value="@(Request.QueryString["countryOverride"])" />
         }
     }
-    <div class="product-page-grid-wrapper my-4">
-        <span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable, remove">
-            @grid.Searchable
-        </span>
-       @if (!grid.Searchable)
-        {
-            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
-                @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>()))
-            </span>
-        }
-        else
-        {
-            <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
-                @Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>().Select(p => p.ProductPageID)))
-            </span>
-        }
-       @if (Model.PageSection.Paging || Model.PageSection.Filter)
-        {
-            <div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
-            @*<div class="product-page-grid grid" data-bind="foreach: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">*@
-              @if (Model.PageSection.PreviewColourways)
-               {
+<div class="product-page-grid-wrapper my-4">
+	<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable, remove">
+		@grid.Searchable
+	</span>
+    @if (grid.Json != null)
+	{
+		<span class="d-none" data-bind="init: { convert: parseInt }, text: productPageGrid.pager.totalCount, remove">
+			@grid.Json.totals.Total
+		</span>
+	}
+	@if (!grid.Searchable)
+	{
+		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
+			@Html.Raw(JsonConvert.SerializeObject(grid.Json.totals.ProductPageIDs))
+		</span>
+	}
+	else
+	{
+		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }, remove">
+			@Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>().Select(p => p.ProductPageID)))
+		</span>
+	}
+	@if (Model.PageSection.Paging || Model.PageSection.Filter)
+	{
+		<div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
+			@*<div class="product-page-grid grid" data-bind="foreach: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">*@
+			@if (Model.PageSection.PreviewColourways)
+			{
 
-               }
-               else
-               {
-                   foreach (var p in thisPage)
-                   {
-                        @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
-                   }
-               }
-            </div>
-        }
-        else
-        {
-            <div class="product-page-grid grid">
-               @if (Model.PageSection.PreviewColourways)
-                {
+			}
+			else
+			{
+				foreach (var p in thisPage)
+				{
+					@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+				}
+			}
+		</div>
+	}
+	else
+	{
+		<div class="product-page-grid grid">
+			@if (Model.PageSection.PreviewColourways)
+			{
 
-                }
-                else
-                {
-                    foreach (var p in thisPage)
-                    {
-                        @Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
-                    }
-                }
-            </div>
-        }
-    </div>
+			}
+			else
+			{
+				foreach (var p in thisPage)
+				{
+					@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+				}
+			}
+		</div>
+	}
+</div>
     @if ((Model.PageSection.Paging || Model.PageSection.Filter) && grid.Contents.Any())
     { 
         grid.Index = 1;

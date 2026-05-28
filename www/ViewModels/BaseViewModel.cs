@@ -30,6 +30,7 @@ using wwwDesignersGuild.Models.Resource;
 using wwwDesignersGuild.Models.ResourceFetch;
 using wwwDesignersGuild.Models.Scrapbook;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.ViewModels
 {
@@ -478,7 +479,7 @@ namespace wwwDesignersGuild.ViewModels
                         .Select(p => new
                         {
                             productPageId = p.SelectToken("productPageId").Value<int>(),
-                            price = p.SelectToken("productPagePrice").ToObject<productPagePodPrice>()
+                            price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>()
                         });
 
                     RecentlyViewed.ForEach(rv =>

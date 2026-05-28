@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,6 +8,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web;
+
+using wwwDesignersGuild.PCAFind;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Util
 {
@@ -267,7 +272,65 @@ namespace wwwDesignersGuild.Util
                 return Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]);
             }
         }
-    }
+
+		public static IEnumerable<ProductPageFilterablePod> StreamSegmentOfJsonArray(string json, string targetArrayProperty, int skip, int take)
+		{
+			int currentIndex = 0;
+			int itemsDeserialized = 0;
+
+			// 1. Open the file stream sequentially
+			using (var sr = new StringReader(json))
+			using (var reader = new JsonTextReader(sr))
+			{
+				// 2. Scan forward until we find the target property name
+				while (reader.Read())
+				{
+					if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == targetArrayProperty)
+					{
+						// Move the reader past the property name to the StartArray token '['
+						reader.Read();
+						break;
+					}
+				}
+
+				// 3. Ensure we are actually looking at an array
+				if (reader.TokenType != JsonToken.StartArray)
+				{
+                    throw new JsonException("reader.TokenType != JsonToken.StartArray");
+				}
+
+				var serializer = new JsonSerializer();
+
+				// 4. Stream through the array items one by one
+				while (reader.Read() && reader.TokenType != JsonToken.EndArray)
+				{
+					// Check if the current item falls within our target segment bounds
+					if (currentIndex >= skip && itemsDeserialized < take)
+					{
+						// Deserialize only this specific single object into memory
+						var item = serializer.Deserialize<ProductPageFilterablePod>(reader);
+
+                        yield return item;
+
+						itemsDeserialized++;
+					}
+					else
+					{
+						// Skip the tokens of this object entirely without deserializing it
+						reader.Skip();
+					}
+
+					currentIndex++;
+
+					// Optimization: Break early if we have collected enough items
+					if (itemsDeserialized >= take)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
 
     public static class StringExtension
     {

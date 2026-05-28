@@ -6,6 +6,7 @@ using System.Data.Linq;
 using System.Reflection;
 using System.Data.Linq.Mapping;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 
 namespace wwwDesignersGuild.Models.Database
@@ -20,8 +21,8 @@ namespace wwwDesignersGuild.Models.Database
         [ResultTypeAttribute(typeof(collectionRelatedCollectionSelect))]
         [ResultTypeAttribute(typeof(collectionBrochureSelect))]
         [ResultTypeAttribute(typeof(collectionVideo))]
-        [ResultTypeAttribute(typeof(productPagePod))]
-        [ResultTypeAttribute(typeof(googleHref))]
+        [ResultTypeAttribute(typeof(ProductPagePod))]
+        [ResultTypeAttribute(typeof(GoogleHref))]
         [ResultTypeAttribute(typeof(collectionBreadcrumb))]
         public IMultipleResults Collection_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "CollectionID", DbType = "SmallInt")] System.Nullable<short> collectionID, 
                                                             [global::System.Data.Linq.Mapping.ParameterAttribute(Name = "LanguageID", DbType = "TinyInt")] System.Nullable<byte> languageID,

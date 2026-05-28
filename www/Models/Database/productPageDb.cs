@@ -15,6 +15,7 @@ using System.Data;
 using System.Threading.Tasks;
 using System.Web;
 using wwwDesignersGuild.Models.Helper;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -49,7 +50,7 @@ namespace wwwDesignersGuild.Models.Database
         [ResultTypeAttribute(typeof(productPageTechInfoAftercare))]
         [ResultTypeAttribute(typeof(productPageTechInfoUsage))]
         [ResultTypeAttribute(typeof(productPageTechInfoTest))]
-        [ResultTypeAttribute(typeof(googleHref))]
+        [ResultTypeAttribute(typeof(GoogleHref))]
         [ResultTypeAttribute(typeof(productPageBrochure))]
         [ResultTypeAttribute(typeof(productPageRRP))]
         public IMultipleResults ProductPage_GenerateMultiple([global::System.Data.Linq.Mapping.ParameterAttribute(Name = "ProductPageID", DbType = "Int")] System.Nullable<int> productPageID,
@@ -168,7 +169,17 @@ namespace wwwDesignersGuild.Models.Database
             return result;
         }
 
-        public PageSectionJSON FetchProductPageGrid(long pageSectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool displayTradePrice, DateTime useDate)
+        public PageSectionJSON FetchProductPageGrid(
+            long pageSectionId,
+            int? memberId,
+            byte languageId,
+            short countryId,
+            int? tradeAccountId,
+            bool countryMatch,
+            bool displayTradePrice,
+            DateTime useDate,
+            int? productPageGridPageId = null,
+            int? productPageGridPagSize = null)
         {
             var result = new PageSectionJSON
             {
@@ -194,6 +205,8 @@ namespace wwwDesignersGuild.Models.Database
                 comm.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
                 comm.Parameters.AddWithValue("@CountryMatch", countryMatch);
                 comm.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@PageNumber", productPageGridPageId ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@PageSize", productPageGridPagSize ?? (object)DBNull.Value);
 
                 conn.Open();
 
@@ -215,7 +228,16 @@ namespace wwwDesignersGuild.Models.Database
                     });
                 }
 
-                conn.Close();
+                result.totals = new PageSectionProductPageTotals();
+
+				reader.NextResult();
+
+				while (reader.Read())
+				{
+                    result.totals.ProductPageIDs.Add(reader.GetInt32(0));
+				}
+
+				conn.Close();
             }
 
             return result;

@@ -16,11 +16,15 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.ServiceModel.Configuration;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+
+using U2.Data.ClientTypes;
 
 using wwwDesignersGuild.Models;
 using wwwDesignersGuild.Models.ArticleSubType;
@@ -39,14 +43,18 @@ using wwwDesignersGuild.Models.LandingPage;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Resource;
 using wwwDesignersGuild.Models.ResourceFetch;
+using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.Util;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
+
+using static Antlr.Runtime.Tree.TreeWizard;
 
 namespace wwwDesignersGuild.ViewModels
 {
     public class LandingPageViewModel : BaseViewModel
     {
         [JsonIgnore]
-        public cmsLandingPageDefinition Definition { get; set; }
+        public Models.Classes.cmsLandingPageDefinition Definition { get; set; }
 
         [JsonIgnore]
         public List<PageSectionViewModel> PageSections { get; set; }
@@ -184,7 +192,11 @@ namespace wwwDesignersGuild.ViewModels
 
             await base.Initialise();
 
-            Definition = await new cmsLandingPage().loadLandingPageFromCms(
+			var pager = new PagerViewModel(-1, true, true, null, false, null);
+			
+            pager.InitialisePager();
+
+			Definition = await new cmsLandingPage().loadLandingPageFromCms(
                 memberId: Visitor.memberId,
                 pageId: MasterDefinition.UrlBreakdown.ContentId,
                 languageId: MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
@@ -194,7 +206,9 @@ namespace wwwDesignersGuild.ViewModels
                 isTrade: MasterDefinition.TradeMember,
                 countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                 displayTradePrice: Visitor.memberDisplayTradePrice,
-                tradeAccountId: Visitor.memberTradeAccountID);
+                tradeAccountId: Visitor.memberTradeAccountID,
+                productPageGridPageId: pager.Page,
+                productPageGridPageSize: pager.PageSize);
 
             if (!isShop)
             {
@@ -258,7 +272,13 @@ namespace wwwDesignersGuild.ViewModels
                             allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
                         }
 
-                        break;
+						// 26/05/2026
+						// This ProductPageGrid PageSection must now, server-side, 
+						// determine all applicable attribute groups and attributes so as to be able to render them out.
+                        // It would make sense if it is already doing so... let me see what happens when I prevent client-side
+                        // viewModel binding happening at all.
+
+						break;
                     case (byte)PageSectionType.HTML:
                         var htmlSection = Definition.pageSectionHtmls.Single(p => p.PageSectionID == pageSectionId);
 
@@ -1678,8 +1698,8 @@ namespace wwwDesignersGuild.ViewModels
             long pageSectionId,
             bool halfWidth,
             string heading,
-            List<pageSectionSlideShow> images,
-            pageSectionSlideShowAspect aspect,
+            List<PageSectionSlideShow> images,
+            PageSectionSlideShowAspect aspect,
             BaseViewModel baseViewModel
             )
         {
@@ -1697,42 +1717,6 @@ namespace wwwDesignersGuild.ViewModels
         }
     }
 
-    public class CollectionGridPageSection
-    {
-        public List<pageSectionCollection> Collections { get; set; }
-
-        public CollectionGridPageSection(
-            List<pageSectionCollection> collections,
-            List<pageSectionCollectionImage> images,
-            BaseViewModel baseViewModel
-            )
-        {
-            Collections = collections.OrderBy(p => p.SortOrder).ToList();
-
-            Collections.ForEach(c =>
-            {
-                c.CarouselViewModel = new CarouselViewModel
-                (
-                    carouselId: $"#collection-{c.CollectionID}-carousel",
-                    wrapperCssClass: "card-img-top",
-                    aspectRatio: AspectRatio.LandscapeFeature,
-                    heading: c.Heading,
-                    images: images.Where(i => i.CollectionID == c.CollectionID)
-                                  .Select(i => new CarouselImage(
-                                      imageId: i.ImageID,
-                                      sortOrder: i.SortOrder,
-                                      altText: c.Heading, 
-                                      imageSize: ImageSize.Nine, 
-                                      overlay: null,
-                                      maxWidth: null, 
-                                      forceLazyLoading: true))
-                                  .OrderBy(i => i.SortOrder),
-                    baseViewModel: baseViewModel,
-                    displayDashes: false
-                );
-            });
-        }
-    }
 
     public class ProductPageGridPageSection : PagerViewModel
     {
@@ -1807,6 +1791,10 @@ namespace wwwDesignersGuild.ViewModels
             ProductTypes = new List<ProductType>();
 
             MustOverwritePageCanonical = false;
+
+            Ajax = true;
+
+            AjaxEndpoint = "/api/ProductPageAPI/FetchProductPageGridPortion";
         }
 
         //public List<int> FilteredProductPageIDs { get; set; }
@@ -1911,6 +1899,9 @@ namespace wwwDesignersGuild.ViewModels
 
             var preResultSet = new List<ProductPageFilterablePodWrapper>();
 
+            // problem is that at this point, result.Json.JSON contains pageNumber number of entries.
+            // is it the procedure obeying the paging which is causing this? We need the procedure to NOT obey
+            // the paging, and the full result set (8000 products, for instance) to sit in a MemoryCache object.
             var jsonString = result.Json.JSON.Replace("{\"productPages\":", "").TrimEnd(new char[] { '}' });
 
             using (var stream = Framework.GenerateStreamFromString(jsonString, System.Text.Encoding.UTF8))
@@ -2391,7 +2382,7 @@ namespace wwwDesignersGuild.ViewModels
 
             result.FilteredIDs = initialProductPageIds;
 
-            if (result.FilteredIDs.Count == 0)
+			if (result.FilteredIDs.Count == 0)
             {
                 var problemAttributes = result.AttributeGroups.Where(ag => ag.Selection.Any()).SelectMany(ag =>
                 {
@@ -2400,7 +2391,7 @@ namespace wwwDesignersGuild.ViewModels
 
                 result.DeselectedAttributeNames = String.Join(", ", problemAttributes.Select(pa => pa.Name));
 
-                result.FilteredIDs = completeResultSet.Select(p => p.ProductPageID).ToList();
+                result.FilteredIDs = completeResultSet.Select(p => p.ProductPageID).ToList(); ;// result.Json.totals.ProductPageIDs;
 
                 model.AttributeSignatureText = null;
             }
@@ -2409,12 +2400,128 @@ namespace wwwDesignersGuild.ViewModels
 
             result.SortContents(ref completeResultSet);
 
-            #endregion
+			#endregion
 
-            #region Perform Paging
+			#region Perform Paging
 
-            // ....??? ???????
+			#region Build a list of product page ids to fire the render and pricing fetches for
 
+			var productPageIdsToRender = new List<int>();
+
+			result.SortContents(ref completeResultSet);
+
+			#region Initialise Pager
+
+			// The call to InitialisePager is necessary to cause the PagerViewModel to carry appropriate values for things like page, pageCount, pageSize.
+			result.InitialisePager();
+
+			#endregion
+
+			productPageIdsToRender = result.FilteredIDs.Skip((result.Page - 1) * result.PageSize).Take(result.PageSize).ToList();
+
+			#endregion
+
+			// If we have any product page ids for the current page...
+			if (productPageIdsToRender.Any())
+			{
+				#region Render the Current Page
+
+				// Datatable to pass to SQL proc
+				var productPageToRenderTable = new DataTable();
+
+				// Datatable columns... why is Sequence necessary?
+				productPageToRenderTable.Columns.Add("ProductPageID", typeof(int));
+				productPageToRenderTable.Columns.Add("Sequence", typeof(int));
+
+				int sequence = 0;
+
+				// add rows to datatable
+				foreach (var productPageId in productPageIdsToRender)
+				{
+#if DEBUG
+					//System.Diagnostics.Debug.WriteLine(productPage);
+#endif
+					productPageToRenderTable.Rows.Add(productPageId, sequence++);
+				}
+
+				var objSearchGenerate = new searchGenerate();
+
+                // call SQL render proc
+                var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
+                    tradeAccountId: model.Visitor.memberTradeAccountID,
+                    isTrade: model.MasterDefinition.TradeAllowed,
+                    displayTradePrice: model.Visitor.memberDisplayTradePrice,
+                    productPageToRenderTable,
+                    model.Date,
+                    model.MasterDefinition.UrlBreakdown.countryDetails,
+                    dateOverride: $"{model.Date:O}",
+                    countryOverride: model.MasterDefinition.UrlBreakdown.countryDetails.CountryCode
+				);
+
+				// convert SQL render proc JSON results to List<T>
+				var renderedResults = JObject.FromObject(productPages.json)
+											.SelectToken("productPages")
+											.ToObject<List<ProductPageFilterablePod>>();
+
+				#endregion
+
+				#region Fetch Pricing for the Current Page
+
+				// call SQL pricing select for page
+				var objPrices = objDb.ProductPage_Price_Select(
+					productPageIdsToRender,
+					model.Visitor,
+					model.MasterDefinition);
+
+				var serializer = new Newtonsoft.Json.JsonSerializer();
+
+				serializer.ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver();
+
+				// convert SQL pricing proc JSON results to List<a'>
+				var prices = JObject.FromObject(objPrices.json ?? (new { productPages = new int[] { } }))
+					.SelectToken("productPages")
+					.Children()
+					.Select(p => p.SelectToken("productPage"))
+					.Select(p => new
+					{
+						productPageId = p.SelectToken("productPageId").Value<int>(),
+						price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
+					});
+
+				#endregion
+
+				#region Update our Complete Results list with this page's fleshed-out info
+
+				// Iterate over render results
+				for (var i = 0; i < renderedResults.Count(); i++)
+				{
+					// grab product page id
+					var productPageId = renderedResults[i].ProductPageID;
+
+					// grab index into complete result set 
+					var index = completeResultSet.FindIndex(crs => crs.ProductPageID == productPageId);
+
+                    if (index > -1)
+					{
+						// Set price object for this result
+						renderedResults[i].ProductPagePrice = prices.Where(p => p.productPageId == productPageId).Select(p => p.price).SingleOrDefault();
+
+						// Overwrite complete result set at appropriate index with this rendered, priced version
+						completeResultSet[index].ApplyRender(renderedResults[i]);
+
+						// Need to re-establish Product Type as it will have been lost
+						completeResultSet[index].ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == completeResultSet[index].ProductTypeID);
+					}
+				}
+
+				#endregion
+
+				#region We've modified the complete result set, overwrite it on the product page grid. Also set TakeCount, to avoid Razor rendering upto PageSize if only n have been fetched for render.
+
+				result.Contents = completeResultSet.Cast<object>().ToList();
+
+				#endregion
+			}
 			#endregion
 
 			result.Contents = completeResultSet.Cast<object>()
@@ -2638,11 +2745,11 @@ namespace wwwDesignersGuild.ViewModels
 
     public class PageGridPageSection
     {
-        public List<pageSectionPageSelect> Pages { get; set; }
+        public List<PageSectionPageSelect> Pages { get; set; }
 
         public PageGridPageSection(
-            List<pageSectionPageSelect> pages,
-            List<pageSectionPageSelectImage> images,
+            List<PageSectionPageSelect> pages,
+            List<PageSectionPageSelectImage> images,
             BaseViewModel baseViewModel
             )
         {
@@ -2668,7 +2775,7 @@ namespace wwwDesignersGuild.ViewModels
     public class ArticleGridPageSection : PagerViewModel
     {
         [JsonIgnore]
-        public List<pageSectionArticle> Articles { get; set; }
+        public List<PageSectionArticle> Articles { get; set; }
 
         public byte GridArticleType { get; set; }
 
@@ -2680,8 +2787,8 @@ namespace wwwDesignersGuild.ViewModels
             long pageSectionId,
             bool pagingEnabled,
             bool isShop,
-            List<pageSectionArticle> articles,
-            List<pageSectionArticleImage> images,
+            List<PageSectionArticle> articles,
+            List<PageSectionArticleImage> images,
             BaseViewModel baseViewModel) : base(pageSectionId,
                                                 pagingEnabled,
                                                 isShop,
@@ -2723,8 +2830,8 @@ namespace wwwDesignersGuild.ViewModels
             long pageSectionId,
             bool pagingEnabled,
             bool isShop,
-            List<pageSectionArticle> articles,
-            List<pageSectionArticleImage> images,
+            List<PageSectionArticle> articles,
+            List<PageSectionArticleImage> images,
             BaseViewModel baseViewModel)
         {
             var result = new ArticleGridPageSection(pageSectionId,
@@ -2788,11 +2895,11 @@ namespace wwwDesignersGuild.ViewModels
             return result;
         }
 
-        public new List<pageSectionArticle> GetContents()
+        public new List<PageSectionArticle> GetContents()
         {
             if (AttributeGroups.Any(p => p.InUse))
             {
-                var results = Contents.Cast<pageSectionArticle>()
+                var results = Contents.Cast<PageSectionArticle>()
                                       .Where(p => FilteredIDs.Contains(p.ArticleID))
                                       .ToList();
 
@@ -2800,7 +2907,7 @@ namespace wwwDesignersGuild.ViewModels
             }
             else
             {
-                return Contents.Cast<pageSectionArticle>().ToList();
+                return Contents.Cast<PageSectionArticle>().ToList();
             }
         }
 
@@ -2832,10 +2939,10 @@ namespace wwwDesignersGuild.ViewModels
 
     public class BrochurePageSection
     {
-        public pageSectionBrochure Brochure { get; set; }
+        public PageSectionBrochure Brochure { get; set; }
 
         public BrochurePageSection(
-            pageSectionBrochure brochure
+            PageSectionBrochure brochure
             )
         {
             Brochure = brochure;
@@ -2844,20 +2951,20 @@ namespace wwwDesignersGuild.ViewModels
 
     public class FormPageSection
     {
-        public pageSectionForm Form { get; set; }
-        public List<pageSectionFormRetailAppointmentAgenda> RetailAppointmentAgendas { get; set; }
-        public List<pageSectionFormRetailAppointmentType> RetailAppointmentTypes { get; set; }
+        public PageSectionForm Form { get; set; }
+        public List<PageSectionFormRetailAppointmentAgenda> RetailAppointmentAgendas { get; set; }
+        public List<PageSectionFormRetailAppointmentType> RetailAppointmentTypes { get; set; }
         public List<StoreEventsByLocation> StoreEventsByLocation { get; set; }
-        public List<pageFormCountry> Countries { get; set; }
+        public List<PageFormCountry> Countries { get; set; }
         public List<Language> Languages { get; set; }
         public short DefaultCountryID { get; set; }
 
         public FormPageSection(
-            pageSectionForm form,
-            List<pageSectionFormRetailAppointmentAgenda> appointmentAgendas,
-            List<pageSectionFormRetailAppointmentType> appointmentTypes,
-            List<pageSectionStoreEvent> storeEvents,
-            List<pageFormCountry> countries,
+            PageSectionForm form,
+            List<PageSectionFormRetailAppointmentAgenda> appointmentAgendas,
+            List<PageSectionFormRetailAppointmentType> appointmentTypes,
+            List<PageSectionStoreEvent> storeEvents,
+            List<PageFormCountry> countries,
             short defaultCountryId,
             DateTime useDate
             )
@@ -2885,13 +2992,13 @@ namespace wwwDesignersGuild.ViewModels
 
     public class StoreEventsByLocation
     {
-        public List<pageSectionStoreEvent> StoreEvents { get; set; }
+        public List<PageSectionStoreEvent> StoreEvents { get; set; }
         public string StoreEventLocation { get; set; }
         public short StoreEventLocationID { get; set; }
 
         public StoreEventsByLocation(short storeEventLocationId,
             string storeEventLocation,
-            List<pageSectionStoreEvent> events)
+            List<PageSectionStoreEvent> events)
         {
             StoreEventLocationID = storeEventLocationId;
             StoreEventLocation = storeEventLocation;
@@ -2913,104 +3020,13 @@ namespace wwwDesignersGuild.ViewModels
 
     public class VideoPageSection
     {
-        public pageSectionVideo Video { get; set; }
+        public PageSectionVideo Video { get; set; }
 
         public VideoPageSection(
-            pageSectionVideo video
+            PageSectionVideo video
             )
         {
             Video = video;
-        }
-    }
-
-    public class AnimationPageSection
-    {
-        public string PageHeading { get; set; }
-        public string PageSubHeading { get; set; }
-        public string PageDescription { get; set; }
-        public string PageDiscountMessage { get; set; }
-        public ImageSize ImageSize { get; set; }
-        public pageSectionAnimation Animation { get; set; }
-        public List<pageSectionAnimationSlide> Images { get; set; }
-        public List<pageSectionAnimationSlideCallToAction> CallsToAction { get; set; }
-
-        public AnimationPageSection(
-            string pageHeading,
-            string pageSubHeading,
-            string pageDescription,
-            string pageDiscountMessage,
-            bool isHeader,
-            pageSectionAnimation animation,
-            List<pageSectionAnimationSlide> images,
-            List<pageSectionAnimationSlideCallToAction> callsToAction
-            )
-        {
-            PageHeading = pageHeading;
-            PageSubHeading = pageSubHeading;
-            PageDescription = pageDescription;
-            PageDiscountMessage = pageDiscountMessage;
-            Animation = animation;
-            Images = images;
-            ImageSize = isHeader ? ImageSize.Nine : ImageSize.Twelve;
-            CallsToAction = callsToAction;
-
-            CallsToAction.ForEach(c =>
-            {
-                c.Text = c.Text.Replace(">", "").Trim();
-            });
-        }
-    }
-
-    public class BespokePageSection
-    {
-        public BespokePageSection()
-        {
-
-        }
-    }
-
-    public class PageSectionViewModel
-    {
-        [JsonIgnore]
-        public BaseViewModel Base { get; set; }
-        public pageSectionSelect PageSection { get; set; }
-        public object Definition { get; set; }
-        public bool IsShop { get; set; }
-
-        public PageSectionType PageSectionType
-        {
-            get
-            {
-                return (PageSectionType)PageSection.PageSectionTypeID;
-            }
-        }
-
-        public dgFixedPageSection? BespokeContentPageSection
-        {
-            get
-            {
-                if (Enum.TryParse<dgFixedPageSection>($"{PageSection.PageSectionID}", out dgFixedPageSection dgfps))
-                    return dgfps;
-                else
-                    return null;
-            }
-        }
-
-        public PageSectionViewModel(
-            pageSectionSelect pageSection,
-            BaseViewModel baseViewModel,
-            object sectionDefinition,
-            bool isShop,
-            bool? pagingOverride = null)
-        {
-            PageSection = pageSection;
-            Base = baseViewModel;
-            Definition = sectionDefinition;
-            IsShop = isShop;
-            if (pagingOverride != null)
-            {
-                PageSection.Paging = pagingOverride.Value;
-            }
         }
     }
 }

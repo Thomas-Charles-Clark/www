@@ -8,6 +8,7 @@ using wwwDesignersGuild.Models.Cache;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.EmailCapturePopupForm;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Form
 {
@@ -39,8 +40,8 @@ namespace wwwDesignersGuild.Models.Form
             var emailCapturePopupForm = new cmsEmailCapturePopupForm
             {
                 defaultCountryForDropDown = objLoad.countryId,
-                objForm = results.GetResult<pageSectionForm>().Single(),
-                availableCountries = results.GetResult<pageFormCountry>().ToList(),
+                objForm = results.GetResult<PageSectionForm>().Single(),
+                availableCountries = results.GetResult<PageFormCountry>().ToList(),
                 availableLanguages = results.GetResult<Language>().ToList(),
                 banner = results.GetResult<pageSectionBanner>().SingleOrDefault(),
             };

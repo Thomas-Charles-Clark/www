@@ -35,4 +35,4 @@
 });
 
 window.pageModel = landingPageViewModel(getPrefetchedResources());
-ko.applyBindings(window.pageModel, document.querySelector('#ko-wrapper'));
+ko.applyBindings(window.pageModel, document.querySelector('#ko-wrapper')); 

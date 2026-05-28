@@ -11,6 +11,7 @@ using wwwDesignersGuild.Models.Interface;
 using wwwDesignersGuild.Models.Helper;
 using NLog;
 using wwwDesignersGuild.Models.Cache.Collection;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.CollectionPage
 {
@@ -80,7 +81,7 @@ namespace wwwDesignersGuild.Models.CollectionPage
                 collectionRelatedCollectionSelects = results.GetResult<collectionRelatedCollectionSelect>().ToList<collectionRelatedCollectionSelect>(),
                 collectionBrochureSelects = results.GetResult<collectionBrochureSelect>().ToList<collectionBrochureSelect>(),
                 collectionVideos = results.GetResult<collectionVideo>().ToList<collectionVideo>(),
-                collectionGoogleHrefs = results.GetResult<googleHref>().ToList<googleHref>(),
+                collectionGoogleHrefs = results.GetResult<GoogleHref>().ToList<GoogleHref>(),
                 collectionPageBreadcrumbs = results.GetResult<collectionBreadcrumb>().ToList(),
                 objUnavailabilityRedirect = results.GetResult<collectionUnavailabilityRedirect>().SingleOrDefault(),
             };

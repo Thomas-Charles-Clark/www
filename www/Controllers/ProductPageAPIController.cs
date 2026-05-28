@@ -1,11 +1,14 @@
 ﻿using Braintree;
 
+using DocumentFormat.OpenXml.EMMA;
 using DocumentFormat.OpenXml.Wordprocessing;
 
 using iText.Html2pdf.Attach.Impl.Layout.Form.Renderer;
 
 using MertexerV2.Models;
 using MertexerV2.SQLFunctions;
+
+using Microsoft.Ajax.Utilities;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,17 +26,21 @@ using System.Web.Http;
 
 using U2.Data.ClientTypes;
 
+using wwwDesignersGuild.Models.Attribute;
 using wwwDesignersGuild.Models.BasketClasses;
 using wwwDesignersGuild.Models.Cache;
 using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.LandingPage;
 using wwwDesignersGuild.Models.ModularFurniture;
 using wwwDesignersGuild.Models.OrderForm;
 using wwwDesignersGuild.Models.ProductPage;
+using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 using static Antlr.Runtime.Tree.TreeWizard;
 
@@ -42,7 +49,7 @@ namespace wwwDesignersGuild.Controllers
     public class ProductPageAPIController : ApiController
     {
         [HttpPost]
-        public async Task<IHttpActionResult> fetchModuleDetail([FromBody]PassModuleOption module)
+        public async Task<IHttpActionResult> fetchModuleDetail([FromBody] PassModuleOption module)
         {
             var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
 
@@ -135,85 +142,151 @@ namespace wwwDesignersGuild.Controllers
                 render = dgFramework.RenderViewToString("NewSection", "~/Views-New/ProductPages/Shared/_OrderFormItem.cshtml", orderFormItemViewModel);
             }
 
-            return Ok(new { 
+            return Ok(new {
                 furnitureOrderForm,
                 render
             });
         }
 
-   //     [HttpPost]
-   //     public async Task<IHttpActionResult> FetchPageSectionDefinition([FromBody]ProductPageGrid_PagingDTO dto)
-   //     {
-			//var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
+		[HttpPost]
+		public async Task<IHttpActionResult> FetchProductPageGridPortion([FromBody]ProductPageGrid_PagingDTO dto)
+		{
+			var objAttribute = new cmsAttribute();
 
-			//var session = HttpContext.Current.Session;
+			var objAttributeLoad = objAttribute.loadAttributeFromCms(dto.LanguageID);
 
-			//Int32? memberId = null;
+			// Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
 
-			//if (session["memberIdFromDatabase"] == null)
-			//{
+			await Task.WhenAll(objAttributeLoad); //(, ...);
 
-			//}
-			//else
-			//{
-			//	memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
-			//}
+			var attributeData = await objAttributeLoad;
 
-			//int? tradeAccountId = null;
+			var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
 
-			//if (session["memberTradeChecksPassed"] != null)
-			//{
-			//	if (Convert.ToBoolean(session["memberTradeChecksPassed"]) == true)
-			//	{
-			//		tradeAccountId = Convert.ToInt32(session["memberTradeAccountID"].ToString());
-			//	}
-			//}
+			var useCountry = Framework.GetCountryOverride(new HttpRequestWrapper(HttpContext.Current.Request));
 
-   //         var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
-            
-   //         var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
+			var session = HttpContext.Current.Session;
 
-			//dto.TradeAccountID = tradeAccountId;
-   //         dto.IsTrade = dto.TradeAccountID.HasValue;
-   //         dto.DisplayTradePrice = displayTradePrice;
-   //         dto.MemberID = memberId;
-   //         dto.IsMember = dto.MemberID.HasValue;
-   //         dto.UseDate = useDate;
-   //         dto.CountryMatch = countryMatched;
-   //         dto.DebugProductCode = null;
-			//dto.Debug = false;
+			Int32? memberId = null;
 
-			//var Definition = await new cmsLandingPage().loadLandingPageFromCms(
-			//   memberId: dto.MemberID,
-			//   pageId: dto.PageID,
-			//   languageId: dto.LanguageID,
-			//   countryId: dto.CountryID,
-			//   useDate: dto.UseDate,
-			//   isMember: dto.IsMember,
-			//   isTrade: dto.IsTrade,
-			//   countryMatch: dto.CountryMatch,
-			//   displayTradePrice: dto.DisplayTradePrice,
-			//   tradeAccountId: dto.TradeAccountID);
+			if (session["memberIdFromDatabase"] == null)
+			{
 
-   //         var ppg = Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID);
+			}
+			else
+			{
+				memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
+			}
 
-   //         var pageSection = Definition.pageSectionSelects.Single(p => p.PageSectionID == dto.PageSectionID);
+			int? tradeAccountId = null;
 
-   //         var ps = new PageSectionViewModel(
-   //             pageSection: pageSection,
-   //             baseViewModel: null,
-   //             sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
-   //                 originalUrlKeywords: Definition.PageDetails.URLKeywords,
-   //                 productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
-   //                 pagingEnabled: pageSection.Paging || pageSection.Filter,
-   //                 filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-   //                 isShop: Definition.PageDetails.IsShop,
-   //                 isLifestyleGallery: pageSection.IsLifestyleGallery,
-   //                 model: dto.BaseViewModel
-   //             ),
-   //             isShop: Definition.PageDetails.IsShop);
+			if (session["memberTradeChecksPassed"] != null)
+			{
+				if (Convert.ToBoolean(session["memberTradeChecksPassed"]) == true)
+				{
+					tradeAccountId = Convert.ToInt32(session["memberTradeAccountID"].ToString());
+				}
+			}
 
-			//return Ok(ps);
-   //     }
-    }
+			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+
+			var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
+
+			var ppgCache = new ProductPageGridCacheProvider();
+
+			var ppg = ppgCache.Get(dto.PageSectionID,
+				dto.LanguageID,
+				dto.CountryID,
+				tradeAccountId.HasValue,
+				tradeAccountId,
+				countryMatched,
+				useDate);
+
+			var results = Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * dto.Page, dto.PageSize)
+				.ToList();
+
+			// Datatable to pass to SQL proc
+			var productPageToRenderTable = new System.Data.DataTable();
+
+			// Datatable columns... why is Sequence necessary?
+			productPageToRenderTable.Columns.Add("ProductPageID", typeof(int));
+			productPageToRenderTable.Columns.Add("Sequence", typeof(int));
+
+			int sequence = 0;
+
+			// add rows to datatable
+			foreach (var productPageId in results)
+			{
+#if DEBUG
+				//System.Diagnostics.Debug.WriteLine(productPage);
+#endif
+				productPageToRenderTable.Rows.Add(productPageId.ProductPageID, sequence++);
+			}
+			var objSearchGenerate = new searchGenerate();
+
+			// call SQL render proc
+			var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
+				tradeAccountId: dto.Visitor.memberTradeAccountID,
+				isTrade: dto.MasterDefinition.TradeAllowed,
+				displayTradePrice: dto.Visitor.memberDisplayTradePrice,
+				productPageToRenderTable,
+				useDate,
+				dto.MasterDefinition.UrlBreakdown.countryDetails,
+				dateOverride: $"{useDate:yyyy-MM-dd}",
+				countryOverride: useCountry
+			);
+
+			// convert SQL render proc JSON results to List<T>
+			var renderedResults = JObject.FromObject(productPages.json)
+										.SelectToken("productPages")
+										.ToObject<List<ProductPageFilterablePod>>();
+
+			var objDb = new databaseDataContext();
+
+			// call SQL pricing select for page
+			var objPrices = objDb.ProductPage_Price_Select(
+				results.Select(p => p.ProductPageID),
+				dto.Visitor,
+				dto.MasterDefinition);
+
+			var serializer = new Newtonsoft.Json.JsonSerializer();
+
+			serializer.ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver();
+
+			// convert SQL pricing proc JSON results to List<a'>
+			var prices = JObject.FromObject(objPrices.json ?? (new { productPages = new int[] { } }))
+				.SelectToken("productPages")
+				.Children()
+				.Select(p => p.SelectToken("productPage"))
+				.Select(p => new
+				{
+					productPageId = p.SelectToken("productPageId").Value<int>(),
+					price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
+				}).ToList();
+
+			// Iterate over render results
+			for (var i = 0; i < prices.Count(); i++)
+			{
+				// grab product page id
+				var productPageId = prices[i].productPageId;
+
+				// grab index into complete result set 
+				var index = results.FindIndex(crs => crs.ProductPageID == productPageId);
+
+				if (index > -1)
+				{
+					// Set price object for this result
+					renderedResults[i].ProductPagePrice = prices.Where(p => p.productPageId == productPageId).Select(p => p.price).SingleOrDefault();
+
+					// Overwrite complete result set at appropriate index with this rendered, priced version
+					results[index].ApplyRender(renderedResults[i]);
+
+					// Need to re-establish Product Type as it will have been lost
+					results[index].ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == results[index].ProductTypeID);
+				}
+			}
+
+			return Ok(results);
+		}
+	}
 }

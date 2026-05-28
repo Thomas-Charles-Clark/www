@@ -1,11 +1,20 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.EMMA;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Web;
 using System.Web.Configuration;
+using Tweetinvi.Core.Events;
+
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Cache.ProductPages
 {
@@ -16,7 +25,10 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
         public PageSectionJSON Get(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {
             String key = buildKey(pageSectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
-            return (PageSectionJSON)Cache[key];
+
+            var result = (PageSectionJSON)Cache[key];
+
+            return result;
         }
 
         public void Set(long pageSectionTypeId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data)
@@ -49,6 +61,7 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
             };
 
             String key = buildKey(pageSectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
+            
             Cache.Add(new CacheItem(key, data), policy);
         }
 
@@ -86,6 +99,6 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
         private string buildKey(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {
             return $"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-        }
-    }
+		}
+	}
 }

@@ -13,6 +13,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using wwwDesignersGuild.Models.Cache.ProductPages;
 using System.Management.Automation;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.LandingPage
 {
@@ -47,7 +48,7 @@ namespace wwwDesignersGuild.Models.LandingPage
             }
         }
 
-        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId)
+        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPageId = null, int? productPageGridPageSize = null)
         {
             //  Is page in cache?
             cmsLandingPageDefinition landingPageStore;
@@ -113,31 +114,31 @@ namespace wwwDesignersGuild.Models.LandingPage
                 cmsLandingPageDefinition pageStore = new cmsLandingPageDefinition
                 {
                     //  Convert from IEnumerable to a List so a collection query can be run multiple times
-                    PageDetails = results.GetResult<pageLanguageSelect>().SingleOrDefault(),
-                    pageSectionSelects = results.GetResult<pageSectionSelect>().ToList(),
-                    pageSectionHtmls = results.GetResult<pageSectionHtml>().ToList(),
-                    pageSectionSlideShowAspects = results.GetResult<pageSectionSlideShowAspect>().ToList(),
-                    pageSectionSlideShows = results.GetResult<pageSectionSlideShow>().ToList(),
-                    pageSectionForms = results.GetResult<pageSectionForm>().ToList(),
-                    pageSectionFormRetailAppointmentAgendas = results.GetResult<pageSectionFormRetailAppointmentAgenda>().ToList(),
-                    pageSectionFormRetailAppointmentTypes = results.GetResult<pageSectionFormRetailAppointmentType>().ToList(),
-                    pageSectionCollections = results.GetResult<pageSectionCollection>().ToList(),
-                    pageSectionCollectionImages = results.GetResult<pageSectionCollectionImage>().ToList(),
-                    pageSectionPageSelects = results.GetResult<pageSectionPageSelect>().ToList(),
-                    pageSectionPageSelectImages = results.GetResult<pageSectionPageSelectImage>().ToList(),
-                    pageSectionBanners = results.GetResult<pageSectionBannerJson>().Single(),
-                    pageRelateds = results.GetResult<pageRelated>().ToList(),
+                    PageDetails = results.GetResult<PageLanguageSelect>().SingleOrDefault(),
+                    pageSectionSelects = results.GetResult<PageSectionSelect>().ToList(),
+                    pageSectionHtmls = results.GetResult<PageSectionHTML>().ToList(),
+                    pageSectionSlideShowAspects = results.GetResult<PageSectionSlideShowAspect>().ToList(),
+                    pageSectionSlideShows = results.GetResult<PageSectionSlideShow>().ToList(),
+                    pageSectionForms = results.GetResult<PageSectionForm>().ToList(),
+                    pageSectionFormRetailAppointmentAgendas = results.GetResult<PageSectionFormRetailAppointmentAgenda>().ToList(),
+                    pageSectionFormRetailAppointmentTypes = results.GetResult<PageSectionFormRetailAppointmentType>().ToList(),
+                    pageSectionCollections = results.GetResult<PageSectionCollection>().ToList(),
+                    pageSectionCollectionImages = results.GetResult<PageSectionCollectionImage>().ToList(),
+                    pageSectionPageSelects = results.GetResult<PageSectionPageSelect>().ToList(),
+                    pageSectionPageSelectImages = results.GetResult<PageSectionPageSelectImage>().ToList(),
+                    pageSectionBanners = results.GetResult<PageSectionBannerJSON>().Single(),
+                    pageRelateds = results.GetResult<PageRelated>().ToList(),
                     Breadcrumbs = results.GetResult<Breadcrumb>().ToList(),
-                    pageGoogleHrefs = results.GetResult<googleHref>().ToList(),
-                    pageSectionArticles = results.GetResult<pageSectionArticle>().ToList(),
-                    pageSectionArticleImages = results.GetResult<pageSectionArticleImage>().ToList(),
-                    pageFormCountrys = results.GetResult<pageFormCountry>().ToList(),
-                    pageSectionVideos = results.GetResult<pageSectionVideo>().ToList(),
-                    pageSectionStoreEvents = results.GetResult<pageSectionStoreEvent>().ToList(),
-                    pageSectionAnimations = results.GetResult<pageSectionAnimation>().ToList(),
-                    pageSectionAnimationSlides = results.GetResult<pageSectionAnimationSlide>().ToList(),
-                    pageSectionAnimationSlideCallsToAction = results.GetResult<pageSectionAnimationSlideCallToAction>().ToList(),
-                    ratingAggregate = results.GetResult<pageRatingAggregate>().ToList()
+                    pageGoogleHrefs = results.GetResult<GoogleHref>().ToList(),
+                    pageSectionArticles = results.GetResult<PageSectionArticle>().ToList(),
+                    pageSectionArticleImages = results.GetResult<PageSectionArticleImage>().ToList(),
+                    pageFormCountrys = results.GetResult<PageFormCountry>().ToList(),
+                    pageSectionVideos = results.GetResult<PageSectionVideo>().ToList(),
+                    pageSectionStoreEvents = results.GetResult<PageSectionStoreEvent>().ToList(),
+                    pageSectionAnimations = results.GetResult<PageSectionAnimation>().ToList(),
+                    pageSectionAnimationSlides = results.GetResult<PageSectionAnimationSlide>().ToList(),
+                    pageSectionAnimationSlideCallsToAction = results.GetResult<PageSectionAnimationSlideCallToAction>().ToList(),
+                    ratingAggregate = results.GetResult<PageRatingAggregate>().ToList()
                 };
                 return pageStore;
             }

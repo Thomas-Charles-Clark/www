@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.RecentlyViewed
 {
@@ -20,6 +21,6 @@ namespace wwwDesignersGuild.Models.RecentlyViewed
         public string URL { get; set; }
         public string URLSemantics { get; set; }
         public short Width { get; set; }
-        public productPagePodPrice ProductPagePrice { get; set; }
+        public ProductPagePodPrice ProductPagePrice { get; set; }
     }
 }

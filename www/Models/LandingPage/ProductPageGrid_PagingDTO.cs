@@ -10,33 +10,12 @@ namespace wwwDesignersGuild.Models.LandingPage
 {
 	public class ProductPageGrid_PagingDTO
 	{
-		public int PageID { get; set; }
-
 		public long PageSectionID { get; set; }
 
 		public byte LanguageID { get; set; }
 
 		public short CountryID { get; set; }
 
-		public DateTime UseDate { get; set; }
-
-		public bool IsMember { get; set; }
-
-		public bool IsTrade { get; set; }
-
-		public int? MemberID { get; set; }
-
-		public bool DisplayTradePrice { get; set; }
-		
-		public int? TradeAccountID { get; set; }
-
-		public bool Debug { get; set; }
-
-		public string DebugProductCode { get; set; }
-
-		public bool CountryMatch { get; set; }
-
-		// needs to be zero-based
 		public int Page { get; set; }
 
 		public int PageSize { get; set; }
@@ -50,6 +29,8 @@ namespace wwwDesignersGuild.Models.LandingPage
 
 		public byte? ProductTypeID { get; set; }
 
-		public BaseViewModel BaseViewModel { get; set; }
+		public VisitorSelect Visitor { get; set; }
+
+		public NewMasterDefinition MasterDefinition { get; set; }
 	}
 }

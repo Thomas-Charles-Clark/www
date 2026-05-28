@@ -10,6 +10,7 @@ using wwwDesignersGuild.Models.Cache;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Interface;
 using NLog;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.ArticlePage
 {
@@ -58,7 +59,7 @@ namespace wwwDesignersGuild.Models.ArticlePage
                 articleImageHotspotSelects = results.GetResult<articleImageHotspotSelect>().ToList<articleImageHotspotSelect>(),
                 articleRelatedArticleSelects = results.GetResult<articleRelatedArticleSelect>().ToList<articleRelatedArticleSelect>(),
                 articleVideoSelects = results.GetResult<articleVideoSelect>().ToList<articleVideoSelect>(),
-                articleGoogleHrefs = results.GetResult<googleHref>().ToList<googleHref>(),
+                articleGoogleHrefs = results.GetResult<GoogleHref>().ToList<GoogleHref>(),
                 articleNextArticleSelects = results.GetResult<articleNextArticleSelect>().ToList<articleNextArticleSelect>(),
                 articlePreviousArticleSelects = results.GetResult<articlePreviousArticleSelect>().ToList<articlePreviousArticleSelect>(),
                 articleTypeSelects = results.GetResult<articleTypeSelect>().ToList<articleTypeSelect>(),

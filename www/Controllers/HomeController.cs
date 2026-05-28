@@ -29,6 +29,7 @@ using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.PCAFind;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -1027,7 +1028,7 @@ namespace wwwDesignersGuild.Controllers
                                     backInStockReminder: (int?)Session["backInStockReminder"],
                                     itemsInBasket: basketTotalData.TotalQuantity,
                                     urlBreakdown: urlData,
-                                    googleHrefs: new List<googleHref>(),
+                                    googleHrefs: new List<GoogleHref>(),
                                     tradeMember: Session["memberTradeAccountID"] != null
                                 ),
                                 objVisitor: objVisitorSelect
@@ -1187,7 +1188,7 @@ namespace wwwDesignersGuild.Controllers
                                 backInStockReminder: (int?)Session["backInStockReminder"],
                                 itemsInBasket: basketTotalData.TotalQuantity,
                                 urlBreakdown: urlData,
-                                googleHrefs: new List<googleHref>(),
+                                googleHrefs: new List<GoogleHref>(),
                                 tradeMember: Session["memberTradeAccountID"] != null
                             ),
                             objVisitor: objVisitorSelect,
@@ -2180,7 +2181,7 @@ namespace wwwDesignersGuild.Controllers
                         backInStockReminder: (int?)Session["backInStockReminder"],
                         itemsInBasket: basketTotalQuantity,
                         urlBreakdown: urlBreakdown,
-                        googleHrefs: new List<googleHref>(),
+                        googleHrefs: new List<GoogleHref>(),
                         tradeMember: Session["memberTradeAccountID"] != null
                     ),
                 objVisitor: objVisitorSelect);

@@ -16,6 +16,7 @@ using wwwDesignersGuild.Models.Films;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.ProductReview;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Helpers
 {
@@ -327,7 +328,7 @@ namespace wwwDesignersGuild.Helpers
 
                     case "Category":
 
-                        var aggregateData = this.objModel as pageRatingAggregate;
+                        var aggregateData = this.objModel as PageRatingAggregate;
 
                         result += $@"{{
     ""@context"": ""http://www.schema.org"",

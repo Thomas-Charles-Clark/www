@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.ViewModels
 {
@@ -10,13 +11,13 @@ namespace wwwDesignersGuild.ViewModels
     {
         public NewMasterDefinition MasterDefinition { get; set; }
 
-        public pageSectionArticle Article { get; set; }
+        public PageSectionArticle Article { get; set; }
 
         // set by the ArticleGrid template as rendering occurs
 
         public ArticlePodViewModel(
             NewMasterDefinition objMaster,
-            pageSectionArticle objArticle)
+            PageSectionArticle objArticle)
         {
             MasterDefinition = objMaster;
             Article = objArticle;

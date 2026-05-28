@@ -356,15 +356,15 @@ namespace wwwDesignersGuild.Controllers
             }
 
             //  Get the form details for validation purposes
-            cmsLandingPage objLandingPage = new cmsLandingPage();
-            cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(memberId,
+            var objLandingPage = new cmsLandingPage();
+			Models.Classes.cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(memberId,
                                                                                                 objForm.ContentID,
                                                                                                 objCountryItem.LanguageID,
                                                                                                 objCountryItem.CountryID,
                                                                                                 useDate,
                                                                                                 session["memberIdFromDatabase"] != null,
                                                                                                 session["memberTradeAccountID"] != null,
-                                                                                                Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+																								Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                                                                                                 session["memberDisplayTradePrice"] != null && Convert.ToBoolean(session["memberDisplayTradePrice"]),
                                                                                                 session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]));
 
@@ -372,7 +372,8 @@ namespace wwwDesignersGuild.Controllers
             {
                 dgFramework.raiseErrorNotHandled(webapiUnhandledError.InvalidParameters);
             }
-            pageSectionForm objFormDefinition = objPageData.pageSectionForms.Where(p => p.PageSectionID == objForm.PageSectionID).First();
+
+            var objFormDefinition = objPageData.pageSectionForms.Where(p => p.PageSectionID == objForm.PageSectionID).First();
 
 
             //  Validate email block
@@ -725,15 +726,15 @@ namespace wwwDesignersGuild.Controllers
             }
 
             //  Get the form details for validation purposes
-            cmsLandingPage objLandingPage = new cmsLandingPage();
-            cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(memberId,
+            var objLandingPage = new cmsLandingPage();
+			Models.Classes.cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(memberId,
                                                                                                 objSave.ContentID,
                                                                                                 objCountryItem.LanguageID,
                                                                                                 objCountryItem.CountryID,
                                                                                                 useDate,
                                                                                                 session["memberIdFromDatabase"] != null,
                                                                                                 session["memberTradeAccountID"] != null,
-                                                                                                Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+																								Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                                                                                                 session["memberDisplayTradePrice"] != null && Convert.ToBoolean(session["memberDisplayTradePrice"]),
                                                                                                 session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]));
 
@@ -741,7 +742,8 @@ namespace wwwDesignersGuild.Controllers
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "PageSectionIDFailure"));
             }
-            pageSectionForm objFormDefinition = objPageData.pageSectionForms.Where(p => p.PageSectionID == objSave.PageSectionID).First();
+
+            var objFormDefinition = objPageData.pageSectionForms.Where(p => p.PageSectionID == objSave.PageSectionID).First();
 
 
             //  Validate email block

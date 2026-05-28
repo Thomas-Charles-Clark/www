@@ -38,6 +38,7 @@ using wwwDesignersGuild.Models.UnsubscribePage;
 using wwwDesignersGuild.Models.ViewedProduct;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Controllers
 {
@@ -351,11 +352,11 @@ namespace wwwDesignersGuild.Controllers
             objProductPageGrid.usePageSectionAttributes = pageSectionAttributes;
             objProductPageGrid.useAttributeDefinitions = new cmsAttributeDefinition { attributeGroups = attributeGroups, attributeDetails = attributeDetails };
 
-            objProductPageGrid.usePageRelateds = new List<pageRelated>();
+            objProductPageGrid.usePageRelateds = new List<PageRelated>();
 
             foreach (var objRelated in objProductPageGrid.pageRelateds)
             {
-                objProductPageGrid.usePageRelateds.Add(new pageRelated
+                objProductPageGrid.usePageRelateds.Add(new PageRelated
                 {
                     Heading = objRelated.Heading,
                     PageID = objRelated.PageID,

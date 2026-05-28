@@ -165,8 +165,8 @@ namespace wwwDesignersGuild.Controllers
             // bollocks, it does need to run through page select...
             masterDefinition objMaster = new masterDefinition();
             
-            cmsLandingPage objLandingPage = new cmsLandingPage();
-            cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(
+            var objLandingPage = new Models.LandingPage.cmsLandingPage();
+            Models.Classes.cmsLandingPageDefinition objPageData = await objLandingPage.loadLandingPageFromCms(
                                                                                     objVisitorSelect.memberId,
                                                                                     1515,
                                                                                     languageId,
@@ -176,7 +176,9 @@ namespace wwwDesignersGuild.Controllers
                                                                                     objVisitorSelect.memberTradeAccountID != null,
                                                                                     Convert.ToBoolean(Session["countryCheckMatched"]),
                                                                                     objVisitorSelect.memberDisplayTradePrice,
-                                                                                    objVisitorSelect.memberTradeAccountID);
+                                                                                    objVisitorSelect.memberTradeAccountID,
+                                                                                    null,
+                                                                                    null);
 
             basketRoutines objBasket = new basketRoutines();
             var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, objVisitorSelect.memberId, countryId);
@@ -247,7 +249,7 @@ namespace wwwDesignersGuild.Controllers
     public class AlternativeProductsViewModel
     {
         public masterDefinition masterDefinition { get; set; }
-        public cmsLandingPageDefinition LandingPage { get; set; }
+        public Models.Classes.cmsLandingPageDefinition LandingPage { get; set; }
         public List<searchResultRenderCore> SourcePods { get; set; }
         public List<searchResultRenderImage> SourcePodImages { get; set; }
         public List<ProductPageAttribute> SourceProductPageAttributes { get; set; }

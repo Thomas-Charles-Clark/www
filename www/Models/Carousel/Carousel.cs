@@ -6,6 +6,7 @@ using System.Web;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Hotspot;
 using wwwDesignersGuild.Models.ImgSize;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Carousel
 {
@@ -93,7 +94,7 @@ namespace wwwDesignersGuild.Models.Carousel
             }
         }
 
-        public CarouselImageOverlay(pageSectionSlideShow i)
+        public CarouselImageOverlay(PageSectionSlideShow i)
         {
             Visible = i.DisplayOverlay;
             AutoHide = Convert.ToBoolean(i.AutoHideOverlay);
@@ -111,7 +112,7 @@ namespace wwwDesignersGuild.Models.Carousel
             Width = i.OverlayWidth ?? 35.0m;
         }
 
-        public CarouselImageOverlay(pageSectionAnimationSlide i)
+        public CarouselImageOverlay(PageSectionAnimationSlide i)
         {
             Visible = false;
             AutoHide = true;
