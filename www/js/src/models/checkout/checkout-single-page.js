@@ -674,7 +674,7 @@ const deliveryAddressFactory = ((parent) => {
             addr.AddressKeyFormat.PoliticalDivision2,
             addr.AddressKeyFormat.PoliticalDivision3,
             addr.AddressKeyFormat.PostcodePrimaryLow + (addr.AddressKeyFormat.PostcodeExtended ? ' ' + addr.AddressKeyFormat.PostcodeExtendedLow : ''),
-            addr.AccessPointInformation.PublicAccessPointIDField,
+            addr.AccessPointInformation.PublicAccessPointID,
             null,
             false,
             false);
