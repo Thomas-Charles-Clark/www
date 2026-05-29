@@ -866,8 +866,6 @@ namespace wwwDesignersGuild.Models.Helper
             return result;
         }
 
-        // This should be working with the addition of AttributeSignature
-        // However something still needs to be done about JS not being able to pull the appropriate AttributeSignature text for a given filter change
         public static string ProcessAttributeFilterText(string input, string attributeFilterText, string productTypePluralPropercase, string attributeSignatureText, bool enabledByAttributeCombination, bool useHtml = true)
         {
             var filterRegex = new Regex(@"{FilterStart}((.|\n|\r)*?){FilterEnd}");

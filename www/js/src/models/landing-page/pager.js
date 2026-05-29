@@ -7,7 +7,7 @@
         sort: ko.observable()
     };
 
-    self.totalCount = grid.totalCount;
+    self.totalCount = grid.filteredContent;
 
     self.page.subscribe(nv => {
 
@@ -60,7 +60,7 @@
         read: () => {
             //if (self.parent.filteredContent().length) {
 
-            let count = self.totalCount();
+            let count = self.totalCount().length;
             let size = self.pageSize();
 
             if (count < size)
@@ -215,13 +215,14 @@
                 pageSize: self.pageSize(),
                 sort: self.sort(),
                 productTypeId: self.parent.productTypeId(),
-                attributes: self.parent.selectedAttributes()?.map(a => {
+                attributes: self.parent.wholeAttributeSelection().map(a => {
                     return {
-                        AttributeID: a.AttributeID,
-                        AttributeGroupID: a.AttributeGroupID,
-                        AttributeOperator: a.AttributeGroup.Operator
+                        AttributeID: a.attributeId,
+                        AttributeGroupID: a.attributeGroupId,
+                        AttributeOperator: a.attributeOperator,
+                        ProductPageIDs: a.productPageIds
                     }
-                }) ?? [],
+                }),
                 visitor: window.getBase().Visitor,
                 masterDefinition: window.getMasterDefinition()
             }

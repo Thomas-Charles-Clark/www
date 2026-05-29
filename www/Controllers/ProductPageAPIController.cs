@@ -202,8 +202,75 @@ namespace wwwDesignersGuild.Controllers
 				countryMatched,
 				useDate);
 
-			var results = Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * dto.Page, dto.PageSize)
-				.ToList();
+			if (ppg == null)
+			{
+				ppg = await Task.FromResult(new cmsLandingPage().loadProductPageGridFromCmsDatabase(dto.PageSectionID, 
+					memberId, 
+					dto.LanguageID, 
+					dto.CountryID, 
+					tradeAccountId, 
+					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+					displayTradePrice,
+					useDate));
+
+				ppgCache.Set(dto.PageSectionID, 
+					dto.LanguageID, 
+					dto.CountryID, 
+					tradeAccountId.HasValue, 
+					tradeAccountId,
+					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match, 
+					useDate, 
+					ppg);
+			}
+
+			var filteredProductPages = new List<int>();
+
+			if (dto.Attributes.Any())
+			{
+				var attributesGrouped = dto.Attributes.GroupBy(a => new { a.AttributeGroupID, a.AttributeOperator }).ToList();
+
+				attributesGrouped.ForEach(ag => 
+				{
+					var thisGroupProductPageIDs = new List<int>();
+
+					// ag.Key is the AttributeGroupID
+					switch(ag.Key.AttributeOperator)
+					{
+						case "AND":
+							thisGroupProductPageIDs.AddRange(ag.Select(a => a.ProductPageIDs).Aggregate((previous, next) => previous.Intersect(next)));
+							break;
+						case "OR":
+							thisGroupProductPageIDs.AddRange(ag.SelectMany(p => p.ProductPageIDs));
+							break;
+					}
+
+					filteredProductPages.AddRange(thisGroupProductPageIDs);
+				});
+			}
+
+
+
+			// we need a way to use the attributes as given to reduce this potentially enormous list
+			// as efficiently as possible
+			// as quickly as possible
+			//
+			// right so now we have ProductPageIDs on each Attribute coming in...
+			// and each attribute declares which operator its group uses: AND or OR
+			// that means... that means that we need to group them by attribute group
+			// and apply 
+			//
+			// between attribute groups themselves, the operator is always AND
+
+			var preResults = new List<ProductPageFilterablePod>();
+
+			if (filteredProductPages.Any())
+			{
+				preResults = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages).ToList();
+			}
+
+			var results = preResults.Any() 
+					? preResults.Skip(dto.PageSize * (dto.Page - 1)).Take(dto.PageSize).ToList() 
+					: Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize).ToList();
 
 			// Datatable to pass to SQL proc
 			var productPageToRenderTable = new System.Data.DataTable();
@@ -222,6 +289,7 @@ namespace wwwDesignersGuild.Controllers
 #endif
 				productPageToRenderTable.Rows.Add(productPageId.ProductPageID, sequence++);
 			}
+
 			var objSearchGenerate = new searchGenerate();
 
 			// call SQL render proc
@@ -286,7 +354,52 @@ namespace wwwDesignersGuild.Controllers
 				}
 			}
 
-			return Ok(results);
+			var objSearch = new cmsSearch();
+
+			var objSearchResultReturn = await objSearch.loadSearchFromCms(productPageToRenderTable, dto.LanguageID, dto.CountryID, null, tradeAccountId, dto.ProductTypeID, useDate);
+
+			Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
+			{
+				var tempSearch = results.Where(p => p.ProductPageID == tempResult.ProductPageID).FirstOrDefault();
+
+				if (tempSearch == null) { }
+				else
+				{
+					tempResult.ScorePercent = tempSearch.ScorePercent;
+				}
+			});
+
+			objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
+
+			Parallel.ForEach(results, (r) =>
+			{
+				var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
+				
+				if (src != null)
+				{
+					r.ApplySorting(src);
+				}
+			});
+
+			switch (dto.Sort)
+			{
+				case "default":
+					return Ok(results.OrderBy(p => p.SortOrder));
+				case "bestSellers":
+					return Ok(results.OrderBy(p => p.SalesRank));
+				case "priceLowToHigh":
+					return Ok(results.OrderByDescending(p => p.PriceSortOrder));
+				case "priceHighToLow":
+					return Ok(results.OrderBy(p => p.PriceSortOrder));
+				case "alphaAZ":
+					return Ok(results.OrderBy(p => p.AZSortOrder));
+				case "alphaZA":
+					return Ok(results.OrderByDescending(p => p.AZSortOrder));
+				case "new":
+					return Ok(results.OrderBy(p => p.NewSort));
+				default:
+					return Ok(results.OrderBy(p => p.SortOrder));
+			}
 		}
 	}
 }

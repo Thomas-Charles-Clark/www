@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -329,6 +330,65 @@ namespace wwwDesignersGuild.Util
 					}
 				}
 			}
+		}
+
+        // Thanks again, Google
+		public static IEnumerable<ProductPageFilterablePod> StreamingJsonReduction(string enormousJsonString, IEnumerable<int> productPageIds)
+		{
+			// Convert to a HashSet for O(1) lookups instead of O(N) scans
+			var targetIds = new HashSet<int>(productPageIds);
+			var results = new List<ProductPageFilterablePod>();
+			var serializer = new JsonSerializer();
+
+			using (var stringReader = new StringReader(enormousJsonString))
+			using (var jsonReader = new JsonTextReader(stringReader))
+			{
+				// 1. Advance the reader until we find the "productPages" property
+				while (jsonReader.Read())
+				{
+					if (jsonReader.TokenType == JsonToken.PropertyName && "productPages".Equals(jsonReader.Value?.ToString(), StringComparison.OrdinalIgnoreCase))
+					{
+						break;
+					}
+				}
+
+				// 2. Advance to the start of the array inside that property
+				while (jsonReader.Read())
+				{
+					if (jsonReader.TokenType == JsonToken.StartArray)
+					{
+						break;
+					}
+				}
+
+				// 3. Stream through the objects inside the array safely
+				while (jsonReader.Read())
+				{
+					// Break out if we hit the end of the productPages array
+					if (jsonReader.TokenType == JsonToken.EndArray)
+					{
+						break;
+					}
+
+					if (jsonReader.TokenType == JsonToken.StartObject)
+					{
+						// Only loads one array item into memory at a time
+						var obj = JObject.Load(jsonReader);
+						var idValue = obj["productPageId"]?.Value<int>();
+
+						if (idValue.HasValue && targetIds.Contains(idValue.Value))
+						{
+							var pod = obj.ToObject<ProductPageFilterablePod>(serializer);
+							if (pod != null)
+							{
+								results.Add(pod);
+							}
+						}
+					}
+				}
+			}
+
+			return results;
 		}
 	}
 

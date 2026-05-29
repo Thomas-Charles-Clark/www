@@ -12,5 +12,7 @@ namespace wwwDesignersGuild.Models.LandingPage
 		public short AttributeGroupID { get; set; }
 
 		public string AttributeOperator { get; set; } // AND / OR
+		
+		public IEnumerable<int> ProductPageIDs { get; set; }
 	}
 }

@@ -26,6 +26,8 @@
 
     self.selectedAttributes = ko.observableArray([]);
 
+    self.wholeAttributeSelection = ko.observableArray([]);
+
     self.selectedAttributes.subscribe(nv => {
         console.log('selectedAttributes subscribe hit');
     });
@@ -713,18 +715,38 @@
             let selection = ko.unwrap(ag.selection);
             if (Array.isArray(selection))
                 selection.forEach(a => {
-                    if (attributes.indexOf(a) == -1)
-                        attributes.push({ selection: a, lexicographicalSortOrder: ag.lexicographicalSortOrder });
+                    if (attributes.map(a => a.selection).indexOf(a) == -1)
+                        attributes.push({
+                            attributeId: a.AttributeID,
+                            attributeGroupId: a.AttributeGroupID,
+                            attributeOperator: ag.logicalOperator(),
+                            selection: a,
+                            lexicographicalSortOrder: ag.lexicographicalSortOrder,
+                            productPageIds: a.ProductPageIDs
+                        });
                 });
             else {
-                if (selection != '')
-                    attributes.push({ selection: selection, lexicographicalSortOrder: ag.lexicographicalSortOrder });
+                let attribute = ag.attributes().find(a => a.FormValue == selection);
+                if (attribute) {
+                    attributes.push({
+                        attributeId: attribute.AttributeID,
+                        attributeGroupId: attribute.AttributeGroupID,
+                        attributeOperator: ag.logicalOperator(),
+                        selection: selection,
+                        lexicographicalSortOrder: ag.lexicographicalSortOrder,
+                        productPageIds: attribute.ProductPageIDs
+                    });
+                }
             }
         });
 
-        let attributes = attributes.sort((a, b) => {
+        let sorted = attributes.sort((a, b) => {
             return a.lexicographicalSortOrder < b.lexicographicalSortOrder ? -1 : 1;
-        }).map(a => a.selection);
+        });
+
+        self.wholeAttributeSelection(sorted);
+
+        attributes = sorted.map(x => x.selection);
 
         // I think we don't want to include Product Type as a clearable filter. 25/08/2022
         //self.filterCount(attributes.length + (self.productType() ? (self.productType() == 'all' ? 0 : 1) : 0));

@@ -32,7 +32,8 @@ namespace wwwDesignersGuild.Models.Database
             DateTime? date,
             bool emptySearch,
             int? tradeAccountId,
-            bool isTrade)
+            bool isTrade,
+            byte? productTypeId)
         {
             serverSearchDatabase storeSearchResults = new serverSearchDatabase();
 
@@ -55,9 +56,10 @@ namespace wwwDesignersGuild.Models.Database
                     cmd.Parameters.AddWithValue("@EmptySearch", emptySearch); // @EmptySearch = 1 if it's an empty search!
                     cmd.Parameters.AddWithValue("@IsTrade", isTrade);
                     cmd.Parameters.AddWithValue("@TradeAccountID", tradeAccountId);
+                    cmd.Parameters.AddWithValue("@ProductTypeID", productTypeId);
 
-                    //conn.Open();
-                    await conn.OpenAsync();
+					//conn.Open();
+					await conn.OpenAsync();
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     storeSearchResults.searchResultCores = new List<serverSearchResultCore>();

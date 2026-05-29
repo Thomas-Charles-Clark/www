@@ -66,5 +66,15 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			ProductTypeID = patch.ProductTypeID;
 			ProductPagePrice = patch.ProductPagePrice;
 		}
+
+		internal void ApplySorting(serverSearchResultCore c)
+		{
+			SearchSortOrder = c.SearchSortOrder;
+			MerchandisedSortOrder = c.SearchSortOrder;
+			AZSortOrder = c.AtoZScore;
+			ColourSort = c.ColourSort;
+			NewSort = c.NewSort;
+			PriceSortOrder = c.PriceSort;
+		}
 	}
 }

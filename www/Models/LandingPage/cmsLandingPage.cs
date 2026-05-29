@@ -97,7 +97,7 @@ namespace wwwDesignersGuild.Models.LandingPage
             return landingPageStore;
         }
 
-        private PageSectionJSON loadProductPageGridFromCmsDatabase(long pageSectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool displayTradePrice, DateTime useDate)
+        internal PageSectionJSON loadProductPageGridFromCmsDatabase(long pageSectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool displayTradePrice, DateTime useDate)
         {
             using (var dataContext = new databaseDataContext())
             {
