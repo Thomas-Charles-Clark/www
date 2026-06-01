@@ -151,6 +151,22 @@ namespace wwwDesignersGuild.Controllers
 		[HttpPost]
 		public async Task<IHttpActionResult> FetchProductPageGridPortion([FromBody]ProductPageGrid_PagingDTO dto)
 		{
+#if DEBUG
+			var sw = new System.Diagnostics.Stopwatch();
+
+			var overallSw = new System.Diagnostics.Stopwatch();
+
+			var longestWait = new List<Tuple<string, TimeSpan>>();
+
+			sw.Start();
+
+			overallSw.Start();
+
+			var debugString = "";
+
+			System.Diagnostics.Trace.WriteLine($"FetchProductPageGridPortion Checkpoint 0) - called at {DateTime.Now:HH:mm:ss.fffffff}");
+#endif
+
 			var objAttribute = new cmsAttribute();
 
 			var objAttributeLoad = objAttribute.loadAttributeFromCms(dto.LanguageID);
@@ -160,6 +176,17 @@ namespace wwwDesignersGuild.Controllers
 			await Task.WhenAll(objAttributeLoad); //(, ...);
 
 			var attributeData = await objAttributeLoad;
+
+
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint A) - attributeLoad completed in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+			
+			sw.Restart();
+#endif
 
 			var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
 
@@ -188,6 +215,16 @@ namespace wwwDesignersGuild.Controllers
 				}
 			}
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint B) - Session properties gathered in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
+
 			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
 
 			var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
@@ -204,7 +241,18 @@ namespace wwwDesignersGuild.Controllers
 
 			if (ppg == null)
 			{
-				ppg = await Task.FromResult(new cmsLandingPage().loadProductPageGridFromCmsDatabase(dto.PageSectionID, 
+#if DEBUG
+				debugString = "FetchProductPageGridPortion Checkpoint C.i) - ProductPageGridCacheProvider returned null in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+				
+				sw.Restart();
+#endif
+
+				ppg = await Task.FromResult(new cmsLandingPage().loadProductPageGridFromCmsDatabase(
+					dto.PageSectionID, 
 					memberId, 
 					dto.LanguageID, 
 					dto.CountryID, 
@@ -212,6 +260,33 @@ namespace wwwDesignersGuild.Controllers
 					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
 					displayTradePrice,
 					useDate));
+
+#if DEBUG
+				System.Diagnostics.Trace.WriteLine("");
+				System.Diagnostics.Trace.WriteLine($@"
+{DateTime.Now}
+loadProductPageGridFromCmsDatabase called with: 
+    pageSectionId = {dto.PageSectionID},
+    memberId = {memberId},
+    languageId = {dto.LanguageID},
+    countryId = {dto.CountryID},
+    tradeAccountId = {tradeAccountId},
+    countryMatch = {dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match},
+    displayTradePrice = {displayTradePrice},
+    useDate = {useDate}
+");
+				System.Diagnostics.Trace.WriteLine("");
+#endif
+
+#if DEBUG
+				debugString = "FetchProductPageGridPortion Checkpoint C.ii) - cmsLandingPage.loadProductPageGridFromCmsDatabase returned in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+				sw.Restart();
+#endif
 
 				ppgCache.Set(dto.PageSectionID, 
 					dto.LanguageID, 
@@ -221,6 +296,28 @@ namespace wwwDesignersGuild.Controllers
 					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match, 
 					useDate, 
 					ppg);
+
+#if DEBUG
+				debugString = "FetchProductPageGridPortion Checkpoint C.iii) - ProductPageGridCache.Set returned in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+				sw.Restart();
+#endif
+			}
+			else
+			{
+#if DEBUG
+				debugString = "FetchProductPageGridPortion Checkpoint C.0) - ProductPageGridCacheProvider returned non-null in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+				sw.Restart();
+#endif
 			}
 
 			var filteredProductPages = new List<int>();
@@ -248,7 +345,15 @@ namespace wwwDesignersGuild.Controllers
 				});
 			}
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint D) - attributeGroups parsed in";
 
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
 
 			// we need a way to use the attributes as given to reduce this potentially enormous list
 			// as efficiently as possible
@@ -268,9 +373,42 @@ namespace wwwDesignersGuild.Controllers
 				preResults = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages).ToList();
 			}
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint E) - Framework.StreamingJsonReduction returned in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
+
 			var results = preResults.Any() 
 					? preResults.Skip(dto.PageSize * (dto.Page - 1)).Take(dto.PageSize).ToList() 
 					: Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize).ToList();
+
+#if DEBUG
+			if (preResults.Any())
+			{
+				debugString = "FetchProductPageGridPortion Checkpoint Fi) - preResults.Skip.Take completed in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+				sw.Restart();
+			}
+			else
+			{
+				debugString = "FetchProductPageGridPortion Checkpoint Fii) - Framework.StreamingJsonReduction returned in";
+
+				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+				sw.Restart();
+			}
+#endif
 
 			// Datatable to pass to SQL proc
 			var productPageToRenderTable = new System.Data.DataTable();
@@ -304,6 +442,16 @@ namespace wwwDesignersGuild.Controllers
 				countryOverride: useCountry
 			);
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint G) - objSearchGenerate.getRenderForSearchResultsAsync returned in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
+
 			// convert SQL render proc JSON results to List<T>
 			var renderedResults = JObject.FromObject(productPages.json)
 										.SelectToken("productPages")
@@ -317,6 +465,15 @@ namespace wwwDesignersGuild.Controllers
 				dto.Visitor,
 				dto.MasterDefinition);
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint H) - objDb.ProductPage_Price_Select returned in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
 			var serializer = new Newtonsoft.Json.JsonSerializer();
 
 			serializer.ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver();
@@ -331,6 +488,16 @@ namespace wwwDesignersGuild.Controllers
 					productPageId = p.SelectToken("productPageId").Value<int>(),
 					price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
 				}).ToList();
+
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint I) - objPrices.json parsed in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
 
 			// Iterate over render results
 			for (var i = 0; i < prices.Count(); i++)
@@ -354,9 +521,29 @@ namespace wwwDesignersGuild.Controllers
 				}
 			}
 
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint J) - prices rendered to results in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
+
 			var objSearch = new cmsSearch();
 
 			var objSearchResultReturn = await objSearch.loadSearchFromCms(productPageToRenderTable, dto.LanguageID, dto.CountryID, null, tradeAccountId, dto.ProductTypeID, useDate);
+
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint K) - objSearch.loadSearchFromCms returned in";
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			sw.Restart();
+#endif
 
 			Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
 			{
@@ -368,7 +555,7 @@ namespace wwwDesignersGuild.Controllers
 					tempResult.ScorePercent = tempSearch.ScorePercent;
 				}
 			});
-
+			
 			objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
 
 			Parallel.ForEach(results, (r) =>
@@ -380,6 +567,24 @@ namespace wwwDesignersGuild.Controllers
 					r.ApplySorting(src);
 				}
 			});
+
+#if DEBUG
+			debugString = "FetchProductPageGridPortion Checkpoint Z) - completed in";
+
+			sw.Stop();
+
+			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+			var longestWaiter = longestWait.OrderByDescending(p => p.Item2).First();
+
+			System.Diagnostics.Trace.WriteLine("");
+
+			System.Diagnostics.Trace.WriteLine($"Period of longest wait: \"{longestWaiter.Item1}: {longestWaiter.Item2}\"");
+
+			System.Diagnostics.Trace.WriteLine("");
+#endif
 
 			switch (dto.Sort)
 			{

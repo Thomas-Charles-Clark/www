@@ -86,7 +86,24 @@ namespace wwwDesignersGuild.Models.LandingPage
                 {
                     ppg = await Task.FromResult(loadProductPageGridFromCmsDatabase(pageSectionId, memberId, languageId, countryId, tradeAccountId, countryMatch, displayTradePrice, useDate));
 
-                    ppgCache.Set(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppg);
+#if DEBUG
+                    System.Diagnostics.Trace.WriteLine("");
+					System.Diagnostics.Trace.WriteLine($@"
+{DateTime.Now}
+loadProductPageGridFromCmsDatabase called with: 
+    pageSectionId = {pageSectionId},
+    memberId = {memberId},
+    languageId = {languageId},
+    countryId = {countryId},
+    tradeAccountId = {tradeAccountId},
+    countryMatch = {countryMatch},
+    displayTradePrice = {displayTradePrice},
+    useDate = {useDate}
+");
+					System.Diagnostics.Trace.WriteLine("");
+#endif
+
+					ppgCache.Set(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppg);
                 }
 
                 ppgs.Add(ppg);
