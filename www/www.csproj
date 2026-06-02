@@ -2022,6 +2022,7 @@
     <Content Include="Content\images\shop\swatch-arrow.webp" />
     <Content Include="Content\images\shop\swatch-close.gif" />
     <Content Include="Content\images\shop\swatch-close.webp" />
+    <Content Include="Content\images\social\facebook-logo.png" />
     <Content Include="Content\images\social\icon-facebook-light.png" />
     <Content Include="Content\images\social\icon-facebook.png" />
     <Content Include="Content\images\social\icon-instagram-light.png" />
@@ -2034,6 +2035,10 @@
     <Content Include="Content\images\social\icon-x.png" />
     <Content Include="Content\images\social\icon-youtube-light.png" />
     <Content Include="Content\images\social\icon-youtube.png" />
+    <Content Include="Content\images\social\instagram-logo.png" />
+    <Content Include="Content\images\social\pinterest-logo.png" />
+    <Content Include="Content\images\social\tiktok-logo.png" />
+    <Content Include="Content\images\social\youtube-logo.png" />
     <Content Include="Content\images\stockist\christian_lacroix.gif" />
     <Content Include="Content\images\stockist\christian_lacroix.webp" />
     <Content Include="Content\images\stockist\designers_guild.gif" />
@@ -3000,6 +3005,11 @@
     <Content Include="js\dist\lib\tempus-dominus\custom-date-format.min.js.map" />
     <Content Include="js\dist\lib\tempus-dominus\tempus-dominus-knockout.min.js.map" />
     <Content Include="js\dist\lib\tempus-dominus\tempus-dominus.min.js.map" />
+    <Content Include="Content\images\social\facebook-logo.webp" />
+    <Content Include="Content\images\social\instagram-logo.webp" />
+    <Content Include="Content\images\social\pinterest-logo.webp" />
+    <Content Include="Content\images\social\tiktok-logo.webp" />
+    <Content Include="Content\images\social\youtube-logo.webp" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
