@@ -106,6 +106,7 @@ namespace wwwDesignersGuild.Models.Search
 			DateTime useDate)
         {
             var objDbSearchResults = new searchDb();
+
             return objDbSearchResults.generateServerSearchResults(productPageTable,
                 languageId,
                 countryId,

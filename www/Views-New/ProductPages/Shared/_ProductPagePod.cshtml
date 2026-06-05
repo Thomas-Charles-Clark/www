@@ -43,15 +43,16 @@
             <div class="card">
                 @if (HtmlHelperExtra.Debug)
                 {
-                    <div class="sort-data grid">
-                        <span>Sales Rank:</span><span>@Model.ProductPage.SalesRank</span>
-                        <span>Search Sort Order:</span><span>@Model.ProductPage.SearchSortOrder</span>
-                        <span>AZ Sort Order:</span><span>@Model.ProductPage.AZSortOrder</span>
-                        <span>Colour Sort:</span><span>@Model.ProductPage.ColourSort</span>
-                        <span>New Sort:</span><span>@Model.ProductPage.NewSort</span>
-                        <span>Price Sort:</span><span>@Model.ProductPage.PriceSortOrder</span>
-                        <span>Discount Sort:</span><span>@Model.ProductPage.DiscountSortOrder</span>
-                    </div>
+					<div class="sort-data grid">
+						<span>Sales Rank:</span><span>@Model.ProductPage.SalesRank</span>
+						<span>Merchandised Sort Order:</span><span data-bind="text: MerchandisedSortOrder"></span>
+						<span>Search Sort Order:</span><span>@Model.ProductPage.SearchSortOrder</span>
+						<span>AZ Sort Order:</span><span>@Model.ProductPage.AZSortOrder</span>
+						<span>Colour Sort:</span><span>@Model.ProductPage.ColourSort</span>
+						<span>New Sort:</span><span>@Model.ProductPage.NewSort</span>
+						<span>Price Sort:</span><span>@Model.ProductPage.PriceSortOrder</span>
+						<span>Discount Sort:</span><span>@Model.ProductPage.DiscountSortOrder</span>
+					</div>
                 }
                 <div class="relative">
                     @if (objMaster.UrlBreakdown.ContentId == (int)dgFixedPage.tradeClearance)
@@ -161,14 +162,15 @@
             <div class="card">
                 @if (HtmlHelperExtra.Debug)
                 {
-                    <div class="sort-data grid">
-                        <span>Search Sort Order:</span><span>@Model.ProductPage.SearchSortOrder</span>
-                        <span>AZ Sort Order:</span><span>@Model.ProductPage.AZSortOrder</span>
-                        <span>Colour Sort:</span><span>@Model.ProductPage.ColourSort</span>
-                        <span>New Sort:</span><span>@Model.ProductPage.NewSort</span>
-                        <span>Price Sort:</span><span>@Model.ProductPage.PriceSortOrder</span>
-                        <span>Discount Sort:</span><span>@Model.ProductPage.DiscountSortOrder</span>
-                    </div>
+					<div class="sort-data grid">
+						<span>Search Sort Order:</span><span>@Model.ProductPage.SearchSortOrder</span>
+						<span>Merchandised Sort Order:</span><span data-bind="text: MerchandisedSortOrder"></span>
+						<span>AZ Sort Order:</span><span>@Model.ProductPage.AZSortOrder</span>
+						<span>Colour Sort:</span><span>@Model.ProductPage.ColourSort</span>
+						<span>New Sort:</span><span>@Model.ProductPage.NewSort</span>
+						<span>Price Sort:</span><span>@Model.ProductPage.PriceSortOrder</span>
+						<span>Discount Sort:</span><span>@Model.ProductPage.DiscountSortOrder</span>
+					</div>
                 }
                 <img class="card-img-top"
                      width="488"

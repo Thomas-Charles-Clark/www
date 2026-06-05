@@ -18,6 +18,7 @@ using DocumentFormat.OpenXml.EMMA;
 using DevExpress.Web.Rendering;
 using wwwDesignersGuild.Models.Hotspot;
 using System.Threading.Tasks;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Helper
 {

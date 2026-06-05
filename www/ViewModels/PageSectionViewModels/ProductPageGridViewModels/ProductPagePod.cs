@@ -23,7 +23,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 		public short ImageWidth { get; set; }
 		public short ImageHeight { get; set; }
 		public decimal AspectRatio { get; set; }
-		public int? MerchandisedSortOrder { get; set; }
+		public short MerchandisedSortOrder { get; set; }
 		public int? SearchSortOrder { get; set; }
 		public int? ColourSort { get; set; }
 		public decimal StockSortOrder { get; set; }
@@ -35,6 +35,13 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 		public long? PriceSortOrder { get; set; }
 		public int? DiscountSortOrder { get; set; }
 		public long? NewSort { get; set; }
+
+		public int SearchSortOrder_New { get; set; }
+		public int AtoZScore_New { get; set; }
+		public int ColourSort_New { get; set; }
+		public int NewSort_New { get; set; }
+		public int PriceSort_New { get; set; }
+
 		public int? DesignID { get; set; }
 		public byte BrandID { get; set; }
 		public bool AlternateColourwayIncludeSize { get; set; }

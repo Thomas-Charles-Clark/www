@@ -185,15 +185,23 @@ namespace wwwDesignersGuild.ViewModels
                 .Select(p => new ProductPageFilterablePod(p, ProductTypes.Single(pt => pt.ProductTypeID == p.ProductTypeID)))
                 .ToList();
 
-            #region Perform Sorting
+			#region Perform Sorting
 
-            ProductPageGrid.SortContents(ref completeResultSet);
+			completeResultSet = ProductPageGrid.SortContents(completeResultSet);
 
             #endregion
 
             // We have our base list of contents: this is what we should be building our product type list and attribute groups from.
             // We should not be building our paging around this list though. Paging should be built AFTER filtering.
             ProductPageGrid.Contents = completeResultSet.Cast<object>().ToList();
+
+            ProductPageGrid.Json = new PageSectionJSON()
+            {
+                totals = new PageSectionProductPageTotals()
+                {
+                    ProductPageIDs = completeResultSet.Select(p => p.ProductPageID).ToList()
+                }
+            };
 
             foreach (var objGroup in attributeData.attributeGroups)
             {
@@ -368,8 +376,6 @@ namespace wwwDesignersGuild.ViewModels
             #region Build a list of product page ids to fire the render and pricing fetches for
 
             var productPageIdsToRender = new List<int>();
-
-            ProductPageGrid.SortContents(ref completeResultSet);
 
             #region Initialise Pager
 

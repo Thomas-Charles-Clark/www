@@ -213,8 +213,8 @@ namespace wwwDesignersGuild.Controllers
             {
                 //results.Add(productPageGridCache.InvalidateMultiple(ps, objPurge.LanguageID, objPurge.CountryID));
 
-                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, true, objPurge.ContentDate);
-                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID, false, null, false, objPurge.ContentDate);
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID,  null, true, objPurge.ContentDate);
+                productPageGridCache.Invalidate(ps, objPurge.LanguageID, objPurge.CountryID,  null, false, objPurge.ContentDate);
             }
 
             return results;

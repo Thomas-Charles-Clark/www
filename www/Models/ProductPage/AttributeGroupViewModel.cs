@@ -5,6 +5,7 @@ using System.Web;
 
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.ViewModels;
+using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.ProductPage
 {

@@ -8,7 +8,7 @@ namespace wwwDesignersGuild.Models.SearchRender
 {
     public class PassSearchRender
     {
-        public NewMasterDefinition objMaster { get; set; }
+        public NewMasterDefinition masterDefinition { get; set; }
 
         public IEnumerable<int> productPageIds { get; set; }
     }

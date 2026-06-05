@@ -40,7 +40,7 @@
     {
         thisPage = grid.GetProductPages(objMaster, null, null).ToList();
     }
-
+    
     var attributeCombinations = grid.AttributeCombinations;
 
     var currentAttributeSignature = grid.CurrentAttributeSignature;
@@ -318,7 +318,7 @@
 	{
 		<div class="product-page-grid grid" data-bind="foreachInit: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">
 			@*<div class="product-page-grid grid" data-bind="foreach: { name: 'ko-product-page-pod-template', data: productPageGrid.visibleProductPages, createElement: productPagePodViewModel, afterQueueFlush: productPageGrid.lazyImages }">*@
-			@if (Model.PageSection.PreviewColourways)
+		    @if (Model.PageSection.PreviewColourways)
 			{
 
 			}
@@ -326,7 +326,7 @@
 			{
 				foreach (var p in thisPage)
 				{
-					@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+					@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p);
 				}
 			}
 		</div>

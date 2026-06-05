@@ -75,10 +75,14 @@ namespace wwwDesignersGuild.Models.Database
                             AtoZScore = reader.GetInt64(3),
                             ColourSort = reader.GetByte(4),
                             NewSort = reader.GetInt64(5),
-                            PriceSort = reader.GetInt64(6)
+                            PriceSort = reader.GetInt64(6),
+                            SearchSortOrder_New = reader.GetInt32(7),
+                            AtoZScore_New = reader.GetInt32(8),
+                            ColourSort_New = reader.GetInt32(9),
+                            NewSort_New = reader.GetInt32(10),
+                            PriceSort_New = reader.GetInt32(11)
                         });
                     }
-
 
                     reader.NextResult();
 
@@ -141,6 +145,7 @@ namespace wwwDesignersGuild.Models.Database
 
             return result;
         }
+        
         #endregion
 
 

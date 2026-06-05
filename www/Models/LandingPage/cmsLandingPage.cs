@@ -48,7 +48,7 @@ namespace wwwDesignersGuild.Models.LandingPage
             }
         }
 
-        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPageId = null, int? productPageGridPageSize = null)
+        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPage = null, int? productPageGridPageSize = null)
         {
             //  Is page in cache?
             cmsLandingPageDefinition landingPageStore;
@@ -80,7 +80,7 @@ namespace wwwDesignersGuild.Models.LandingPage
 
             foreach (var pageSectionId in productPageGridSections)
             {
-                var ppg = ppgCache.Get(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate);
+                var ppg = ppgCache.Get(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
 
                 if (ppg == null)
                 {
@@ -102,8 +102,8 @@ loadProductPageGridFromCmsDatabase called with:
 ");
 					System.Diagnostics.Trace.WriteLine("");
 #endif
-
-					ppgCache.Set(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppg);
+                    
+					ppgCache.Set(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, ppg);
                 }
 
                 ppgs.Add(ppg);

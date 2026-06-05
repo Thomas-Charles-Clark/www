@@ -205,7 +205,7 @@
         if (self.skipRender()) {
             self.skipRender(false);
         } else {
-            self.busy(true); 
+            self.busy(true);
 
             let data = {
                 pageSectionId: self.parent.parent.pageSectionId,
@@ -225,6 +225,10 @@
                 }),
                 visitor: window.getBase().Visitor,
                 masterDefinition: window.getMasterDefinition()
+            }
+
+            if (self.parent.searchable()) {
+                data.productPageIds = self.parent.filteredContent();
             }
 
             fetch(self.ajaxEndpoint(), {

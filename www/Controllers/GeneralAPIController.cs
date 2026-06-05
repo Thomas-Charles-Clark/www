@@ -396,9 +396,9 @@ namespace wwwDesignersGuild.Controllers
 
             var countryOverride = Framework.GetCountryOverride(requestWrapper);
 
-            var countryId = objPage.objMaster.UrlBreakdown.countryDetails.CountryID;
+            var countryId = objPage.masterDefinition.UrlBreakdown.countryDetails.CountryID;
 
-            var languageId = objPage.objMaster.UrlBreakdown.countryDetails.LanguageID;
+            var languageId = objPage.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
 
             if (!String.IsNullOrEmpty(countryOverride))
             {
@@ -435,7 +435,7 @@ namespace wwwDesignersGuild.Controllers
                  Convert.ToBoolean(HttpContext.Current.Session["memberDisplayTradePrice"]),
                 productPageToRenderTable,
                 useDate,
-                objPage.objMaster.UrlBreakdown.countryDetails,
+                objPage.masterDefinition.UrlBreakdown.countryDetails,
                 $"{useDate:O}",
                 countryOverride);
 

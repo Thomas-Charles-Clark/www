@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
@@ -274,10 +276,9 @@ namespace wwwDesignersGuild.Util
             }
         }
 
-		public static IEnumerable<ProductPageFilterablePod> StreamSegmentOfJsonArray(string json, string targetArrayProperty, int skip, int take)
+		public static IEnumerable<ProductPageFilterablePodWrapper> StreamSegmentOfJsonArray(string json, string targetArrayProperty, int skip, int take, string sort)
 		{
-			int currentIndex = 0;
-			int itemsDeserialized = 0;
+			var allItems = new List<ProductPageFilterablePodWrapper>();
 
 			// 1. Open the file stream sequentially
 			using (var sr = new StringReader(json))
@@ -297,47 +298,75 @@ namespace wwwDesignersGuild.Util
 				// 3. Ensure we are actually looking at an array
 				if (reader.TokenType != JsonToken.StartArray)
 				{
-                    throw new JsonException("reader.TokenType != JsonToken.StartArray");
+					throw new JsonException("reader.TokenType != JsonToken.StartArray");
 				}
 
 				var serializer = new JsonSerializer();
 
-				// 4. Stream through the array items one by one
+				// 4. Stream ALL items into memory for sorting
 				while (reader.Read() && reader.TokenType != JsonToken.EndArray)
 				{
-					// Check if the current item falls within our target segment bounds
-					if (currentIndex >= skip && itemsDeserialized < take)
+					var item = serializer.Deserialize<ProductPageFilterablePodWrapper>(reader);
+					if (item != null)
 					{
-						// Deserialize only this specific single object into memory
-						var item = serializer.Deserialize<ProductPageFilterablePod>(reader);
-
-                        yield return item;
-
-						itemsDeserialized++;
-					}
-					else
-					{
-						// Skip the tokens of this object entirely without deserializing it
-						reader.Skip();
-					}
-
-					currentIndex++;
-
-					// Optimization: Break early if we have collected enough items
-					if (itemsDeserialized >= take)
-					{
-						break;
+						allItems.Add(item);
 					}
 				}
 			}
+
+			IEnumerable<ProductPageFilterablePodWrapper> sortedResults;
+
+			switch (sort)
+			{
+				case "bestSellers":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.SalesRank);
+					break;
+                case "colour":
+                    sortedResults = allItems.OrderBy(p => p.ProductPage.ColourSort);
+                    break;
+				case "alphaAZ":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.AZSortOrder);
+					break;
+				case "alphaZA":
+					sortedResults = allItems.OrderByDescending(p => p.ProductPage.AZSortOrder);
+					break;
+				case "new":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.NewSort);
+					break;
+				case "priceHighToLow":
+					sortedResults = allItems.OrderByDescending(p => p.ProductPage.PriceSortOrder);
+					break;
+				case "priceLowToHigh":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.PriceSortOrder);
+					break;
+				case "discountHighToLow":
+					sortedResults = allItems.OrderByDescending(p => p.ProductPage.DiscountSortOrder);
+					break;
+				case "discountLowToHigh":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.DiscountSortOrder);
+					break;
+				case "stockHighToLow":
+                    sortedResults = allItems.OrderByDescending(p => p.ProductPage.StockSortOrder);
+                    break;
+				case "stockLowToHigh":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.StockSortOrder);
+					break;
+				case "default":
+				default:
+					sortedResults = allItems.OrderBy(p => p.ProductPage.MerchandisedSortOrder);
+					break;
+			}
+
+			// 6. Paginate after sorting
+			return sortedResults.Skip(skip).Take(take);
 		}
 
-        // Thanks again, Google
-		public static IEnumerable<ProductPageFilterablePod> StreamingJsonReduction(string enormousJsonString, IEnumerable<int> productPageIds)
+		// Thanks again, Google
+		public static IEnumerable<ProductPageFilterablePodWrapper> StreamingJsonReduction(string enormousJsonString, IEnumerable<int> productPageIds, int skip, int take, string sort)
 		{
 			// Convert to a HashSet for O(1) lookups instead of O(N) scans
 			var targetIds = new HashSet<int>(productPageIds);
-			var results = new List<ProductPageFilterablePod>();
+			var results = new List<ProductPageFilterablePodWrapper>();
 			var serializer = new JsonSerializer();
 
 			using (var stringReader = new StringReader(enormousJsonString))
@@ -378,7 +407,7 @@ namespace wwwDesignersGuild.Util
 
 						if (idValue.HasValue && targetIds.Contains(idValue.Value))
 						{
-							var pod = obj.ToObject<ProductPageFilterablePod>(serializer);
+							var pod = obj.ToObject<ProductPageFilterablePodWrapper>(serializer);
 							if (pod != null)
 							{
 								results.Add(pod);
@@ -388,7 +417,71 @@ namespace wwwDesignersGuild.Util
 				}
 			}
 
-			return results;
+			IEnumerable<ProductPageFilterablePodWrapper> sortedResults;
+
+			switch (sort)
+			{
+				case "bestSellers":
+					sortedResults = results.OrderBy(p => p.ProductPage.SalesRank);
+					break;
+				case "colour":
+					sortedResults = results.OrderBy(p => p.ProductPage.ColourSort);
+					break;
+				case "alphaAZ":
+					sortedResults = results.OrderBy(p => p.ProductPage.AZSortOrder);
+					break;
+				case "alphaZA":
+					sortedResults = results.OrderByDescending(p => p.ProductPage.AZSortOrder);
+					break;
+				case "new":
+					sortedResults = results.OrderBy(p => p.ProductPage.NewSort_New);
+					break;
+				case "priceHighToLow":
+					sortedResults = results.OrderByDescending(p => p.ProductPage.PriceSortOrder);
+					break;
+				case "priceLowToHigh":
+					sortedResults = results.OrderBy(p => p.ProductPage.PriceSortOrder);
+					break;
+				case "discountHighToLow":
+					sortedResults = results.OrderByDescending(p => p.ProductPage.DiscountSortOrder);
+					break;
+				case "discountLowToHigh":
+					sortedResults = results.OrderBy(p => p.ProductPage.DiscountSortOrder);
+					break;
+				case "stockHighToLow":
+					sortedResults = results.OrderByDescending(p => p.ProductPage.StockSortOrder);
+					break;
+				case "stockLowToHigh":
+					sortedResults = results.OrderBy(p => p.ProductPage.StockSortOrder);
+					break;
+				case "default":
+				default:
+					sortedResults = results.OrderBy(p => p.ProductPage.MerchandisedSortOrder);
+					break;
+			}
+
+			// 6. Paginate after sorting
+			return sortedResults.Skip(skip).Take(take);
+		}
+
+		public static IEnumerable<int> IntersectAll(IEnumerable<IEnumerable<int>> source)
+		{
+            using (var enumerator = source.GetEnumerator())
+            {
+                // If the outer collection is empty, return empty
+                if (!enumerator.MoveNext())
+                    return Enumerable.Empty<int>();
+
+                // Load the first collection into a HashSet
+                var intersectResult = new HashSet<int>(enumerator.Current);
+
+                // Intersect with remaining collections in-place
+                while (enumerator.MoveNext() && intersectResult.Count > 0)
+                {
+                    intersectResult.IntersectWith(enumerator.Current);
+                }
+                return intersectResult;
+            }
 		}
 	}
 

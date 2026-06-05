@@ -2231,7 +2231,7 @@ namespace wwwDesignersGuild.Models.Classes
         public long PageSectionID { get; set; }
         public int ProductPageID { get; set; }
         public byte ProductTypeID { get; set; }
-        public short MerchandisedSortOrder { get; set; }
+        public int MerchandisedSortOrder { get; set; }
         public int SearchSortOrder { get; set; }
         public long AZSortOrder { get; set; }
         public byte ColourSort { get; set; }

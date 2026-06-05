@@ -1267,12 +1267,17 @@ namespace wwwDesignersGuild.Models.Classes
         public byte ProductTypeID { get; set; }
         public int ScorePercent { get; set; }
         public int SearchSortOrder { get; set; }
-        public long AtoZScore { get; set; }
+		public long AtoZScore { get; set; }
         public byte ColourSort { get; set; }
         public long NewSort { get; set; }
         public long PriceSort { get; set; }
         public ProductType ProductType { get; internal set; }
-    }
+        public int SearchSortOrder_New { get; set; }
+        public int AtoZScore_New { get; set; }
+        public int ColourSort_New { get; set; }
+        public int NewSort_New { get; set; }
+        public int PriceSort_New { get; set; }
+	}
 
     [Serializable]
     public class serverSearchResultAttribute

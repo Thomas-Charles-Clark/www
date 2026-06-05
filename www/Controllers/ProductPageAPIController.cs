@@ -1,6 +1,8 @@
 ﻿using Braintree;
 
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 
 using iText.Html2pdf.Attach.Impl.Layout.Form.Renderer;
@@ -207,12 +209,9 @@ namespace wwwDesignersGuild.Controllers
 
 			int? tradeAccountId = null;
 
-			if (session["memberTradeChecksPassed"] != null)
+			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
 			{
-				if (Convert.ToBoolean(session["memberTradeChecksPassed"]) == true)
-				{
-					tradeAccountId = Convert.ToInt32(session["memberTradeAccountID"].ToString());
-				}
+				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
 			}
 
 #if DEBUG
@@ -229,12 +228,13 @@ namespace wwwDesignersGuild.Controllers
 
 			var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
 
+
+
 			var ppgCache = new ProductPageGridCacheProvider();
 
 			var ppg = ppgCache.Get(dto.PageSectionID,
 				dto.LanguageID,
 				dto.CountryID,
-				tradeAccountId.HasValue,
 				tradeAccountId,
 				countryMatched,
 				useDate);
@@ -291,7 +291,6 @@ loadProductPageGridFromCmsDatabase called with:
 				ppgCache.Set(dto.PageSectionID, 
 					dto.LanguageID, 
 					dto.CountryID, 
-					tradeAccountId.HasValue, 
 					tradeAccountId,
 					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match, 
 					useDate, 
@@ -320,11 +319,15 @@ loadProductPageGridFromCmsDatabase called with:
 #endif
 			}
 
+			
+
 			var filteredProductPages = new List<int>();
 
 			if (dto.Attributes.Any())
 			{
 				var attributesGrouped = dto.Attributes.GroupBy(a => new { a.AttributeGroupID, a.AttributeOperator }).ToList();
+
+				var allAttributeGroupProductPageIds = new List<List<int>>();
 
 				attributesGrouped.ForEach(ag => 
 				{
@@ -341,8 +344,10 @@ loadProductPageGridFromCmsDatabase called with:
 							break;
 					}
 
-					filteredProductPages.AddRange(thisGroupProductPageIDs);
+					allAttributeGroupProductPageIds.Add(thisGroupProductPageIDs);
 				});
+
+				filteredProductPages = Framework.IntersectAll(allAttributeGroupProductPageIds).ToList();
 			}
 
 #if DEBUG
@@ -366,245 +371,236 @@ loadProductPageGridFromCmsDatabase called with:
 			//
 			// between attribute groups themselves, the operator is always AND
 
-			var preResults = new List<ProductPageFilterablePod>();
-
+			// If we have been given any filtering instructions
+			// then we need only read those precise productPageIDs from the in-memory cache
+			// and then we can apply our sorting to that set (before paging it).
+			var results = new List<ProductPageFilterablePod>();
+			
 			if (filteredProductPages.Any())
 			{
-				preResults = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages).ToList();
-			}
-
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint E) - Framework.StreamingJsonReduction returned in";
-
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-			sw.Restart();
-#endif
-
-			var results = preResults.Any() 
-					? preResults.Skip(dto.PageSize * (dto.Page - 1)).Take(dto.PageSize).ToList() 
-					: Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize).ToList();
-
-#if DEBUG
-			if (preResults.Any())
-			{
-				debugString = "FetchProductPageGridPortion Checkpoint Fi) - preResults.Skip.Take completed in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-				sw.Restart();
+				results = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages, dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
+					.Select(p => p.ProductPage)
+					.ToList();
 			}
 			else
 			{
-				debugString = "FetchProductPageGridPortion Checkpoint Fii) - Framework.StreamingJsonReduction returned in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-				sw.Restart();
-			}
-#endif
-
-			// Datatable to pass to SQL proc
-			var productPageToRenderTable = new System.Data.DataTable();
-
-			// Datatable columns... why is Sequence necessary?
-			productPageToRenderTable.Columns.Add("ProductPageID", typeof(int));
-			productPageToRenderTable.Columns.Add("Sequence", typeof(int));
-
-			int sequence = 0;
-
-			// add rows to datatable
-			foreach (var productPageId in results)
-			{
-#if DEBUG
-				//System.Diagnostics.Debug.WriteLine(productPage);
-#endif
-				productPageToRenderTable.Rows.Add(productPageId.ProductPageID, sequence++);
+				results = Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
+					.Select(p => p.ProductPage)
+					.ToList();
 			}
 
-			var objSearchGenerate = new searchGenerate();
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint E) - Framework.StreamingJsonReduction returned in";
 
-			// call SQL render proc
-			var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
-				tradeAccountId: dto.Visitor.memberTradeAccountID,
-				isTrade: dto.MasterDefinition.TradeAllowed,
-				displayTradePrice: dto.Visitor.memberDisplayTradePrice,
-				productPageToRenderTable,
-				useDate,
-				dto.MasterDefinition.UrlBreakdown.countryDetails,
-				dateOverride: $"{useDate:yyyy-MM-dd}",
-				countryOverride: useCountry
-			);
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint G) - objSearchGenerate.getRenderForSearchResultsAsync returned in";
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//			sw.Restart();
+//#endif
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//#if DEBUG
+//			if (results.Any())
+//			{
+//				debugString = "FetchProductPageGridPortion Checkpoint Fi) - preResults.Skip.Take completed in";
 
-			sw.Restart();
-#endif
+//				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-			// convert SQL render proc JSON results to List<T>
-			var renderedResults = JObject.FromObject(productPages.json)
-										.SelectToken("productPages")
-										.ToObject<List<ProductPageFilterablePod>>();
+//				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			var objDb = new databaseDataContext();
+//				sw.Restart();
+//			}
+//			else
+//			{
+//				debugString = "FetchProductPageGridPortion Checkpoint Fii) - Framework.StreamingJsonReduction returned in";
 
-			// call SQL pricing select for page
-			var objPrices = objDb.ProductPage_Price_Select(
-				results.Select(p => p.ProductPageID),
-				dto.Visitor,
-				dto.MasterDefinition);
+//				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint H) - objDb.ProductPage_Price_Select returned in";
+//				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//				sw.Restart();
+//			}
+//#endif
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//			// Datatable to pass to SQL proc
+//			var productPageToRenderTable = new System.Data.DataTable();
 
-			sw.Restart();
-#endif
-			var serializer = new Newtonsoft.Json.JsonSerializer();
+//			// Datatable columns... why is Sequence necessary?
+//			productPageToRenderTable.Columns.Add("ProductPageID", typeof(int));
+//			productPageToRenderTable.Columns.Add("Sequence", typeof(int));
 
-			serializer.ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver();
+//			int sequence = 0;
 
-			// convert SQL pricing proc JSON results to List<a'>
-			var prices = JObject.FromObject(objPrices.json ?? (new { productPages = new int[] { } }))
-				.SelectToken("productPages")
-				.Children()
-				.Select(p => p.SelectToken("productPage"))
-				.Select(p => new
-				{
-					productPageId = p.SelectToken("productPageId").Value<int>(),
-					price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
-				}).ToList();
+//			// add rows to datatable
+//			foreach (var productPageId in results)
+//			{
+//#if DEBUG
+//				//System.Diagnostics.Debug.WriteLine(productPage);
+//#endif
+//				productPageToRenderTable.Rows.Add(productPageId.ProductPageID, sequence++);
+//			}
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint I) - objPrices.json parsed in";
+//			var objSearchGenerate = new searchGenerate();
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//			// call SQL render proc
+//			var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
+//				tradeAccountId: tradeAccountId,
+//				isTrade: dto.MasterDefinition.TradeAllowed,
+//				displayTradePrice: dto.Visitor.memberDisplayTradePrice,
+//				productPageToRenderTable,
+//				useDate,
+//				dto.MasterDefinition.UrlBreakdown.countryDetails,
+//				dateOverride: $"{useDate:yyyy-MM-dd}",
+//				countryOverride: useCountry
+//			);
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint G) - objSearchGenerate.getRenderForSearchResultsAsync returned in";
 
-			sw.Restart();
-#endif
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-			// Iterate over render results
-			for (var i = 0; i < prices.Count(); i++)
-			{
-				// grab product page id
-				var productPageId = prices[i].productPageId;
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-				// grab index into complete result set 
-				var index = results.FindIndex(crs => crs.ProductPageID == productPageId);
+//			sw.Restart();
+//#endif
 
-				if (index > -1)
-				{
-					// Set price object for this result
-					renderedResults[i].ProductPagePrice = prices.Where(p => p.productPageId == productPageId).Select(p => p.price).SingleOrDefault();
+//			// convert SQL render proc JSON results to List<T>
+//			var renderedResults = JObject.FromObject(productPages.json)
+//										.SelectToken("productPages")
+//										.ToObject<List<ProductPageFilterablePod>>();
 
-					// Overwrite complete result set at appropriate index with this rendered, priced version
-					results[index].ApplyRender(renderedResults[i]);
+//			var objDb = new databaseDataContext();
 
-					// Need to re-establish Product Type as it will have been lost
-					results[index].ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == results[index].ProductTypeID);
-				}
-			}
+//			// call SQL pricing select for page
+//			var objPrices = objDb.ProductPage_Price_Select(
+//				results.Select(p => p.ProductPageID),
+//				dto.Visitor,
+//				dto.MasterDefinition);
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint J) - prices rendered to results in";
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint H) - objDb.ProductPage_Price_Select returned in";
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			sw.Restart();
-#endif
+//			sw.Restart();
+//#endif
+//			var serializer = new Newtonsoft.Json.JsonSerializer();
 
-			var objSearch = new cmsSearch();
+//			serializer.ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver();
 
-			var objSearchResultReturn = await objSearch.loadSearchFromCms(productPageToRenderTable, dto.LanguageID, dto.CountryID, null, tradeAccountId, dto.ProductTypeID, useDate);
+//			// convert SQL pricing proc JSON results to List<a'>
+//			var prices = JObject.FromObject(objPrices.json ?? (new { productPages = new int[] { } }))
+//				.SelectToken("productPages")
+//				.Children()
+//				.Select(p => p.SelectToken("productPage"))
+//				.Select(p => new
+//				{
+//					productPageId = p.SelectToken("productPageId").Value<int>(),
+//					price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
+//				}).ToList();
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint K) - objSearch.loadSearchFromCms returned in";
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint I) - objPrices.json parsed in";
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			sw.Restart();
-#endif
+//			sw.Restart();
+//#endif
 
-			Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
-			{
-				var tempSearch = results.Where(p => p.ProductPageID == tempResult.ProductPageID).FirstOrDefault();
+//			// Iterate over render results
+//			for (var i = 0; i < prices.Count(); i++)
+//			{
+//				// grab product page id
+//				var productPageId = prices[i].productPageId;
 
-				if (tempSearch == null) { }
-				else
-				{
-					tempResult.ScorePercent = tempSearch.ScorePercent;
-				}
-			});
+//				// grab index into complete result set 
+//				var index = results.FindIndex(crs => crs.ProductPageID == productPageId);
+
+//				if (index > -1)
+//				{
+//					// Set price object for this result
+//					renderedResults[i].ProductPagePrice = prices.Where(p => p.productPageId == productPageId).Select(p => p.price).SingleOrDefault();
+
+//					// Overwrite complete result set at appropriate index with this rendered, priced version
+//					results[index].ApplyRender(renderedResults[i]);
+
+//					// Need to re-establish Product Type as it will have been lost
+//					results[index].ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == results[index].ProductTypeID);
+//				}
+//			}
+
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint J) - prices rendered to results in";
+
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+//			sw.Restart();
+//#endif
+
+//			var objSearch = new cmsSearch();
+
+//			var objSearchResultReturn = await objSearch.loadSearchFromCms(productPageToRenderTable, dto.LanguageID, dto.CountryID, null, tradeAccountId, dto.ProductTypeID, useDate);
+
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint K) - objSearch.loadSearchFromCms returned in";
+
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+//			sw.Restart();
+//#endif
+
+//			Parallel.ForEach(objSearchResultReturn.searchResultCores, (Action<serverSearchResultCore>)(tempResult =>
+//			{
+//				var tempSearch = Enumerable.FirstOrDefault(results, (Func<ProductPageFilterablePod, bool>)(p => p.ProductPageID == tempResult.ProductPageID));
+
+//				if (tempSearch == null) { }
+//				else
+//				{
+//					tempResult.ScorePercent = tempSearch.ScorePercent;
+//				}
+//			}));
 			
-			objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
+//			objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
 
-			Parallel.ForEach(results, (r) =>
-			{
-				var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
+//			Parallel.ForEach(results, (r) =>
+//			{
+//				var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
 				
-				if (src != null)
-				{
-					r.ApplySorting(src);
-				}
-			});
+//				if (src != null)
+//				{
+//					r.ApplySorting(src);
+//				}
+//			});
 
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint Z) - completed in";
 
-			sw.Stop();
 
-			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+//#if DEBUG
+//			debugString = "FetchProductPageGridPortion Checkpoint Z) - completed in";
 
-			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+//			sw.Stop();
 
-			var longestWaiter = longestWait.OrderByDescending(p => p.Item2).First();
+//			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
-			System.Diagnostics.Trace.WriteLine("");
+//			System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
 
-			System.Diagnostics.Trace.WriteLine($"Period of longest wait: \"{longestWaiter.Item1}: {longestWaiter.Item2}\"");
+//			var longestWaiter = longestWait.OrderByDescending(p => p.Item2).First();
 
-			System.Diagnostics.Trace.WriteLine("");
-#endif
+//			System.Diagnostics.Trace.WriteLine("");
 
-			switch (dto.Sort)
-			{
-				case "default":
-					return Ok(results.OrderBy(p => p.SortOrder));
-				case "bestSellers":
-					return Ok(results.OrderBy(p => p.SalesRank));
-				case "priceLowToHigh":
-					return Ok(results.OrderByDescending(p => p.PriceSortOrder));
-				case "priceHighToLow":
-					return Ok(results.OrderBy(p => p.PriceSortOrder));
-				case "alphaAZ":
-					return Ok(results.OrderBy(p => p.AZSortOrder));
-				case "alphaZA":
-					return Ok(results.OrderByDescending(p => p.AZSortOrder));
-				case "new":
-					return Ok(results.OrderBy(p => p.NewSort));
-				default:
-					return Ok(results.OrderBy(p => p.SortOrder));
-			}
+//			System.Diagnostics.Trace.WriteLine($"Period of longest wait: \"{longestWaiter.Item1}: {longestWaiter.Item2}\"");
+
+//			System.Diagnostics.Trace.WriteLine("");
+//#endif
+
+			return Ok(results);
 		}
 	}
 }

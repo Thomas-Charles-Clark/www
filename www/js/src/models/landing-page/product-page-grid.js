@@ -352,7 +352,9 @@
 
                             // remove the original semantic string from the malleable segment. In the above example
                             // this would be "malleable-segment". This must be re-added as a suffix once we're finished with the attribute dance
-                            malleableSegment = malleableSegment.replace(window.pageModel.OriginalSemanticString, '');
+                            if (malleableSegment != window.pageModel.OriginalSemanticString) {
+                                malleableSegment = malleableSegment.replace(window.pageModel.OriginalSemanticString, '');
+                            }
 
                             // split the malleable segment on hyphens, removing empty entries
                             let originalSplit = malleableSegment.split('-').filter(x => x != '');
@@ -1131,17 +1133,21 @@
     self.createProductPagePod = () => productPagePodViewModel();
 
     self.clearFilters = () => {
-        self.pager.busy(true);
-        setTimeout(() => { // is this really necessary?
-            self.attributeGroups().forEach(ag => {
-                ag.selection([]);
-            });
-            // I think we don't want to include Product Type as a clearable filter. 25/08/2022
-            //self.productType('all');
-            let offcanvas = bootstrap.Offcanvas.getOrCreateInstance(self.offcanvas.DOMElement);
-            offcanvas.hide();
-            self.pager.busy(false);
-        }, 0);
+        //self.pager.busy(true); // this should always be set by the fetching function
+        // not any precursors
+
+        self.attributeGroups().forEach(ag => {
+            ag.selection([]);
+        });
+            
+        // I think we don't want to include Product Type as a clearable filter. 25/08/2022
+        //self.productType('all');
+
+        let offcanvas = bootstrap.Offcanvas.getOrCreateInstance(self.offcanvas.DOMElement);
+
+        offcanvas.hide();
+
+        //self.pager.busy(false);
     }
 
     self.lazyImages = () => {
