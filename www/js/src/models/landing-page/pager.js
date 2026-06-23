@@ -238,9 +238,7 @@
                 masterDefinition: window.getMasterDefinition()
             }
 
-            if (self.parent.searchable()) {
-                data.productPageIds = self.parent.filteredContent();
-            }
+            data.productPageIds = page;
 
             fetch(self.ajaxEndpoint(), {
                 method: 'POST',

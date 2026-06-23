@@ -67,7 +67,10 @@
 		<div class="g-col-12 g-col-sm-4 g-col-lg-4 d-flex justify-content-center">
 			@if (Model.PagingEnabled)
 			{
-				@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPager.cshtml", grid);
+				using (MiniProfiler.Current?.Step("_PageSectionPagerNav.cshtml rendering _PageSectionPager.cshtml"))
+				{
+					@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPager.cshtml", grid);
+				}
 			}
 		</div>
 		<div class="sort-container g-col-12 g-col-sm-4 g-col-lg-4 d-flex justify-content-end align-items-center">

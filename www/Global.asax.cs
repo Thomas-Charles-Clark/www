@@ -87,14 +87,12 @@ namespace wwwDesignersGuild
 					//EnableDebugMode = true,
 					PopupDecimalPlaces = 4
 				}
-				// Optional settings to control the stack trace output in the details pane, examples:
-				.ExcludeType("SessionFactory")  // Ignore any class with the name of SessionFactory)
-				.ExcludeAssembly("NHibernate")  // Ignore any assembly named NHibernate
-				.ExcludeMethod("Flush")         // Ignore any method with the name of Flush
-				.ExcludeMethod("CallImage")
-				.AddViewPofiling()              // A0iyug
-												 // If using EntityFrameworkCore, here's where it'd go.
-												 // .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
+
+				.ExcludeType("SessionFactory")
+				.ExcludeAssembly("NHibernate")
+				.ExcludeMethod("Flush") // Ignore any method with the name of Flush
+				.AddViewPofiling()              // If using EntityFrameworkCore, here's where it'd go.
+												// .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
 				);
 			}
 		}

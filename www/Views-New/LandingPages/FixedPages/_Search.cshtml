@@ -1,215 +1,217 @@
 ﻿@model FixedPageViewModel_Search
 @{
-    var objMaster = Model.MasterDefinition;
+	var objMaster = Model.MasterDefinition;
 
-    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
-    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
-    var d = objMaster.UrlBreakdown.ContentDate;
-    var ci = objMaster.UrlBreakdown.countryDetails;
+	var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+	var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+	var d = objMaster.UrlBreakdown.ContentDate;
+	var ci = objMaster.UrlBreakdown.countryDetails;
 
-    var tradeUser = objMaster.TradeAllowed;
+	var tradeUser = objMaster.TradeAllowed;
 
-    var productTypes = objMaster.ProductTypeDropDown.ProductTypes;
+	var productTypes = objMaster.ProductTypeDropDown.ProductTypes;
 
-    var grid = (ProductPageGridPageSection)Model.ProductPageGridPageSection.Definition;
+	var grid = (ProductPageGridPageSection)Model.ProductPageGridPageSection.Definition;
 }
-
-@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid.cshtml", Model.ProductPageGridPageSection)
+@using (MiniProfiler.Current?.Step("_Search.cshtml rendering _ProductPageGrid.cshtml"))
+{
+	@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid.cshtml", Model.ProductPageGridPageSection)
+}
 
 @if (!Model.AnySearchResults)
 {
-    <input type="hidden" name="product-type" data-bind="init: { convert: parseString }, text: productPageGrid.productType" value="@Model.ProductPageGrid.ProductType"/>
-    if (Model.SearchHints != null)
-    {
-        <div id="predictive-search-hints-section" class="mb-5">
-            <div class="predictive-search-inner">
-                <div class="predictive-hints-grid grid">
-                   @if (Model.SearchHints.predictiveSearchHints.brands.Any())
-                   {
-                        <div class="g-col-1">
-                            <h6>
-                                @HtmlHelperExtra.Resource("Brands", l, c, d)
-                            </h6>
-                            <ul class="undotted-list">
-                                @foreach (var b in Model.SearchHints.predictiveSearchHints.brands)
-                                {
-                                    <li>
-                                        <a class="hint hint-brand" href="@dgFramework.buildUrl(dgContentType.landingPage, b.PageID, ci, null, null, null, b.URLKeywords, null)">
-                                            <span>
-                                                @b.Heading
-                                            </span>
-                                            <span class="hint-type">
-                                                @HtmlHelperExtra.Resource("dropdownBrandOption", l, c, d)
-                                            </span>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                   }
-                   @if (Model.SearchHints.predictiveSearchHints.collections.Any())
-                   {
-                        <div class="g-col-1">
-                            <h6>
-                                @HtmlHelperExtra.Resource("CollectionsPlural", l, c, d)
-                            </h6>
-                            <ul class="undotted-list">
-                                @foreach (var col in Model.SearchHints.predictiveSearchHints.collections)
-                                {
-                                    <li>
-                                        <a class="hint hint-collection" href="@dgFramework.buildUrl(dgContentType.collectionPage, col.CollectionID, ci, null, null, null, col.URLKeywords, null)">
-                                            <span>
-                                                @col.Heading
-                                            </span>
-                                            <span class="hint-type">
-                                                <span>
-                                                    @col.ProductType
-                                                </span>
-                                                <span>
-                                                    @HtmlHelperExtra.Resource("ppCollection", l, c, d)
-                                                </span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                   }
-                   @if (Model.SearchHints.predictiveSearchHints.designs.Any())
-                   {
-                        <div class="g-col-1">
-                            <h6>
-                                @HtmlHelperExtra.Resource("Designs", l, c, d)
-                            </h6>
-                            <ul class="undotted-list">
-                                @foreach (var des in Model.SearchHints.predictiveSearchHints.designs)
-                                {
-                                    <li>
-                                        <a class="hint hint-design" href="@dgFramework.buildUrl(dgContentType.productPage, des.ProductPageID, ci, null, null, null, des.URLKeywords, null)">
-                                            <span>
-                                                @des.Heading
-                                            </span>
-                                            <span class="hint-type">
-                                                <span>
-                                                    @des.ProductType
-                                                </span>
-                                                <span>
-                                                    @HtmlHelperExtra.Resource("ppDesign", l, c, d)
-                                                </span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                   }
-                   @if (Model.SearchHints.predictiveSearchResults.results.Any())
-                   {
-                        <div class="g-col-1">
-                            <h6>
-                                @HtmlHelperExtra.Resource("Suggestions", l, c, d)
-                            </h6>
-                            <ul class="undotted-list">
-                               @foreach (var r in Model.SearchHints.predictiveSearchResults.results)
-                               {
-                                    <li>
-                                        <a class="hint hint-result" href="javacript:;" data-bind="click: (data, event) => { window.searchBoxModel.useResult(@JsonConvert.SerializeObject(r)) }">
-                                            <span>
-                                                @r.Keyword
-                                            </span>
-                                        </a>
-                                    </li>
-                               }
-                            </ul>
-                        </div>
-                   }
-                </div>
-            </div>
-        </div>
-    }
-    <h1>
-        @HtmlHelperExtra.Resource("SearchNoResults", l, c, d)
-    </h1>
-    <p>
-        @HtmlHelperExtra.Resource("ExploreOurRanges", l, c, d)
-    </p>
-    <ul class="dotted-list">
-        @{
-            if (Model.NoResultsPageShowLink(15))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+	<input type="hidden" name="product-type" data-bind="init: { convert: parseString }, text: productPageGrid.productType" value="@Model.ProductPageGrid.ProductType" />
+	if (Model.SearchHints != null)
+	{
+		<div id="predictive-search-hints-section" class="mb-5">
+			<div class="predictive-search-inner">
+				<div class="predictive-hints-grid grid">
+					@if (Model.SearchHints.predictiveSearchHints.brands.Any())
+					{
+						<div class="g-col-1">
+							<h6>
+								@HtmlHelperExtra.Resource("Brands", l, c, d)
+							</h6>
+							<ul class="undotted-list">
+								@foreach (var b in Model.SearchHints.predictiveSearchHints.brands)
+								{
+									<li>
+										<a class="hint hint-brand" href="@dgFramework.buildUrl(dgContentType.landingPage, b.PageID, ci, null, null, null, b.URLKeywords, null)">
+											<span>
+												@b.Heading
+											</span>
+											<span class="hint-type">
+												@HtmlHelperExtra.Resource("dropdownBrandOption", l, c, d)
+											</span>
+										</a>
+									</li>
+								}
+							</ul>
+						</div>
+					}
+					@if (Model.SearchHints.predictiveSearchHints.collections.Any())
+					{
+						<div class="g-col-1">
+							<h6>
+								@HtmlHelperExtra.Resource("CollectionsPlural", l, c, d)
+							</h6>
+							<ul class="undotted-list">
+								@foreach (var col in Model.SearchHints.predictiveSearchHints.collections)
+								{
+									<li>
+										<a class="hint hint-collection" href="@dgFramework.buildUrl(dgContentType.collectionPage, col.CollectionID, ci, null, null, null, col.URLKeywords, null)">
+											<span>
+												@col.Heading
+											</span>
+											<span class="hint-type">
+												<span>
+													@col.ProductType
+												</span>
+												<span>
+													@HtmlHelperExtra.Resource("ppCollection", l, c, d)
+												</span>
+											</span>
+										</a>
+									</li>
+								}
+							</ul>
+						</div>
+					}
+					@if (Model.SearchHints.predictiveSearchHints.designs.Any())
+					{
+						<div class="g-col-1">
+							<h6>
+								@HtmlHelperExtra.Resource("Designs", l, c, d)
+							</h6>
+							<ul class="undotted-list">
+								@foreach (var des in Model.SearchHints.predictiveSearchHints.designs)
+								{
+									<li>
+										<a class="hint hint-design" href="@dgFramework.buildUrl(dgContentType.productPage, des.ProductPageID, ci, null, null, null, des.URLKeywords, null)">
+											<span>
+												@des.Heading
+											</span>
+											<span class="hint-type">
+												<span>
+													@des.ProductType
+												</span>
+												<span>
+													@HtmlHelperExtra.Resource("ppDesign", l, c, d)
+												</span>
+											</span>
+										</a>
+									</li>
+								}
+							</ul>
+						</div>
+					}
+					@if (Model.SearchHints.predictiveSearchResults.results.Any())
+					{
+						<div class="g-col-1">
+							<h6>
+								@HtmlHelperExtra.Resource("Suggestions", l, c, d)
+							</h6>
+							<ul class="undotted-list">
+								@foreach (var r in Model.SearchHints.predictiveSearchResults.results)
+								{
+									<li>
+										<a class="hint hint-result" href="javacript:;" data-bind="click: (data, event) => { window.searchBoxModel.useResult(@JsonConvert.SerializeObject(r)) }">
+											<span>
+												@r.Keyword
+											</span>
+										</a>
+									</li>
+								}
+							</ul>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	}
+	<h1>
+		@HtmlHelperExtra.Resource("SearchNoResults", l, c, d)
+	</h1>
+	<p>
+		@HtmlHelperExtra.Resource("ExploreOurRanges", l, c, d)
+	</p>
+	<ul class="dotted-list">
+		@{
+			if (Model.NoResultsPageShowLink(15))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 15).FormValue) })">
-                        @HtmlHelperExtra.Resource("Fabric", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(18))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("Fabric", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(18))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 18).FormValue) })">
-                        @HtmlHelperExtra.Resource("Wallpaper", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(8))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("Wallpaper", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(8))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 8).FormValue) })">
-                        @HtmlHelperExtra.Resource("StockistProductsPaint", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(35))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("StockistProductsPaint", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(35))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 35).FormValue) })">
-                        @HtmlHelperExtra.Resource("StockistProductsFurniture", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(10))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("StockistProductsFurniture", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(10))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 10).FormValue) })">
-                        @HtmlHelperExtra.Resource("StockistProductsRugs", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(4))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("StockistProductsRugs", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(4))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 4).FormValue) })">
-                        @HtmlHelperExtra.Resource("Cushions", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(1))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("Cushions", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(1))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 1).FormValue) })">
-                        @HtmlHelperExtra.Resource("BedLinen", l, c, d)
-                    </a>
-                </li>
-            }
-            if (Model.NoResultsPageShowLink(2))
-            {
-                <li>
-                    <a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
+						@HtmlHelperExtra.Resource("BedLinen", l, c, d)
+					</a>
+				</li>
+			}
+			if (Model.NoResultsPageShowLink(2))
+			{
+				<li>
+					<a href="@dgFramework.buildUrl(dgContentType.landingPage, (int)dgFixedPage.serverSearch, ci, null, null,
                     new[] { new KeyValuePair<string, string>("product-type", productTypes.Single(pt => pt.ProductTypeID == 2).FormValue) })">
-                        @HtmlHelperExtra.Resource("BlanketsThrows", l, c, d)
-                    </a>
-                </li>
-            }
-        }
-    </ul>
-    <p class="mb-5">
-        @HtmlHelperExtra.Resource("TryAnotherSearch", l, c, d)
-    </p>
+						@HtmlHelperExtra.Resource("BlanketsThrows", l, c, d)
+					</a>
+				</li>
+			}
+		}
+	</ul>
+	<p class="mb-5">
+		@HtmlHelperExtra.Resource("TryAnotherSearch", l, c, d)
+	</p>
 }

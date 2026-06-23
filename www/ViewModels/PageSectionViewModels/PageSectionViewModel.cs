@@ -57,5 +57,10 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				PageSection.Paging = pagingOverride.Value;
 			}
 		}
+
+		public override string ToString()
+		{
+			return JsonConvert.SerializeObject(this, Formatting.None);
+		}
 	}
 }

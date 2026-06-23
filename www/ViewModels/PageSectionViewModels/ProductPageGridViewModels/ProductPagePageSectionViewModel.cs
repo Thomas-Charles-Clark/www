@@ -179,7 +179,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			// All product page grids are now ajax enabled
 			Ajax = true;
 
-			// All product page grids ajax to this same endpoint (except Search which is a special case handled above)
+			// All product page grids ajax to this same endpoint (except Search which is a special case handled separately)
 			AjaxEndpoint = "/api/ProductPageAPI/FetchProductPageGridPortion";
 		}
 
@@ -528,7 +528,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				});
 
 #if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 3 () in\t\t{sw.Elapsed}");
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 3 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 
@@ -542,7 +542,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 													.ToList();
 
 #if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 4 (Built AttributeGroups) in\t\t{sw.Elapsed}");
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 4 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 
@@ -564,7 +564,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				});
 
 #if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 5 (AttributeGroupWaltz) in\t\t{sw.Elapsed}");
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 5 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 

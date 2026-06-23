@@ -132,11 +132,14 @@ namespace wwwDesignersGuild.ViewModels
 
         public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop)
         {
-            var result = new LandingPageViewModel(objMaster, objVisitor);
+            using (MiniProfiler.Current?.Step("LandingPageViewModel.CreateAsync"))
+			{
+				var result = new LandingPageViewModel(objMaster, objVisitor);
 
-            await result.Initialise(isShop);
+				await result.Initialise(isShop);
 
-            return result;
+				return result;
+			}
         }
 
         public bool IsShop
@@ -262,7 +265,7 @@ namespace wwwDesignersGuild.ViewModels
 						ppSw.Start();
 #endif
 
-                        using (MiniProfiler.Current.Step("ProductPageGridSection.CreateAsync"))
+                        using (MiniProfiler.Current?.Step("ProductPageGridSection.CreateAsync"))
 						{
 							// createAsync internally checks a memoryCache object for an extant ProductPageGridPageSection for this key
 							var productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(

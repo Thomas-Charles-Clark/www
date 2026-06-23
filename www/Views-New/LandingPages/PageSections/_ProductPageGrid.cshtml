@@ -62,7 +62,7 @@
 </script>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
 	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
-		@Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
+		@Html.Encode(Html.Raw(Model.ToString()))
 	</span>
 	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
 		@Model.Base.AttributeFilterText
@@ -228,7 +228,10 @@
 					<!-- ko if: productPageGrid.productTypeId() -->
 					@foreach (var item in grid.AttributeGroups.Where(ag => ag.AttributeGroupGroupID == null).OrderBy(p => p.SortOrder).Select((value, index) => new AttributeGroupViewModel(grid, value, index, Model.Base)))
 					{
-						@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", item)
+						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_AttributeGroup.cshtml"))
+						{
+							@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", item)
+						}
 					}
 					@foreach (var pair in grid.AttributeGroupGroups.Select((item, index) => new { item, index }))
 					{
@@ -252,7 +255,10 @@
 										.OrderBy(p => p.SortOrder)
 										.Select((value, index) => new AttributeGroupViewModel(grid, value, index + attributeGroupsWithoutAdditionalGroupingCount, Model.Base)))
 									{
-										@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", ag)
+										using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_AttributeGroup.cshtml"))
+										{
+											@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", ag)
+										}
 									}
 								</div>
 							</div>
@@ -286,7 +292,10 @@
 	@if (tradeUser && Model.PageSection.PageSectionID == 7899)
 	{
 		@* Trade Clearance Funtimes *@
-		@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_TradeClearanceNav.cshtml", Model)
+		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_TradeClearanceNav.cshtml"))
+		{
+			@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_TradeClearanceNav.cshtml", Model)
+		}
 	}
 	@if ((Model.PageSection.Paging || Model.PageSection.Filter) && grid.Contents.Any())
 	{
@@ -301,7 +310,10 @@
 				@(attributeFilterTextCount)
 			</h3>
 		}
-		@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _PageSectionPagerNav.cshtml"))
+		{
+			@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+		}
 		<!-- /ko -->
 	}
 	@if ((!Framework.ProductionVersion) && (!Model.PageSection.Paging && !Model.PageSection.Filter))
@@ -327,7 +339,10 @@
 				{
 					foreach (var p in thisPage)
 					{
-						@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p);
+						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPagePod.cshtml"))
+						{
+							@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p);
+						}
 					}
 				}
 			</div>
@@ -343,7 +358,10 @@
 				{
 					foreach (var p in thisPage)
 					{
-						@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPagePod.cshtml"))
+						{
+							@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
+						}
 					}
 				}
 			</div>
@@ -353,7 +371,10 @@
 	{
 		grid.Index = 1;
 		<!-- ko with: productPageGrid -->
-		@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _PageSectionPagerNav.cshtml"))
+		{
+			@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
+		}
 		<!-- /ko -->
 	}
 </form>

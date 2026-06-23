@@ -1,575 +1,589 @@
 ﻿@model LandingPageViewModel
 @{
-    var objMaster = Model.MasterDefinition;
+	var objMaster = Model.MasterDefinition;
 
-    var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
-    var c = objMaster.UrlBreakdown.countryDetails.CountryID;
-    var d = objMaster.UrlBreakdown.ContentDate;
+	var l = objMaster.UrlBreakdown.countryDetails.LanguageID;
+	var c = objMaster.UrlBreakdown.countryDetails.CountryID;
+	var d = objMaster.UrlBreakdown.ContentDate;
 
-    var tradeUser = objMaster.TradeAllowed;
+	var tradeUser = objMaster.TradeAllowed;
 }
 @section TemplateStyles {
-    @if (Model.IncludesForm)
-    {
-        if (Model.RequiresKendoDatePicker)
-        {
-            @Render.StylesPreload("~/bundles/css/kendo-datepicker")
-            @Render.StylesPreload("~/bundles/css/tempus-dominus")
-        }
-        @Render.StylesPreload("~/bundles/css/forms")
-    }
+	@if (Model.IncludesForm)
+	{
+		if (Model.RequiresKendoDatePicker)
+		{
+			@Render.StylesPreload("~/bundles/css/kendo-datepicker")
+			@Render.StylesPreload("~/bundles/css/tempus-dominus")
+		}
+		@Render.StylesPreload("~/bundles/css/forms")
+	}
 }
 @section LateTemplateScripts {
-    @Html.JsonLD("LandingPage", Model, Model.MasterDefinition.MetaDescription, Model.MasterDefinition.UrlBreakdown.countryDetails.CurrencyCode)
+	@Html.JsonLD("LandingPage", Model, Model.MasterDefinition.MetaDescription, Model.MasterDefinition.UrlBreakdown.countryDetails.CurrencyCode)
 
-    @if (Model.IncludesForm)
-    {
-        @Render.ScriptDefer("~/bundles/js/jquery")
-        @Render.Script("~/bundles/js/forms")
-        if (Model.RequiresKendoDatePicker)
-        {
-            @Render.Script("~/bundles/js/kendo-datepicker")
-            @Render.Script("~/bundles/js/tempus-dominus")
-        }
-    }
+	@if (Model.IncludesForm)
+	{
+		@Render.ScriptDefer("~/bundles/js/jquery")
+		@Render.Script("~/bundles/js/forms")
+		if (Model.RequiresKendoDatePicker)
+		{
+			@Render.Script("~/bundles/js/kendo-datepicker")
+			@Render.Script("~/bundles/js/tempus-dominus")
+		}
+	}
 
-    @Render.Script("~/bundles/js/landing-page")
+	@Render.Script("~/bundles/js/landing-page")
 }
-@if (Model.PageSections.Where(p => p.PageSection.Paging || p.PageSection.Filter).Any() || Model.ContentID == (int)dgFixedPage.serverSearch)
+@using (MiniProfiler.Current?.Step("_LandingPage.cshtml"))
 {
-    <script id="ko-pager-template" type="text/html">
-        <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
-           <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
-                <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
-                       data-bind="enable: backEnabled, click: () => navigatePrevious(), css: { 'disabled': !backEnabled() }">
-                    <span class="material-icons">
-                        chevron_left
-                    </span>
-                    <span class="visually-hidden">
-                        <input type="radio" name="page"
-                               data-bind="checked: page, checkedValue: previousPage">
-                    </span>
-                </label>
-            </a>
-        </li>
-        <!-- ko if: leftEllipsisVisible -->
-        <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
-                <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) - 2">
-                    <span>
-                        &#8230;
-                    </span>
-                    <span class="visually-hidden">
-                        <input type="radio" name="page"
-                               data-bind="checked: page, checkedValue: 1">
-                    </span>
-                </label>
-            </a>
-        </li>
-        <!-- /ko -->
-        <!-- ko foreach: visiblePages -->
-        <li class="page-item ripple disabled" data-bind="css: { 'disabled': false, 'active': $parent.page() == $data.page }">
-            <a data-bind="class: `page-section-${$parent.parent.parent.PageSection?.PageSectionID}-submitter`">
-                <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)">
-                    <span data-bind="text: $data.page"></span>
-                    <span class="visually-hidden">
-                        <input type="radio" name="page"
-                               data-bind="checked: $parent.page, checkedValue: $data.page">
-                    </span>
-                </label>
-            </a>
-        </li>
-        <!-- /ko -->
-        <!-- ko if: rightEllipsisVisible -->
-        <li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
-                <label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) + 2">
-                    <span>
-                        &#8230;
-                    </span>
-                    <span class="visually-hidden">
-                        <input type="radio" name="page"
-                               data-bind="checked: page, checkedValue: pageCount">
-                    </span>
-                </label>
-            </a>
-        </li>
-        <!-- /ko -->
-        <li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
-            <a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
-                <label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
-                       data-bind="enable: forwardEnabled, click: () => navigateNext(), css: { 'disabled': !forwardEnabled() }">
-                    <span class="material-icons">
-                        chevron_right
-                    </span>
-                    <span class="visually-hidden">
-                        <input type="radio" name="page"
-                               data-bind="checked: page, checkedValue: nextPage">
-                    </span>
-                </label>
-            </a>
-        </li>
-    </script>
-    <script id="ko-product-page-pod-template" type="text/html">
-        <div>
-            <!-- ko ifnot: IsLifestyle -->
-            <a class="pod-card" data-bind="attr: { href: URL }">
-                <div class="card">
-                    @if (HtmlHelperExtra.Debug)
-                    {
-						<div class="sort-data grid">
-							<span>Sales Rank:</span><span data-bind="text: SalesRank"></span>
-							<span>Merchandised Sort Order:</span><span data-bind="text: MerchandisedSortOrder"></span>
-							<span>Search Sort Order:</span><span data-bind="text: SearchSortOrder"></span>
-							<span>AZ Sort Order:</span><span data-bind="text: AZSortOrder"></span>
-							<span>Colour Sort:</span><span data-bind="text: ColourSort"></span>
-							<span>New Sort:</span><span data-bind="text: NewSort"></span>
-							<span>Price Sort:</span><span data-bind="text: PriceSortOrder"></span>
-							<span>Discount Sort:</span><span data-bind="text: DiscountSortOrder"></span>
-						</div>
-                    }
-                    <div class="relative">
-                        @if (Model.ContentID == (int)dgFixedPage.tradeClearance)
-                        {
-                            <label class="trade-clearance-selector form-check" data-bind="css: { 'open': selected }">
-                                <input class="form-check-input" type="checkbox" data-bind="checked: selected" />
-                            </label>
-                        }
-                        <img class="card-img-top"
-                             width="488"
-                             height="488"
-                             data-bind="attr: { src: `/image@(Framework.WebPFallback)/488/${$data.ImageID}`,
+	if (Model.PageSections.Where(p => p.PageSection.Paging || p.PageSection.Filter).Any() || Model.ContentID == (int)dgFixedPage.serverSearch)
+	{
+		<script id="ko-pager-template" type="text/html">
+			<li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
+				<a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
+					<label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
+						   data-bind="enable: backEnabled, click: () => navigatePrevious(), css: { 'disabled': !backEnabled() }">
+						<span class="material-icons">
+							chevron_left
+						</span>
+						<span class="visually-hidden">
+							<input type="radio" name="page"
+								   data-bind="checked: page, checkedValue: previousPage">
+						</span>
+					</label>
+				</a>
+			</li>
+			<!-- ko if: leftEllipsisVisible -->
+			<li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
+				<a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
+					<label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) - 2">
+						<span>
+							&#8230;
+						</span>
+						<span class="visually-hidden">
+							<input type="radio" name="page"
+								   data-bind="checked: page, checkedValue: 1">
+						</span>
+					</label>
+				</a>
+			</li>
+			<!-- /ko -->
+			<!-- ko foreach: visiblePages -->
+			<li class="page-item ripple disabled" data-bind="css: { 'disabled': false, 'active': $parent.page() == $data.page }">
+				<a data-bind="class: `page-section-${$parent.parent.parent.PageSection?.PageSectionID}-submitter`">
+					<label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)">
+						<span data-bind="text: $data.page"></span>
+						<span class="visually-hidden">
+							<input type="radio" name="page"
+								   data-bind="checked: $parent.page, checkedValue: $data.page">
+						</span>
+					</label>
+				</a>
+			</li>
+			<!-- /ko -->
+			<!-- ko if: rightEllipsisVisible -->
+			<li class="page-item ripple disabled" data-bind="css: { 'disabled': false }">
+				<a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
+					<label class="page-link" aria-label="@HtmlHelperExtra.Resource("KendoPagerPage", l, c, d) + 2">
+						<span>
+							&#8230;
+						</span>
+						<span class="visually-hidden">
+							<input type="radio" name="page"
+								   data-bind="checked: page, checkedValue: pageCount">
+						</span>
+					</label>
+				</a>
+			</li>
+			<!-- /ko -->
+			<li class="page-item bookend ripple disabled" data-bind="css: { 'disabled': false }">
+				<a data-bind="class: `page-section-${parent.parent.PageSection?.PageSectionID}-submitter`">
+					<label class="page-link" aria-label="@HtmlHelperExtra.Resource("ArticlePrevious", l, c, d) @HtmlHelperExtra.Resource("KendoPagerPage", l, c, d)"
+						   data-bind="enable: forwardEnabled, click: () => navigateNext(), css: { 'disabled': !forwardEnabled() }">
+						<span class="material-icons">
+							chevron_right
+						</span>
+						<span class="visually-hidden">
+							<input type="radio" name="page"
+								   data-bind="checked: page, checkedValue: nextPage">
+						</span>
+					</label>
+				</a>
+			</li>
+		</script>
+		<script id="ko-product-page-pod-template" type="text/html">
+			<div>
+				<!-- ko ifnot: IsLifestyle -->
+				<a class="pod-card" data-bind="attr: { href: URL }">
+					<div class="card">
+						@if (HtmlHelperExtra.Debug)
+						{
+							<div class="sort-data grid">
+								<span>Sales Rank:</span><span data-bind="text: SalesRank"></span>
+								<span>Merchandised Sort Order:</span><span data-bind="text: MerchandisedSortOrder"></span>
+								<span>Search Sort Order:</span><span data-bind="text: SearchSortOrder"></span>
+								<span>AZ Sort Order:</span><span data-bind="text: AZSortOrder"></span>
+								<span>Colour Sort:</span><span data-bind="text: ColourSort"></span>
+								<span>New Sort:</span><span data-bind="text: NewSort"></span>
+								<span>Price Sort:</span><span data-bind="text: PriceSortOrder"></span>
+								<span>Discount Sort:</span><span data-bind="text: DiscountSortOrder"></span>
+							</div>
+						}
+						<div class="relative">
+							@if (Model.ContentID == (int)dgFixedPage.tradeClearance)
+							{
+								<label class="trade-clearance-selector form-check" data-bind="css: { 'open': selected }">
+									<input class="form-check-input" type="checkbox" data-bind="checked: selected" />
+								</label>
+							}
+							<img class="card-img-top"
+								 width="488"
+								 height="488"
+								 data-bind="attr: { src: `/image@(Framework.WebPFallback)/488/${$data.ImageID}`,
                                                 title: Heading,
                                                 alt: Heading,
                                                 srcset: window.imageAttributeSourceSet($data.ImageID, imageSizeMedium),
                                                 sizes: window.imageAttributeSizes($data.ImageID, imageSizeMedium)
                                 }"
-                             loading="lazy" />
-                    </div>
-                    <div class="card-body">
-                        <!-- ko if: $data.New -->
-                        <h6 class="card-new">
-                            @HtmlHelperExtra.Resource("PodNew", l, c, d)
-                        </h6>
-                        <!-- /ko -->
-                        <h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
-                        <!-- ko if: AKAHeading -->
-                        <h5 class="card-title aka-heading" data-bind="html: AKAHeading"></h5>
-                        <!-- /ko -->
-                        <!-- ko if: SubHeading -->
-                        <h5 class="card-title" data-bind="html: SubHeading"></h5>
-                        <!-- /ko -->
-                        <!-- ko if: DisplayParagraph -->
-                        <p class="card-text mb-0">
-                            <!-- ko if: ProductPagePrice.CodeMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.CodeMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.DiscountMessageBase64 -->
-                            <span class="d-block discount" data-bind="html: window.decodeBase64(ProductPagePrice.DiscountMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.PriceMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.PriceMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.RRPMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.RRPMessageBase64)"></span>
-                            <!-- /ko -->
-                        </p>
-                        <!-- /ko -->
-                        <!-- ko if: DisplayRating -->
-                        <div class="mt-1" data-bind="html: window.decodeBase64(ReviewStarsDisplayBase64)"></div>
-                        <!-- /ko -->
-                    </div>
-                </div>
-            </a>
-            <!-- /ko -->
-            <!-- ko if: IsLifestyle -->
-            <div class="pod-card">
-                <div class="card">
-                    <img class="card-img-top pointer"
-                         width="488"
-                         height="488"
-                         data-bind="click: () => { window.loadQuickLook($data.URL, $data.Heading) },
+								 loading="lazy" />
+						</div>
+						<div class="card-body">
+							<!-- ko if: $data.New -->
+							<h6 class="card-new">
+								@HtmlHelperExtra.Resource("PodNew", l, c, d)
+							</h6>
+							<!-- /ko -->
+							<h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
+							<!-- ko if: AKAHeading -->
+							<h5 class="card-title aka-heading" data-bind="html: AKAHeading"></h5>
+							<!-- /ko -->
+							<!-- ko if: SubHeading -->
+							<h5 class="card-title" data-bind="html: SubHeading"></h5>
+							<!-- /ko -->
+							<!-- ko if: DisplayParagraph -->
+							<p class="card-text mb-0">
+								<!-- ko if: ProductPagePrice.CodeMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.CodeMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.DiscountMessageBase64 -->
+								<span class="d-block discount" data-bind="html: window.decodeBase64(ProductPagePrice.DiscountMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.PriceMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.PriceMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.RRPMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.RRPMessageBase64)"></span>
+								<!-- /ko -->
+							</p>
+							<!-- /ko -->
+							<!-- ko if: DisplayRating -->
+							<div class="mt-1" data-bind="html: window.decodeBase64(ReviewStarsDisplayBase64)"></div>
+							<!-- /ko -->
+						</div>
+					</div>
+				</a>
+				<!-- /ko -->
+				<!-- ko if: IsLifestyle -->
+				<div class="pod-card">
+					<div class="card">
+						<img class="card-img-top pointer"
+							 width="488"
+							 height="488"
+							 data-bind="click: () => { window.loadQuickLook($data.URL, $data.Heading) },
                                 attr: { src: `/image@(Framework.WebPFallback)/488/${$data.ImageID}`,
                                     title: Heading,
                                     alt: Heading,
                                     srcset: window.imageAttributeSourceSet($data.ImageID),
                                     sizes: window.imageAttributeSizes($data.ImageID)
                                 }"
-                         loading="lazy" />
-                    <div class="card-body">
-                        <!-- ko if: $data.New -->
-                        <h6 class="card-new">
-                            @HtmlHelperExtra.Resource("PodNew", l, c, d)
-                        </h6>
-                        <!-- /ko -->
-                        <h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
-                        <!-- ko if: AKAHeading -->
-                        <h5 class="card-title aka-heading" data-bind="html: AKAHeading"></h5>
-                        <!-- /ko -->
-                        <!-- ko if: SubHeading -->
-                        <h5 class="card-title" data-bind="html: SubHeading"></h5>
-                        <!-- /ko -->
-                        <!-- ko if: DisplayParagraph -->
-                        <p class="card-text mb-0">
-                            <!-- ko if: ProductPagePrice.CodeMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.CodeMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.DiscountMessageBase64 -->
-                            <span class="d-block discount" data-bind="html: window.decodeBase64(ProductPagePrice.DiscountMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.PriceMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.PriceMessageBase64)"></span>
-                            <!-- /ko -->
-                            <!-- ko if: ProductPagePrice.RRPMessageBase64 -->
-                            <span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.RRPMessageBase64)"></span>
-                            <!-- /ko -->
-                            <button type="button"
-                                    class="btn btn-light mt-2"
-                                    data-bind="click: () => { window.loadQuickLook($data.URL) }">
-                                @HtmlHelperExtra.Resource("QuickLook", l, c, d)
-                            </button>
-                        </p>
-                        <!-- ko if: DisplayRating -->
-                        <div class="mt-1" data-bind="html: window.decodeBase64(ReviewStarsDisplayBase64)"></div>
-                        <!-- /ko -->
-                        <!-- /ko -->
-                    </div>
-                </div>
-            </div>
-            <!-- /ko -->
-        </div>
-    </script>
-    <script id="ko-article-pod-template" type="text/html">
-        <div class="g-col-12 g-col-sm-6 g-col-md-6 g-col-lg-4">
-            <a class="pod-card" data-bind="attr: { href: `${URLKeywords}/a${ArticleID}` }">
-                <div class="card">
-                    <img class="card-img-top"
-                         width="416"
-                         height="254"
-                         data-bind="attr: { src: `/image@(Framework.WebPFallback)/488/${CarouselViewModel.Images[0].ImageID}`,
+							 loading="lazy" />
+						<div class="card-body">
+							<!-- ko if: $data.New -->
+							<h6 class="card-new">
+								@HtmlHelperExtra.Resource("PodNew", l, c, d)
+							</h6>
+							<!-- /ko -->
+							<h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
+							<!-- ko if: AKAHeading -->
+							<h5 class="card-title aka-heading" data-bind="html: AKAHeading"></h5>
+							<!-- /ko -->
+							<!-- ko if: SubHeading -->
+							<h5 class="card-title" data-bind="html: SubHeading"></h5>
+							<!-- /ko -->
+							<!-- ko if: DisplayParagraph -->
+							<p class="card-text mb-0">
+								<!-- ko if: ProductPagePrice.CodeMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.CodeMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.DiscountMessageBase64 -->
+								<span class="d-block discount" data-bind="html: window.decodeBase64(ProductPagePrice.DiscountMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.PriceMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.PriceMessageBase64)"></span>
+								<!-- /ko -->
+								<!-- ko if: ProductPagePrice.RRPMessageBase64 -->
+								<span class="d-block" data-bind="html: window.decodeBase64(ProductPagePrice.RRPMessageBase64)"></span>
+								<!-- /ko -->
+								<button type="button"
+										class="btn btn-light mt-2"
+										data-bind="click: () => { window.loadQuickLook($data.URL) }">
+									@HtmlHelperExtra.Resource("QuickLook", l, c, d)
+								</button>
+							</p>
+							<!-- ko if: DisplayRating -->
+							<div class="mt-1" data-bind="html: window.decodeBase64(ReviewStarsDisplayBase64)"></div>
+							<!-- /ko -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</script>
+		<script id="ko-article-pod-template" type="text/html">
+			<div class="g-col-12 g-col-sm-6 g-col-md-6 g-col-lg-4">
+				<a class="pod-card" data-bind="attr: { href: `${URLKeywords}/a${ArticleID}` }">
+					<div class="card">
+						<img class="card-img-top"
+							 width="416"
+							 height="254"
+							 data-bind="attr: { src: `/image@(Framework.WebPFallback)/488/${CarouselViewModel.Images[0].ImageID}`,
                                             title: Heading,
                                             alt: Heading,
                                             srcset: window.imageAttributeSourceSet(CarouselViewModel.Images[0].ImageID),
                                             sizes: window.imageAttributeSizes(CarouselViewModel.Images[0].ImageID)
                          }"
-                         loading="lazy" />
-                    @*@Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", art.CarouselViewModel)*@
-                    <div class="card-body">
-                        <!-- ko if: $data.New -->
-                        <h6 class="card-new">
-                            @HtmlHelperExtra.Resource("PodNew", l, c, d)
-                        </h6>
-                        <!-- /ko -->
-                        <h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
-                        <p data-bind="html: SubHeading"></p>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </script>
-}
-@if (!dgFramework.IsMobileDevice() && Model.SiteSectionID != 10 && Model.HasHeaderBanners && Model.ContentID != 0)
-{
-    <div class="grid header-banners mb-4">
-        @foreach (var bl in Model.HeaderBanners)
-        {
-            var banner = bl.banners.OrderBy(b => b.sortOrder).FirstOrDefault();
-            if (banner != null)
-            {
-                <div id="banner-@(banner.bannerId)"
-                     class="g-col-4 banner banner-location-@(bl.id) text-center">
-                    <a href="@banner.linkURL"
-                       target="@(banner.newWindow ? "_blank" : "_self")"
-                       title="@(banner.titleText)"
-                       alt="@(banner.altText)"
-                       class="header-banner @(banner.fontClass) btn btn-outline-light"
-                       style="color: @(String.IsNullOrEmpty(banner.foregroundColour) ? "inherit" : banner.foregroundColour);
-                              background-color: @(String.IsNullOrEmpty(banner.backgroundColour) ? "inherit" : banner.backgroundColour)">
-                        @(banner.overlayText?.Replace(">", "").Trim())
-                    </a>
-                </div>
-            }
-            else
-            {
-                <div class="g-col-4 banner-location-@(bl.id)">
-
-                </div>
-            }
-        }
-    </div>
-}
-@if (!Request.QueryString.AllKeys.Contains("lifestyle"))
-{
-    if (!dgFramework.isPagePartOfCheckOutProcess(dgContentType.landingPage, Model.ContentID))
-    {
-        <nav class="breadcrumb-social-wrapper"
-             aria-label="breadcrumb">
-            @Model.Breadcrumbs()
-            @if (Model.ContentID != (int)dgFixedPage.moodboard)
-            {
-                @Html.Partial("~/Views-New/Shared/_SocialMediaDrop.cshtml", Model.SocialMediaViewModel)
-            }
-        </nav>
-    }
-}
-<div id="ko-wrapper">
-    @if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)
-    {
-        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
-            @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
-        </div>
-        if (String.IsNullOrEmpty(Model.Definition.PageDetails.Heading))
-        {
-            <h4>
-                @Model.Definition.PageDetails.Heading
-            </h4>
-        }
-    }
-    @if (Model.PageSections.Any())
-    {   
-		<div class="page-section-grid grid">
-			<!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
-			@foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
-			{
-				using (MiniProfiler.Current.Step($"PageSection {pageSection.section.PageSection.PageSectionID}"))
-				{
-					var section = pageSection.section;
-					var index = pageSection.index;
-					var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
-
-					if (section.PageSection.PlatformSwitch == null ||
-					   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
-					   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
-					{
-						if (sectionClass == "product-page-grid-section")
-						{
-							<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
-								<div class="spinner-border" role="status"></div>
-								<h4>
-									@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
-								</h4>
-							</div>
-						}
-						<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
-							<!-- ko with: pageSections[@(index)] -->
-							@if ((section.PageSection.TradeSwitch == null) ||
-							 (section.PageSection.TradeSwitch == false && !tradeUser) ||
-							 (section.PageSection.TradeSwitch == true && tradeUser))
-							{
-								var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
-
-								switch (section.PageSectionType)
-								{
-									case PageSectionType.Slideshow:
-										@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
-										break;
-									case PageSectionType.BespokeContent:
-										if (section.BespokeContentPageSection != null)
-										{
-											var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
-											if (attr.RequiresBase)
-											{
-												@Html.Action(attr.Action, attr.Controller, Model)
-											}
-											else
-											{
-												@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
-											}
-										}
-										break;
-									default:
-										@Html.Partial(viewPath, section)
-										break;
-								}
-							}
+							 loading="lazy" />
+						@*@Html.Partial("~/Views-New/LandingPages/PageSections/_Carousel.cshtml", art.CarouselViewModel)*@
+						<div class="card-body">
+							<!-- ko if: $data.New -->
+							<h6 class="card-new">
+								@HtmlHelperExtra.Resource("PodNew", l, c, d)
+							</h6>
 							<!-- /ko -->
+							<h6 class="card-title text-uppercase" data-bind="html: Heading"></h6>
+							<p data-bind="html: SubHeading"></p>
 						</div>
-					}
+					</div>
+				</a>
+			</div>
+		</script>
+	}
+	if (!dgFramework.IsMobileDevice() && Model.SiteSectionID != 10 && Model.HasHeaderBanners && Model.ContentID != 0)
+	{
+		<div class="grid header-banners mb-4">
+			@foreach (var bl in Model.HeaderBanners)
+			{
+				var banner = bl.banners.OrderBy(b => b.sortOrder).FirstOrDefault();
+				if (banner != null)
+				{
+					<div id="banner-@(banner.bannerId)"
+						 class="g-col-4 banner banner-location-@(bl.id) text-center">
+						<a href="@banner.linkURL"
+						   target="@(banner.newWindow ? "_blank" : "_self")"
+						   title="@(banner.titleText)"
+						   alt="@(banner.altText)"
+						   class="header-banner @(banner.fontClass) btn btn-outline-light"
+						   style="color: @(String.IsNullOrEmpty(banner.foregroundColour) ? "inherit" : banner.foregroundColour);
+                              background-color: @(String.IsNullOrEmpty(banner.backgroundColour) ? "inherit" : banner.backgroundColour)">
+							@(banner.overlayText?.Replace(">", "").Trim())
+						</a>
+					</div>
+				}
+				else
+				{
+					<div class="g-col-4 banner-location-@(bl.id)">
+
+					</div>
 				}
 			}
 		</div>
-    }
+	}
+	if (!Request.QueryString.AllKeys.Contains("lifestyle"))
+	{
+		if (!dgFramework.isPagePartOfCheckOutProcess(dgContentType.landingPage, Model.ContentID))
+		{
+			using (MiniProfiler.Current?.Step("_LandingPage.cshtml calling _SocialMediaDrop.cshtml"))
+			{
+				<nav class="breadcrumb-social-wrapper"
+					 aria-label="breadcrumb">
+					@Model.Breadcrumbs()
+					@if (Model.ContentID != (int)dgFixedPage.moodboard)
+					{
+						@Html.Partial("~/Views-New/Shared/_SocialMediaDrop.cshtml", Model.SocialMediaViewModel)
+					}
+				</nav>
+			}
+		}
+	}
+	<div id="ko-wrapper">
+		@if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)
+		{
+			<div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
+				@Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
+			</div>
+			if (String.IsNullOrEmpty(Model.Definition.PageDetails.Heading))
+			{
+				<h4>
+					@Model.Definition.PageDetails.Heading
+				</h4>
+			}
+		}
+		@if (Model.PageSections.Any())
+		{
+			<div class="page-section-grid grid">
+				<!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
+				@foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
+				{
+					using (MiniProfiler.Current?.Step($"PageSection {pageSection.section.PageSection.PageSectionID}"))
+					{
+						var section = pageSection.section;
+						var index = pageSection.index;
+						var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
 
-    @if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)
-    {
-        if (Enum.TryParse<dgFixedPage>($"{objMaster.UrlBreakdown.ContentId}", out dgFixedPage dgFixedPage))
-        {
-            if (Enum.IsDefined(typeof(dgFixedPage), dgFixedPage))
-            {
-                if (dgFixedPage.HasAttributeOfType<PageSectionViewModelAttribute>())
-                {
-                    <!-- ko init: { field: fixedPage, value: pageSectionViewModel('@(dgFixedPage.GetAttributeOfType<PageSectionViewModelAttribute>().PageSectionType)', resources) } --><!-- /ko -->
-                }
-                if (dgFixedPage.HasAttributeOfType<ActionAttribute>())
-                {
-                    <!-- ko with: fixedPage -->
-                    @Html.Action(dgFixedPage.GetAttributeOfType<ActionAttribute>().Action, dgFixedPage.GetAttributeOfType<ActionAttribute>().Controller, Model)
-                    <!-- /ko -->
-                }
-            }
-        }
-    }
-    else
-    {
-        if (Enum.TryParse<dgFixedPage>($"{objMaster.UrlBreakdown.ContentId}", out dgFixedPage dgFixedPage))
-        {
-            if (Enum.IsDefined(typeof(dgFixedPage), dgFixedPage))
-            {
-                if (dgFixedPage.HasAttributeOfType<ActionAttribute>())
-                {
-                    @Html.Action(dgFixedPage.GetAttributeOfType<ActionAttribute>().Action, dgFixedPage.GetAttributeOfType<ActionAttribute>().Controller, Model)
-                }
-            }
-        }
-    }
-</div>
-@if (false && !dgFramework.IsMobileDevice() && Model.SiteSectionID != 10 && Model.HasFooterBanners)
-{
-    <div class="grid footer-banners mt-3 mb-4">
-        @foreach (var bl in Model.FooterBanners)
-        {
-            var banner = bl.banners.OrderBy(b => b.sortOrder).FirstOrDefault();
-            if (banner != null)
-            {
-                <div id="banner-@(banner.bannerId)"
-                     class="g-col-3 banner banner-location-@(bl.id) text-center">
-                    <a href="@banner.linkURL"
-                       target="@(banner.newWindow ? "_blank" : "_self")"
-                       title="@(banner.titleText)"
-                       alt="@(banner.altText)"
-                       class="footer-banner @(banner.fontClass)"
-                       style="color: @(String.IsNullOrEmpty(banner.foregroundColour) ? "inherit" : banner.foregroundColour);
+						if (section.PageSection.PlatformSwitch == null ||
+						   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
+						   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
+						{
+							if (sectionClass == "product-page-grid-section")
+							{
+								<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
+									<div class="spinner-border" role="status"></div>
+									<h4>
+										@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+									</h4>
+								</div>
+							}
+							<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
+								<!-- ko with: pageSections[@(index)] -->
+								@if ((section.PageSection.TradeSwitch == null) ||
+								 (section.PageSection.TradeSwitch == false && !tradeUser) ||
+								 (section.PageSection.TradeSwitch == true && tradeUser))
+								{
+									var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
+
+									switch (section.PageSectionType)
+									{
+										case PageSectionType.Slideshow:
+											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
+											{
+												@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
+											}
+											break;
+										case PageSectionType.BespokeContent:
+											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
+											{
+												if (section.BespokeContentPageSection != null)
+												{
+													var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
+													if (attr.RequiresBase)
+													{
+														@Html.Action(attr.Action, attr.Controller, Model)
+													}
+													else
+													{
+														@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
+													}
+												}
+											}
+											break;
+										default:
+											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
+											{
+												@Html.Partial(viewPath, section)
+											}
+											break;
+									}
+								}
+								<!-- /ko -->
+							</div>
+						}
+					}
+				}
+			</div>
+		}
+
+		@if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)
+		{
+			if (Enum.TryParse<dgFixedPage>($"{objMaster.UrlBreakdown.ContentId}", out dgFixedPage dgFixedPage))
+			{
+				if (Enum.IsDefined(typeof(dgFixedPage), dgFixedPage))
+				{
+					if (dgFixedPage.HasAttributeOfType<PageSectionViewModelAttribute>())
+					{
+						<!-- ko init: { field: fixedPage, value: pageSectionViewModel('@(dgFixedPage.GetAttributeOfType<PageSectionViewModelAttribute>().PageSectionType)', resources) } --><!-- /ko -->
+					}
+					if (dgFixedPage.HasAttributeOfType<ActionAttribute>())
+					{
+						<!-- ko with: fixedPage -->
+						@Html.Action(dgFixedPage.GetAttributeOfType<ActionAttribute>().Action, dgFixedPage.GetAttributeOfType<ActionAttribute>().Controller, Model)
+						<!-- /ko -->
+					}
+				}
+			}
+		}
+		else
+		{
+			if (Enum.TryParse<dgFixedPage>($"{objMaster.UrlBreakdown.ContentId}", out dgFixedPage dgFixedPage))
+			{
+				if (Enum.IsDefined(typeof(dgFixedPage), dgFixedPage))
+				{
+					if (dgFixedPage.HasAttributeOfType<ActionAttribute>())
+					{
+						@Html.Action(dgFixedPage.GetAttributeOfType<ActionAttribute>().Action, dgFixedPage.GetAttributeOfType<ActionAttribute>().Controller, Model)
+					}
+				}
+			}
+		}
+	</div>
+	if (false && !dgFramework.IsMobileDevice() && Model.SiteSectionID != 10 && Model.HasFooterBanners)
+	{
+		<div class="grid footer-banners mt-3 mb-4">
+			@foreach (var bl in Model.FooterBanners)
+			{
+				var banner = bl.banners.OrderBy(b => b.sortOrder).FirstOrDefault();
+				if (banner != null)
+				{
+					<div id="banner-@(banner.bannerId)"
+						 class="g-col-3 banner banner-location-@(bl.id) text-center">
+						<a href="@banner.linkURL"
+						   target="@(banner.newWindow ? "_blank" : "_self")"
+						   title="@(banner.titleText)"
+						   alt="@(banner.altText)"
+						   class="footer-banner @(banner.fontClass)"
+						   style="color: @(String.IsNullOrEmpty(banner.foregroundColour) ? "inherit" : banner.foregroundColour);
                               background-color: @(String.IsNullOrEmpty(banner.backgroundColour) ? "inherit" : banner.backgroundColour)">
-                        <img src="/imagebanner@(Framework.WebPFallback)/512/@(banner.bannerId)?v=@(banner.version)"
-                             alt="@banner.altText"
-                             title="@banner.titleText"
-                             @HtmlHelperExtra.BannerImageSourceSetSizes((long)banner.bannerId, banner.version, ImageSize.Three) />
-                        @(banner.overlayText?.Replace(">", "").Trim())
-                    </a>
-                </div>
-            }
-            else
-            {
-                <div class="g-col-3 banner-location-@(bl.id)">
+							<img src="/imagebanner@(Framework.WebPFallback)/512/@(banner.bannerId)?v=@(banner.version)"
+								 alt="@banner.altText"
+								 title="@banner.titleText"
+								 @HtmlHelperExtra.BannerImageSourceSetSizes((long)banner.bannerId, banner.version, ImageSize.Three) />
+							@(banner.overlayText?.Replace(">", "").Trim())
+						</a>
+					</div>
+				}
+				else
+				{
+					<div class="g-col-3 banner-location-@(bl.id)">
 
-                </div>
-            }
-        }
-    </div>
-}
-@if (!Model.IsShop)
-{
-    <div id="quick-look-modal"
-         class="modal fade" data-bs-backdrop="true" data-bs-keyboard="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">
-                        @HtmlHelperExtra.Resource("QuickLook", l, c, d)
-                        @*:
-                            <span id="quick-look-title" class="ms-3"></span>*@
-                    </h4>
-                    <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="quick-look-loading" class="page-blocker">
-                        <div class="spinner-border"></div>
-                        <h4>
-                            @HtmlHelperExtra.Resource("Loading", l, c, d)
-                        </h4>
-                    </div>
-                    <iframe id="quick-look-iframe"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
-    if (Framework.ProductionVersion)
-    {
-        <script type="text/javascript">
-            window.loadQuickLook = (url, title) => {
-                let params = new URLSearchParams({
-                    lifestyle: 1
-                });
-                if (url.indexOf('lifestyle=1') == -1) {
-                    if (url.indexOf('?') == -1) {
-                        url = `${url}?${params.toString()}`;
-                    } else {
-                        url = `${url}&${params.toString()}`;
-                    }
-                }
-                console.trace(url);
-                let modalElement = document.getElementById('quick-look-modal');
-                let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-                let iframe = document.getElementById('quick-look-iframe');
-                iframe.remove();
-                iframe = document.createElement('iframe');
-                iframe.id = 'quick-look-iframe';
-                iframe.src = url;
-                iframe.addEventListener('load', window.quickLookUnbusy);
-                modalElement.querySelector('.modal-body').appendChild(iframe);
-                window.quickLookBusy();
-                window.setTimeout(() => {
-                    modal.show();
-                }, 0);
-            }
-        </script>
-    }
-    else
-    {
-        var dateOverride = Request.QueryString["dateOverride"];
-        var countryOverride = Request.QueryString["countryOverride"];
+					</div>
+				}
+			}
+		</div>
+	}
+	if (!Model.IsShop)
+	{
+		<div id="quick-look-modal"
+			 class="modal fade" data-bs-backdrop="true" data-bs-keyboard="true">
+			<div class="modal-dialog modal-fullscreen">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							@HtmlHelperExtra.Resource("QuickLook", l, c, d)
+							@*:
+								<span id="quick-look-title" class="ms-3"></span>*@
+						</h4>
+						<button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div id="quick-look-loading" class="page-blocker">
+							<div class="spinner-border"></div>
+							<h4>
+								@HtmlHelperExtra.Resource("Loading", l, c, d)
+							</h4>
+						</div>
+						<iframe id="quick-look-iframe"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+		if (Framework.ProductionVersion)
+		{
+			<script type="text/javascript">
+				window.loadQuickLook = (url, title) => {
+					let params = new URLSearchParams({
+						lifestyle: 1
+					});
+					if (url.indexOf('lifestyle=1') == -1) {
+						if (url.indexOf('?') == -1) {
+							url = `${url}?${params.toString()}`;
+						} else {
+							url = `${url}&${params.toString()}`;
+						}
+					}
+					console.trace(url);
+					let modalElement = document.getElementById('quick-look-modal');
+					let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+					let iframe = document.getElementById('quick-look-iframe');
+					iframe.remove();
+					iframe = document.createElement('iframe');
+					iframe.id = 'quick-look-iframe';
+					iframe.src = url;
+					iframe.addEventListener('load', window.quickLookUnbusy);
+					modalElement.querySelector('.modal-body').appendChild(iframe);
+					window.quickLookBusy();
+					window.setTimeout(() => {
+						modal.show();
+					}, 0);
+				}
+			</script>
+		}
+		else
+		{
+			var dateOverride = Request.QueryString["dateOverride"];
+			var countryOverride = Request.QueryString["countryOverride"];
 
-        <script type="text/javascript">
-            window.loadQuickLook = (url, title) => {
+			<script type="text/javascript">
+				window.loadQuickLook = (url, title) => {
 
-                let params = new URLSearchParams({
-                    lifestyle: 1
-                });
-                if (url.indexOf('lifestyle=1') == -1) {
-                    if (url.indexOf('?') == -1) {
-                        url = `${url}?${params.toString()}`;
-                    } else {
-                        url = `${url}&${params.toString()}`;
-                    }
-                }
+					let params = new URLSearchParams({
+						lifestyle: 1
+					});
+					if (url.indexOf('lifestyle=1') == -1) {
+						if (url.indexOf('?') == -1) {
+							url = `${url}?${params.toString()}`;
+						} else {
+							url = `${url}&${params.toString()}`;
+						}
+					}
 
-                console.trace(url);
+					console.trace(url);
 
-                let modalElement = document.getElementById('quick-look-modal');
-                let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-                let iframe = document.getElementById('quick-look-iframe');
-                iframe.remove();
-                iframe = document.createElement('iframe');
-                iframe.id = 'quick-look-iframe';
-                iframe.src = url;
-                iframe.addEventListener('load', window.quickLookUnbusy);
-                modalElement.querySelector('.modal-body').appendChild(iframe);
-                window.quickLookBusy();
-                window.setTimeout(() => {
-                    modal.show();
-                }, 0);
-            }
-        </script>
-    }
-    <script type="text/javascript">
-        window.quickLookBusy = () => {
-            let busyElement = document.getElementById('quick-look-loading');
-            busyElement.style.display = 'flex';
-            busyElement.classList.add('show');
-        }
-        window.quickLookUnbusy = () => {
-            console.log('quickLookUnbusy')
-            let busyElement = document.getElementById('quick-look-loading');
-            busyElement.classList.remove('show');
-            setTimeout(() => {
-                busyElement.style.display = 'none';
-            }, 300);
-        }
-    </script>
-}
-@if (!dgFramework.isPagePartOfCheckOutProcess(dgContentType.landingPage, Model.ContentID))
-{
-    <script>
+					let modalElement = document.getElementById('quick-look-modal');
+					let modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+					let iframe = document.getElementById('quick-look-iframe');
+					iframe.remove();
+					iframe = document.createElement('iframe');
+					iframe.id = 'quick-look-iframe';
+					iframe.src = url;
+					iframe.addEventListener('load', window.quickLookUnbusy);
+					modalElement.querySelector('.modal-body').appendChild(iframe);
+					window.quickLookBusy();
+					window.setTimeout(() => {
+						modal.show();
+					}, 0);
+				}
+			</script>
+		}
+		<script type="text/javascript">
+			window.quickLookBusy = () => {
+				let busyElement = document.getElementById('quick-look-loading');
+				busyElement.style.display = 'flex';
+				busyElement.classList.add('show');
+			}
+			window.quickLookUnbusy = () => {
+				console.log('quickLookUnbusy')
+				let busyElement = document.getElementById('quick-look-loading');
+				busyElement.classList.remove('show');
+				setTimeout(() => {
+					busyElement.style.display = 'none';
+				}, 300);
+			}
+		</script>
+	}
+	if (!dgFramework.isPagePartOfCheckOutProcess(dgContentType.landingPage, Model.ContentID))
+	{
+		<script>
         window.permittedMessageSources = [
             '@($"https://{Request.Url.Host}")',
             '@($"https://{Request.Url.Host}:{Request.Url.Port}")',
@@ -596,5 +610,6 @@
                 }
             }
         }, false);
-    </script>
+		</script>
+	}
 }
