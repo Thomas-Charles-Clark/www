@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
@@ -15,13 +17,13 @@ namespace wwwDesignersGuild.Models.Search
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public serverSearchDatabase Get(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate)
+        public serverSearchDatabase Get(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId = null)
         {
-            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
             return (serverSearchDatabase)Cache[key];
         }
 
-        public void Set(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, serverSearchDatabase data)
+        public void Set(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId, serverSearchDatabase data)
         {
             Boolean.TryParse(WebConfigurationManager.AppSettings["searchCacheEnabled"], out bool cacheEnabled);
 
@@ -37,66 +39,66 @@ namespace wwwDesignersGuild.Models.Search
                     policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
                 }
 
-                var key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+                var key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
 
                 Cache.Add(new CacheItem(key, data), policy);
             }
         }
 
-        public void ExplicitSet(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, serverSearchDatabase data, DateTimeOffset expiration)
+        public void ExplicitSet(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, serverSearchDatabase data, DateTimeOffset expiration, long? pageSectionId = null)
         {
             CacheItemPolicy policy = new CacheItemPolicy
             {
                 AbsoluteExpiration = expiration
             };
 
-            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
             Cache.Add(new CacheItem(key, data), policy);
         }
 
-        public bool IsSet(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate)
+        public bool IsSet(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId = null)
         {
-            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
             return (Cache[key] != null);
-        }
+		}
 
 
-        public void Invalidate(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate)
+        public void Invalidate(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId = null)
         {
-            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+            String key = buildKey(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
             Cache.Remove(key);
         }
 
 
-        private string buildKey(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate)
+        private string buildKey(byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId = null)
         {
-            return $"SEARCHCACHE~{languageId}~{countryId}~{searchTerm}~{tradeAccountId}~{productTypeId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+            return $"SEARCHCACHE~{languageId}~{countryId}~{searchTerm}~{tradeAccountId}~{productTypeId}~{useDate.Year}~{useDate.Month}~{useDate.Day}~{pageSectionId}";
         }
     }
 
 
     public class cmsSearch
     {
-        public async Task<serverSearchDatabase> loadSearchFromCms(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate)
+        public async Task<serverSearchDatabase> loadSearchFromCms(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, byte? productTypeId, DateTime useDate, long? pageSectionId = null)
         {
             //  Is result already in cache?
             serverSearchDatabase result = null;
 
             var cache = new SearchCacheProvider();
 
-            result = cache.Get(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+			result = cache.Get(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId);
 
             if (result == null)
             {
                 result = await Task.FromResult<serverSearchDatabase>(loadSearchFromDatabase(productPageTable, languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate));
 
-                cache.Set(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, result);
+                cache.Set(languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate, pageSectionId, result);
             }
 
             return result;
         }
 
-        private serverSearchDatabase loadSearchFromDatabase(
+        public serverSearchDatabase loadSearchFromDatabase(
             DataTable productPageTable, 
             byte languageId, 
             short countryId, 

@@ -5,6 +5,8 @@ using MertexerV2.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using StackExchange.Profiling;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,6 +24,7 @@ using wwwDesignersGuild.Models.ArticleType;
 using wwwDesignersGuild.Models.Aspect;
 using wwwDesignersGuild.Models.Attribute;
 using wwwDesignersGuild.Models.Banner;
+using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models.Carousel;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Country;
@@ -246,32 +249,51 @@ namespace wwwDesignersGuild.ViewModels
                 switch (pageSection.PageSectionTypeID)
                 {
                     case (byte)PageSectionType.ProductPageGrid:
-						// 26/05/2026
-						// This ProductPageGrid PageSection must now, server-side, 
-						// determine all applicable attribute groups and attributes so as to be able to render them out.
+                        // 26/05/2026
+                        // This ProductPageGrid PageSection must now, server-side, 
+                        // determine all applicable attribute groups and attributes so as to be able to render them out.
                         // It would make sense if it is already doing so... let me see what happens when I prevent client-side
                         // viewModel binding happening at all.
 
-                        PageSections.Add(new PageSectionViewModel(
-                            pageSection: pageSection,
-                            baseViewModel: this,
-                            sectionDefinition: (object)await ProductPageGridPageSection.CreateAsync(
-                                originalUrlKeywords: Definition.PageDetails.URLKeywords,
-                                productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
-                                pagingEnabled: pageSection.Paging || pageSection.Filter,
-                                filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-                                isShop: Definition.PageDetails.IsShop,
-                                isLifestyleGallery: pageSection.IsLifestyleGallery,
-                                model: this
-                            ),
-                            isShop: Definition.PageDetails.IsShop));
+#if DEBUG
+                        var ppSw = new System.Diagnostics.Stopwatch();
+						System.Diagnostics.Debug.WriteLine($"Initialising productPageGridSection: {pageSection.PageSectionID}");
+						System.Diagnostics.Debug.WriteLine("");
+						ppSw.Start();
+#endif
 
-                        var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
+                        using (MiniProfiler.Current.Step("ProductPageGridSection.CreateAsync"))
+						{
+							// createAsync internally checks a memoryCache object for an extant ProductPageGridPageSection for this key
+							var productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
+								originalUrlKeywords: Definition.PageDetails.URLKeywords,
+								productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
+								pagingEnabled: pageSection.Paging || pageSection.Filter,
+								filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+								isShop: Definition.PageDetails.IsShop,
+								isLifestyleGallery: pageSection.IsLifestyleGallery,
+								model: this
+							);
 
-                        if (ppgps.Contents.Any())
-                        {
-                            allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
-                        }
+							PageSections.Add(new PageSectionViewModel(
+								pageSection: pageSection,
+								baseViewModel: this,
+								sectionDefinition: (object)productPageGridPageSection,
+								isShop: Definition.PageDetails.IsShop));
+
+							var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
+
+							if (productPageGridPageSection.Contents.Any())
+							{
+								allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
+							}
+						}
+
+#if DEBUG
+                        ppSw.Stop();
+						System.Diagnostics.Debug.WriteLine($"Initialised productPageGridSection: {pageSection.PageSectionID} in {ppSw.Elapsed}");
+#endif
+
 
 						break;
                     case (byte)PageSectionType.HTML:
@@ -568,9 +590,11 @@ namespace wwwDesignersGuild.ViewModels
 
 #if DEBUG
             sw.Stop();
+            System.Diagnostics.Debug.WriteLine("");
             System.Diagnostics.Debug.WriteLine($"LandingPageViewModel initialised in {sw.Elapsed}");
+			System.Diagnostics.Debug.WriteLine("");
 #endif
-        }
+		}
 
         public override string ToString()
         {

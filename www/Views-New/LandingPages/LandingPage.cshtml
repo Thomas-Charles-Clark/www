@@ -315,7 +315,7 @@
 <div id="ko-wrapper">
     @if (Model.ContentID != (int)dgFixedPage.checkoutSinglePage)
     {
-        <div class="d-none" data-bind="remove, init: { convert: JSON.parse }, text: data">
+        <div class="d-none" data-bind="init: { convert: JSON.parse }, text: data, remove">
             @Html.Encode(Html.Raw(JsonConvert.SerializeObject(Model)))
         </div>
         if (String.IsNullOrEmpty(Model.Definition.PageDetails.Heading))
@@ -326,62 +326,65 @@
         }
     }
     @if (Model.PageSections.Any())
-    {
+    {   
 		<div class="page-section-grid grid">
 			<!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
 			@foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
 			{
-				var section = pageSection.section;
-				var index = pageSection.index;
-				var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
-
-				if (section.PageSection.PlatformSwitch == null ||
-				   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
-				   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
+				using (MiniProfiler.Current.Step($"PageSection {pageSection.section.PageSection.PageSectionID}"))
 				{
-					if (sectionClass == "product-page-grid-section")
+					var section = pageSection.section;
+					var index = pageSection.index;
+					var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
+
+					if (section.PageSection.PlatformSwitch == null ||
+					   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
+					   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
 					{
-						<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
-							<div class="spinner-border" role="status"></div>
-							<h4>
-								@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
-							</h4>
+						if (sectionClass == "product-page-grid-section")
+						{
+							<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
+								<div class="spinner-border" role="status"></div>
+								<h4>
+									@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+								</h4>
+							</div>
+						}
+						<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
+							<!-- ko with: pageSections[@(index)] -->
+							@if ((section.PageSection.TradeSwitch == null) ||
+							 (section.PageSection.TradeSwitch == false && !tradeUser) ||
+							 (section.PageSection.TradeSwitch == true && tradeUser))
+							{
+								var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
+
+								switch (section.PageSectionType)
+								{
+									case PageSectionType.Slideshow:
+										@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
+										break;
+									case PageSectionType.BespokeContent:
+										if (section.BespokeContentPageSection != null)
+										{
+											var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
+											if (attr.RequiresBase)
+											{
+												@Html.Action(attr.Action, attr.Controller, Model)
+											}
+											else
+											{
+												@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
+											}
+										}
+										break;
+									default:
+										@Html.Partial(viewPath, section)
+										break;
+								}
+							}
+							<!-- /ko -->
 						</div>
 					}
-					<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
-						<!-- ko with: pageSections[@(index)] -->
-						@if ((section.PageSection.TradeSwitch == null) ||
-						 (section.PageSection.TradeSwitch == false && !tradeUser) ||
-						 (section.PageSection.TradeSwitch == true && tradeUser))
-						{
-							var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
-
-							switch (section.PageSectionType)
-							{
-								case PageSectionType.Slideshow:
-									@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
-									break;
-								case PageSectionType.BespokeContent:
-									if (section.BespokeContentPageSection != null)
-									{
-										var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
-										if (attr.RequiresBase)
-										{
-											@Html.Action(attr.Action, attr.Controller, Model)
-										}
-										else
-										{
-											@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
-										}
-									}
-									break;
-								default:
-									@Html.Partial(viewPath, section)
-									break;
-							}
-						}
-						<!-- /ko -->
-					</div>
 				}
 			}
 		</div>

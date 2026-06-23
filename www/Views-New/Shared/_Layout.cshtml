@@ -19,6 +19,15 @@
 	<meta name="description" content="@(objMaster.MetaDescription ?? objMaster.TitleTag)" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<!-- #region StackExchange MiniProfiler Injection -->
+	@{
+		var configRaw = System.Configuration.ConfigurationManager.AppSettings["enableProfiler"] ?? "NOT_FOUND";
+		var profilerState = StackExchange.Profiling.MiniProfiler.Current == null
+		? "NULL"
+		: "ACTIVE (ID: " + StackExchange.Profiling.MiniProfiler.Current.Id + ")";
+	}
+	<!-- DIAGNOSTIC CHECK: @profilerState | RAW CONFIG VALUE: @configRaw -->
+
 	@if (String.IsNullOrEmpty(Model.CustomCanonical))
 	{
 		foreach (var href in objMaster.GoogleHrefs)
@@ -91,6 +100,7 @@
 </style>
 }
 	<!-- #endregion -->
+	<!-- #endregion StackExchange MiniProfiler Injection -->
 	<!-- #region Global CSS -->
 	@Render.StylesPreload("~/bundles/css/common")
 
@@ -383,8 +393,8 @@
 
 </head>
 <body>
-    @Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
-    @Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
+	@Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
+	@Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
 	<div id="body-content">
 		@if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
 		{
@@ -409,13 +419,20 @@
 						@Render.Script("~/bundles/js/menu-scripts")
 					}
 					<div id="body-proper" class="py-2 container mb-4">
-						@RenderBody()
+						@using (MiniProfiler.Current.Step("RenderBody"))
+						{
+							@RenderBody()
+						}
+
 						@if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
 						{
 							@* productPages render this in their own templates because of relatedSearches *@
+							using (MiniProfiler.Current.Step("_RecentlyViewed.cshtml"))
+							{
 							if (Model.ShowRecentlyViewed)
 							{
 								@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
+							}
 							}
 						}
 					</div>
@@ -503,38 +520,38 @@
 		}
 	</div>
 
-    @Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
+	@Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
 
-    @Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
+	@Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
 
-    @if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
-    {
-        @(MiniProfiler.Current?.RenderIncludes())
-    }
-
-    @if (!ViewBag.Partial)
-    {
-        if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
-        {
-            <script type="text/javascript">
+	@if (!ViewBag.Partial)
+	{
+		if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
+		{
+			<script type="text/javascript">
                window.ecommerceEmailCapturePopupBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommerceEmailCaptureBanners));
-            </script>
-        }
+			</script>
+		}
 
-        if (Model.HasEcommerceGeneralPopupBanners)
-        {
-            <script type="text/javascript">
+		if (Model.HasEcommerceGeneralPopupBanners)
+		{
+			<script type="text/javascript">
                 window.ecommerceGeneralPopupBanners = @Html.Raw(JsonConvert.SerializeObject(Model.EcommerceGeneralPopupBanners));
-            </script>
-        }
+			</script>
+		}
 
-         @Render.ScriptDefer("~/bundles/js/ecommerce-popup")
-    }
+		@Render.ScriptDefer("~/bundles/js/ecommerce-popup")
+	}
 
-    @Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
+	@Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
 
-    @RenderSection("LateTemplateScripts", required: false)
+	@RenderSection("LateTemplateScripts", required: false)
 
-    @Render.ScriptDefer("~/bundles/js/bootstrap-onload")
+	@Render.ScriptDefer("~/bundles/js/bootstrap-onload")
+
+	@if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+	{
+		@(MiniProfiler.Current?.RenderIncludes())
+	}
 </body>
 </html>

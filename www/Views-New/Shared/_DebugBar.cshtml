@@ -57,6 +57,15 @@
                 @ViewBag.DebugMessage
             </label>
         }
+       @if (Model.ProductPageGridCacheHit.HasValue)
+        {
+            <label>
+                PPG Cache Hit: @(Model.ProductPageGridCacheHit)
+            </label>
+            <label>
+                PPG Requested URL: @(Model.RequestURL)
+            </label>
+        }
         <label id="breakpoint-display"></label>
         </div>
         <div class="collapse navbar-collapse" id="debug-navbar-content">

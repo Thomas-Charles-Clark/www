@@ -1,7 +1,11 @@
-﻿const productPageGridViewModel = ((pageSection) => {
+﻿const productPageGridViewModel = ({
+    parent
+} = {
+    parent: {}
+}) => {
     let self = {
-        parent: pageSection,
-        resources: pageSection.resources
+        parent,
+        resources: parent.resources
     };
 
     //#region Properties
@@ -46,7 +50,7 @@
     });
 
     self.allProductPagesReady = ko.observable(false);
-
+    
     self.visibleProductPages = ko.observableArray([]);
 
     self.filterCount = ko.observable();
@@ -292,7 +296,7 @@
 
                 console.log(`updateUrl #page-section-${self.parent.PageSection.PageSectionID}-form FormData.entries():`);
 
-                for (const kvp of e.entries()) {
+                for (var kvp of e.entries()) {
                     if (obj.hasOwnProperty(kvp[0])) {
                         obj[kvp[0]] = [obj[kvp[0]]];
                         obj[kvp[0]].push(kvp[1]);
@@ -571,7 +575,7 @@
                     //    window.history.replaceState({}, '', url);
                     //}
 
-                    window.history.replaceState({}, '', url);
+                    window.history.pushState({ isFilterAction: true }, '', url);
 
                 }
                 else
@@ -588,7 +592,7 @@
 
                     url.search = qs;
 
-                    window.history.replaceState({}, '', url);
+                    window.history.pushState({ isFilterAction: true }, '', url);
                 }
             }
         }
@@ -699,9 +703,8 @@
         }
         if (self.selectedProductType() && self.selectedProductType().ProductTypeID != 0) {
             return `${result} ${self.selectedProductType().Name} (${self.filteredContent().length})`.trim();
-        } else {
-            return `${self.parent.PageSection.Heading}`.trim();
         }
+        
     });
 
     self.attributeSelectionComputer = ko.computed(() => {
@@ -897,7 +900,7 @@
     self.skipProductPageRenderer = ko.observable(true);
 
     self.skipProductPageRenderer.subscribe(nv => {
-        console.log('skipProductPageRenderer subscribe hit',)
+        console.log('skipProductPageRenderer subscribe hit', nv)
     });
 
     self.productPageRenderer = ko.computed({
@@ -1067,36 +1070,57 @@
                 }
             }
 
+            console.log('self.filteredContent(results)', results);
             self.filteredContent(results);
 
-            results = results.slice((page - 1) * pageSize, ((page - 1) * pageSize) + pageSize);
+            var skip = (page - 1) * pageSize;
+            var take = ((page - 1) * pageSize) + pageSize;
+            console.log('results = results.slice((page - 1) * pageSize, ((page - 1) * pageSize) + pageSize);', skip, take);
+            results = results.slice(skip, take);
 
             // fortunately, the first time this computed evaluates the pager's ajax is always false
             // this works in my favour because I need to skip the first call to render a page, as it has
             // already been rendered by Razor
+            
             if (self.pager.ajax()) {
+                console.log('self.pager.ajax()', true);
                 if (results.length) {
+                    console.log('results.length', results.length);
                     if (self.skipProductPageRenderer()) {
+                        console.log('self.skipProductPageRenderer', true);
                         self.skipProductPageRenderer(false);
+                        console.log('self.skipProductPageRenderer', false);
                     } else {
+                        console.log('self.pager.renderPage', results);
                         self.pager.renderPage(results, (renderedResults) => {
+                            console.log('self.visibleProductPages', renderedResults);
                             self.visibleProductPages(renderedResults);
                         });
                     }
+                } else {
+                    console.log('results.length', results.length);
                 }
             } else {
+                console.log('self.pager.ajax()', false);
                 if (self.pager.skipRender()) {
+                    console.log('self.pager.skipRender()', true);
                     self.pager.skipRender(false);
+                    console.log('self.pager.skipRender()', false);
                 } else {
                     if (self.skipProductPageRenderer()) {
+                        console.log('self.skipProductPageRenderer()', true);
                         self.skipProductPageRenderer(false);
+                        console.log('self.skipProductPageRenderer()', false);
                     } else {
+                        console.log('self.visibleProductPages', results);
                         self.visibleProductPages(results);
                     }
                 }
             }
 
-            self.updateUrl();
+            window.setTimeout(() => {
+                self.updateUrl();
+            }, 1);
 
             return results;
 
@@ -1200,5 +1224,37 @@
 
     //#endregion
 
+    //#region Events
+
+    // Add event handler to document to listen for click, check if event.target is inside offcanvas, if so, ignore event
+    // if outside, then call bootstrap close on the offcanvas element
+
+    self.canvasFunction = () => {
+        // Get the offcanvas element and instance
+        const offCanvasElement = document.getElementById(`grid-filters-${self.parent.PageSection.PageSectionID}`);
+        const offCanvas = bootstrap.Offcanvas.getOrCreateInstance(offCanvasElement);
+
+        // Listen for clicks on the entire document
+        document.addEventListener('click', function (event) {
+            // Check if the offcanvas is currently open
+            const isOpen = offCanvasElement.classList.contains('show');
+
+            // Check if the click target is inside the offcanvas
+            const clickedInside = offCanvasElement.contains(event.target);
+
+            // Check if the click target is the button that opens the offcanvas
+            const clickedToggle = event.target.closest('[data-bs-toggle="offcanvas"]');
+
+            // If open, and click is outside both the offcanvas and the toggle button, hide it
+            if (isOpen && !clickedInside && !clickedToggle) {
+                offCanvas.hide();
+            }
+        });
+    }
+
+    window.addBootstrapLoadFunction(self.canvasFunction);
+
+    //#endregion
+
     return self;
-});
+};

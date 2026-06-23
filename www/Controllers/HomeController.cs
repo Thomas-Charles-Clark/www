@@ -4,6 +4,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
@@ -48,6 +49,12 @@ namespace wwwDesignersGuild.Controllers
 		[AsyncTimeout(60000)]
 		public async Task<ActionResult> CatchAll(string urlParameter)
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
+
+
             #region Redirectioneering
 
             // Honestly, I don't love that this was done. Redirects should *all* be handled from the database.
@@ -957,8 +964,12 @@ namespace wwwDesignersGuild.Controllers
                     return View("~/Views-New/LandingPages/FixedPages/_GlobalSiteSelector.cshtml", viewModel);
                 }
                 else
-                {
-                    return View("~/Views-New/LandingPages/LandingPage.cshtml", landingPageViewModel);
+				{
+#if DEBUG
+                    Debug.WriteLine($"HomeController handing model to LandingPage.cshtml after {sw.Elapsed}");
+					Debug.WriteLine("");
+#endif
+					return View("~/Views-New/LandingPages/LandingPage.cshtml", landingPageViewModel);
                 }
             }
 

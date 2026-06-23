@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.ViewModels;
 
 
 namespace wwwDesignersGuild.Models.Interface

@@ -18,7 +18,6 @@
 
     self.pageSections = [];
 
-
     //#region Fixed Page
 
     self.fixedPage = ko.observable();
@@ -34,5 +33,7 @@
     return self;
 });
 
-window.pageModel = landingPageViewModel(getPrefetchedResources());
-ko.applyBindings(window.pageModel, document.querySelector('#ko-wrapper')); 
+window.setTimeout(() => {
+    window.pageModel = landingPageViewModel(getPrefetchedResources());
+    ko.applyBindings(window.pageModel, document.querySelector('#ko-wrapper'));
+}, 0);

@@ -26,26 +26,97 @@ using wwwDesignersGuild.Util;
 using System.Data;
 using Tweetinvi.Streaming;
 using System.ServiceModel.PeerResolvers;
+using System.Diagnostics;
+using wwwDesignersGuild.Models.Cache.ProductPages;
+using DocumentFormat.OpenXml.Math;
+using Braintree;
 
 namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 {
 	public class ProductPageGridPageSection : PagerViewModel
 	{
+		/// <summary>
+		/// All AttributeIDs lent by all dbo.ProductPage_Attribute records for this section
+		/// </summary>
+		[JsonIgnore]
+		public IEnumerable<short> AttributeIDs { get; set; }
+
+		/// <summary>
+		/// Some sort of pre-result-set. I don't know why.
+		/// </summary>
+		[JsonIgnore]
+		public IEnumerable<ProductPageFilterablePodWrapper> PreResultSet { get; set; }
+
+		/// <summary>
+		/// Is this grid searchable? Only one page 76.
+		/// </summary>
 		public bool Searchable { get; set; }
+
+		/// <summary>
+		/// Is the user approaching viewing this grid through a Lifestyle perspective
+		/// </summary>
 		public bool IsLifestyleGallery { get; set; }
+
+		/// <summary>
+		/// The output from cache.ProductPageGrid_Select
+		/// </summary>
 		public PageSectionJSON Json { get; set; }
+
+		/// <summary>
+		/// dbo.Page.EnableFilterIndexing
+		/// </summary>
 		public bool FilterIndexingEnabled { get; set; }
 
+		/// <summary>
+		/// Does what it says on the tin
+		/// </summary>
 		public Regex UrlParsingRegex = new Regex(@"(.*)\/([^\s\/]+)(\/)([a-z][\d]+)(\??)(.*)$");
+
+		/// <summary>
+		/// Is what it says on the tin
+		/// </summary>
 		public string OriginalSemanticString { get; set; }
+
+		/// <summary>
+		/// Is what it says on the tin
+		/// </summary>
 		public string OriginalTitle { get; set; }
+
+		/// <summary>
+		/// If we've not been able to match a URL-sourced attribute formvalue to any attributes lent by this grid,
+		/// we then display a warning stating that we found no matches for that value and have removed it from the filtering.
+		/// This was throwing unexpectedly in Preview when returning from a productPage to a grid
+		/// </summary>
 		public string DeselectedAttributeNames { get; set; }
+
+		/// <summary>
+		/// Is what it says on the tin. Might be the same as OriginalSemanticString
+		/// </summary>
 		public string OriginalURLKeywords { get; set; }
+
+		/// <summary>
+		/// Whether or not we must overwrite the parent landingPage's Canonical flag.
+		/// </summary>
 		public bool MustOverwritePageCanonical { get; set; }
+
+		/// <summary>
+		/// The current attribute signature
+		/// </summary>
 		public string CurrentAttributeSignature { get; set; }
+
+		/// <summary>
+		/// The dbo.FilterIndexCombination set - is this filtered in any way?
+		/// </summary>
 		public IEnumerable<FilterIndexAttributeCombination> AttributeCombinations { get; set; }
 
-		// This for use by search - but why? Figure that out after fixing the standard usage.
+		/// <summary>
+		/// This for use by search - but why? Figure that out after fixing the standard usage.
+		/// </summary>
+		/// <param name="originalUrlKeywords">Exactly what it says on the tin</param>
+		/// <param name="objMaster">The NewMasterViewModel</param>
+		/// <param name="filterIndexingEnabled">dbo.Page.FilterIndexingEnabled</param>
+		/// <param name="ajax">True</param>
+		/// <param name="ajaxEndpoint">/l76</param>
 		public ProductPageGridPageSection(
 			string originalUrlKeywords,
 			NewMasterDefinition objMaster,
@@ -73,6 +144,8 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			MustOverwritePageCanonical = false;
 		}
 
+		// The standard constructor: private because you are not meant to instantiate ProductPageGridPageSection objects directly
+		// rather you are supposed to utilitse the static CreateAsync function. Because at least in this version of C#, constructors cannot be async.
 		private ProductPageGridPageSection(
 			string originalUrlKeywords,
 			PageSectionJSON json,
@@ -103,35 +176,40 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			MustOverwritePageCanonical = false;
 
+			// All product page grids are now ajax enabled
 			Ajax = true;
 
+			// All product page grids ajax to this same endpoint (except Search which is a special case handled above)
 			AjaxEndpoint = "/api/ProductPageAPI/FetchProductPageGridPortion";
 		}
 
-		//public List<int> FilteredProductPageIDs { get; set; }
-
-		// What is the intention behind this function? It has no parameters: is it supposed to return ALL contents?
-		// No; it checks internal properties and returns potentially subsets which are potentially sorted
+		// Determine the purpose of and usage of this function
 		public new List<ProductPageFilterablePod> GetContents()
 		{
+			// If you have at least one Filter specified, or your ProductType is not an empty string
 			if (FilterCount > 0 || ProductType != "")
 			{
+				// If your productType is an empty string
 				if (ProductType == "")
 				{
+					// Just return from Contents where the Filter selected contains ProductPageID
 					var r = Contents.Cast<ProductPageFilterablePod>()
 						.Where(ir => (!FilteredIDs.Any() || FilteredIDs.Contains(ir.ProductPageID)))
 						.ToList();
 
-					r.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
+					// Why are we setting IsLifestyle here? Isn't it already set? Disabling for now
+					//r.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
 
 					return r;
 				}
 				else
 				{
+					// We have a product type, prefilter the Contents to match:
 					var matches = Contents.Cast<ProductPageFilterablePod>()
 						.Where(ir => ir.ProductType.FormValue == ProductType)
 						.ToList();
 
+					// Then if we have any further filtering to do, apply it.
 					if (FilteredIDs.Any())
 					{
 						matches = matches.Where(ptm => FilteredIDs.Contains(ptm.ProductPageID)).ToList();
@@ -139,27 +217,25 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 					//SortContents(ref matches);
 
-					matches.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
+					//Again, why are we... I can't imagine why we need to set this here
+					//matches.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
 
 					return matches;
 				}
 			}
 			else
 			{
+				// No filters, no product type, return everything.
 				var r = Contents.Cast<ProductPageFilterablePod>().ToList();
-
-				//SortContents(ref r);
-
-				r.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
 
 				return r;
 			}
 		}
 
+		// Determine the purpose of and usage of this function
 		public IEnumerable<ProductPagePodViewModel> GetProductPages(NewMasterDefinition model, int? skip, int? take)
 		{
 			// Should already be sorted correctly, shouldn't it...?
-
 			if (skip == null)
 			{
 				var results = GetContents();
@@ -174,21 +250,24 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 				results = SortContents(results);
 
-				return results.Skip(skip.Value).Take(take.Value).Select(p => new ProductPagePodViewModel(model, p, IsLifestyleGallery, dgFramework.IsMobileDevice() ? ImageSize.Six : ImageSize.Three));
+				return results.Skip(skip.Value).Take(take.Value).Select(p => new ProductPagePodViewModel(model, p, IsLifestyleGallery));
 			}
 		}
 
-		public ProductPagePodViewModel GetProductPage(int productPageId, NewMasterDefinition model)
-		{
-			var results = Contents.Cast<ProductPageFilterablePod>().ToList();
-
-			results.ForEach(c => c.IsLifestyle = IsLifestyleGallery);
-
-			return results.Where(p => p.ProductPageID == productPageId)
-						  .Select(p => new ProductPagePodViewModel(model, p, IsShop, dgFramework.IsMobileDevice() ? ImageSize.Six : ImageSize.Three))
-						  .Single();
-		}
-
+		/// <summary>
+		/// CreateAsync because we may want to call for unrelated database collections and we might as well do that in parallel if we can
+		/// </summary>
+		/// <param name="originalUrlKeywords">The keywords as they originally were (URL segments between culture and page identifier)</param>
+		/// <param name="productPage">The result of cache.ProductPageGrid_Select</param>
+		/// <param name="pagingEnabled">Whether or not paging is enabled on this grid. If there's only a handful of product pages in the grid, we might not want paging.</param>
+		/// <param name="filterIndexingEnabled">
+		///		Allow filter changes to alter markup, title, url segments,
+		///		and markup on the page. Permits a filtered view of the page to be accessible with no query string, e.g. /en-gb/orange-silk-cushions/l1046
+		/// </param>
+		/// <param name="isShop">This seems to be a stupid relic</param>
+		/// <param name="isLifestyleGallery">This also might be a stupid relic, but it varies just based on the queryString parameters "lifestyle"</param>
+		/// <param name="model">The BaseViewModel upon which the landingPageViewMode for which this pageSection is being created.</param>
+		/// <returns></returns>
 		public static async Task<ProductPageGridPageSection> CreateAsync(
 			string originalUrlKeywords,
 			PageSectionJSON productPage,
@@ -199,177 +278,358 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			BaseViewModel model
 			)
 		{
-			var result = new ProductPageGridPageSection(
-				originalUrlKeywords,
-				productPage,
-				pagingEnabled,
-				filterIndexingEnabled,
-				isShop,
-				isLifestyleGallery,
-				model.MasterDefinition);
+			#region Properties
 
-			var objDb = new databaseDataContext();
+			// The entire set of product pages assigned to this grid
+			var completeResultSet = new List<ProductPageFilterablePod>();
 
+			// The entire set of attributeIds lent by the entire set of product pages via dbo.ProductPage_Attribute
+			var attributeIds = new List<short>();
+
+			// The tradeAccountId - soft signed-in is acceptable
+			int? tradeAccountId = null;
+
+			// A database context object
+			var objDbContext = new databaseDataContext();
+
+			// The cache-enabled wrapper around pulling attributeGroups and attributeIds
 			var objAttribute = new cmsAttribute();
 
-			var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
+			// The result of this CreateAsync 
+			var result = (ProductPageGridPageSection)null;
 
-			// Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
+			// The productPageGridPageSectionCacheProvider
+			var cacheProvider = new ProductPageGridPageSectionCacheProvider();
 
-			await Task.WhenAll(objAttributeLoad); //(, ...);
+			// Stopwatch to help identify slow spots while debugging
+#if DEBUG
+			var sw = new Stopwatch();
 
-			var attributeData = await objAttributeLoad;
+			sw.Start();
 
-			var preResultSet = new List<ProductPageFilterablePodWrapper>();
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 1 in\t\t{sw.Elapsed}");
 
-			// problem is that at this point, result.Json.JSON contains pageNumber * pageCount number of entries.
-			// is it the procedure obeying the paging which is causing this? We need the procedure to NOT obey
-			// the paging, and the full result set (8000 products, for instance) to sit in a MemoryCache object.
-			var jsonString = result.Json.JSON.Replace("{\"productPages\":", "").TrimEnd(new char[] { '}' });
+			sw.Restart();
+#endif
 
-			using (var stream = Framework.GenerateStreamFromString(jsonString, System.Text.Encoding.UTF8))
+			#endregion
+
+			#region Pull Session Variables
+
+			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
 			{
-				using (var streamReader = new StreamReader(stream))
+				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
+			}
+
+			#endregion
+
+			#region Set the RequestURL on the BVM
+
+			model.RequestURL = HttpContext.Current.Request.RawUrl;
+
+			#endregion
+
+			#region Check the Cache
+
+			result = cacheProvider.Get(
+				productPage.PageSectionID,
+				model.LanguageID,
+				model.CountryID, 
+				tradeAccountId,
+				model.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+				model.Date);
+
+			#endregion
+
+			if (result == null)
+			{
+				// Cache was not hit: we need to do just about seven out of the whole nine yards here, then cache the results.
+				// That way when the next request comes through and hits the cache, there are only three yards to be done to return
+				// the correct result.
+				model.ProductPageGridCacheHit = false;
+
+				var objAttributeLoad = objAttribute.loadAttributeFromCms(model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
+
+				// Thanks https://stackoverflow.com/questions/32119507/multiple-awaits-vs-task-waitall-equivalent#answer-32119616
+
+				await Task.WhenAll(objAttributeLoad); //(, ...); // are there any other loads at all which could be done here
+
+				var attributeData = await objAttributeLoad;
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 2 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
+				result = new ProductPageGridPageSection(
+					originalUrlKeywords,
+					productPage,
+					pagingEnabled,
+					filterIndexingEnabled,
+					isShop,
+					isLifestyleGallery,
+					model.MasterDefinition);
+
+				// again, pre to what?
+				var preResultSet = new List<ProductPageFilterablePodWrapper>();
+
+				// problem is that at this point, result.Json.JSON contains pageNumber * pageCount number of entries.
+				// is it the procedure obeying the paging which is causing this? We need the procedure to NOT obey
+				// the paging, and the full result set (8000 products, for instance) to sit in a MemoryCache object.
+				var jsonString = result.Json.JSON.Replace("{\"productPages\":", "").TrimEnd(new char[] { '}' });
+
+				// Stream the string into reified objects without putting it all in RAM at once
+				using (var stream = Framework.GenerateStreamFromString(jsonString, System.Text.Encoding.UTF8))
 				{
-					using (JsonReader jsonReader = new JsonTextReader(streamReader))
+					using (var streamReader = new StreamReader(stream))
 					{
-						//jsonReader.CloseInput = false;
-						jsonReader.SupportMultipleContent = true;
-
-						var serializer = new JsonSerializer
+						using (JsonReader jsonReader = new JsonTextReader(streamReader))
 						{
-							ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver()
-						};
+							jsonReader.SupportMultipleContent = true;
 
-						while (jsonReader.Read())
-						{
-							if (jsonReader.TokenType == JsonToken.StartObject)
+							var serializer = new JsonSerializer
 							{
-								var obj = JObject.Load(jsonReader);
-								preResultSet.Add(obj.ToObject<ProductPageFilterablePodWrapper>(serializer));
+								ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver()
+							};
+
+							while (jsonReader.Read())
+							{
+								if (jsonReader.TokenType == JsonToken.StartObject)
+								{
+									var obj = JObject.Load(jsonReader);
+									preResultSet.Add(obj.ToObject<ProductPageFilterablePodWrapper>(serializer));
+								}
 							}
 						}
 					}
 				}
-			}
 
-			var completeResultSet = preResultSet.Select(p => p.ProductPage).ToList();
+				// Keep hold of that result
+				// I really should name this somemthing more appropriate
+				result.PreResultSet = preResultSet;
 
-			//var completeResultSet = JObject.FromObject(result.Json.json)
-			//                                .SelectToken("productPages")
-			//                                .Children()
-			//                                .Select(p => JsonConvert.DeserializeObject<ProductPageFilterablePod>(p.SelectToken("productPage").ToString(), 
-			//                                                new JsonSerializerSettings() { ContractResolver = new JsonIgnoreAttributeIgnorerContractResolver() }))
-			//                                .ToList();
+				// I really should rename this to something more appropriate
+				completeResultSet = result.PreResultSet.Select(p => p.ProductPage).ToList();
 
-			completeResultSet.ForEach(c => c.IsLifestyle = isLifestyleGallery);
+				// Argh. Lifestyle.
+				completeResultSet.ForEach(c => c.IsLifestyle = isLifestyleGallery);
 
-			var productPageIds = completeResultSet.Select(p => p.ProductPageID).ToList();
+				// All ProductPageIDs in the grid.
+				var productPageIds = completeResultSet.Select(p => p.ProductPageID).ToList();
 
-			var attributeIds = result.Json.attributes
-										  .Where(p => productPageIds.Contains(p.ProductPageID))
-										  .GroupBy(p => p.AttributeID)
-										  .Select(p => p.Key).ToList();
+				// The Json result from ProductPage_Attribute_Select via cache.ProductPageGrid_Select
+				attributeIds = result.Json.attributes
+												.Where(p => productPageIds.Contains(p.ProductPageID))
+												.GroupBy(p => p.AttributeID)
+												.Select(p => p.Key).ToList();
 
-			completeResultSet.ForEach(pp =>
-			{
-				var ids = result.Json.attributes.Where(p => p.ProductPageID == pp.ProductPageID)
-														.Select(p => p.AttributeID).ToList();
-
-				pp.AttributeFormValues = attributeData.attributeDetails.Where(p => ids.Contains(p.AttributeID))
-																	   .Select(p => p.FormValue)
-																	   .ToList();
-
-				pp.ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == pp.ProductTypeID);
-			});
-
-			var gridProductTypeIds = completeResultSet.Select(p => p.ProductTypeID).Distinct();
-
-			result.ProductTypes = attributeData.productTypes.Where(pt => gridProductTypeIds.Contains(pt.ProductTypeID)).ToList();
-
-			result.ProductTypes.ForEach(pt =>
-			{
-				pt.ProductPageIDs = completeResultSet.Where(crs => crs.ProductTypeID == pt.ProductTypeID).Select(crs => crs.ProductPageID);
-			});
-
-			if (result.ProductTypes.Count > 1)
-			{
-				result.ProductTypes.Insert(0, new ProductType
+				// This loops over the entire result set and assigns AttributeFormValues 
+				completeResultSet.ForEach(pp =>
 				{
-					ProductTypeID = 0,
-					Name = HtmlHelperExtra.Resource("All", model.LanguageID, model.CountryID, model.Date).ToString(),
-					SortOrder = 0,
-					ProductPageIDs = completeResultSet.Select(p => p.ProductPageID)
+					// attributeIds having association to this productPageId
+					var ids = result.Json.attributes.Where(p => p.ProductPageID == pp.ProductPageID)
+															.Select(p => p.AttributeID).ToList();
+
+					// set AttributeFormValues (the querySring sanitised version of the Name text)
+					pp.AttributeFormValues = attributeData.attributeDetails.Where(p => ids.Contains(p.AttributeID))
+																			.Select(p => p.FormValue)
+																			.ToList();
+					// The full ProductType object for this ProductPage
+					pp.ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == pp.ProductTypeID);
 				});
+
+				// Distinct list of ProductTypeIDs which feature in this grid
+				var gridProductTypeIds = completeResultSet.Select(p => p.ProductTypeID).Distinct();
+
+				// the result's distinct list of ProductType objects (for with which to build the filter option)
+				result.ProductTypes = attributeData.productTypes.Where(pt => gridProductTypeIds.Contains(pt.ProductTypeID)).ToList();
+
+				// all of those product types can and will lend a set of productPageIds, same as attributes do, for filtering with
+				result.ProductTypes.ForEach(pt =>
+				{
+					// See?
+					pt.ProductPageIDs = completeResultSet.Where(crs => crs.ProductTypeID == pt.ProductTypeID).Select(crs => crs.ProductPageID);
+				});
+
+				// If you have more than one productType in the set
+				if (result.ProductTypes.Count > 1)
+				{
+					// Create a new dummy one named All and have it... well, reflect ALL of the productPageIds in the grid.
+					result.ProductTypes.Insert(0, new ProductType
+					{
+						ProductTypeID = 0,
+						Name = HtmlHelperExtra.Resource("All", model.LanguageID, model.CountryID, model.Date).ToString(),
+						SortOrder = 0,
+						ProductPageIDs = preResultSet.Select(p => p.ProductPageID)
+					});
+				}
+				else
+				{
+					// However, if we have precisely one product type represented in this grid
+					if (result.ProductTypes.Count() == 1)
+					{
+						// We can set the ProductType formValue string on the result now, so as to pre-select the filter option.
+						result.ProductType = result.ProductTypes[0].FormValue;
+
+						// Grab some filter index combinations, should any exist.
+						// Filter index restrictions fn
+						var objFilterIndexCombinations = await new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
+								new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date, model.CountryURL),
+								model
+							);
+
+						// It's fine to cache the results of that call on this object
+						result.AttributeCombinations = objFilterIndexCombinations.Combinations;
+					}
+				}
+
+				// The Json result set provides these attributeIds from ProductPage_Attribute_Select via cache.ProductPageGrid_Select
+				result.AttributeIDs = attributeIds;
+
+				#region Set "Contents" on this PageSection (the base class) to an object cast from completeResultSet
+
+				result.Contents = completeResultSet.Cast<object>().ToList();
+
+				#endregion
+
+				#region Run the result.InitialisePager routine
+
+				result.InitialisePager();
+
+				#endregion
+
+				#region
+
+				// If you've got fewer results than PageSize, as has just been determined by the call to InitialisePager, 
+				// then set your TakeCount to the lower of the two counts.
+				if (result.Contents.Count() < result.PageSize)
+					result.TakeCount = result.Contents.Count();
+				else // Otherwise, set TakeCount to PageSize. Woo.
+					result.TakeCount = result.PageSize;
+
+				#endregion
+
+				// Grab the full attribute object
+				var attributes = attributeData.attributeDetails
+												.Where(p => attributeIds.Contains(p.AttributeID))
+												.OrderBy(p => p.SortOrder)
+												.ToList();
+
+				attributes.ForEach(a =>
+				{
+					// Should... they not already have ProductPageIDs? Check this because it might be redundant
+
+					// Iterate over all attributes and set the ProductPageIDs
+					a.ProductPageIDs = result.Json
+												.attributes
+												.Where(p => p.AttributeID == a.AttributeID)
+												.Select(p => p.ProductPageID)
+												.ToList();
+				});
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 3 () in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
+				// Build the attributeGroups
+				var attributeGroupIds = attributes.Select(p => p.AttributeGroupID).Distinct();
+
+				result.AttributeGroupGroups = attributeData.attributeGroupGroups;
+
+				result.AttributeGroups = attributeData.attributeGroups
+													.Where(p => attributeGroupIds.Contains(p.AttributeGroupID))
+													.ToList();
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 4 (Built AttributeGroups) in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
+				result.AttributeGroups.ForEach(ag =>
+				{
+					ag.Attributes = attributes.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
+
+					ag.AttributeGroupGroup = attributeData.attributeGroupGroups.SingleOrDefault(agg => agg.AttributeGroupGroupID == ag.AttributeGroupGroupID);
+
+					ag.ProductTypes = attributeData.attributeGroupProductTypes
+						.Where(agpt => agpt.AttributeGroupID == ag.AttributeGroupID)
+						.Select(agpt => new AttributeGroupProductType(attributeData.productTypes.Single(pt => pt.ProductTypeID == agpt.ProductTypeID), agpt.LexicographicalSortOrder))
+						.ToList();
+
+					if (!String.IsNullOrEmpty(result.ProductType))
+					{
+						ag.LexicographicalSortOrder = ag.ProductTypes.SingleOrDefault(pt => pt.FormValue == result?.ProductType).LexicographicalSortOrder ?? 0;
+					}
+				});
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 5 (AttributeGroupWaltz) in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
+				if (!model.MasterDefinition.TradeAllowed) /* If you're not trade and trade-allowed */
+				{
+					// and there's a Clearance attribute group delivered
+					result.AttributeGroups.RemoveAll(p => p.AttributeGroupID == 0);
+					// remove it
+				}
+
+				#region Write the object to the cache see as we had a cache miss.
+
+				// But are there not other things to be done to fully fledge this ProductPagePageSectionGrid before caching... check below.
+
+				cacheProvider.Set(
+					result.PageSectionID,
+					model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+					model.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+					tradeAccountId,
+					model.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+					model.Date,
+					result);
+
+				#endregion
+
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync finished Checkpoint 2 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 			}
 			else
 			{
-				if (result.ProductTypes.Count() == 1)
-				{
-					result.ProductType = result.ProductTypes[0].FormValue;
+				// Great, we hit the cache, but are there not other things to be done in here to fully fledge this ProductPagePageSectionGrid ?
+				model.ProductPageGridCacheHit = true;
 
-					// Filter index restrictions fn
-					var objFilterIndexCombinations = await new cmsFilterIndexAttributeCombination().loadFilterIndexingAttributeCombinationsFromCmsAsync(
-							new PassFilterIndexAttributeCombinationCacheFetch(model.LanguageID, result.ProductTypes[0].ProductTypeID, model.Date, model.CountryURL),
-							model
-						);
+				completeResultSet = result.PreResultSet.Select(p => p.ProductPage).ToList();
 
-					result.AttributeCombinations = objFilterIndexCombinations.Combinations;
-				}
+				completeResultSet.ForEach(c => c.IsLifestyle = isLifestyleGallery);
+
+				result.InitialisePager();
+
+				if (result.Contents.Count() < result.PageSize)
+					result.TakeCount = result.Contents.Count();
+				else
+					result.TakeCount = result.PageSize;
+
+				attributeIds = result.AttributeIDs.ToList();
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync skipped Checkpoint 2 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 			}
 
-			var attributes = attributeData.attributeDetails
-										  .Where(p => attributeIds.Contains(p.AttributeID))
-										  .OrderBy(p => p.SortOrder)
-										  .ToList();
-
-			attributes.ForEach(a =>
-			{
-				a.ProductPageIDs = result.Json
-										 .attributes
-										 .Where(p => p.AttributeID == a.AttributeID)
-										 .Select(p => p.ProductPageID)
-										 .ToList();
-			});
-
-			var attributeGroupIds = attributes.Select(p => p.AttributeGroupID).Distinct();
-
-			result.AttributeGroupGroups = attributeData.attributeGroupGroups;
-
-			result.AttributeGroups = attributeData.attributeGroups
-											   .Where(p => attributeGroupIds.Contains(p.AttributeGroupID))
-											   .ToList();
-
-			result.AttributeGroups.ForEach(ag =>
-			{
-				ag.Attributes = attributes.Where(p => p.AttributeGroupID == ag.AttributeGroupID).ToList();
-
-				ag.AttributeGroupGroup = attributeData.attributeGroupGroups.SingleOrDefault(agg => agg.AttributeGroupGroupID == ag.AttributeGroupGroupID);
-
-				ag.ProductTypes = attributeData.attributeGroupProductTypes
-					.Where(agpt => agpt.AttributeGroupID == ag.AttributeGroupID)
-					.Select(agpt => new AttributeGroupProductType(attributeData.productTypes.Single(pt => pt.ProductTypeID == agpt.ProductTypeID), agpt.LexicographicalSortOrder))
-					.ToList();
-
-				if (!String.IsNullOrEmpty(result.ProductType))
-				{
-					ag.LexicographicalSortOrder = ag.ProductTypes.SingleOrDefault(pt => pt.FormValue == result?.ProductType).LexicographicalSortOrder ?? 0;
-				}
-			});
-
-			if (!model.MasterDefinition.TradeAllowed) /* If you're not trade and trade-allowed */
-			{
-				// and there's a Clearance attribute group delivered
-				result.AttributeGroups.RemoveAll(p => p.AttributeGroupID == 0);
-			}
-
+			// This must be dynamic and cannot be cached: it's the result of attribute filtering
+			// is that statement a misgiving? cannot be cached?
 			var attributeFormValuesFromQueryString = new List<string>();
 
 			result.AttributeGroups.ForEach(ag =>
 			{
 				var attributeNames = HttpContext.Current.Request.QueryString[$"{HttpUtility.UrlEncode(ag.Name.ToLowerInvariant())}"]?
-									  .Split(Framework.CommaDelimiter)
-									  .ToList();
+										.Split(Framework.CommaDelimiter)
+										.ToList();
 
 				if (attributeNames != null)
 				{
@@ -388,10 +648,16 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				}
 			});
 
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 6 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
 			#region QueryString based attribute determination dance
 
 			// produce the power set of all words in the malleable url segment
 			// it's possible that some are attributes
+			// again this part must be dynamic as we don't include attribute formValues in the cache key
 			var queryStringAttributesPowerSet = EnumerableExtensions.PowerSet(attributeFormValuesFromQueryString);
 
 			var queryStringAttributesList = new List<AttributeSorter>();
@@ -418,6 +684,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			}
 
 			#endregion
+
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 7 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
 
 			#region URLKeyword based attribute determination dance
 
@@ -460,6 +731,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					}
 				}
 			}
+
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 8 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
 
 			#endregion
 
@@ -587,10 +863,13 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				}
 			}
 
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 9 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
 			var overallSelection = result.AttributeGroups.Where(ag => ag.Selection.Any())
 				.SelectMany(ag => ag.Selection).Distinct().ToList();
-
-			result.InitialisePager();
 
 			var initialProductPageIds = completeResultSet
 				.Where(crs => result.ProductType == null || crs.ProductTypeFormValue == result.ProductType)
@@ -638,6 +917,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				}
 			}
 
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 10 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
 			if (detectedAttributeGroups.Any() && detectedAttributeGroups.Count == attributesList.Count)
 			{
 				if (result.AttributeCombinations.FirstOrDefault(r => r.AttributeSignature == attributeSignature) == null)
@@ -675,7 +959,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					case "OR":
 						productPageIdsAffectingThisAttributeGroup = productPageIdsToConsider.Intersect(
 							attributeProductPageIds.Where(appid => appid.AttributeGroupID != ag.AttributeGroupID)
-												   .SelectMany(appid => appid.ProductPageIDs)
+													.SelectMany(appid => appid.ProductPageIDs)
 						).ToList();
 						break;
 				}
@@ -700,6 +984,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			result.FilteredIDs = initialProductPageIds;
 
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 11 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
 			if (result.FilteredIDs.Count == 0)
 			{
 				var problemAttributes = result.AttributeGroups.Where(ag => ag.Selection.Any()).SelectMany(ag =>
@@ -723,28 +1012,25 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			#region Initialise Pager
 
 			// The call to InitialisePager is necessary to cause the PagerViewModel to carry appropriate values for things like page, pageCount, pageSize.
-			result.InitialisePager();
+			// result.InitialisePager();
+
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 12 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
 
 			#endregion
 
-			var page = Convert.ToInt32(HttpContext.Current.Request.QueryString["page"] ?? "0");
+			var pagingResults = Framework.StreamSegmentOfJsonArray(result.Json.JSON, "productPages", result.Page * result.PageSize, result.PageSize, result.Sort).ToList();
 
-			var pageSize = Convert.ToInt32(HttpContext.Current.Request.QueryString["pagesize"] ?? "200");
-
-			var sort = HttpContext.Current.Request.QueryString["sort"] ?? "default";
-
-			var pagingResults = Framework.StreamSegmentOfJsonArray(result.Json.JSON, "productPages", page * pageSize, pageSize, sort).ToList();
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 13 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
 
 			productPageIdsToRender = pagingResults.Select(p => p.ProductPageID).ToList();// result.FilteredIDs.Skip((result.Page - 1) * result.PageSize).Take(result.PageSize).ToList();
 
 			#endregion
-
-			int? tradeAccountId = null;
-
-			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
-			{
-				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
-			}
 
 			// Datatable to pass to SQL proc
 			var productPageToRenderTable = new DataTable();
@@ -769,6 +1055,10 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			{
 				#region Render the Current Page
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 14 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				var objSearchGenerate = new searchGenerate();
 				var objSearch = new cmsSearch();
@@ -779,18 +1069,29 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					searchTerm: null,
 					tradeAccountId,
 					null,
-					model.Date);
+					model.Date,
+					result.PageSectionID);
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 15 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
 				{
 					var tempSearch = pagingResults.Where(p => p.ProductPageID == tempResult.ProductPageID).FirstOrDefault();
 
-					if (tempSearch == null) { }
+			 		if (tempSearch == null) { }
 					else
 					{
 						tempResult.ScorePercent = tempSearch.ProductPage.ScorePercent;
 					}
 				});
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 16 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
 
@@ -804,6 +1105,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					}
 				});
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 17 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				Parallel.ForEach(completeResultSet, (r) =>
 				{
 					var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
@@ -813,6 +1119,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 						r.ApplySorting(src);
 					}
 				});
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 18 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				// call SQL render proc
 				var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
@@ -826,17 +1137,27 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					countryOverride: model.MasterDefinition.UrlBreakdown.countryDetails.CountryCode
 				);
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 19 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				// convert SQL render proc JSON results to List<T>
 				var renderedResults = JObject.FromObject(productPages.json)
 											.SelectToken("productPages")
 											.ToObject<List<ProductPageFilterablePod>>();
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 20 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				#endregion
 
 				#region Fetch Pricing for the Current Page
 
 				// call SQL pricing select for page
-				var objPrices = objDb.ProductPage_Price_Select(
+				var objPrices = objDbContext.ProductPage_Price_Select(
 					productPageIdsToRender,
 					model.Visitor,
 					model.MasterDefinition);
@@ -856,6 +1177,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 						productPageId = p.SelectToken("productPageId").Value<int>(),
 						price = p.SelectToken("productPagePrice").ToObject<ProductPagePodPrice>(serializer)
 					});
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 21 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				#endregion
 
@@ -879,20 +1205,30 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 						completeResultSet[index].ApplyRender(renderedResults[i]);
 
 						// Need to re-establish Product Type as it will have been lost
-						completeResultSet[index].ProductType = attributeData.productTypes.Single(pt => pt.ProductTypeID == completeResultSet[index].ProductTypeID);
+						completeResultSet[index].ProductType = result.ProductTypes.Single(pt => pt.ProductTypeID == completeResultSet[index].ProductTypeID);
 					}
 				}
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 22 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				#endregion
 
-				#region We've modified the complete result set, overwrite it on the product page grid. Also set TakeCount, to avoid Razor rendering upto PageSize if only n have been fetched for render.
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 23 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
-				result.Contents = completeResultSet.Cast<object>().ToList();
-
-				#endregion
 			}
 			else
 			{
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 24 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				var objSearchGenerate = new searchGenerate();
 				var objSearch = new cmsSearch();
 				var objSearchResultReturn = await objSearch.loadSearchFromCms(
@@ -902,7 +1238,13 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					searchTerm: null,
 					tradeAccountId,
 					null,
-					model.Date);
+					model.Date,
+					result.PageSectionID);
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 25 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 
 				Parallel.ForEach(completeResultSet, (r) =>
 				{
@@ -914,21 +1256,48 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					}
 				});
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 26 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				result.SortContents(completeResultSet);
 
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 27 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
+
 				result.Contents = completeResultSet.Cast<object>()
-												   .ToList();
+													.ToList();
+
+#if DEBUG
+				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 28 in\t\t{sw.Elapsed}");
+				sw.Restart();
+#endif
 			}
 			#endregion
 
-			if (result.Contents.Count() < result.PageSize)
-				result.TakeCount = result.Contents.Count();
-			else
-				result.TakeCount = result.PageSize;
+
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 29 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
+			result.SortContents(completeResultSet);
+
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 31 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
 
 			result.InitialisePager();
 
-			result.SortContents(completeResultSet);
+#if DEBUG
+			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 32 in\t\t{sw.Elapsed}");
+			sw.Restart();
+#endif
+
 
 			return result;
 		}

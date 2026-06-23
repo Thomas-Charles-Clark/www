@@ -177,9 +177,8 @@ namespace wwwDesignersGuild.Models.Database
             int? tradeAccountId,
             bool countryMatch,
             bool displayTradePrice,
-            DateTime useDate,
-            int? productPageGridPageId = null,
-            int? productPageGridPagSize = null)
+            DateTime useDate
+            )
         {
             var result = new PageSectionJSON
             {
@@ -205,8 +204,8 @@ namespace wwwDesignersGuild.Models.Database
                 comm.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
                 comm.Parameters.AddWithValue("@CountryMatch", countryMatch);
                 comm.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@PageNumber", productPageGridPageId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@PageSize", productPageGridPagSize ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@PageNumber", 1);
+                comm.Parameters.AddWithValue("@PageSize", 48);
 
                 conn.Open();
 
@@ -240,7 +239,7 @@ namespace wwwDesignersGuild.Models.Database
 				conn.Close();
             }
 
-            return result;
+			return result;
         }
 
         public PageSectionJSON FetchCollectionProductPageGrid(short collectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, DateTime useDate)

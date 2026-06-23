@@ -22,11 +22,17 @@ namespace wwwDesignersGuild
             var jsPrefix = "~/js/src";
             var jsSuffix = ".js";
 #else
-            var cssPrefix = "~/css/dist";
-            var cssSuffix = ".min.css";
+            //var cssPrefix = "~/css/dist";
+            //var cssSuffix = ".min.css";
 
-            var jsPrefix = "~/js/dist";
-            var jsSuffix = ".min.js";
+            //var jsPrefix = "~/js/dist";
+            //var jsSuffix = ".min.js";
+            
+            var cssPrefix = "~/css/dist";
+            var cssSuffix = ".css";
+
+            var jsPrefix = "~/js/src";
+            var jsSuffix = ".js";
 #endif
 
             //

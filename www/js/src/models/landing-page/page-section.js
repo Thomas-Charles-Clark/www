@@ -52,7 +52,9 @@
             self.PageSection = {
                 PageSectionID: self.pageSectionId
             }
-            self.productPageGrid = productPageGridViewModel(self);
+            self.productPageGrid = productPageGridViewModel({
+                parent: self
+            });
             break;
         case 'CollectionGrid':
             self.collectionGrid = collectionGridViewModel(self);
@@ -91,12 +93,14 @@
             self.memberOrderHistoryModel = memberOrderHistoryViewModel(self);
             break;
         case 'SearchResults': {
-                // Necessary for the productPageRenderer computed to identify the correct form
-                self.PageSection = {
-                    PageSectionID: -1
-                }
-                self.productPageGrid = productPageGridViewModel(self);
+            // Necessary for the productPageRenderer computed to identify the correct form
+            self.PageSection = {
+                PageSectionID: -1
             }
+            self.productPageGrid = productPageGridViewModel({
+                parent: self
+            });
+        }
             break;
         case 'Basket': {
             self.basketMaintenanceModel = basketMaintenanceViewModel(self);

@@ -7,7 +7,44 @@
         sort: ko.observable()
     };
 
-    self.totalCount = grid.filteredContent;
+    self.filteredContent = grid.filteredContent;
+
+    self.allProductPages = grid.allProductPages;
+
+    self.totalCount = ko.computed(() => {
+        let tpps = ko.unwrap(self.allProductPages);
+        return tpps.length;
+    });
+
+    // This holds PageCount from the server. It is fed by prerendered binding.
+    self.pages = ko.observable();
+
+    self.pageCount = ko.pureComputed({
+        read: () => {
+            //if (self.parent.filteredContent().length) {
+
+            let filteredCount = self.filteredContent().length;
+            let totalCount = self.allProductPages().length;
+
+            let countToUse = filteredCount > 0 ? filteredCount : totalCount;
+
+            let size = self.pageSize();
+
+            if (countToUse < size)
+                return 1;
+            else
+                return Math.ceil(countToUse / size);
+
+            //} else {
+            //    return self.pages();
+            //}
+        }
+    }, self).extend({
+        rateLimit: {
+            timeout: 10,
+            method: 'notifyWhenChangesStop'
+        }
+    });
 
     self.page.subscribe(nv => {
 
@@ -52,32 +89,6 @@
 
     // We have no desire to re-render the first page
     self.skipRender = ko.observable(true);
-
-    // This holds PageCount from the server. It is fed by prerendered binding.
-    self.pages = ko.observable();
-
-    self.pageCount = ko.pureComputed({
-        read: () => {
-            //if (self.parent.filteredContent().length) {
-
-            let count = self.totalCount().length;
-            let size = self.pageSize();
-
-            if (count < size)
-                return 1;
-            else
-                return Math.ceil(count / size);
-
-            //} else {
-            //    return self.pages();
-            //}
-        }
-    }, self).extend({
-        rateLimit: {
-            timeout: 10,
-            method: 'notifyWhenChangesStop'
-        }
-    });
 
     self.previousPage = ko.pureComputed(() => self.page() + 1, self);
 

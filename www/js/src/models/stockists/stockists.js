@@ -188,7 +188,7 @@
             });
             let url = new URL(window.location);
             url.search = qs;
-            window.history.replaceState({}, '', url);
+            window.history.pushState({ isFilterAction: true }, '', url);
 
             if (self.latitude() && self.longitude())
                 self.search();

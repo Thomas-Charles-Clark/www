@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.EMMA;
+﻿    using DocumentFormat.OpenXml.EMMA;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,17 +22,17 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public PageSectionJSON Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
+		public PageSectionJSON Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+		{
+			String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
 
-            var result = (PageSectionJSON)Cache[key];
+			var result = (PageSectionJSON)Cache[key];
 
-            return result;
-        }
+			return result;
+		}
 
-        public void Set(long pageSectionTypeId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data)
-        {
+		public void Set(long pageSectionTypeId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data)
+		{
             Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool cacheEnabled);
 
             if (cacheEnabled)
@@ -51,21 +51,21 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 
                 Cache.Add(new CacheItem(key, data), policy);
             }
-        }
+		}
 
-        public void ExplicitSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
+		public void ExplicitSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
+		{
+			CacheItemPolicy policy = new CacheItemPolicy
+			{
+				AbsoluteExpiration = expiration
+			};
 
-            String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
-            
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+			String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
 
-        public bool IsSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+			Cache.Add(new CacheItem(key, data), policy);
+		}
+
+		public bool IsSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {
             String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
             return (Cache[key] != null);

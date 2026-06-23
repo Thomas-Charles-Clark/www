@@ -2,10 +2,13 @@
 
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 
 using iText.Html2pdf.Attach.Impl.Layout.Form.Renderer;
+
+using Kendo.Mvc.UI;
 
 using MertexerV2.Models;
 using MertexerV2.SQLFunctions;
@@ -153,6 +156,77 @@ namespace wwwDesignersGuild.Controllers
 		[HttpPost]
 		public async Task<IHttpActionResult> FetchProductPageGridPortion([FromBody]ProductPageGrid_PagingDTO dto)
 		{
+			var session = HttpContext.Current.Session;
+
+			Int32? memberId = null;
+
+			if (session["memberIdFromDatabase"] == null)
+			{
+
+			}
+			else
+			{
+				memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
+			}
+
+			int? tradeAccountId = null;
+
+			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
+			{
+				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
+			}
+
+			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+
+			var Definition = await new cmsLandingPage().loadLandingPageFromCms(
+				memberId: memberId,
+				pageId: dto.MasterDefinition.UrlBreakdown.ContentId,
+				languageId: dto.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+				countryId: dto.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+				useDate: dto.MasterDefinition.UrlBreakdown.ContentDate,
+				isMember: memberId.HasValue,
+				isTrade: dto.MasterDefinition.TradeMember,
+				countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+				displayTradePrice: displayTradePrice,
+				tradeAccountId: tradeAccountId,
+				productPageGridPage: dto.Page,
+				productPageGridPageSize: dto.PageSize);
+
+			var ppgCacheProvider = new ProductPageGridPageSectionCacheProvider();
+
+			var productPageGridPageSection = ppgCacheProvider.Get(
+				dto.PageSectionID,
+				dto.LanguageID,
+				dto.CountryID,
+				tradeAccountId,
+				dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+				dto.MasterDefinition.UrlBreakdown.ContentDate);
+
+			if (productPageGridPageSection == null)
+			{
+				productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
+					originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
+					productPage:  Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
+					pagingEnabled: true,
+					filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+					isShop: Definition.PageDetails.IsShop,
+					isLifestyleGallery: false,
+					model: dto.Base
+				);
+
+				ppgCacheProvider.Set(
+					productPageGridPageSection.PageSectionID,
+					dto.LanguageID,
+					dto.CountryID,
+					tradeAccountId,
+					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+					dto.MasterDefinition.UrlBreakdown.ContentDate,
+					productPageGridPageSection
+				);
+			}
+
+			//##############################################################################################################
+
 #if DEBUG
 			var sw = new System.Diagnostics.Stopwatch();
 
@@ -194,26 +268,6 @@ namespace wwwDesignersGuild.Controllers
 
 			var useCountry = Framework.GetCountryOverride(new HttpRequestWrapper(HttpContext.Current.Request));
 
-			var session = HttpContext.Current.Session;
-
-			Int32? memberId = null;
-
-			if (session["memberIdFromDatabase"] == null)
-			{
-
-			}
-			else
-			{
-				memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
-			}
-
-			int? tradeAccountId = null;
-
-			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
-			{
-				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
-			}
-
 #if DEBUG
 			debugString = "FetchProductPageGridPortion Checkpoint B) - Session properties gathered in";
 
@@ -224,11 +278,7 @@ namespace wwwDesignersGuild.Controllers
 			sw.Restart();
 #endif
 
-			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
-
 			var countryMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
-
-
 
 			var ppgCache = new ProductPageGridCacheProvider();
 
@@ -262,9 +312,7 @@ namespace wwwDesignersGuild.Controllers
 					useDate));
 
 #if DEBUG
-				System.Diagnostics.Trace.WriteLine("");
 				System.Diagnostics.Trace.WriteLine($@"
-{DateTime.Now}
 loadProductPageGridFromCmsDatabase called with: 
     pageSectionId = {dto.PageSectionID},
     memberId = {memberId},
@@ -273,8 +321,7 @@ loadProductPageGridFromCmsDatabase called with:
     tradeAccountId = {tradeAccountId},
     countryMatch = {dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match},
     displayTradePrice = {displayTradePrice},
-    useDate = {useDate}
-");
+    useDate = {useDate}");
 				System.Diagnostics.Trace.WriteLine("");
 #endif
 
@@ -318,8 +365,6 @@ loadProductPageGridFromCmsDatabase called with:
 				sw.Restart();
 #endif
 			}
-
-			
 
 			var filteredProductPages = new List<int>();
 

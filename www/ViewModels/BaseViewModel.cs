@@ -36,6 +36,8 @@ namespace wwwDesignersGuild.ViewModels
 {
     public class BaseViewModel
     {
+        public bool? ProductPageGridCacheHit { get; set; } = null;
+        public string RequestURL { get; set; } = null;
         public bool NoFollow { get; set; }
         public bool NoIndex { get; set; }
         public string CustomCanonical { get; set; }

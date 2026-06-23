@@ -19,8 +19,6 @@ namespace wwwDesignersGuild.Models.ProductPage
 
     public class cmsProductPage : ICmsProductPageRepository
     {
-
-
         public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
         {
             //  Is page in cache?

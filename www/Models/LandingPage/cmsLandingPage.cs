@@ -50,6 +50,11 @@ namespace wwwDesignersGuild.Models.LandingPage
 
         public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPage = null, int? productPageGridPageSize = null)
         {
+#if DEBUG
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+#endif
+
             //  Is page in cache?
             cmsLandingPageDefinition landingPageStore;
             LandingPageCacheProvider objLandingPageCache = new LandingPageCacheProvider();
@@ -83,14 +88,9 @@ namespace wwwDesignersGuild.Models.LandingPage
                 var ppg = ppgCache.Get(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
 
                 if (ppg == null)
-                {
-                    ppg = await Task.FromResult(loadProductPageGridFromCmsDatabase(pageSectionId, memberId, languageId, countryId, tradeAccountId, countryMatch, displayTradePrice, useDate));
-
+				{
 #if DEBUG
-                    System.Diagnostics.Trace.WriteLine("");
-					System.Diagnostics.Trace.WriteLine($@"
-{DateTime.Now}
-loadProductPageGridFromCmsDatabase called with: 
+					System.Diagnostics.Trace.WriteLine($@"loadProductPageGridFromCmsDatabase called with: 
     pageSectionId = {pageSectionId},
     memberId = {memberId},
     languageId = {languageId},
@@ -98,11 +98,17 @@ loadProductPageGridFromCmsDatabase called with:
     tradeAccountId = {tradeAccountId},
     countryMatch = {countryMatch},
     displayTradePrice = {displayTradePrice},
-    useDate = {useDate}
-");
+    useDate = {useDate}");
+                    sw.Restart();
 					System.Diagnostics.Trace.WriteLine("");
 #endif
-                    
+					ppg = await Task.FromResult(loadProductPageGridFromCmsDatabase(pageSectionId, memberId, languageId, countryId, tradeAccountId, countryMatch, displayTradePrice, useDate));
+
+#if DEBUG
+					System.Diagnostics.Trace.WriteLine($@"loadProductPageGridFromCmsDatabase returned in: {sw.Elapsed}");
+					sw.Restart();
+					System.Diagnostics.Trace.WriteLine("");
+#endif
 					ppgCache.Set(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, ppg);
                 }
 

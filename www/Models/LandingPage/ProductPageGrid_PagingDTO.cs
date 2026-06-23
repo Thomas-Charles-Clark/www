@@ -32,5 +32,7 @@ namespace wwwDesignersGuild.Models.LandingPage
 		public VisitorSelect Visitor { get; set; }
 
 		public NewMasterDefinition MasterDefinition { get; set; }
+
+		public BaseViewModel Base { get; set; }
 	}
 }
