@@ -246,7 +246,7 @@
     else
     {
         <span data-bind="init: { field: productPageGrid.productType, value: '@(String.IsNullOrEmpty(grid.ProductType) ? grid.ProductTypes.FirstOrDefault()?.FormValue : grid.ProductType)' }, remove"></span>
-        <span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.productTypes, remove">
+		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.productTypes">
             @Html.Raw(JsonConvert.SerializeObject(grid.ProductTypes))
         </span>
     }

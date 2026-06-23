@@ -28,7 +28,7 @@
 		<span class="d-none" data-bind="init: { convert: parseInt }, text: page, remove">
 			@(grid.Page)
 		</span>
-		<span class="d-none" data-bind="init: { convert: parseInt }, text: pages, remove">
+		<span class="d-none" data-bind="init: { convert: parseInt }, text: pages">
 			@(grid.PageCount)
 		</span>
 		<span class="d-none" data-bind="init: { convert: parseInt }, text: breadth, remove">
@@ -37,7 +37,7 @@
 		<span class="d-none" data-bind="init: { convert: parseBool }, text: leftEllipsis, remove">
 			@(grid.DisplayLeftEllipsis)
 		</span>
-		<span class="d-none" data-bind="init: { convert: parseBool }, text: rightEllipsis, remove">
+		<span class="d-none" data-bind="init: { convert: parseBool }, text: rightEllipsis">
 			@(grid.DisplayRightEllipsis)
 		</span>
 		<span class="d-none" data-bind="init: { convert: parseBool }, text: ajax, remove">@(grid.Ajax)</span>
