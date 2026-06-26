@@ -132,14 +132,11 @@ namespace wwwDesignersGuild.ViewModels
 
         public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop)
         {
-            using (MiniProfiler.Current?.Step("LandingPageViewModel.CreateAsync"))
-			{
-				var result = new LandingPageViewModel(objMaster, objVisitor);
+		    var result = new LandingPageViewModel(objMaster, objVisitor);
 
-				await result.Initialise(isShop);
+		    await result.Initialise(isShop);
 
-				return result;
-			}
+		    return result;
         }
 
         public bool IsShop
@@ -260,45 +257,41 @@ namespace wwwDesignersGuild.ViewModels
 
 #if DEBUG
                         var ppSw = new System.Diagnostics.Stopwatch();
-						System.Diagnostics.Debug.WriteLine($"Initialising productPageGridSection: {pageSection.PageSectionID}");
-						System.Diagnostics.Debug.WriteLine("");
-						ppSw.Start();
+                        System.Diagnostics.Debug.WriteLine($"Initialising productPageGridSection: {pageSection.PageSectionID}");
+                        System.Diagnostics.Debug.WriteLine("");
+                        ppSw.Start();
 #endif
 
-                        using (MiniProfiler.Current?.Step("ProductPageGridSection.CreateAsync"))
-						{
-							// createAsync internally checks a memoryCache object for an extant ProductPageGridPageSection for this key
-							var productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
-								originalUrlKeywords: Definition.PageDetails.URLKeywords,
-								productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
-								pagingEnabled: pageSection.Paging || pageSection.Filter,
-								filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-								isShop: Definition.PageDetails.IsShop,
-								isLifestyleGallery: pageSection.IsLifestyleGallery,
-								model: this
-							);
+                        // createAsync internally checks a memoryCache object for an extant ProductPageGridPageSection for this key
+                        var productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
+                            originalUrlKeywords: Definition.PageDetails.URLKeywords,
+                            productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == pageSectionId),
+                            pagingEnabled: pageSection.Paging || pageSection.Filter,
+                            filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+                            isShop: Definition.PageDetails.IsShop,
+                            isLifestyleGallery: pageSection.IsLifestyleGallery,
+                            model: this
+                        );
 
-							PageSections.Add(new PageSectionViewModel(
-								pageSection: pageSection,
-								baseViewModel: this,
-								sectionDefinition: (object)productPageGridPageSection,
-								isShop: Definition.PageDetails.IsShop));
+                        PageSections.Add(new PageSectionViewModel(
+                            pageSection: pageSection,
+                            baseViewModel: this,
+                            sectionDefinition: (object)productPageGridPageSection,
+                            isShop: Definition.PageDetails.IsShop));
 
-							var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
+                        var ppgps = PageSections.Last().Definition as ProductPageGridPageSection;
 
-							if (productPageGridPageSection.Contents.Any())
-							{
-								allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
-							}
-						}
+                        if (productPageGridPageSection.Contents.Any())
+                        {
+                            allImagesSorted.Add(new Tuple<long, int, int>(ppgps.GetContents().Skip(0).Take(1).First().ImageID, 0, pageSection.SortOrder ?? 0));
+                        }
 
 #if DEBUG
                         ppSw.Stop();
-						System.Diagnostics.Debug.WriteLine($"Initialised productPageGridSection: {pageSection.PageSectionID} in {ppSw.Elapsed}");
+                        System.Diagnostics.Debug.WriteLine($"Initialised productPageGridSection: {pageSection.PageSectionID} in {ppSw.Elapsed}");
 #endif
 
-
-						break;
+                        break;
                     case (byte)PageSectionType.HTML:
                         var htmlSection = Definition.pageSectionHtmls.Single(p => p.PageSectionID == pageSectionId);
 

@@ -13,10 +13,8 @@
 
 	var grid = (ProductPageGridPageSection)Model.ProductPageGridPageSection.Definition;
 }
-@using (MiniProfiler.Current?.Step("_Search.cshtml rendering _ProductPageGrid.cshtml"))
-{
-	@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid.cshtml", Model.ProductPageGridPageSection)
-}
+
+@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid.cshtml", Model.ProductPageGridPageSection)
 
 @if (!Model.AnySearchResults)
 {

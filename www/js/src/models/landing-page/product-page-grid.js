@@ -267,6 +267,7 @@
                 pp.OriginalHeading = ko.unwrap(pp.Heading);
             }
         });
+        self.fetchParentDefinition();
     });
 
     self.attributeCount.subscribe(nv => {
@@ -625,6 +626,24 @@
 
         self.parentSub.dispose();
     });
+
+    self.fetchParentDefinition = () => {
+        fetch('/api/generalApi/FetchProductPageGridDefinition', {
+            method: 'POST',
+            headers: window.fetchHeaders,
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                pageSectionId: self.parent.pageSectionId
+            })
+        }).then(window.handleFetchResponse)
+            .then(data => {
+                self.parent.data({
+                    FilterIndexingEnabled: data.FilterIndexingEnabled
+                })
+            })
+            .catch(window.catchFetchErrors)
+    };
 
     self.attrSub = self.attributes.subscribe(nvs => {
         if (nvs.length == self.attributeCount()) {
@@ -1232,24 +1251,27 @@
     self.canvasFunction = () => {
         // Get the offcanvas element and instance
         const offCanvasElement = document.getElementById(`grid-filters-${self.parent.PageSection.PageSectionID}`);
-        const offCanvas = bootstrap.Offcanvas.getOrCreateInstance(offCanvasElement);
 
-        // Listen for clicks on the entire document
-        document.addEventListener('click', function (event) {
-            // Check if the offcanvas is currently open
-            const isOpen = offCanvasElement.classList.contains('show');
+        if (offCanvasElement) {
+            const offCanvas = bootstrap.Offcanvas.getOrCreateInstance(offCanvasElement);
 
-            // Check if the click target is inside the offcanvas
-            const clickedInside = offCanvasElement.contains(event.target);
+            // Listen for clicks on the entire document
+            document.addEventListener('click', function (event) {
+                // Check if the offcanvas is currently open
+                const isOpen = offCanvasElement.classList.contains('show');
 
-            // Check if the click target is the button that opens the offcanvas
-            const clickedToggle = event.target.closest('[data-bs-toggle="offcanvas"]');
+                // Check if the click target is inside the offcanvas
+                const clickedInside = offCanvasElement.contains(event.target);
 
-            // If open, and click is outside both the offcanvas and the toggle button, hide it
-            if (isOpen && !clickedInside && !clickedToggle) {
-                offCanvas.hide();
-            }
-        });
+                // Check if the click target is the button that opens the offcanvas
+                const clickedToggle = event.target.closest('[data-bs-toggle="offcanvas"]');
+
+                // If open, and click is outside both the offcanvas and the toggle button, hide it
+                if (isOpen && !clickedInside && !clickedToggle) {
+                    offCanvas.hide();
+                }
+            });
+        }
     }
 
     window.addBootstrapLoadFunction(self.canvasFunction);

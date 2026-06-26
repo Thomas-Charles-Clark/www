@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 
+using Microsoft.Ajax.Utilities;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -276,37 +278,32 @@ namespace wwwDesignersGuild.Util
             }
         }
 
+		private static readonly JsonSerializer Serializer = new JsonSerializer();
+
 		public static IEnumerable<ProductPageFilterablePodWrapper> StreamSegmentOfJsonArray(string json, string targetArrayProperty, int skip, int take, string sort)
 		{
-			var allItems = new List<ProductPageFilterablePodWrapper>();
+			var allItems = new List<ProductPageFilterablePodWrapper>(1000);
 
-			// 1. Open the file stream sequentially
 			using (var sr = new StringReader(json))
 			using (var reader = new JsonTextReader(sr))
 			{
-				// 2. Scan forward until we find the target property name
 				while (reader.Read())
 				{
 					if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == targetArrayProperty)
 					{
-						// Move the reader past the property name to the StartArray token '['
 						reader.Read();
 						break;
 					}
 				}
 
-				// 3. Ensure we are actually looking at an array
 				if (reader.TokenType != JsonToken.StartArray)
 				{
 					throw new JsonException("reader.TokenType != JsonToken.StartArray");
 				}
 
-				var serializer = new JsonSerializer();
-
-				// 4. Stream ALL items into memory for sorting
 				while (reader.Read() && reader.TokenType != JsonToken.EndArray)
 				{
-					var item = serializer.Deserialize<ProductPageFilterablePodWrapper>(reader);
+					var item = Serializer.Deserialize<ProductPageFilterablePodWrapper>(reader);
 					if (item != null)
 					{
 						allItems.Add(item);
@@ -314,16 +311,17 @@ namespace wwwDesignersGuild.Util
 				}
 			}
 
-			IEnumerable<ProductPageFilterablePodWrapper> sortedResults;
+			IOrderedEnumerable<ProductPageFilterablePodWrapper> sortedResults;
 
+			// Reimplemented using a classic C# 4.0 switch statement block
 			switch (sort)
 			{
 				case "bestSellers":
 					sortedResults = allItems.OrderBy(p => p.ProductPage.SalesRank);
 					break;
-                case "colour":
-                    sortedResults = allItems.OrderBy(p => p.ProductPage.ColourSort);
-                    break;
+				case "colour":
+					sortedResults = allItems.OrderBy(p => p.ProductPage.ColourSort);
+					break;
 				case "alphaAZ":
 					sortedResults = allItems.OrderBy(p => p.ProductPage.AZSortOrder);
 					break;
@@ -346,8 +344,8 @@ namespace wwwDesignersGuild.Util
 					sortedResults = allItems.OrderBy(p => p.ProductPage.DiscountSortOrder);
 					break;
 				case "stockHighToLow":
-                    sortedResults = allItems.OrderByDescending(p => p.ProductPage.StockSortOrder);
-                    break;
+					sortedResults = allItems.OrderByDescending(p => p.ProductPage.StockSortOrder);
+					break;
 				case "stockLowToHigh":
 					sortedResults = allItems.OrderBy(p => p.ProductPage.StockSortOrder);
 					break;
@@ -357,8 +355,8 @@ namespace wwwDesignersGuild.Util
 					break;
 			}
 
-			// 6. Paginate after sorting
-			return sortedResults.Skip(skip).Take(take);
+			// Materialising with .ToList() evaluates the LINQ expression right away
+			return sortedResults.Skip(skip).Take(take).ToList();
 		}
 
 		// Thanks again, Google

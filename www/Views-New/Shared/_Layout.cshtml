@@ -401,51 +401,33 @@
 			<div id="body-inner">
 				@if (!ViewBag.Partial)
 				{
-					using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _SiteCorrector.cshtml"))
-					{
-						@Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
-					}
-
-					using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _SiteCorrector.cshtml"))
-					{
-						@Html.Partial("~/Views-New/Shared/_TradeLoginPrompt.cshtml")
-					}
+					@Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
+					@Html.Partial("~/Views-New/Shared/_TradeLoginPrompt.cshtml")
 				}
 				@if (!ViewBag.Partial && !dgFramework.IsMobileDevice())
 				{
-					using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _DebugBar.cshtml"))
-					{
-						@Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
-					}
+					@Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
 				}
 				@if (!dgFramework.IsMobileDevice())
 				{
 					if (!ViewBag.Partial)
 					{
-						using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _Menu-Desktop.cshtml"))
-						{
-							@Html.Partial("~/Views-New/Shared/_Menu-Desktop.cshtml")
-						}
+						@Html.Partial("~/Views-New/Shared/_Menu-Desktop.cshtml")
 					}
 					else
 					{
 						@Render.Script("~/bundles/js/menu-scripts")
 					}
 					<div id="body-proper" class="py-2 container mb-4">
-						@using (MiniProfiler.Current?.Step("RenderBody"))
-						{
-							@RenderBody()
-						}
+						@RenderBody()
 
 						@if (!ViewBag.Partial && Model.ContentType != dgContentType.productPage)
 						{
 							@* productPages render this in their own templates because of relatedSearches *@
-							using (MiniProfiler.Current?.Step("_RecentlyViewed.cshtml"))
+							@* Model.ShowRecentlyViewed *@
+							if (false)
 							{
-								if (Model.ShowRecentlyViewed)
-								{
-									@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-								}
+								@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
 							}
 						}
 					</div>
@@ -454,10 +436,7 @@
 				{
 					if (!ViewBag.Partial)
 					{
-						using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _Menu-Mobile.cshtml"))
-						{
-							@Html.Partial("~/Views-New/Shared/_Menu-Mobile.cshtml")
-						}
+						@Html.Partial("~/Views-New/Shared/_Menu-Mobile.cshtml")
 					}
 					else
 					{
@@ -474,10 +453,7 @@
 						{
 							if (!Request.IsLocal && Model.ShowRecentlyViewed)
 							{
-								using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _RecentlyViewed.cshtml"))
-								{
-									@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
-								}
+								@Html.Partial("~/Views-New/Shared/_RecentlyViewed.cshtml")
 							}
 						}
 					</div>
@@ -496,17 +472,11 @@
 				<footer>
 					@if (!dgFramework.IsMobileDevice())
 					{
-						using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _RecentlyViewed.cshtml"))
-						{
-							@Html.Partial("~/Views-New/Shared/_Footer-Desktop.cshtml")
-						}
+						@Html.Partial("~/Views-New/Shared/_Footer-Desktop.cshtml")
 					}
 					else
 					{
-						using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _RecentlyViewed.cshtml"))
-						{
-							@Html.Partial("~/Views-New/Shared/_Footer-Mobile.cshtml")
-						}
+						@Html.Partial("~/Views-New/Shared/_Footer-Mobile.cshtml")
 					}
 				</footer>
 			}
@@ -514,35 +484,22 @@
 		else
 		{
 			<div id="body-inner" style="min-height: 101vh">
-				@using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _DebugBar.cshtml"))
-				{
-					@Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
-				}
+				@Html.Partial("~/Views-New/Shared/_DebugBar.cshtml")
+
 				@if (Model.ContentID == (int)dgFixedPage.checkoutLogin)
 				{
-					using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _SiteCorrector.cshtml"))
-					{
-						@Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
-					}
-				}
-				@using (MiniProfiler.Current?.Step("_Layout.cshtml calling _Header-Common.cshtml"))
-				{
-					@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Common.cshtml")
+					@Html.Partial("~/Views-New/Shared/_SiteCorrector.cshtml")
 				}
 
+				@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Common.cshtml")
+				
 				@if (!dgFramework.IsMobileDevice())
 				{
-					using (MiniProfiler.Current?.Step("_Layout.cshtml calling _Header-Desktop.cshtml"))
-					{
-						@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Desktop.cshtml")
-					}
+					@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Desktop.cshtml")
 				}
 				else
 				{
-					using (MiniProfiler.Current?.Step("_Layout.cshtml calling _Header-Mobile.cshtml"))
-					{
-						@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Mobile.cshtml")
-					}
+					@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Header-Mobile.cshtml")
 				}
 				<div class="py-2 container mb-4">
 					@RenderBody()
@@ -551,32 +508,20 @@
 			<footer>
 				@if (!dgFramework.IsMobileDevice())
 				{
-					using (MiniProfiler.Current?.Step($"_Layout.cshtml rendering _Footer-Desktop.cshtml"))
-					{
-						@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Desktop.cshtml")
-					}
+					@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Desktop.cshtml")
 				}
 				else
 				{
-					using (MiniProfiler.Current?.Step($"_Layout.cshtml rendering _Footer-Mobile.cshtml"))
-					{
-						@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Mobile.cshtml")
-					}
+					@Html.Partial("~/Views-New/LandingPages/FixedPages/Checkout/_Footer-Mobile.cshtml")
 				}
 			</footer>
 		}
 	</div>
 
-	@using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _Layout-Late-JS.cshtml"))
-	{
-		@Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
-	}
-
-	@using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _Layout-GA-JS.cshtml"))
-	{
-		@Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
-	}
-
+	@Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
+	
+	@Html.Partial("~/Views-New/Shared/_Layout-GA-JS.cshtml")
+	
 	@if (!ViewBag.Partial)
 	{
 		if (Model.MasterDefinition.LoginStatus == dgLoginStatus.notLoggedIn)
@@ -596,16 +541,10 @@
 		@Render.ScriptDefer("~/bundles/js/ecommerce-popup")
 	}
 
-	@using (MiniProfiler.Current?.Step("_Layout.cshtml rendering _CookieNotice.cshtml"))
-	{
-		@Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
-	}
+	@Html.Partial("~/Views-New/Shared/_CookieNotice.cshtml")
 
-	@using (MiniProfiler.Current?.Step("_Layout.cshtml calling RenderSection(\"LateTemplateScripts\")"))
-	{
-		@RenderSection("LateTemplateScripts", required: false)
-	}
-
+	@RenderSection("LateTemplateScripts", required: false)
+	
 	@Render.ScriptDefer("~/bundles/js/bootstrap-onload")
 
 	@if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)

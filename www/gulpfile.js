@@ -15,11 +15,11 @@ const
     babel = require('gulp-babel'),
     del = require('del'),
     debug = require('gulp-debug'),
-    postcss = require('gulp-postcss'),
+    //postcss = require('gulp-postcss'),
     rename = require('gulp-rename'),
-    flexGapPolyfill = require('flex-gap-polyfill'),
-    autoprefixer = require('autoprefixer'),
-    gapProperties = require('postcss-gap-properties'),
+    //flexGapPolyfill = require('flex-gap-polyfill'),
+    //autoprefixer = require('autoprefixer'),
+    //gapProperties = require('postcss-gap-properties'),
     bundleconfig = require('./bundleconfig.json'),
     rollup = require('rollup'),
     rollupNodeResolve = require('@rollup/plugin-node-resolve'),
@@ -125,7 +125,7 @@ function compilesass() {
             .pipe(sass({
                 includePaths: ['node_modules']
             }).on('error', sass.logError))
-            .pipe(postcss([gapProperties(), autoprefixer()]))
+            .pipe(postcss([]))
             .pipe(concat(bundle.inputFiles.length > 1 ? bundle.outputFileName : bundle.inputFiles[0].replace('.scss', '.css')))
             .pipe(sourcemaps.write('.'))
             .pipe(gulp.dest('.'));

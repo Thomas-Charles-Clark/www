@@ -36,6 +36,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 	public class ProductPageGridPageSection : PagerViewModel
 	{
 		/// <summary>
+		/// These are rendered unto the view
+		/// </summary>
+		public string ProductPageIDs { get; set; }
+
+		/// <summary>
 		/// All AttributeIDs lent by all dbo.ProductPage_Attribute records for this section
 		/// </summary>
 		[JsonIgnore]
@@ -108,6 +113,8 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 		/// The dbo.FilterIndexCombination set - is this filtered in any way?
 		/// </summary>
 		public IEnumerable<FilterIndexAttributeCombination> AttributeCombinations { get; set; }
+
+		public string AttributeCombinationsString { get; set; }
 
 		/// <summary>
 		/// This for use by search - but why? Figure that out after fixing the standard usage.
@@ -480,6 +487,8 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 						// It's fine to cache the results of that call on this object
 						result.AttributeCombinations = objFilterIndexCombinations.Combinations;
+
+						result.AttributeCombinationsString = JsonConvert.SerializeObject(result.AttributeCombinations);
 					}
 				}
 
@@ -574,6 +583,8 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 					result.AttributeGroups.RemoveAll(p => p.AttributeGroupID == 0);
 					// remove it
 				}
+
+				result.ProductPageIDs = JsonConvert.SerializeObject(result.Json.totals.ProductPageIDs);
 
 				#region Write the object to the cache see as we had a cache miss.
 
@@ -1003,24 +1014,10 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				model.AttributeSignatureText = null;
 			}
 
-			#region Perform Paging
-
 			#region Build a list of product page ids to fire the render and pricing fetches for
 
 			var productPageIdsToRender = new List<int>();
-
-			#region Initialise Pager
-
-			// The call to InitialisePager is necessary to cause the PagerViewModel to carry appropriate values for things like page, pageCount, pageSize.
-			// result.InitialisePager();
-
-#if DEBUG
-			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 12 in\t\t{sw.Elapsed}");
-			sw.Restart();
-#endif
-
-			#endregion
-
+			
 			var pagingResults = Framework.StreamSegmentOfJsonArray(result.Json.JSON, "productPages", result.Page * result.PageSize, result.PageSize, result.Sort).ToList();
 
 #if DEBUG
@@ -1044,9 +1041,6 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			// add rows to datatable
 			foreach (var productPageId in productPageIdsToRender)
 			{
-#if DEBUG
-				//System.Diagnostics.Debug.WriteLine(productPage);
-#endif
 				productPageToRenderTable.Rows.Add(productPageId, sequence++);
 			}
 
@@ -1060,70 +1054,70 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				sw.Restart();
 #endif
 
-				var objSearchGenerate = new searchGenerate();
-				var objSearch = new cmsSearch();
-				var objSearchResultReturn = await objSearch.loadSearchFromCms(
-					productPageToRenderTable,
-					model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
-					model.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
-					searchTerm: null,
-					tradeAccountId,
-					null,
-					model.Date,
-					result.PageSectionID);
+				//var objSearch = new cmsSearch();
+				//var objSearchResultReturn = await objSearch.loadSearchFromCms(
+				//	productPageToRenderTable,
+				//	model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+				//	model.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+				//	searchTerm: null,
+				//	tradeAccountId,
+				//	null,
+				//	model.Date,
+				//	result.PageSectionID);
 
 #if DEBUG
 				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 15 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 
-				Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
-				{
-					var tempSearch = pagingResults.Where(p => p.ProductPageID == tempResult.ProductPageID).FirstOrDefault();
+				//Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
+				//{
+				//	var tempSearch = pagingResults.Where(p => p.ProductPageID == tempResult.ProductPageID).FirstOrDefault();
 
-			 		if (tempSearch == null) { }
-					else
-					{
-						tempResult.ScorePercent = tempSearch.ProductPage.ScorePercent;
-					}
-				});
+			 //		if (tempSearch == null) { }
+				//	else
+				//	{
+				//		tempResult.ScorePercent = tempSearch.ProductPage.ScorePercent;
+				//	}
+				//});
 
 #if DEBUG
 				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 16 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 
-				objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
+				//objSearchResultReturn.searchResultCores = objSearchResultReturn.searchResultCores.OrderByDescending(p => p.ScorePercent).ThenByDescending(p => p.SearchSortOrder).ThenBy(p => p.ProductPageID).ToList();
 
-				Parallel.ForEach(pagingResults, (r) =>
-				{
-					var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
+				//Parallel.ForEach(pagingResults, (r) =>
+				//{
+				//	var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
 
-					if (src != null)
-					{
-						r.ProductPage.ApplySorting(src);
-					}
-				});
+				//	if (src != null)
+				//	{
+				//		r.ProductPage.ApplySorting(src);
+				//	}
+				//});
 
 #if DEBUG
 				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 17 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
 
-				Parallel.ForEach(completeResultSet, (r) =>
-				{
-					var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
+				//Parallel.ForEach(completeResultSet, (r) =>
+				//{
+				//	var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
 
-					if (src != null)
-					{
-						r.ApplySorting(src);
-					}
-				});
+				//	if (src != null)
+				//	{
+				//		r.ApplySorting(src);
+				//	}
+				//});
 
 #if DEBUG
 				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 18 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
+				var objSearchGenerate = new searchGenerate();
 
 				// call SQL render proc
 				var productPages = objSearchGenerate.getRenderForSearchResultsAsync(
@@ -1215,89 +1209,14 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 #endif
 
 				#endregion
-
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 23 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
-
 			}
 			else
 			{
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 24 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
-
-				var objSearchGenerate = new searchGenerate();
-				var objSearch = new cmsSearch();
-				var objSearchResultReturn = await objSearch.loadSearchFromCms(
-					productPageToRenderTable,
-					model.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
-					model.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
-					searchTerm: null,
-					tradeAccountId,
-					null,
-					model.Date,
-					result.PageSectionID);
-
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 25 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
-
-				Parallel.ForEach(completeResultSet, (r) =>
-				{
-					var src = objSearchResultReturn.searchResultCores.FirstOrDefault(p => p.ProductPageID == r.ProductPageID);
-
-					if (src != null)
-					{
-						r.ApplySorting(src);
-					}
-				});
-
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 26 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
-
-				result.SortContents(completeResultSet);
-
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 27 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
-
 				result.Contents = completeResultSet.Cast<object>()
 													.ToList();
-
-#if DEBUG
-				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 28 in\t\t{sw.Elapsed}");
-				sw.Restart();
-#endif
 			}
-			#endregion
-
-
-#if DEBUG
-			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 29 in\t\t{sw.Elapsed}");
-			sw.Restart();
-#endif
-
-			result.SortContents(completeResultSet);
-
-#if DEBUG
-			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 31 in\t\t{sw.Elapsed}");
-			sw.Restart();
-#endif
 
 			result.InitialisePager();
-
-#if DEBUG
-			Debug.WriteLine($"ProductPageGridPageSection.CreateAsync reached Checkpoint 32 in\t\t{sw.Elapsed}");
-			sw.Restart();
-#endif
-
 
 			return result;
 		}
@@ -1359,135 +1278,220 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 		public string BuildAttributeURL(AttributeGroup attributeGroup, AttributeDetail attribute, string currentAttributeSignature, IEnumerable<FilterIndexAttributeCombination> attributeCombinations)
 		{
+			// 1. Guard clauses for early exit
+			if (!FilterIndexingEnabled || attributeGroup == null || attribute == null) return "#";
+			if (!attributeGroup.InvolveInFilterIndexing(ProductType)) return "#";
+
+			var context = HttpContext.Current;
+			if (context?.Request?.Url == null) return "#";
+
+			string originalUrl = context.Request.Url.ToString();
+			string placeholder = $"{(char)254}";
+			string url = originalUrl.Replace(OriginalURLKeywords, placeholder);
+
+			var matches = UrlParsingRegex.Matches(url);
+			if (matches.Count != 1 || matches[0].Groups.Count < 3) return "#";
+
+			// 2. Pre-filter active groups and flatten attributes into an efficient lookup dictionary O(N)
+			var activeAttributeGroups = AttributeGroups
+				.Where(ag => ag.InvolveInFilterIndexing(ProductType))
+				.ToList();
+
+			var attributeLookup = activeAttributeGroups
+				.SelectMany(ag => ag.Attributes)
+				.GroupBy(a => a.FormValue)
+				.ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+			// 3. Directly extract keywords from the URL without using PowerSet
+			string[] urlSegments = matches[0].Groups[2].Value.Split(Framework.HyphenDelimiter);
+			var split = new List<AttributeSorter>();
+
+			foreach (var segment in urlSegments)
+			{
+				if (attributeLookup.TryGetValue(segment, out var attr))
+				{
+					split.Add(new AttributeSorter(attr.AttributeID, attr.AttributeGroupID, attr.FormValue, attr.Name, null, null));
+				}
+			}
+
+			// 4. Safely inject or replace the target incoming attribute
+			split.RemoveAll(s => s.AttributeGroupID == attribute.AttributeGroupID);
+			split.Add(new AttributeSorter(attribute.AttributeID, attribute.AttributeGroupID, attribute.FormValue, attribute.Name, null, null));
+
+			// 5. Build lookup metadata maps to avoid nested looping
+			var groupMap = activeAttributeGroups.ToDictionary(g => g.AttributeGroupID);
+
+			// Populate sorting and logic data
+			foreach (var s in split)
+			{
+				if (groupMap.TryGetValue(s.AttributeGroupID, out var matchingGroup))
+				{
+					s.LogicalOperator = matchingGroup.LogicalOperator;
+
+					var prodType = matchingGroup.ProductTypes?.FirstOrDefault(pt => pt.FormValue == ProductType);
+					if (prodType != null)
+					{
+						s.LexicographicalSortOrder = prodType.LexicographicalSortOrder;
+					}
+				}
+			}
+
+			// 6. Sort and validate the signatures
+			split = split.OrderBy(s => s.LexicographicalSortOrder ?? int.MaxValue).ToList();
+
+			string signatureToMatch = string.IsNullOrEmpty(currentAttributeSignature)
+				? attribute.AttributeID.ToString()
+				: string.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID));
+
+			bool isCombinationValid = attributeCombinations.Any(ac =>
+				ac.Enabled == true &&
+				string.Equals(ac.AttributeSignature, signatureToMatch, StringComparison.Ordinal));
+
+			if (!isCombinationValid) return "#";
+
+			// 7. Construct final URL
+			split.Add(new AttributeSorter(0, 0, OriginalSemanticString, null, null, null));
+			url = UrlParsingRegex.Replace(url, $"$1/{string.Join("-", split.Select(s => s.Attribute))}/$4");
+
+			// Clean query string parameters
+			int qIndex = url.IndexOf('?');
+			if (qIndex > -1)
+			{
+				url = url.Substring(0, qIndex);
+			}
+
+			return url;
+
+
 			//if (attribute.FormValue == "blue")
 			//{
 			//    int f = 0;
 			//}
 
-			// if FilterIndexing is enabled on this grid's containing page
-			if (FilterIndexingEnabled)
-			{
-				// does this ProductType describe a LexicographicalSortOrder for this AttributeGroup?
-				if (attributeGroup.InvolveInFilterIndexing(ProductType))
-				{
-					// Yes, we can include this attribute in the URL
-					var originalUrl = HttpContext.Current.Request.Url.ToString();
-					var placeholder = $"{(char)254}";
-					var url = HttpContext.Current.Request.Url.ToString().Replace(OriginalURLKeywords, placeholder);
+			//// if FilterIndexing is enabled on this grid's containing page
+			//if (FilterIndexingEnabled)
+			//{
+			//	// does this ProductType describe a LexicographicalSortOrder for this AttributeGroup?
+			//	if (attributeGroup.InvolveInFilterIndexing(ProductType))
+			//	{
+			//		// Yes, we can include this attribute in the URL
+			//		var originalUrl = HttpContext.Current.Request.Url.ToString();
+			//		var placeholder = $"{(char)254}";
+			//		var url = HttpContext.Current.Request.Url.ToString().Replace(OriginalURLKeywords, placeholder);
 
-					var matches = UrlParsingRegex.Matches(url);
+			//		var matches = UrlParsingRegex.Matches(url);
 
-					if (matches.Count == 1)
-					{
-						if (matches[0].Groups.Count >= 3)
-						{
-							var split = new List<AttributeSorter>();
+			//		if (matches.Count == 1)
+			//		{
+			//			if (matches[0].Groups.Count >= 3)
+			//			{
+			//				var split = new List<AttributeSorter>();
 
-							var urlKeywordsAttributesPowerSet = EnumerableExtensions.PowerSet(matches[0].Groups[2].Value.Split(Framework.HyphenDelimiter).AsEnumerable<string>());
+			//				var urlKeywordsAttributesPowerSet = EnumerableExtensions.PowerSet(matches[0].Groups[2].Value.Split(Framework.HyphenDelimiter).AsEnumerable<string>());
 
-							foreach (var set in urlKeywordsAttributesPowerSet)
-							{
-								var potentialAttribute = String.Join("-", set);
+			//				foreach (var set in urlKeywordsAttributesPowerSet)
+			//				{
+			//					var potentialAttribute = String.Join("-", set);
 
-								//if (AttributeGroups.SelectMany(a => a.Attributes).Where(a => a.FormValue == potentialAttribute).Any())
-								//    split.Add(new AttributeSorter(potentialAttribute, null, null, null));
+			//					//if (AttributeGroups.SelectMany(a => a.Attributes).Where(a => a.FormValue == potentialAttribute).Any())
+			//					//    split.Add(new AttributeSorter(potentialAttribute, null, null, null));
 
-								var attr = AttributeGroups.SelectMany(a => a.Attributes).SingleOrDefault(a => a.FormValue == potentialAttribute);
-								if (attr != null)
-									split.Add(new AttributeSorter(attr.AttributeID, attr.AttributeGroupID, attr.FormValue, attr.Name, null, null));
-							}
+			//					var attr = AttributeGroups.SelectMany(a => a.Attributes).SingleOrDefault(a => a.FormValue == potentialAttribute);
+			//					if (attr != null)
+			//						split.Add(new AttributeSorter(attr.AttributeID, attr.AttributeGroupID, attr.FormValue, attr.Name, null, null));
+			//				}
 
-							if (!split.Select(s => s.Attribute).Contains(attribute.FormValue))
-							{
-								split.Add(new AttributeSorter(attribute.AttributeID, attribute.AttributeGroupID, attribute.FormValue, attribute.Name, null, null));
-							}
+			//				if (!split.Select(s => s.Attribute).Contains(attribute.FormValue))
+			//				{
+			//					split.Add(new AttributeSorter(attribute.AttributeID, attribute.AttributeGroupID, attribute.FormValue, attribute.Name, null, null));
+			//				}
 
-							// split now contains e.g. new, cushions, blue, patterned
-							// we want to rebuild it in the correct sort order
-							// so we need to pull the attributeGroups having these attributes...
+			//				// split now contains e.g. new, cushions, blue, patterned
+			//				// we want to rebuild it in the correct sort order
+			//				// so we need to pull the attributeGroups having these attributes...
 
-							var attributeGroups = AttributeGroups.Where(ag => ag.InvolveInFilterIndexing(ProductType)).ToList();
+			//				var attributeGroups = AttributeGroups.Where(ag => ag.InvolveInFilterIndexing(ProductType)).ToList();
 
-							var toRemove = new List<AttributeSorter>();
-							var toAdd = new List<AttributeSorter>();
+			//				var toRemove = new List<AttributeSorter>();
+			//				var toAdd = new List<AttributeSorter>();
 
-							foreach (var s in split)
-							{
-								var thisAttributeGroup = attributeGroups
-									.Where(ag => ag.Attributes.SingleOrDefault(a => a.FormValue == s.Attribute) != null)
-									.SingleOrDefault();
+			//				foreach (var s in split)
+			//				{
+			//					var thisAttributeGroup = attributeGroups
+			//						.Where(ag => ag.Attributes.SingleOrDefault(a => a.FormValue == s.Attribute) != null)
+			//						.SingleOrDefault();
 
-								// find the lexSortOrder for this split
-								var lexSortOrder = attributeGroups
-									.Where(ag => ag.Attributes.SingleOrDefault(a => a.FormValue == s.Attribute) != null)
-									?.Select(ag => ag.ProductTypes.Single(pt => pt.FormValue == ProductType).LexicographicalSortOrder)
-									?.SingleOrDefault();
+			//					// find the lexSortOrder for this split
+			//					var lexSortOrder = attributeGroups
+			//						.Where(ag => ag.Attributes.SingleOrDefault(a => a.FormValue == s.Attribute) != null)
+			//						?.Select(ag => ag.ProductTypes.Single(pt => pt.FormValue == ProductType).LexicographicalSortOrder)
+			//						?.SingleOrDefault();
 
-								if (lexSortOrder != null)
-								{
-									s.LexicographicalSortOrder = lexSortOrder;
-									s.LogicalOperator = thisAttributeGroup.LogicalOperator;
+			//					if (lexSortOrder != null)
+			//					{
+			//						s.LexicographicalSortOrder = lexSortOrder;
+			//						s.LogicalOperator = thisAttributeGroup.LogicalOperator;
 
-									// we want to remove other attributes already in split belonging to this attribute group, leaving just the incoming attribute representing this group
-									if (attribute.AttributeGroupID == thisAttributeGroup.AttributeGroupID)
-									{
-										toRemove.Add(s);
-										if (toAdd.SingleOrDefault(a =>
-											a.Attribute == attribute.FormValue &&
-											a.LexicographicalSortOrder == lexSortOrder &&
-											a.LogicalOperator == thisAttributeGroup.LogicalOperator)
-											== null)
-										{
-											toAdd.Add(new AttributeSorter(attribute.AttributeID, attribute.AttributeGroupID, attribute.FormValue, attribute.Name, lexSortOrder, thisAttributeGroup.LogicalOperator));
-										}
-									}
-								}
-							}
+			//						// we want to remove other attributes already in split belonging to this attribute group, leaving just the incoming attribute representing this group
+			//						if (attribute.AttributeGroupID == thisAttributeGroup.AttributeGroupID)
+			//						{
+			//							toRemove.Add(s);
+			//							if (toAdd.SingleOrDefault(a =>
+			//								a.Attribute == attribute.FormValue &&
+			//								a.LexicographicalSortOrder == lexSortOrder &&
+			//								a.LogicalOperator == thisAttributeGroup.LogicalOperator)
+			//								== null)
+			//							{
+			//								toAdd.Add(new AttributeSorter(attribute.AttributeID, attribute.AttributeGroupID, attribute.FormValue, attribute.Name, lexSortOrder, thisAttributeGroup.LogicalOperator));
+			//							}
+			//						}
+			//					}
+			//				}
 
-							foreach (var s in toRemove)
-							{
-								split.Remove(s);
-							}
+			//				foreach (var s in toRemove)
+			//				{
+			//					split.Remove(s);
+			//				}
 
-							foreach (var s in toAdd)
-							{
-								split.Add(s);
-							}
+			//				foreach (var s in toAdd)
+			//				{
+			//					split.Add(s);
+			//				}
 
-							split = split.OrderBy(s => s.LexicographicalSortOrder).ToList();
+			//				split = split.OrderBy(s => s.LexicographicalSortOrder).ToList();
 
-							if (attributeCombinations
-								.SingleOrDefault(ac =>
-									ac.Enabled == true &&
-									ac.AttributeSignature == (
-										String.IsNullOrEmpty(currentAttributeSignature)
-											? $"{attribute.AttributeID}"
-											: String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
-							{
-								return "#";
-							}
-							else
-							{
-								split.Add(new AttributeSorter(0, 0, OriginalSemanticString, null, null, null));
+			//				if (attributeCombinations
+			//					.SingleOrDefault(ac =>
+			//						ac.Enabled == true &&
+			//						ac.AttributeSignature == (
+			//							String.IsNullOrEmpty(currentAttributeSignature)
+			//								? $"{attribute.AttributeID}"
+			//								: String.Join(".", split.Where(s => s.AttributeGroupID != 0).Select(s => s.AttributeID)))) == null)
+			//				{
+			//					return "#";
+			//				}
+			//				else
+			//				{
+			//					split.Add(new AttributeSorter(0, 0, OriginalSemanticString, null, null, null));
 
-								url = UrlParsingRegex.Replace(url, $"$1/{String.Join("-", split.Select(s => s.Attribute))}/$4");
+			//					url = UrlParsingRegex.Replace(url, $"$1/{String.Join("-", split.Select(s => s.Attribute))}/$4");
 
-								// we don't want Google to be indexing the query string parameters
-								if (url.IndexOf("?") > -1)
-								{
-									url = url.Substring(0, url.IndexOf("?"));
-								}
+			//					// we don't want Google to be indexing the query string parameters
+			//					if (url.IndexOf("?") > -1)
+			//					{
+			//						url = url.Substring(0, url.IndexOf("?"));
+			//					}
 
-								return url;
-							}
-						}
-					}
-				}
+			//					return url;
+			//				}
+			//			}
+			//		}
+			//	}
 
-				return "#";
-			}
+			//	return "#";
+			//}
 
-			return "#";
+			//return "#";
 		}
 	}
 }

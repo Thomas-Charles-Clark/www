@@ -1,4 +1,6 @@
-﻿using Kendo.Mvc.Extensions;
+﻿using DocumentFormat.OpenXml.InkML;
+
+using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using MertexerV2.Models.Accounts;
 using MertexerV2SQL.Accounts;
@@ -544,6 +546,14 @@ namespace wwwDesignersGuild.Controllers
             HttpContext.Current.Session["tradeLoginPromptDismissed"] = true;
 
             return Ok(new { });
+        }
+
+        [HttpPost]
+        public async Task<IHttpActionResult> FetchProductPageGridDefinition([FromBody] PassProductPageGridDefinitionFetch dto)
+        {
+            var productPageGridPageSection = new databaseDataContext().ProductPageGrid_FilterIndexingEnabled(dto.pageSectionId);
+
+			return Ok(productPageGridPageSection);
         }
     }
 }

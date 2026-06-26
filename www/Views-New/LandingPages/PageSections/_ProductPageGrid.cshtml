@@ -61,41 +61,41 @@
     //});
 </script>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
-	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
-		@Html.Encode(Html.Raw(Model.ToString()))
-	</span>
-	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
-		@Model.Base.AttributeFilterText
-	</span>
-	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
-		@grid.OriginalTitle
-	</span>
-	<div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures">
-		@JsonConvert.SerializeObject(grid.AttributeCombinations)
-	</div>
 	@if (grid.Searchable)
 	{
-		<input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)" />
-	}
-	<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable">
-		@grid.Searchable
-	</span>
-	@if (grid.Json != null)
-	{
-		<span class="d-none" data-bind="text: productPageGrid.pager.totalCount">
-			@grid.Json.totals.Total
+		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
+			@Html.Encode(Html.Raw(Model.ToString()))
 		</span>
-	}
-	@if (!grid.Searchable)
-	{
+		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
+			@Model.Base.AttributeFilterText
+		</span>
+		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
+			@grid.OriginalTitle
+		</span>
+		<div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures">
+			@Html.Raw(grid.AttributeCombinationsString)
+		</div>
+		if (grid.Searchable)
+		{
+			<input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)" />
+		}
+		<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable">
+			@grid.Searchable
+		</span>
+		if (grid.Json != null)
+		{
+			<span class="d-none" data-bind="text: productPageGrid.pager.totalCount">
+				@grid.Json.totals.Total
+			</span>
+		}
 		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-			@Html.Raw(JsonConvert.SerializeObject(grid.Json.totals.ProductPageIDs))
+			@Html.Raw(grid.ProductPageIDs)
 		</span>
 	}
 	else
 	{
 		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-			@Html.Raw(JsonConvert.SerializeObject(grid.Contents.Cast<ProductPageFilterablePod>().Select(p => p.ProductPageID)))
+			@Html.Raw(grid.ProductPageIDs)
 		</span>
 	}
 	@if (grid.AttributeGroups.Any())
@@ -228,10 +228,7 @@
 					<!-- ko if: productPageGrid.productTypeId() -->
 					@foreach (var item in grid.AttributeGroups.Where(ag => ag.AttributeGroupGroupID == null).OrderBy(p => p.SortOrder).Select((value, index) => new AttributeGroupViewModel(grid, value, index, Model.Base)))
 					{
-						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_AttributeGroup.cshtml"))
-						{
-							@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", item)
-						}
+						@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", item)
 					}
 					@foreach (var pair in grid.AttributeGroupGroups.Select((item, index) => new { item, index }))
 					{
@@ -255,10 +252,7 @@
 										.OrderBy(p => p.SortOrder)
 										.Select((value, index) => new AttributeGroupViewModel(grid, value, index + attributeGroupsWithoutAdditionalGroupingCount, Model.Base)))
 									{
-										using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_AttributeGroup.cshtml"))
-										{
-											@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", ag)
-										}
+										@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_AttributeGroup.cshtml", ag)
 									}
 								</div>
 							</div>
@@ -292,10 +286,7 @@
 	@if (tradeUser && Model.PageSection.PageSectionID == 7899)
 	{
 		@* Trade Clearance Funtimes *@
-		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPageGrid_TradeClearanceNav.cshtml"))
-		{
-			@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_TradeClearanceNav.cshtml", Model)
-		}
+		@Html.Partial("~/Views-New/LandingPages/PageSections/_ProductPageGrid_TradeClearanceNav.cshtml", Model)
 	}
 	@if ((Model.PageSection.Paging || Model.PageSection.Filter) && grid.Contents.Any())
 	{
@@ -310,10 +301,8 @@
 				@(attributeFilterTextCount)
 			</h3>
 		}
-		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _PageSectionPagerNav.cshtml"))
-		{
-			@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
-		}
+			
+		@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
 		<!-- /ko -->
 	}
 	@if ((!Framework.ProductionVersion) && (!Model.PageSection.Paging && !Model.PageSection.Filter))
@@ -339,10 +328,7 @@
 				{
 					foreach (var p in thisPage)
 					{
-						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPagePod.cshtml"))
-						{
-							@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p);
-						}
+						@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p);
 					}
 				}
 			</div>
@@ -358,10 +344,7 @@
 				{
 					foreach (var p in thisPage)
 					{
-						using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _ProductPagePod.cshtml"))
-						{
-							@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
-						}
+						@Html.Partial("~/Views-New/ProductPages/Shared/_ProductPagePod.cshtml", p)
 					}
 				}
 			</div>
@@ -371,10 +354,7 @@
 	{
 		grid.Index = 1;
 		<!-- ko with: productPageGrid -->
-		using (MiniProfiler.Current?.Step("_ProductPageGrid.cshtml rendering _PageSectionPagerNav.cshtml"))
-		{
-			@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
-		}
+		@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
 		<!-- /ko -->
 	}
 </form>

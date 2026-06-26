@@ -35,8 +35,7 @@
 
 	@Render.Script("~/bundles/js/landing-page")
 }
-@using (MiniProfiler.Current?.Step("_LandingPage.cshtml"))
-{
+@{
 	if (Model.PageSections.Where(p => p.PageSection.Paging || p.PageSection.Filter).Any() || Model.ContentID == (int)dgFixedPage.serverSearch)
 	{
 		<script id="ko-pager-template" type="text/html">
@@ -307,7 +306,7 @@
 			using (MiniProfiler.Current?.Step("_LandingPage.cshtml calling _SocialMediaDrop.cshtml"))
 			{
 				<nav class="breadcrumb-social-wrapper"
-					 aria-label="breadcrumb">
+						aria-label="breadcrumb">
 					@Model.Breadcrumbs()
 					@if (Model.ContentID != (int)dgFixedPage.moodboard)
 					{
@@ -330,75 +329,64 @@
 				</h4>
 			}
 		}
-		@if (Model.PageSections.Any())
-		{
+		@if (Model.PageSections.Any()) 
+ 		{
+			@* false *@
 			<div class="page-section-grid grid">
 				<!-- ko init: { field: pageSections, value: [@Html.Raw(String.Join(",", (Model.PageSections.Select(p => $"pageSectionViewModel('{p.PageSectionType}', resources, {(int?)p.BespokeContentPageSection})"))))] } --><!-- /ko -->
 				@foreach (var pageSection in Model.PageSections.Select((section, index) => new { index, section }))
 				{
-					using (MiniProfiler.Current?.Step($"PageSection {pageSection.section.PageSection.PageSectionID}"))
+					var section = pageSection.section;
+					var index = pageSection.index;
+					var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
+
+					if (section.PageSection.PlatformSwitch == null ||
+					   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
+					   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
 					{
-						var section = pageSection.section;
-						var index = pageSection.index;
-						var sectionClass = section.PageSectionType.GetAttributeOfType<PageSectionClassAttribute>().ClassName;
-
-						if (section.PageSection.PlatformSwitch == null ||
-						   section.PageSection.PlatformSwitch == false && !dgFramework.IsMobileDevice() ||
-						   section.PageSection.PlatformSwitch == true && dgFramework.IsMobileDevice())
+						if (sectionClass == "product-page-grid-section")
 						{
-							if (sectionClass == "product-page-grid-section")
-							{
-								<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
-									<div class="spinner-border" role="status"></div>
-									<h4>
-										@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
-									</h4>
-								</div>
-							}
-							<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
-								<!-- ko with: pageSections[@(index)] -->
-								@if ((section.PageSection.TradeSwitch == null) ||
-								 (section.PageSection.TradeSwitch == false && !tradeUser) ||
-								 (section.PageSection.TradeSwitch == true && tradeUser))
-								{
-									var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
-
-									switch (section.PageSectionType)
-									{
-										case PageSectionType.Slideshow:
-											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
-											{
-												@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
-											}
-											break;
-										case PageSectionType.BespokeContent:
-											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
-											{
-												if (section.BespokeContentPageSection != null)
-												{
-													var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
-													if (attr.RequiresBase)
-													{
-														@Html.Action(attr.Action, attr.Controller, Model)
-													}
-													else
-													{
-														@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
-													}
-												}
-											}
-											break;
-										default:
-											using (MiniProfiler.Current?.Step($"_LandingPage.cshtml calling {viewPath}"))
-											{
-												@Html.Partial(viewPath, section)
-											}
-											break;
-									}
-								}
-								<!-- /ko -->
+							<div class="page-blocker product-page-grid-blocker d-none" data-bind="toggleOpacity: pageSections[@(index)].productPageGrid.pager.busy">
+								<div class="spinner-border" role="status"></div>
+								<h4>
+									@HtmlHelperExtra.Resource("PleaseWait", l, c, d)
+								</h4>
 							</div>
 						}
+						<div id="page-section-@(section.PageSection.PageSectionID)" class="@(section.PageSection.HalfWidth ? "g-col-12 g-col-lg-6" : "g-col-12") page-section @(sectionClass) @(section.PageSection.ViewportWidth ? "viewport-width" : "")">
+							<!-- ko with: pageSections[@(index)] -->
+							@if ((section.PageSection.TradeSwitch == null) ||
+						(section.PageSection.TradeSwitch == false && !tradeUser) ||
+						(section.PageSection.TradeSwitch == true && tradeUser))
+							{
+								var viewPath = section.PageSectionType.GetAttributeOfType<ViewPathAttribute>().ViewPath;
+
+								switch (section.PageSectionType)
+								{
+									case PageSectionType.Slideshow:
+										@Html.Partial(viewPath, ((SlideshowPageSection)section.Definition).CarouselViewModel)
+										break;
+									case PageSectionType.BespokeContent:
+										if (section.BespokeContentPageSection != null)
+										{
+											var attr = section.BespokeContentPageSection.Value.GetAttributeOfType<ActionAttribute>();
+											if (attr.RequiresBase)
+											{
+												@Html.Action(attr.Action, attr.Controller, Model)
+											}
+											else
+											{
+												@Html.Action(attr.Action, attr.Controller, Model.MasterDefinition)
+											}
+										}
+										break;
+									default:
+										@Html.Partial(viewPath, section)
+										break;
+								}
+							}
+							<!-- /ko -->
+						</div>
 					}
 				}
 			</div>

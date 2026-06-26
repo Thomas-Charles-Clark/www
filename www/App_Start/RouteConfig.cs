@@ -20,7 +20,13 @@ namespace wwwDesignersGuild
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/)(.*).pdf" });
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/furniturepdfs/)(.*).pdf" });
 
-            routes.MapRoute(
+			routes.MapRoute(
+				name: "TestBlankPageRoutine",
+				url: "blank",
+				defaults: new { controller = "Home", action = "Blank" }
+			);
+
+			routes.MapRoute(
                 name: "GiftVoucherViewer",
                 url: "gift-voucher",
                 defaults: new { controller = "GiftVoucher", action = "View" }
@@ -261,7 +267,7 @@ namespace wwwDesignersGuild
                 defaults: new { controller = "Trade", action = "downloadClearancePDF" }
                 );
 
-            routes.MapRoute(
+			routes.MapRoute(
                 name: "CatchAllRoutine",
                 url: "{*urlparameter}",
                 defaults: new { controller = "Home", action = "CatchAll" }
