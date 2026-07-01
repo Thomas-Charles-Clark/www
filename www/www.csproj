@@ -2845,7 +2845,9 @@
     <Content Include="ExternalDependencies\UODOTNET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="favicon.ico" />
+    <Content Include="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="..\.editorconfig">
       <Link>.editorconfig</Link>
