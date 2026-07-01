@@ -20,6 +20,7 @@ using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using wwwDesignersGuild.Models;
 using wwwDesignersGuild.Models.BasketClasses;
+using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.ClientError;
 using wwwDesignersGuild.Models.Country;
@@ -550,10 +551,22 @@ namespace wwwDesignersGuild.Controllers
 
         [HttpPost]
         public async Task<IHttpActionResult> FetchProductPageGridDefinition([FromBody] PassProductPageGridDefinitionFetch dto)
-        {
-            var productPageGridPageSection = new databaseDataContext().ProductPageGrid_FilterIndexingEnabled(dto.pageSectionId);
+		{
+			var requestWrapper = new HttpRequestWrapper(HttpContext.Current.Request);
 
-			return Ok(productPageGridPageSection);
+			var useDate = Framework.GetUseDate(requestWrapper);
+
+			var cacheProvider = new ProductPageGridPageSectionCacheProvider();
+
+            var result = cacheProvider.Get(
+                pageSectionId: dto.pageSectionId, 
+                languageId: dto.languageId,
+                countryId: dto.countryId,
+                tradeAccountId: (int?)HttpContext.Current.Session["memberTradeAccountID"], 
+                countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+                useDate: useDate);
+
+			return Ok(result);
         }
     }
 }

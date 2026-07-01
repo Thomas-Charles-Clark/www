@@ -21,12 +21,6 @@ namespace wwwDesignersGuild
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/furniturepdfs/)(.*).pdf" });
 
 			routes.MapRoute(
-				name: "TestBlankPageRoutine",
-				url: "blank",
-				defaults: new { controller = "Home", action = "Blank" }
-			);
-
-			routes.MapRoute(
                 name: "GiftVoucherViewer",
                 url: "gift-voucher",
                 defaults: new { controller = "GiftVoucher", action = "View" }

@@ -95,9 +95,18 @@
 
     self.attributeSignatures = null;
 
+    self.decodeHtml = (html) => {
+        let txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
+    }
+
     self.filterTextComputer = ko.computed(() => {
 
         // grab dependencies
+        let parentData = self.parent.data();
+        // parentData is touched here because we now async call for Definition apres l'arrive
+
         let productTypeText = self.productTypeText();
 
         let productTypeTextPlural = self.productTypeTextPlural();
@@ -120,7 +129,7 @@
         if (self.parent.hasOwnProperty('Definition')) {
 
             // sanity check: filter indexing must be enabled on the page
-            if (self.parent.Definition.FilterIndexingEnabled) {
+            if (self.parent.Definition?.FilterIndexingEnabled) {
 
                 // bugger about with the product type text
                 if (productTypeTextPlural) {
@@ -163,6 +172,7 @@
 
                 if (filterIndexCombinationFound) {
                     // great, swap all the smart tags out as appropriate
+                    // this is all done server-side now
                 } else {
                     // boo, get the original boilerplate for the... page...? back in place. The "unfiltered" state.
                 }
@@ -189,7 +199,7 @@
                     }
 
                     // self.originalTitle will only ever be filled by FilterIndexCombination_Language if at all.
-                    if (!self.originalTitle()) {
+                    if (self.originalTitle()) {
                         document.title = `${filterText} ${productTypeTextPlural} | Designers Guild`;
                     }
 
@@ -233,7 +243,7 @@
 
                 if (filterIndexCombinationText) {
                     document.querySelectorAll('.attribute-signature-text').forEach(e => {
-                        e.innerHTML = `${filterIndexCombinationText}`;
+                        e.innerHTML = self.decodeHtml(filterIndexCombinationText);
                     });
                 } else {
                     document.querySelectorAll('.attribute-signature-text').forEach(e => {
@@ -339,7 +349,7 @@
                 // if we're doing the filter indexing dance
                 if (self.parent.hasOwnProperty('Definition')) {
                     // [dbo].[Page].[EnableFilterIndexing]
-                    if (self.parent.Definition.FilterIndexingEnabled) {
+                    if (self.parent.Definition?.FilterIndexingEnabled === true) {
 
                         // we might not have any selected attributes, in which case we still need to do the rebuild beneath
                         // here, have an unhelpful variable name...
@@ -634,15 +644,24 @@
             cache: 'no-cache',
             credentials: 'same-origin',
             body: JSON.stringify({
-                pageSectionId: self.parent.pageSectionId
+                pageSectionId: self.parent.pageSectionId,
+                languageId: window.getLanguageId(),
+                countryId: window.getCountryId()
             })
         }).then(window.handleFetchResponse)
-            .then(data => {
-                self.parent.data({
-                    FilterIndexingEnabled: data.FilterIndexingEnabled
-                })
+            .then(definition => {
+
+                let currentData = self.parent.data() ?? {};
+
+                let updatedData = Object.assign(currentData, definition);
+
+                self.parent.Definition = definition;
+
+                self.parent.data(updatedData);
             })
-            .catch(window.catchFetchErrors)
+            .catch(err => {
+                window.window.catchFetchErrors(err);
+            })
     };
 
     self.attrSub = self.attributes.subscribe(nvs => {

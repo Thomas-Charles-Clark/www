@@ -75,16 +75,5 @@ namespace wwwDesignersGuild.Models.Database
             IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), pageID, date, attributeList);
             return (ISingleResult<GoogleHref>)result.ReturnValue;
         }
-
-
-
-		[Function(Name = "pub.ProductPageGrid_FilterIndexingEnabled")]
-		[ResultTypeAttribute(typeof(ProductPageGrid_FilterIndexingEnabledResult))]
-		public ISingleResult<ProductPageGrid_FilterIndexingEnabledResult> ProductPageGrid_FilterIndexingEnabled(
-														[global::System.Data.Linq.Mapping.ParameterAttribute(Name = "PageSectionID", DbType = "BigInt")] long pageSectionId)
-		{
-			IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), pageSectionId);
-			return (ISingleResult<ProductPageGrid_FilterIndexingEnabledResult>)result.ReturnValue;
-		}
 	}
 }

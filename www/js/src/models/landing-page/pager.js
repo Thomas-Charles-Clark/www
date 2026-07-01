@@ -234,8 +234,7 @@
                         ProductPageIDs: a.productPageIds
                     }
                 }),
-                visitor: window.getBase().Visitor,
-                masterDefinition: window.getMasterDefinition()
+                base: window.getBase()
             }
 
             data.productPageIds = page;

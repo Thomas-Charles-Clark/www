@@ -61,43 +61,39 @@
     //});
 </script>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
+	
 	@if (grid.Searchable)
 	{
-		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
-			@Html.Encode(Html.Raw(Model.ToString()))
-		</span>
-		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
-			@Model.Base.AttributeFilterText
-		</span>
-		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
-			@grid.OriginalTitle
-		</span>
-		<div class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.attributeSignatures">
-			@Html.Raw(grid.AttributeCombinationsString)
-		</div>
-		if (grid.Searchable)
-		{
-			<input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)" />
-		}
-		<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable">
-			@grid.Searchable
-		</span>
-		if (grid.Json != null)
-		{
-			<span class="d-none" data-bind="text: productPageGrid.pager.totalCount">
-				@grid.Json.totals.Total
-			</span>
-		}
-		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-			@Html.Raw(grid.ProductPageIDs)
-		</span>
+		<input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)" />
 	}
-	else
+	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
+		@Html.Encode(Html.Raw(Model.ToString()))
+	</span>
+	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
+		@Model.Base.AttributeFilterText
+	</span>
+	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
+		@grid.OriginalTitle
+	</span>
+	<div class="d-none" data-bind="init: { convert: JSON.parse }, html: productPageGrid.attributeSignatures">
+		@Html.Raw(Html.Encode(grid.AttributeCombinationsString))
+	</div>
+	<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable">
+		@grid.Searchable
+	</span>
+	@if (grid.Json != null)
 	{
-		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-			@Html.Raw(grid.ProductPageIDs)
+		<span class="d-none" data-bind="text: productPageGrid.pager.totalCount">
+			@grid.Json.totals.Total
 		</span>
 	}
+	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
+		@Html.Raw(grid.ProductPageIDs)
+	</span>
+	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
+		@Html.Raw(grid.ProductPageIDs)
+	</span>
+
 	@if (grid.AttributeGroups.Any())
 	{
 		<div id="grid-filters-@(Model.PageSection.PageSectionID)"
@@ -301,7 +297,7 @@
 				@(attributeFilterTextCount)
 			</h3>
 		}
-			
+
 		@Html.Partial("~/Views-New/LandingPages/PageSections/_PageSectionPagerNav.cshtml", grid);
 		<!-- /ko -->
 	}

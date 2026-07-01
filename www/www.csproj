@@ -34,6 +34,8 @@
     </NuGetPackageImportStamp>
     <Use64BitIISExpress>true</Use64BitIISExpress>
     <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
+	<CleanWPPTargets>True</CleanWPPTargets>
+    <UseSharedCompilation>False</UseSharedCompilation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -3294,8 +3296,6 @@
     <Content Include="Views-New\Shared\_404.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleansePositive.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleanseNegative.cshtml" />
-    <Content Include="Views\Home\Blank.cshtml" />
-    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">
@@ -3325,6 +3325,7 @@
     <Folder Include="PDFs\Returns\" />
     <Folder Include="TradeDownloads\" />
     <Folder Include="Uploads\" />
+    <Folder Include="Views\" />
     <Folder Include="WebReferences\" />
   </ItemGroup>
   <ItemGroup>

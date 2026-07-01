@@ -29,10 +29,22 @@ namespace wwwDesignersGuild.Models.LandingPage
 
 		public byte? ProductTypeID { get; set; }
 
-		public VisitorSelect Visitor { get; set; }
-
-		public NewMasterDefinition MasterDefinition { get; set; }
-
 		public BaseViewModel Base { get; set; }
+
+		public VisitorSelect Visitor
+		{ 
+			get 
+			{
+				return Base.Visitor;
+			} 
+		}
+
+		public NewMasterDefinition MasterDefinition
+		{
+			get
+			{
+				return Base.MasterDefinition;
+			}
+		}
 	}
 }

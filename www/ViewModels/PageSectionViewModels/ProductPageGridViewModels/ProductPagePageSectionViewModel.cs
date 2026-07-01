@@ -629,7 +629,9 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				Debug.WriteLine($"ProductPageGridPageSection.CreateAsync skipped Checkpoint 2 in\t\t{sw.Elapsed}");
 				sw.Restart();
 #endif
-
+				// We can't have people going caching silly title tags meta descriptions etc.
+				// So even if we have a cache hit, we need to use the real NewMasterDefinition
+				result.MasterDefinition = model.MasterDefinition;
 			}
 
 			// This must be dynamic and cannot be cached: it's the result of attribute filtering

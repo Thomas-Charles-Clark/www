@@ -16,34 +16,28 @@ namespace wwwDesignersGuild
         {
 
 #if DEBUG
-            var cssPrefix = "~/css/dist";
-            var cssSuffix = ".css";
+			var cssPrefix = "~/css/dist";
+			var cssSuffix = ".css";
 
-            var jsPrefix = "~/js/src";
-            var jsSuffix = ".js";
+			var jsPrefix = "~/js/src";
+			var jsSuffix = ".js";
 #else
-            //var cssPrefix = "~/css/dist";
-            //var cssSuffix = ".min.css";
-
-            //var jsPrefix = "~/js/dist";
-            //var jsSuffix = ".min.js";
-            
             var cssPrefix = "~/css/dist";
             var cssSuffix = ".css";
 
-            var jsPrefix = "~/js/src";
-            var jsSuffix = ".js";
+            var jsPrefix = "~/js/dist";
+            var jsSuffix = ".min.js";
 #endif
 
-            //
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //
-            // Styles
-            //
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //
+			//
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//
+			// Styles
+			//
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//
 
-            bundles.Add(new StyleBundle("~/bundles/css/fonts")
+			bundles.Add(new StyleBundle("~/bundles/css/fonts")
                 .Include($"{cssPrefix}/fonts/fonts{cssSuffix}", cssTransforms));
 
             bundles.Add(new StyleBundle("~/bundles/css/font-awesome")
