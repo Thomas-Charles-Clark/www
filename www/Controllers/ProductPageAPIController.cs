@@ -18,6 +18,8 @@ using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using NLog;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,8 +54,10 @@ using static Antlr.Runtime.Tree.TreeWizard;
 namespace wwwDesignersGuild.Controllers
 {
     public class ProductPageAPIController : ApiController
-    {
-        [HttpPost]
+	{
+		private static Logger Logger = LogManager.GetCurrentClassLogger();
+
+		[HttpPost]
         public async Task<IHttpActionResult> fetchModuleDetail([FromBody] PassModuleOption module)
         {
             var useDate = Framework.GetUseDate(new HttpRequestWrapper(HttpContext.Current.Request));
@@ -156,6 +160,8 @@ namespace wwwDesignersGuild.Controllers
 		[HttpPost]
 		public async Task<IHttpActionResult> FetchProductPageGridPortion([FromBody]ProductPageGrid_PagingDTO dto)
 		{
+			Logger.Log(LogLevel.Debug, "FetchProductPageGridPortion was called:\r\n\r\n{0}", dto);
+
 			var session = HttpContext.Current.Session;
 
 			Int32? memberId = null;

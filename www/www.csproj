@@ -34,7 +34,7 @@
     </NuGetPackageImportStamp>
     <Use64BitIISExpress>true</Use64BitIISExpress>
     <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
-	<CleanWPPTargets>True</CleanWPPTargets>
+    <CleanWPPTargets>True</CleanWPPTargets>
     <UseSharedCompilation>False</UseSharedCompilation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -3274,9 +3274,6 @@
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\PaymentSections\_PaymentApple.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Checkout\AddressSections\_AddressApple.cshtml" />
     <Content Include="Views-New\LandingPages\PageSections\_ProductPageGrid_AttributeGroup.cshtml" />
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Web.Development.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -3284,9 +3281,6 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Web.Production.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views-New\Shared\_TradeLoginPrompt.cshtml" />

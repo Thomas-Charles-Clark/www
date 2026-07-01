@@ -2,10 +2,16 @@
 
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
+
+using MertexerV2.Models;
 using MertexerV2.Models.Accounts;
 using MertexerV2SQL.Accounts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+using NLog;
+using NLog.Fluent;
+
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -27,6 +33,7 @@ using wwwDesignersGuild.Models.Country;
 using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.JsonLD;
+using wwwDesignersGuild.Models.LandingPage;
 using wwwDesignersGuild.Models.ProductPage;
 using wwwDesignersGuild.Models.Resource;
 using wwwDesignersGuild.Models.ResourceFetch;
@@ -41,8 +48,10 @@ using wwwDesignersGuild.ViewModels.Trade;
 namespace wwwDesignersGuild.Controllers
 {
     public class GeneralAPIController : ApiController
-    {
-        [HttpPost]
+	{
+		private static Logger Logger = LogManager.GetCurrentClassLogger();
+
+		[HttpPost]
         public async Task<IHttpActionResult> addressSearch([FromBody]PassPCAPredictFind objSearch)
         {
             var loginCheck = dgFramework.ensureMemberLoginWebApi(HttpContext.Current.Session, false);
@@ -552,19 +561,79 @@ namespace wwwDesignersGuild.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> FetchProductPageGridDefinition([FromBody] PassProductPageGridDefinitionFetch dto)
 		{
+			var session = HttpContext.Current.Session;
+
+			int? memberId = null;
+
+			if (session["memberIdFromDatabase"] == null)
+			{
+
+			}
+			else
+			{
+				memberId = Convert.ToInt32(session["memberIdFromDatabase"].ToString());
+			}
+
+			int? tradeAccountId = null;
+
+			if (HttpContext.Current.Session["memberTradeAccountID"] != null)
+			{
+				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
+			}
 			var requestWrapper = new HttpRequestWrapper(HttpContext.Current.Request);
 
-			var useDate = Framework.GetUseDate(requestWrapper);
+            var useDate = Framework.GetUseDate(requestWrapper);
 
-			var cacheProvider = new ProductPageGridPageSectionCacheProvider();
+            var cacheProvider = new ProductPageGridPageSectionCacheProvider();
 
             var result = cacheProvider.Get(
-                pageSectionId: dto.pageSectionId, 
+                pageSectionId: dto.pageSectionId,
                 languageId: dto.languageId,
                 countryId: dto.countryId,
-                tradeAccountId: (int?)HttpContext.Current.Session["memberTradeAccountID"], 
+                tradeAccountId: (int?)HttpContext.Current.Session["memberTradeAccountID"],
                 countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                 useDate: useDate);
+
+            if (result == null)
+			{
+				var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+
+				var Definition = await new cmsLandingPage().loadLandingPageFromCms(
+					memberId: memberId,
+					pageId: dto.MasterDefinition.UrlBreakdown.ContentId,
+					languageId: dto.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+					countryId: dto.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+					useDate: dto.MasterDefinition.UrlBreakdown.ContentDate,
+					isMember: memberId.HasValue,
+					isTrade: dto.MasterDefinition.TradeMember,
+					countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+					displayTradePrice: displayTradePrice,
+					tradeAccountId: tradeAccountId,
+					productPageGridPage: dto.page,
+					productPageGridPageSize: dto.pageSize);
+
+				result = await ProductPageGridPageSection.CreateAsync(
+					originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
+					productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.pageSectionId),
+					pagingEnabled: true,
+					filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+					isShop: Definition.PageDetails.IsShop,
+					isLifestyleGallery: false,
+					model: dto.@base
+				);
+
+				Logger.Log(LogLevel.Warn, "FetchProductPageGridDefinition would've returned NULL;\r\nProductPageGridPageSection.CreateAsync had to be called:\r\n\r\n{0}", dto);
+
+				cacheProvider.Set(
+					result.PageSectionID,
+					dto.languageId,
+					dto.countryId,
+					tradeAccountId,
+					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+					dto.MasterDefinition.UrlBreakdown.ContentDate,
+					result
+				);
+			}
 
 			return Ok(result);
         }
