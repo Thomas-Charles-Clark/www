@@ -19,22 +19,17 @@ namespace wwwDesignersGuild.Models.Menu
 
         public async Task<cmsMenuDefinition> loadMenuFromCms(byte languageId, short countryId, DateTime useDate, bool isTrade)
         {
-
-            //  Is page in cache?
             cmsMenuDefinition menuStore;
-            MenuCacheProvider objMenuCache = new MenuCacheProvider();
-            menuStore = objMenuCache.Get(languageId, countryId, useDate, isTrade);
-            
-            if (menuStore == null)
-            {
-                menuStore = await Task.FromResult<cmsMenuDefinition>(loadMenuFromCmsDatabaseAsync(languageId, countryId, useDate, isTrade));
-                objMenuCache.Set(languageId, countryId, useDate, menuStore, isTrade);
-                menuStore.MenuLoadedFromCache = false;
-            }
-            else
-            {
-                menuStore.MenuLoadedFromCache = true;
-            }
+
+            var objMenuCache = new MenuCacheProvider();
+
+            menuStore = objMenuCache.GetOrCreate(languageId, countryId, useDate, isTrade, () => {
+
+                var result = Task.Run(() => loadMenuFromCmsDatabaseAsync(languageId, countryId, useDate, isTrade)).Result;
+
+                return result;
+
+            });
 
             menuStore.MobileMenuItems = menuStore.menuItems.Select(mi => new MobileMenuItem(mi)).ToList();
 

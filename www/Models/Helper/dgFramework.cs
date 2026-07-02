@@ -2013,30 +2013,29 @@ namespace wwwDesignersGuild.Models.Helper
                                                 "mobile")?.ToLowerInvariant();
 
 
-            MobileDetectionDefinition mobileDetectionResult = objMobileDetectionCache.Get(cloudflareDeviceTypeHeader);
+            var mobileDetectionResult = objMobileDetectionCache.GetOrCreate(cloudflareDeviceTypeHeader, () => { 
 
-            if (mobileDetectionResult == null)
-            {
-                mobileDetectionResult = new MobileDetectionDefinition()
-                {
-                    IsTablet = false,
-                    IsMobile = false,
-                    IsAppleDevice = false
-                };
+                var result = new MobileDetectionDefinition()
+				{
+					IsTablet = false,
+					IsMobile = false,
+					IsAppleDevice = false
+				};
 
-                switch (cloudflareDeviceTypeHeader?.ToLowerInvariant())
-                {
-                    case "desktop":
-                        // nothing to do
-                        break;
-                    case "tablet":
-                    case "mobile":
-                        mobileDetectionResult.IsMobile = true;
-                        break;
-                }
-            }
-            //if (Convert.ToBoolean(WebConfigurationManager.AppSettings["productionVersion"]) == false)
-            //    mobileDetectionResult.IsMobile = true;
+				switch (cloudflareDeviceTypeHeader?.ToLowerInvariant())
+				{
+					case "desktop":
+						// nothing to do
+						break;
+					case "tablet":
+					case "mobile":
+						result.IsMobile = true;
+						break;
+				}
+
+                return result;
+
+			});
 
             return mobileDetectionResult;
         }

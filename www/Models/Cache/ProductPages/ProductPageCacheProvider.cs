@@ -7,163 +7,184 @@ using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Interface;
 using wwwDesignersGuild.Models.Database;
 using System.Web.Configuration;
+using System.Diagnostics;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-    public class ProductPageCacheProvider : ICacheProductPageProvider
+    public class ProductPageCacheProvider
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsProductPageDefinition Get(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
-            return (cmsProductPageDefinition)Cache[key];
-        }
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public void Set(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate, cmsProductPageDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool cacheEnabled);
+		public cmsProductPageDefinition GetOrCreate(
+			int productPageId,
+            byte languageId,
+            short countryId,
+            bool tradeSwitch,
+            bool? platformSwitch,
+            DateTime useDate,
+			Func<cmsProductPageDefinition> factory)
+		{
+			var key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsProductPageDefinition)Cache[key];
 
-                var key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
+			if (data != null)
+				return data;
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsProductPageDefinition)Cache[key];
+				if (data != null)
+					return data;
 
-        public void ExplicitSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate, cmsProductPageDefinition data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
+				// Execute the creation block passed by the caller
+				data = factory();
 
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-        public bool IsSet(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
-            return (Cache[key] != null);
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
-        public void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
-            Cache.Remove(key);
-        }
-
+			return data;
+		}
 
         private string buildKey(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
             return $"PRODUCTPAGE~{productPageId}~{languageId}~{countryId}~{tradeSwitch}~{platformSwitch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
         }
 
+        public DatabaseJSONResponse GetOrCreateTechInfo(
+			int productPageId,
+            byte languageId,
+            short countryId,
+            DateTime useDate,
+            Func<DatabaseJSONResponse> factory
+			)
+		{
+			var key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
 
+			// Fast path: Try to get existing cache without locking
+			var data = (DatabaseJSONResponse)Cache[key];
 
-        public DatabaseJSONResponse GetTechInfo(int productPageId, byte languageId, short countryId, DateTime useDate)
+			if (data != null)
+				return data;
+
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (DatabaseJSONResponse)Cache[key];
+				if (data != null)
+					return data;
+
+				// Execute the creation block passed by the caller
+				data = factory();
+
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["menuCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["menuCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
+		}
+
+		private string buildTechInfoKey(int productPageId, byte languageId, short countryId, DateTime useDate)
+		{
+			return $"TECHINFO~{productPageId}~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
+
+        public DatabaseJSONResponse GetOrCreateModularInfo(
+			int productPageId,
+			byte languageId,
+			short countryId,
+			DateTime useDate,
+			Func<DatabaseJSONResponse> factory)
         {
-            String key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
-            return (DatabaseJSONResponse)Cache[key];
-        }
+			var key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
 
-        public void SetTechInfo(int productPageId, byte languageId, short countryId, DateTime useDate, DatabaseJSONResponse data, Int16 CacheTimeMinutes)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(CacheTimeMinutes)
-            };
+			// Fast path: Try to get existing cache without locking
+			var data = (DatabaseJSONResponse)Cache[key];
 
-            String key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+			if (data != null)
+				return data;
 
-        public void ExplicitSetTechInfo(int productPageId, byte languageId, short countryId, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (DatabaseJSONResponse)Cache[key];
+				if (data != null)
+					return data;
 
-            String key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+				// Execute the creation block passed by the caller
+				data = factory();
 
-        public bool IsTechInfoSet(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
-            return (Cache[key] != null);
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["menuCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-        public void InvalidateTechInfo(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildTechInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Remove(key);
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["menuCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
-        private string buildTechInfoKey(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            return $"TECHINFO~{productPageId}~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-        }
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
+			return data;
+		}
 
+		private string buildModularInfoKey(int productPageId, byte languageId, short countryId, DateTime useDate)
+		{
+			return $"MODULARDATA~{productPageId}~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
 
-        public DatabaseJSONResponse GetModularInfo(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
-            return (DatabaseJSONResponse)Cache[key];
-        }
-
-        public void SetModularInfo(int productPageId, byte languageId, short countryId, DateTime useDate, DatabaseJSONResponse data, Int16 CacheTimeMinutes)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(CacheTimeMinutes)
-            };
-
-            String key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
-
-        public void ExplicitSetModularInfo(int productPageId, byte languageId, short countryId, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
-
-            String key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
-
-        public bool IsModularInfoSet(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
-            return (Cache[key] != null);
-        }
-
-        public void InvalidateModularInfo(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildModularInfoKey(productPageId, languageId, countryId, useDate);
-            Cache.Remove(key);
-        }
-
-        private string buildModularInfoKey(int productPageId, byte languageId, short countryId, DateTime useDate)
-        {
-            return $"MODULARDATA~{productPageId}~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-        }
-    }
+		public void Invalidate(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
+		{
+			lock (_syncLock)
+			{
+				Cache.Remove(buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate));
+				Cache.Remove(buildTechInfoKey(productPageId, languageId, countryId, useDate));
+				Cache.Remove(buildModularInfoKey(productPageId, languageId, countryId, useDate));
+			}
+		}
+	}
 }

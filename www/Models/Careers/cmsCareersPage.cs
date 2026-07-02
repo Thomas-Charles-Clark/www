@@ -18,13 +18,14 @@ namespace wwwDesignersGuild.Models.Careers
         {
             // Is page in cache?
             var objCareersPageCache = new CareersPageCacheProvider();
-            var careersPageStore = objCareersPageCache.Get(languageId, countryId, useDate);
 
-            if (careersPageStore == null)
-            {
-                careersPageStore = await Task.FromResult<cmsCareersPageDefinition>(loadCareersPageFromCmsDatabase(languageId, countryId, useDate));
-                objCareersPageCache.Set(languageId, countryId, useDate, careersPageStore);
-            }
+            var careersPageStore = objCareersPageCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadCareersPageFromCmsDatabase(languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return careersPageStore;
         }

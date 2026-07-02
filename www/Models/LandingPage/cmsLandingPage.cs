@@ -20,23 +20,19 @@ namespace wwwDesignersGuild.Models.LandingPage
     {
         public async Task<byte?> loadSiteSectionFromCms(int pageId, DateTime useDate)
         {
-            byte? result = null;
+            byte? siteSectionId = null;
 
             var cache = new SiteSectionCacheProvider();
              
-            result = cache.Get(pageId, useDate);
+            siteSectionId = cache.GetOrCreate(pageId, useDate, () => {
 
-            if (result == null) // neat trick! all landing pages have a site section, so this stands.
-            {
-                result = await Task.FromResult(loadSiteSectionFromCmsDatabase(pageId));
+                var result = Task.Run(() => loadSiteSectionFromCmsDatabase(pageId)).Result;
 
-                if (result != null)
-                {
-                    cache.Set(pageId, useDate, result);
-                }
-            }
+                return result;
 
-            return result;
+            });
+
+            return siteSectionId;
         }
         
         private byte? loadSiteSectionFromCmsDatabase(int pageId)
@@ -53,22 +49,10 @@ namespace wwwDesignersGuild.Models.LandingPage
             cmsLandingPageDefinition landingPageStore;
             LandingPageCacheProvider objLandingPageCache = new LandingPageCacheProvider();
             
-            landingPageStore = objLandingPageCache.Get(pageId, languageId, countryId, useDate, isTrade);
-
-            if (landingPageStore == null)
-            {
-                landingPageStore = await Task.FromResult(loadLandingPageFromCmsDatabase(memberId, pageId, languageId, countryId, useDate, isMember, isTrade, displayTradePrice, tradeAccountId));
-
-                var stockStatus = new cmsStockStatus();
-                var stockStatuses = await stockStatus.loadStockStatusesFromCms(languageId, countryId, useDate);
-
-                //landingPageStore.pageSectionProductPages.ForEach(c => 
-                //{
-                //    c.StockStatus = stockStatuses.StockStatuses.Where(p => p.StockStatusID == c.StockStatusID).SingleOrDefault()?.StockStatus;
-                //});
-            
-                objLandingPageCache.Set(pageId, languageId, countryId, useDate, isTrade, landingPageStore);
-            }
+            landingPageStore = objLandingPageCache.GetOrCreate(pageId, languageId, countryId, useDate, isTrade, () => {
+                var result = Task.Run(() => loadLandingPageFromCmsDatabase(memberId, pageId, languageId, countryId, useDate, isMember, isTrade, displayTradePrice, tradeAccountId)).Result;
+                return result;
+            });
 
             // so with the product page grid section page section ids...
             var productPageGridSections = landingPageStore.pageSectionSelects.Where(p => p.PageSectionTypeID == 4).Select(p => p.PageSectionID).ToList();
@@ -79,14 +63,13 @@ namespace wwwDesignersGuild.Models.LandingPage
 
             foreach (var pageSectionId in productPageGridSections)
             {
-                var ppg = ppgCache.Get(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate);
+                var ppg = ppgCache.GetOrCreate(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, () => {
 
-                if (ppg == null)
-                {
-                    ppg = await Task.FromResult(loadProductPageGridFromCmsDatabase(pageSectionId, memberId, languageId, countryId, tradeAccountId, countryMatch, displayTradePrice, useDate));
+                    var result = Task.Run(() => loadProductPageGridFromCmsDatabase(pageSectionId, memberId, languageId, countryId, tradeAccountId, countryMatch, displayTradePrice, useDate)).Result;
 
-                    ppgCache.Set(pageSectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppg);
-                }
+                    return result;
+
+                });
 
                 ppgs.Add(ppg);
             }

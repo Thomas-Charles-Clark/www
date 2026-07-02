@@ -18,13 +18,14 @@ namespace wwwDesignersGuild.Models
             cmsProductTypeOrderRestrictionDefinition productTypeOrderRestrictionStore;
             
             ProductTypeOrderRestrictionCacheProvider objProductTypeOrderRestrictionCache = new ProductTypeOrderRestrictionCacheProvider();
-            productTypeOrderRestrictionStore = objProductTypeOrderRestrictionCache.Get(memberTradeAccountId, languageId, countryId, useDate);
 
-            if (productTypeOrderRestrictionStore == null)
-            {
-                productTypeOrderRestrictionStore = await Task.FromResult<cmsProductTypeOrderRestrictionDefinition>(loadProductTypeOrderRestrictionFromCmsDatabase(memberTradeAccountId, languageId, countryId, useDate));
-                objProductTypeOrderRestrictionCache.Set(memberTradeAccountId, languageId, countryId, useDate, productTypeOrderRestrictionStore);
-            }
+            productTypeOrderRestrictionStore = objProductTypeOrderRestrictionCache.GetOrCreate(memberTradeAccountId, languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadProductTypeOrderRestrictionFromCmsDatabase(memberTradeAccountId, languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return productTypeOrderRestrictionStore;
         }

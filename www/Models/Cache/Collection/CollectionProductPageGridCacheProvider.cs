@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Configuration;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.Models.EmailCapturePopupForm;
 
 namespace wwwDesignersGuild.Models.Cache.Collection
 {
@@ -13,58 +14,58 @@ namespace wwwDesignersGuild.Models.Cache.Collection
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public PageSectionJSON Get(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
-            return (PageSectionJSON)Cache[key];
-        }
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public void Set(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["collectionProductPageGridCacheEnabled"], out bool cacheEnabled);
+		public PageSectionJSON GetOrCreate(
+			short collectionId,
+            byte languageId,
+            short countryId,
+            bool tradeSwitch,
+            int? tradeAccountId,
+            bool countryMatch,
+            DateTime useDate,
+			Func<PageSectionJSON> factory)
+		{
+			var key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["collectionProductPageGridCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Fast path: Try to get existing cache without locking
+			var data = (PageSectionJSON)Cache[key];
 
-                var key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
+			if (data != null)
+				return data;
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (PageSectionJSON)Cache[key];
+				if (data != null)
+					return data;
 
-        public void ExplicitSet(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
+				// Execute the creation block passed by the caller
+				data = factory();
 
-            String key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-        public bool IsSet(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
-            return (Cache[key] != null);
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
-        public void Invalidate(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(collectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
-            Cache.Remove(key);
-        }
-
+			return data;
+		}
 
         private string buildKey(short collectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {

@@ -16,16 +16,15 @@ namespace wwwDesignersGuild.Models.Search
     {
         public async Task<cmsSearchProductTypeDropDownDefinition> loadSearchProductTypeDropDownFromCms(short countryId, byte languageId, DateTime useDate)
         {
-            // Is list of elements in cache?
-            _ = new cmsSearchProductTypeDropDownDefinition();
-            SearchProductTypeDropDownCacheProvider objSearchProductTypeCache = new SearchProductTypeDropDownCacheProvider();
-            cmsSearchProductTypeDropDownDefinition objSearchProductTypes = objSearchProductTypeCache.Get(countryId, languageId, useDate);
+            var objSearchProductTypeCache = new SearchProductTypeDropDownCacheProvider();
 
-            if (objSearchProductTypes == null)
-            {
-                objSearchProductTypes = await Task.FromResult<cmsSearchProductTypeDropDownDefinition>(loadSearchProductTypeDropDownFromCmsDatabase(countryId, languageId, useDate));
-                objSearchProductTypeCache.Set(objSearchProductTypes, countryId, languageId);
-            }
+            var objSearchProductTypes = objSearchProductTypeCache.GetOrCreate(countryId, languageId, useDate, () => {
+                
+                var result = Task.Run(() => loadSearchProductTypeDropDownFromCmsDatabase(countryId, languageId, useDate)).Result;
+                
+                return result;
+
+            });
 
             return objSearchProductTypes;
         }

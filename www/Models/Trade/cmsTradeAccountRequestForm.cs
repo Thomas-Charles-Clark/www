@@ -15,18 +15,17 @@ namespace wwwDesignersGuild.Models.Trade
     {
         public async Task<TradeAccountRequestViewModel> loadTradeAccountRequestFormFromCms(BaseViewModel objBase)
         {
-
-            //  Is page in cache?
             TradeAccountRequestViewModel store;
-            TradeAccountRequestFormCacheProvider objTradeAccountRequestFormCache = new TradeAccountRequestFormCacheProvider();
-            store = objTradeAccountRequestFormCache.Get(objBase.CountryID, objBase.LanguageID, objBase.Date);
 
-            if (store == null)
-            {
-                store = await Task.FromResult<TradeAccountRequestViewModel>(loadTradeAccountRequestFormFromCmsDatabase(objBase));
+            var objTradeAccountRequestFormCache = new TradeAccountRequestFormCacheProvider();
 
-                objTradeAccountRequestFormCache.Set(objBase.CountryID, objBase.LanguageID, objBase.Date, store);
-            }
+            store = objTradeAccountRequestFormCache.GetOrCreate(objBase.CountryID, objBase.LanguageID, objBase.Date, () => {
+
+                var result = Task.Run(() => loadTradeAccountRequestFormFromCmsDatabase(objBase)).Result;
+
+                return result;
+
+            });
 
             return store;
         }

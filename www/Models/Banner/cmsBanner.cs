@@ -16,14 +16,14 @@ namespace wwwDesignersGuild.Models.Banner
         public async Task<cmsBannerDefinition> loadBannersFromCms(short countryId, byte languageId, DateTime useDate, bool isTrade, bool platformSwitch)
         {
             var objBannerCache = new BannerCacheProvider();
-            var bannerStore = objBannerCache.Get(countryId, languageId, useDate, isTrade, platformSwitch);
 
-            if (bannerStore == null)
-            {
-                bannerStore = await Task.FromResult(loadBannerFromCmsDatabase(countryId, languageId, useDate, isTrade, platformSwitch));
+            var bannerStore = objBannerCache.GetOrCreate(countryId, languageId, useDate, isTrade, platformSwitch, () => {
 
-                objBannerCache.Set(bannerStore, countryId, languageId, useDate, isTrade, platformSwitch);
-            }
+                var result = loadBannerFromCmsDatabase(countryId, languageId, useDate, isTrade, platformSwitch);
+
+                return result;
+
+			});
 
             return bannerStore;
         }

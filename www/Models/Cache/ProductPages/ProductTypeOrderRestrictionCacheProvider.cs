@@ -9,59 +9,71 @@ using wwwDesignersGuild.Models.Interface;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-    public class ProductTypeOrderRestrictionCacheProvider : ICacheProductTypeOrderRestrictionProvider
+    public class ProductTypeOrderRestrictionCacheProvider
     { 
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsProductTypeOrderRestrictionDefinition Get(Int32? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
+
+		public cmsProductTypeOrderRestrictionDefinition GetOrCreate(
+			int? memberTradeAccountId,
+            byte languageId,
+            short countryId,
+            DateTime useDate,
+			Func<cmsProductTypeOrderRestrictionDefinition> factory)
+		{
+			var key = buildKey(memberTradeAccountId, languageId, countryId, useDate);
+
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsProductTypeOrderRestrictionDefinition)Cache[key];
+
+			if (data != null)
+				return data;
+
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsProductTypeOrderRestrictionDefinition)Cache[key];
+				if (data != null)
+					return data;
+
+				// Execute the creation block passed by the caller
+				data = factory();
+
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
+		}
+
+		private string buildKey(int? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
+		{
+			return $"PRODUCT~TYPE~ORDER~RESTRICTION~{memberTradeAccountId}~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
+
+		public void Invalidate(int? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
         {
-            String key = buildKey(memberTradeAccountId, languageId, countryId, useDate);
-            return (cmsProductTypeOrderRestrictionDefinition)Cache[key];
-        }
-
-        public void Invalidate(Int32? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(memberTradeAccountId, languageId, countryId, useDate);
-            Cache.Remove(key);
-        }
-
-        public bool IsSet(Int32? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(memberTradeAccountId, languageId, countryId, useDate);
-            return (Cache[key] != null);
-        }
-
-        public void Set(Int32? memberTradeAccountId, byte languageId, short countryId, DateTime useDate, cmsProductTypeOrderRestrictionDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool cacheEnabled);
-
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
-
-                var key = buildKey(memberTradeAccountId, languageId, countryId, useDate);
-
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
-        
-        private string buildKey(Int32? memberTradeAccountId, byte languageId, short countryId, DateTime useDate)
-        {
-            return String.Format("PRODUCT~TYPE~ORDER~RESTRICTION~{0}~{1}~{2}~{3}~{4}~{5}",
-                                                                memberTradeAccountId,
-                                                                languageId,
-                                                                countryId,
-                                                                useDate.Year.ToString(),
-                                                                useDate.Month.ToString(),
-                                                                useDate.Day.ToString());
+            lock (_syncLock)
+			{
+				Cache.Remove(buildKey(memberTradeAccountId, languageId, countryId, useDate));
+			}
         }
     }
 }

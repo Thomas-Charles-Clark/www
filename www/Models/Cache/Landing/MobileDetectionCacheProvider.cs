@@ -9,53 +9,55 @@ using System.Web.Configuration;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-    public class MobileDetectionCacheProvider : ICacheMobileDetectionProvider
+    public class MobileDetectionCacheProvider
     {
-
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public MobileDetectionDefinition Get(String userAgent)
-        {
-            String key = userAgent;
-            return (MobileDetectionDefinition)Cache[key];
-        }
+		public MobileDetectionDefinition GetOrCreate(
+			string userAgent,
+			Func<MobileDetectionDefinition> factory)
+		{
+			var key = userAgent;
 
+			// Fast path: Try to get existing cache without locking
+			var data = (MobileDetectionDefinition)Cache[key];
 
-        public void Set(String userAgent, MobileDetectionDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
+			if (data != null)
+				return data;
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (MobileDetectionDefinition)Cache[key];
+				if (data != null)
+					return data;
 
-                Cache.Add(new CacheItem(userAgent, data), policy);
-            }
-        }
+				// Execute the creation block passed by the caller
+				data = factory();
 
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-        public bool IsSet(String userAgent)
-        {
-            String key = userAgent;
-            return (Cache[key] != null);
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
-        public void Invalidate(String userAgent)
-        {
-            String key = userAgent;
-            Cache.Remove(key);
-        }
-
+			return data;
+		}
     }
-
 }

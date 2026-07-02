@@ -7,6 +7,7 @@ using System.Web.Configuration;
 
 using U2.Data.ClientTypes;
 
+using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Hotspot;
 
 namespace wwwDesignersGuild.Models
@@ -15,44 +16,52 @@ namespace wwwDesignersGuild.Models
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsFilterIndexAttributeCombinationResult Get(PassFilterIndexAttributeCombinationCacheFetch objFetch)
-        {
-            return (cmsFilterIndexAttributeCombinationResult)Cache[buildKey(objFetch)];
-        }
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public void Set(PassFilterIndexAttributeCombinationCacheFetch objFetch, cmsFilterIndexAttributeCombinationResult data)
-        {
-            if (Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled))
-            {
-                if (cacheEnabled)
-                {
-                    var policy = new CacheItemPolicy();
+		public cmsFilterIndexAttributeCombinationResult GetOrCreate(
+			PassFilterIndexAttributeCombinationCacheFetch dto,
+			Func<cmsFilterIndexAttributeCombinationResult> factory)
+		{
+			var key = buildKey(dto);
 
-                    if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                    {
-                        policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                    }
-                    else
-                    {
-                        policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                    }
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsFilterIndexAttributeCombinationResult)Cache[key];
 
-                    var key = buildKey(objFetch);
+			if (data != null)
+				return data;
 
-                    Cache.Add(new CacheItem(key, data), policy);
-                }
-            }
-        }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsFilterIndexAttributeCombinationResult)Cache[key];
+				if (data != null)
+					return data;
 
-        public bool IsSet(PassFilterIndexAttributeCombinationCacheFetch objFetch)
-        {
-            return (Cache[buildKey(objFetch)] != null);
-        }
+				// Execute the creation block passed by the caller
+				data = factory();
 
-        public void Invalidate(PassFilterIndexAttributeCombinationCacheFetch objFetch)
-        {
-            Cache.Remove(buildKey(objFetch));
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
+		}
 
         private string buildKey(PassFilterIndexAttributeCombinationCacheFetch objFetch)
         {

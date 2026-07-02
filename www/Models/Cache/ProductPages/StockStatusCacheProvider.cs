@@ -9,58 +9,70 @@ using wwwDesignersGuild.Models.Interface;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-    public class StockStatusCacheProvider : ICacheStockStatusProvider
+    public class StockStatusCacheProvider
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsStockStatusDefinition Get(byte languageId, short countryId, DateTime useDate)
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
+
+		public cmsStockStatusDefinition GetOrCreate(
+			byte languageId,
+            short countryId,
+            DateTime useDate,
+			Func<cmsStockStatusDefinition> factory)
+		{
+			var key = buildKey(languageId, countryId, useDate);
+
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsStockStatusDefinition)Cache[key];
+
+			if (data != null)
+				return data;
+
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsStockStatusDefinition)Cache[key];
+				if (data != null)
+					return data;
+
+				// Execute the creation block passed by the caller
+				data = factory();
+
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
+		}
+
+		private string buildKey(byte languageId, short countryId, DateTime useDate)
+		{
+			return $"STOCK~STATUS~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
+
+		public void Invalidate(byte languageId, short countryId, DateTime useDate)
         {
-            String key = buildKey(languageId, countryId, useDate);
-            return (cmsStockStatusDefinition)Cache[key];
-        }
-
-        public void Invalidate(byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(languageId, countryId, useDate);
-            Cache.Remove(key);
-        }
-
-        public bool IsSet(byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(languageId, countryId, useDate);
-            return (Cache[key] != null);
-        }
-
-        public void Set(byte languageId, short countryId, DateTime useDate, cmsStockStatusDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool cacheEnabled);
-
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
-
-                var key = buildKey(languageId, countryId, useDate);
-
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
-
-        private string buildKey(byte languageId, short countryId, DateTime useDate)
-        {
-            return String.Format("STOCK~STATUS~{0}~{1}~{2}~{3}~{4}",
-                                                                languageId.ToString(),
-                                                                countryId.ToString(),
-                                                                useDate.Year.ToString(),
-                                                                useDate.Month.ToString(),
-                                                                useDate.Day.ToString());
+            lock(_syncLock)
+			{
+				Cache.Remove(buildKey(languageId, countryId, useDate));
+			}
         }
     }
 }

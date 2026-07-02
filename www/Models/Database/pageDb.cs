@@ -3,6 +3,7 @@ using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using System.Reflection;
 using wwwDesignersGuild.Models.Classes;
+using wwwDesignersGuild.Models.Redirect;
 using wwwDesignersGuild.Models.Redirects;
 
 namespace wwwDesignersGuild.Models.Database

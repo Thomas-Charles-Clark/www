@@ -470,7 +470,9 @@
     <Compile Include="Models\Basket\Basket.cs" />
     <Compile Include="Models\BootstrapBreakpoint\BootstrapBreakpoint.cs" />
     <Compile Include="Models\Breadcrumb\Breadcrumb.cs" />
+    <Compile Include="Models\Cache\Collection\CollectionProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\General\HotspotCacheProvider.cs" />
+    <Compile Include="Models\Cache\Landing\SiteSectionCacheProvider.cs" />
     <Compile Include="Models\Careers\Careers.cs" />
     <Compile Include="Models\Checkout\Checkout.cs" />
     <Compile Include="Models\ClientError\ClientError.cs" />
@@ -513,6 +515,7 @@
     <Compile Include="Models\ModularFurniture\ModuleOption.cs" />
     <Compile Include="Models\ModularFurniture\PassModuleOption.cs" />
     <Compile Include="Models\Moodboard\Moodboard.cs" />
+    <Compile Include="Models\OrderForm\cmsOrderForm.cs" />
     <Compile Include="Models\OrderForm\OrderFormCacheProvider.cs" />
     <Compile Include="Models\OrderHistory\OrderHistory.cs" />
     <Compile Include="Models\ProductPage\AttributeGroupGroup.cs" />
@@ -526,7 +529,10 @@
     <Compile Include="Models\ProductPage\ProductPageAttribute.cs" />
     <Compile Include="Models\ProductPage\ProductPageRelatedSearch.cs" />
     <Compile Include="Models\ProductPage\ProductType.cs" />
-    <Compile Include="Models\Redirect\Redirects.cs" />
+    <Compile Include="Models\Redirect\RedirectCacheProvider.cs" />
+    <Compile Include="Models\Redirect\RedirectDefinition.cs" />
+    <Compile Include="Models\Redirect\RedirectRepository.cs" />
+    <Compile Include="Models\Redirect\RedirectSelectResult.cs" />
     <Compile Include="Models\RelatedProductPage\RelatedProductPage.cs" />
     <Compile Include="Models\AlternateColourway\AlternateColourway.cs" />
     <Compile Include="Models\ArticlePage\cmsArticlePage.cs" />
@@ -537,7 +543,6 @@
     <Compile Include="Models\Banner\cmsBanner.cs" />
     <Compile Include="Models\BraintreeErrorResponse\cmsBraintreeErrorResponse.cs" />
     <Compile Include="Models\Cache\Banners\BannerCacheProvider.cs" />
-    <Compile Include="Models\Cache\Collection\CollectionProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\General\DotDigitalTrackingBehaviourCacheProvider.cs" />
     <Compile Include="Models\Cache\General\ScrapbookCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\ArticlePageCacheProvider.cs" />
@@ -549,7 +554,6 @@
     <Compile Include="Models\Cache\Landing\CountryCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\CountryDropDownCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\EmailCapturePopupFormCacheProvider.cs" />
-    <Compile Include="Models\Cache\Landing\ImageCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\LandingPageCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\LifestyleGalleryPopupCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\MobileDetectionCacheProvider.cs" />
@@ -559,7 +563,6 @@
     <Compile Include="Models\Cache\Landing\UnsubscribePageCacheProvider.cs" />
     <Compile Include="Models\Cache\Menus\MenuCacheProvider.cs" />
     <Compile Include="Models\Cache\ProductPages\AttributeCacheProvider.cs" />
-    <Compile Include="Models\Cache\ProductPages\CollectionProductPageCacheProvider.cs" />
     <Compile Include="Models\Cache\ProductPages\ProductPageCacheProvider.cs" />
     <Compile Include="Models\Cache\ProductPages\ProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\ProductPages\ProductTypeOrderRestrictionCacheProvider.cs" />
@@ -601,23 +604,16 @@
     <Compile Include="Models\Helper\PrettyXML.cs" />
     <Compile Include="Models\Helper\ReturnToLoginJumpViewModel.cs" />
     <Compile Include="Models\Helper\TradeAccountContactHelper.cs" />
-    <Compile Include="Models\Interface\ICacheArticlePageProvider.cs" />
     <Compile Include="Models\Interface\ICacheBannerProvider.cs" />
-    <Compile Include="Models\Interface\ICacheEmailCapturePopupFormProvider.cs" />
-    <Compile Include="Models\Interface\ICacheBraintreeErrorResponseProvider.cs" />
     <Compile Include="Models\Interface\ICacheUnsubscribePageProvider.cs" />
     <Compile Include="Models\Interface\ICacheTradeAccountRequestFormProvider.cs" />
     <Compile Include="Models\Interface\ICacheMobileDetectionProvider.cs" />
     <Compile Include="Models\Interface\ICacheResourceProvider.cs" />
-    <Compile Include="Models\Interface\ICacheArticleTypeProvider.cs" />
-    <Compile Include="Models\Interface\ICacheCareersPageProvider.cs" />
-    <Compile Include="Models\Interface\ICacheCountryDropDownProvider.cs" />
     <Compile Include="Models\Interface\ICacheLifestyleGalleryPopupProvider.cs" />
     <Compile Include="Models\Interface\ICacheSearchProductTypeDropDownProvider.cs" />
     <Compile Include="Models\Interface\ICacheSnippetProvider.cs" />
     <Compile Include="Models\Interface\ICacheStockStatusProvider.cs" />
     <Compile Include="Models\Interface\ICheckout.cs" />
-    <Compile Include="Models\Interface\ICmsArticlePageRepository.cs" />
     <Compile Include="Models\Interface\ICmsArticleSubTypeRepository.cs" />
     <Compile Include="Models\Interface\ICacheProductTypeOrderRestrictionProvider.cs" />
     <Compile Include="Models\Interface\ICmsBannerRepository.cs" />
@@ -643,6 +639,7 @@
     <Compile Include="Models\Returns\EncryptedOrderIdentifier.cs" />
     <Compile Include="Models\Returns\Return.cs" />
     <Compile Include="Models\SearchRender\PassSearchRender.cs" />
+    <Compile Include="Models\Search\cmsSearch.cs" />
     <Compile Include="Models\Search\searchCacheProvider.cs" />
     <Compile Include="Models\Snippet\Snippet.cs" />
     <Compile Include="Models\Source\FormSourceGroup.cs" />
@@ -695,7 +692,6 @@
     <Compile Include="Models\Basket\basketRoutines.cs" />
     <Compile Include="Models\Classes\classDefinition.cs" />
     <Compile Include="Models\CollectionPage\cmsCollectionPage.cs" />
-    <Compile Include="Models\CollectionProductPage\cmsCollectionProductPage.cs" />
     <Compile Include="Models\Country\cmsCountry.cs" />
     <Compile Include="Models\Database\visitorDb.cs" />
     <Compile Include="Models\Database\attributeDb.cs" />
@@ -720,15 +716,11 @@
     <Compile Include="Models\Interface\IVisitor.cs" />
     <Compile Include="Models\Interface\IBasket.cs" />
     <Compile Include="Models\Interface\ICacheAttributeProvider.cs" />
-    <Compile Include="Models\Interface\ICacheCollectionPageProvider.cs" />
     <Compile Include="Models\Interface\ICacheCollectionProductPageProvider.cs" />
-    <Compile Include="Models\Interface\ICacheCountryProvider.cs" />
-    <Compile Include="Models\Interface\ICacheImageProvider.cs" />
     <Compile Include="Models\Interface\ICacheLandingPageProvider.cs" />
     <Compile Include="Models\Interface\ICacheMenuProvider.cs" />
     <Compile Include="Models\Interface\ICacheProductPageProvider.cs" />
     <Compile Include="Models\Interface\ICmsAttributeRepository.cs" />
-    <Compile Include="Models\Interface\ICmsCollectionPageRepository.cs" />
     <Compile Include="Models\Interface\ICmsCollectionProductPageRepository.cs" />
     <Compile Include="Models\Interface\ICmsCountryRepository.cs" />
     <Compile Include="Models\Interface\ICmsLandingPageRepository.cs" />
@@ -3012,6 +3004,7 @@
     <Content Include="Content\images\social\pinterest-logo.webp" />
     <Content Include="Content\images\social\tiktok-logo.webp" />
     <Content Include="Content\images\social\youtube-logo.webp" />
+    <None Include="Properties\PublishProfiles\Local IIS Dev.pubxml" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -3244,6 +3237,9 @@
     <Content Include="Views-New\Shared\_404.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleansePositive.cshtml" />
     <Content Include="Views-New\LandingPages\FixedPages\Member\_DotDigitalDataCleanseNegative.cshtml" />
+    <None Include="Web.local.www.dev.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Database\database.dbml">
@@ -3405,6 +3401,35 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Production|x86'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'local.www.dev|x64'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'local.www.dev|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'local.www.dev|x86'">
     <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>

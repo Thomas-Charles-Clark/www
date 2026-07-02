@@ -19,17 +19,17 @@ namespace wwwDesignersGuild.Models.Snippet
 
         public async Task<cmsSnippetDefinition> loadSnippetFromCms(byte languageId, short countryId, int? tradeAccountId, bool displayTradePrices, DateTime useDate)
         {
-
-            //  Is page in cache?
             cmsSnippetDefinition snippetStore;
-            SnippetCacheProvider objSnippetCache = new SnippetCacheProvider();
-            snippetStore = objSnippetCache.Get(languageId, countryId, useDate);
 
-            if (snippetStore == null)
-            {
-                snippetStore = await Task.FromResult<cmsSnippetDefinition>(loadSnippetFromCmsDatabaseAsync(languageId, countryId, tradeAccountId, displayTradePrices, useDate));
-                objSnippetCache.Set(languageId, countryId, useDate, snippetStore);
-            }
+            var objSnippetCache = new SnippetCacheProvider();
+
+            snippetStore = objSnippetCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadSnippetFromCmsDatabaseAsync(languageId, countryId, tradeAccountId, displayTradePrices, useDate)).Result;
+
+                return result;
+
+            });
 
             return snippetStore;
 

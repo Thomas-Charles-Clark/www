@@ -17,13 +17,14 @@ namespace wwwDesignersGuild.Models.BraintreeErrorResponse
             // Is page in cache?
             var btStore = new cmsBraintreeErrorResponseDefinition();
             var btCache = new BraintreeErrorResponseCacheProvider();
-            btStore.errorResponseSelects = btCache.Get(languageId, useDate);
 
-            if (btStore.errorResponseSelects == null)
-            {
-                btStore = await Task.FromResult<cmsBraintreeErrorResponseDefinition>(loadBraintreeErrorResponsesFromCmsDatabase(languageId, useDate));
-                btCache.Set(languageId, useDate, btStore.errorResponseSelects);
-            }
+            btStore.errorResponseSelects = (List<braintreeErrorResponseSelect>)btCache.GetOrCreate(languageId, useDate, () => {
+
+                var result = Task.Run(() => loadBraintreeErrorResponsesFromCmsDatabase(languageId, useDate)).Result;
+
+                return result.errorResponseSelects;
+
+			});
 
             return btStore;
         }

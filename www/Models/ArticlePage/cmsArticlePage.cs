@@ -13,34 +13,22 @@ using NLog;
 
 namespace wwwDesignersGuild.Models.ArticlePage
 {
-    public class cmsArticlePage : ICmsArticlePageRepository
+    public class cmsArticlePage
     {
-        private static Logger Logger = LogManager.GetCurrentClassLogger();
-
         public async Task<cmsArticlePageDefinition> loadArticlePageFromCms(int articleId, byte languageId, short countryId, DateTime useDate)
         {
             // Is page in cache?
             cmsArticlePageDefinition articlePageStore;
+
             ArticlePageCacheProvider objArticlePageCache = new ArticlePageCacheProvider();
-            articlePageStore = objArticlePageCache.Get(articleId, languageId, countryId, useDate);
 
-            if (articlePageStore == null)
-            {
-                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["extraRequestTracing"]))
-                {
-                    //Logger.Trace($"NOT CACHED: ArticleID: {articleId}, FROM {ip}, LanguageID: {languageId}, CountryID: {countryId}, useDate: {useDate}");
-                }
+            articlePageStore = objArticlePageCache.GetOrCreate(articleId, languageId, countryId, useDate, () => {
 
-                articlePageStore = await Task.FromResult<cmsArticlePageDefinition>(loadArticlePageFromCmsDatabase(articleId, languageId, countryId, useDate));
-                objArticlePageCache.Set(articleId, languageId, countryId, useDate, articlePageStore);
-            }
-            else
-            {
-                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["extraRequestTracing"]))
-                {
-                    //Logger.Trace($"FOUND IN CACHE: ArticleID: {articleId}, FROM {ip}, LanguageID: {languageId}, CountryID: {countryId}, useDate: {useDate}");
-                }
-            }
+				var result = Task.Run(() => loadArticlePageFromCmsDatabase(articleId, languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return articlePageStore;
         }

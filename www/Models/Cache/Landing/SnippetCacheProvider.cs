@@ -9,70 +9,70 @@ using System.Web.Configuration;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-
-
-    public class SnippetCacheProvider : ICacheSnippetProvider
+    public class SnippetCacheProvider
     {
-
-
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public cmsSnippetDefinition Get(byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(languageId, countryId, useDate);
-            return (cmsSnippetDefinition)Cache[key];
-        }
+		public cmsSnippetDefinition GetOrCreate(
+			byte languageId,
+            short countryId,
+            DateTime useDate,
+			Func<cmsSnippetDefinition> factory)
+		{
+			var key = buildKey(languageId, countryId, useDate);
 
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsSnippetDefinition)Cache[key];
 
-        public void Set(byte languageId, short countryId, DateTime useDate, cmsSnippetDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
+			if (data != null)
+				return data;
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsSnippetDefinition)Cache[key];
+				if (data != null)
+					return data;
 
-                var key = buildKey(languageId, countryId, useDate);
+				// Execute the creation block passed by the caller
+				data = factory();
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
-        public bool IsSet(byte languageId, short countryId, DateTime useDate)
-        {
-            String key = buildKey(languageId, countryId, useDate);
-            return (Cache[key] != null);
-        }
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
+			return data;
+		}
 
         public void Invalidate(byte languageId, short countryId, DateTime useDate)
         {
-            String key = buildKey(languageId, countryId, useDate);
-            Cache.Remove(key);
+			lock (_syncLock)
+			{
+				Cache.Remove(buildKey(languageId, countryId, useDate));
+			}
         }
-
 
         private string buildKey(byte languageId, short countryId, DateTime useDate)
         {
-            return String.Format("SNIPPET~{0}~{1}~{2}~{3}~{4}", languageId.ToString(),
-                                                                        countryId.ToString(),
-                                                                        useDate.Year.ToString(),
-                                                                        useDate.Month.ToString(),
-                                                                        useDate.Day.ToString());
+			return $"SNIPPET~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
         }
-
-
     }
-
-
 }

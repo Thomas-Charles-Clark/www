@@ -251,7 +251,7 @@
                                 class="btn btn-light where-to-buy"
                                 onclick="window.parent.postMessage({
                                     hide: 'quick-look-modal',
-                                    navigateTo: '@dgFramework.buildUrl(dgContentType.productPage, Model.ProductPageID, cd, null, null, null, Model.URLKeywords, null)'
+                                    navigateTo: '@dgFramework.buildUrl(dgContentType.productPage, Model.ProductPageID, cd, null, null, null, Model.URLKeywords, null).Replace("?lifestyle=1", "")'
                                 })">
                             @HtmlHelperExtra.Resource("LifestyleGalleryBuyOnline", l, c, d)
                         </button>

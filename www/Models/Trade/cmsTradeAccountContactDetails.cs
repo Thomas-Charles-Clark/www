@@ -12,17 +12,17 @@ namespace wwwDesignersGuild.Models.Trade
     {
         public async Task<DatabaseJSONResponse> loadTradeAccountContactDetailsFromCms(int tradeAccountId, byte languageId, string departmentId)
         {
-            _ = new DatabaseJSONResponse();
             var objCache = new ContactDetailsCacheProvider();
-            DatabaseJSONResponse result = objCache.Get(tradeAccountId, languageId, departmentId);
 
-            if (result == null)
-            {
-                result = await Task.FromResult<DatabaseJSONResponse>(loadTradeAccountContactDetailsFromDatabase(tradeAccountId, languageId, departmentId));
-                objCache.Set(tradeAccountId, languageId, departmentId, result);
-            }
+            DatabaseJSONResponse contactDetails = objCache.GetOrCreate(tradeAccountId, languageId, departmentId, () => {
 
-            return result;
+                var result = Task.Run(() => loadTradeAccountContactDetailsFromDatabase(tradeAccountId, languageId, departmentId)).Result;
+
+                return result;
+
+            });
+
+            return contactDetails;
         }
 
         private DatabaseJSONResponse loadTradeAccountContactDetailsFromDatabase(int tradeAccountId, byte languageId, string departmentId)
