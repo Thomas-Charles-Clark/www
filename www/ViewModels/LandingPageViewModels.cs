@@ -534,7 +534,7 @@ namespace wwwDesignersGuild.ViewModels
 
             if (imageIds.Any())
             {
-                await base.InitialiseHotspots(imageIds);
+                await base.InitialiseHotspots(imageIds, this.MasterDefinition.UrlBreakdown.CountryAwareness.Match);
 
                 PageSections.ForEach(ps =>
                 {

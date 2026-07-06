@@ -14,7 +14,7 @@ namespace wwwDesignersGuild.Models.Classes
 
     public class PassProductPageIDs
     {
-        public masterDefinition objMaster { get; set; }
+        public NewMasterDefinition objMaster { get; set; }
         public List<int> productPageIds { get; set; }
     }
 

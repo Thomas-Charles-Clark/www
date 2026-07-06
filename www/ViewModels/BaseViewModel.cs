@@ -470,7 +470,14 @@ namespace wwwDesignersGuild.ViewModels
             {
                 var objDb = new databaseDataContext();
 
-                var objPrices = await objDb.ProductPage_Price_SelectAsync(RecentlyViewed.Select(rv => rv.ProductPage.ProductPageID), Visitor, MasterDefinition);
+                var objPrices = await objDb.ProductPage_Price_SelectAsync(
+                    new Models.DTOs.ProductPage_Price_SelectDTO ()
+                    {
+                        productPageIds = RecentlyViewed.Select(rv => rv.ProductPage.ProductPageID),
+                        objVisitor = Visitor,
+                        objMaster = MasterDefinition,
+                        countryCheckMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"])
+					});
 
                 if (objPrices.json != null)
                 {
@@ -497,7 +504,7 @@ namespace wwwDesignersGuild.ViewModels
             return Scrapbook.Images.Where(p => p.ImageID == imageId).Any();
         }
 
-        public async Task InitialiseHotspots(IEnumerable<long> imageIds)
+        public async Task InitialiseHotspots(IEnumerable<long> imageIds, bool countryCheckMatched)
         {
             var db = new databaseDataContext();
 
@@ -517,7 +524,8 @@ namespace wwwDesignersGuild.ViewModels
                     CountryID,
                     LanguageID,
                     Date,
-                    imageIds.Distinct()
+                    imageIds.Distinct(),
+                    countryCheckMatched
                 );
 
                 var result = await objHotspotHouse.loadHotspotsFromCmsAsync(objFetch, this);

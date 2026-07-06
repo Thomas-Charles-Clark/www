@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -663,7 +664,7 @@ namespace wwwDesignersGuild.ViewModels
 
             if (fetchHotspots)
             {
-                var hotspotsTask = base.InitialiseHotspots(imageIds);
+                var hotspotsTask = base.InitialiseHotspots(imageIds, Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
 
                 await Task.WhenAll(stockTask, techInfoTask, hotspotsTask);
 
@@ -750,7 +751,13 @@ namespace wwwDesignersGuild.ViewModels
 
             productPageIds = productPageIds.Distinct().ToList();
 
-            var objPrices = await objDb.ProductPage_Price_SelectAsync(productPageIds, Visitor, MasterDefinition, HttpContext.Current.Request.QueryString["lifestyle"] != null);
+            var objPrices = objDb.ProductPage_Price_Select(
+                new PassProductPageIDs ()
+                {
+                    productPageIds = productPageIds,
+                    objMaster = MasterDefinition
+				},
+                Visitor);
 
 #if DEBUG
             System.Diagnostics.Debug.WriteLine($"ProductPageViewModel prices task complete {sw.Elapsed}");

@@ -1633,7 +1633,7 @@ namespace wwwDesignersGuild.Models.Database
             return result.GetResult<Moodboard>().Single();
         }
 
-        internal DatabaseJSONResponse fetchMoodboardSampleOrdering(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch)
+        internal DatabaseJSONResponse fetchMoodboardSampleOrdering(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch, bool countryCheckMatched)
         {
             var result = new DatabaseJSONResponse();
 
@@ -1654,7 +1654,7 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@IsTrade", tradeAccountId.HasValue);
                 cmd.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
-                cmd.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
+                cmd.Parameters.AddWithValue("@CountryMatch", countryCheckMatched);
 
                 conn.Open();
 
@@ -2296,7 +2296,7 @@ namespace wwwDesignersGuild.Models.Database
             return result;
         }
 
-        public quickSearchResult tradeQuickSearch(MertexerV2.Models.Accounts.PassQuickSearch objSearch, int? tradeAccountId, bool displayTradePrice, int? memberId, DateTime useDate) 
+        public quickSearchResult tradeQuickSearch(MertexerV2.Models.Accounts.PassQuickSearch objSearch, int? tradeAccountId, bool displayTradePrice, int? memberId, DateTime useDate, bool countryCheckMatched) 
         {
             var result = new quickSearchResult();
 
@@ -2315,7 +2315,7 @@ namespace wwwDesignersGuild.Models.Database
                 cmd.Parameters.AddWithValue("@IsTrade", tradeAccountId.HasValue);
                 cmd.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
-                cmd.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
+                cmd.Parameters.AddWithValue("@CountryMatch", countryCheckMatched);
                 cmd.Parameters.AddWithValue("@MemberID", memberId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Debug", DBNull.Value);
 
@@ -3064,7 +3064,7 @@ namespace wwwDesignersGuild.Models.Database
                     cmd.Parameters.AddWithValue("@TradeAccountID", objFetch.TradeAccountID);
                     cmd.Parameters.AddWithValue("@IsTrade", objFetch.TradeAccountID.HasValue);
                     cmd.Parameters.AddWithValue("@DisplayTradePrice", objFetch.DisplayTradePrice);
-                    cmd.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
+                    cmd.Parameters.AddWithValue("@CountryMatch", objFetch.CountryCheckMatched);
 
                     cmd.CommandTimeout = 3;
 

@@ -37,6 +37,8 @@ namespace wwwDesignersGuild.Models.Hotspot
         public short CountryID { get; set; }
         public byte LanguageID { get; set; }
 
+        public bool CountryCheckMatched { get; set; }
+
         [JsonIgnore]
         public DateTime ContentDate { get; set; }
 
@@ -53,15 +55,7 @@ namespace wwwDesignersGuild.Models.Hotspot
         }
 
         public IEnumerable<long> ImageIDs { get; set; }
-
-        public bool CountryMatch
-        {
-            get
-            {
-                return Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
-            }
-        }
-
+        
         public PassHotspotCacheFetch(
             int contentId,
             dgContentType contentType,
@@ -72,7 +66,8 @@ namespace wwwDesignersGuild.Models.Hotspot
             short countryId,
             byte languageId,
             DateTime contentDate,
-            IEnumerable<long> imageIds
+            IEnumerable<long> imageIds,
+            bool countryCheckMatched
             )
         {
             ContentID = contentId;
@@ -85,6 +80,7 @@ namespace wwwDesignersGuild.Models.Hotspot
             LanguageID = languageId;
             ContentDate = contentDate;
             ImageIDs = imageIds.Distinct().OrderBy(i => i);
+            CountryCheckMatched = countryCheckMatched;
         }
 
         public override string ToString()

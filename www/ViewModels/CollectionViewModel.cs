@@ -84,7 +84,7 @@ namespace wwwDesignersGuild.ViewModels
                     Visitor.memberId,
                     Visitor.memberTradeAccountID,
                     Visitor.memberDisplayTradePrice,
-                    Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+					this.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
                     MasterDefinition.UrlBreakdown.ContentDate,
                     MasterDefinition.TradeMember
                 );
@@ -117,7 +117,7 @@ namespace wwwDesignersGuild.ViewModels
 
             await base.Initialise();
 
-            await base.InitialiseHotspots(imageIds);
+            await base.InitialiseHotspots(imageIds, this.MasterDefinition.UrlBreakdown.CountryAwareness.Match);
 
             Carousel.Images.ForEach(i =>
             {

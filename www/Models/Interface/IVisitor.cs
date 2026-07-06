@@ -50,7 +50,7 @@ namespace wwwDesignersGuild.Models.Interface
         Task<Boolean> saveMoodboard(Int32 moodboardId, Int16 height, String json, String customerName, Byte? roomId, String reference);
         Task<Boolean> saveMoodboardFromGridView(Int32 moodboardId, String customerName, Byte? roomId, String reference);
         Task<Moodboard> fetchMoodboard(Int32 moodboardId);
-        Task<DatabaseJSONResponse> fetchMoodboardProducts(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch);
+        Task<DatabaseJSONResponse> fetchMoodboardProducts(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch, bool countryCheckMatched);
         Task<Boolean> SendMoodboardEmail(MoodboardShareEmail objEmail);
         Task<memberReceiptGenerate> getReceiptData(Int64 visitorDbId, Int32 transactionId);
         Task<Boolean> auditPostCodeLookupSearch(Int64 visitorDbId, String countryCode, String postcode, String addressLine1);

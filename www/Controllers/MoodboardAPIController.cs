@@ -342,7 +342,13 @@ namespace wwwDesignersGuild.Controllers
 
             objFetch.BaseViewModel.Basket = basket;
 
-            var result = await visitorFactory.fetchMoodboardProducts(memberId.Value, tradeAccountId, displayTradePrice, objFetch);
+            var result = await visitorFactory.fetchMoodboardProducts(
+                memberId.Value,
+                tradeAccountId,
+                displayTradePrice,
+                objFetch,
+                objFetch.BaseViewModel.MasterDefinition.UrlBreakdown.CountryAwareness.Match
+            );
 
             var controller = ViewRenderer.CreateController<GenericController>();
 

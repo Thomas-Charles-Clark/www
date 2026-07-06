@@ -494,8 +494,10 @@
     <Compile Include="Models\County\CountyItem.cs" />
     <Compile Include="Models\CoverageCalculator\CoverageCalculator.cs" />
     <Compile Include="Models\Database\tradeDb.cs" />
+    <Compile Include="Models\DTOs\FetchCollectionProductPageGridDTO.cs" />
     <Compile Include="Models\DTOs\PassGUID.cs" />
     <Compile Include="Models\DTOs\PassMarketingListJoin.cs" />
+    <Compile Include="Models\DTOs\ProductPage_Price_SelectDTO.cs" />
     <Compile Include="Models\EmailCapturePopupForm\cmsEmailCapturePopupForm.cs" />
     <Compile Include="Models\Films\FilmStub.cs" />
     <Compile Include="Models\Films\VideoObjectJSONLD.cs" />

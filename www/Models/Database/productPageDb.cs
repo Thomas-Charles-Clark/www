@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Web;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
+using wwwDesignersGuild.Models.DTOs;
 
 namespace wwwDesignersGuild.Models.Database
 {
@@ -242,7 +243,7 @@ namespace wwwDesignersGuild.Models.Database
 			return result;
         }
 
-        public PageSectionJSON FetchCollectionProductPageGrid(short collectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, DateTime useDate)
+        public PageSectionJSON FetchCollectionProductPageGrid(short collectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, DateTime useDate, bool countryCheckMatched)
         {
             var result = new PageSectionJSON
             {
@@ -266,7 +267,7 @@ namespace wwwDesignersGuild.Models.Database
                 comm.Parameters.AddWithValue("@IsTrade", tradeAccountId.HasValue);
                 comm.Parameters.AddWithValue("@MemberID", memberId ?? (object)DBNull.Value);
                 comm.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
-                comm.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
+                comm.Parameters.AddWithValue("@CountryMatch", countryCheckMatched);
                 comm.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
 
                 conn.Open();
@@ -284,7 +285,8 @@ namespace wwwDesignersGuild.Models.Database
             return result;
         }
 
-        public async Task<DatabaseJSONResponse> ProductPage_Price_SelectAsync(IEnumerable<int> productPageIds, VisitorSelect objVisitor, NewMasterDefinition objMaster, bool isLifestyle = false)
+        public async Task<DatabaseJSONResponse> ProductPage_Price_SelectAsync(ProductPage_Price_SelectDTO dto)
+            //IEnumerable<int> productPageIds, VisitorSelect objVisitor, NewMasterDefinition objMaster, bool countryCheckMatched, bool isLifestyle = false)
         {
             var result = new DatabaseJSONResponse();
 
@@ -299,22 +301,22 @@ namespace wwwDesignersGuild.Models.Database
 
                 dt.Columns.Add("ProductPageID");
 
-                foreach (var pp in productPageIds)
+                foreach (var pp in dto.productPageIds)
                 {
                     dt.Rows.Add(pp);
                 }
 
                 comm.Parameters.AddWithValue("@ProductPageIDs", dt);
-                comm.Parameters.AddWithValue("@CountryID", objMaster.UrlBreakdown.countryDetails.CountryID);
-                comm.Parameters.AddWithValue("@LanguageID", objMaster.UrlBreakdown.countryDetails.LanguageID);
-                comm.Parameters.AddWithValue("@Date", objMaster.UrlBreakdown.ContentDate);
-                comm.Parameters.AddWithValue("@VisitorID", objVisitor.visitorDbId);
-                comm.Parameters.AddWithValue("@MemberID", objVisitor.memberId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@TradeAccountID", objVisitor.memberTradeAccountID ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@IsTrade", objVisitor.memberTradeAccountID.HasValue);
-                comm.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
-                comm.Parameters.AddWithValue("@DisplayTradePrice", objVisitor.memberDisplayTradePrice);
-                comm.Parameters.AddWithValue("@IsLifestyle", isLifestyle);
+                comm.Parameters.AddWithValue("@CountryID", dto.objMaster.UrlBreakdown.countryDetails.CountryID);
+                comm.Parameters.AddWithValue("@LanguageID", dto.objMaster.UrlBreakdown.countryDetails.LanguageID);
+                comm.Parameters.AddWithValue("@Date", dto.objMaster.UrlBreakdown.ContentDate);
+                comm.Parameters.AddWithValue("@VisitorID", dto.objVisitor.visitorDbId);
+                comm.Parameters.AddWithValue("@MemberID", dto.objVisitor.memberId ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@TradeAccountID", dto.objVisitor.memberTradeAccountID ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@IsTrade", dto.objVisitor.memberTradeAccountID.HasValue);
+                comm.Parameters.AddWithValue("@CountryMatch", dto.countryCheckMatched);
+                comm.Parameters.AddWithValue("@DisplayTradePrice", dto.objVisitor.memberDisplayTradePrice);
+                comm.Parameters.AddWithValue("@IsLifestyle", dto.isLifestyle);
 
                 conn.Open();
 
@@ -331,102 +333,7 @@ namespace wwwDesignersGuild.Models.Database
             return result;
         }
 
-        public DatabaseJSONResponse ProductPage_Price_Select(IEnumerable<int> productPageIds, VisitorSelect objVisitor, NewMasterDefinition objMaster)
-        {
-            var result = new DatabaseJSONResponse();
-
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
-            {
-                SqlCommand comm = conn.CreateCommand();
-
-                comm.CommandText = @"cache.ProductPage_Price_Select";
-                comm.CommandType = CommandType.StoredProcedure;
-
-                var dt = new DataTable();
-
-                dt.Columns.Add("ProductPageID");
-
-                foreach (var pp in productPageIds)
-                {
-                    dt.Rows.Add(pp);
-                }
-
-                comm.Parameters.AddWithValue("@ProductPageIDs", dt);
-                comm.Parameters.AddWithValue("@CountryID", objMaster.UrlBreakdown.countryDetails.CountryID);
-                comm.Parameters.AddWithValue("@LanguageID", objMaster.UrlBreakdown.countryDetails.LanguageID);
-                comm.Parameters.AddWithValue("@Date", objMaster.UrlBreakdown.ContentDate);
-                comm.Parameters.AddWithValue("@VisitorID", objVisitor.visitorDbId);
-                comm.Parameters.AddWithValue("@MemberID", objVisitor.memberId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@TradeAccountID", objVisitor.memberTradeAccountID ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@IsTrade", objVisitor.memberTradeAccountID.HasValue);
-                comm.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
-                comm.Parameters.AddWithValue("@DisplayTradePrice", objVisitor.memberDisplayTradePrice);
-                comm.Parameters.AddWithValue("@PageID", objMaster.UrlBreakdown.ContentType == Helper.dgContentType.landingPage ? objMaster.UrlBreakdown.ContentId : (object)DBNull.Value);
-
-                conn.Open();
-
-                var reader = comm.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    result.JSON = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                }
-
-                conn.Close();
-            }
-
-            return result;
-        }
-
-        public DatabaseJSONResponse ProductPage_Price_Select(IEnumerable<int> productPageIds, long? visitorId, int? memberId, int? tradeAccountId, bool displayTradePrice, int? pageId, short countryId, byte languageId, DateTime useDate)
-        {
-            var result = new DatabaseJSONResponse();
-
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ToString()))
-            {
-                SqlCommand comm = conn.CreateCommand();
-
-                comm.CommandText = @"cache.ProductPage_Price_Select";
-                comm.CommandType = CommandType.StoredProcedure;
-
-                var dt = new DataTable();
-
-                dt.Columns.Add("ProductPageID");
-
-                foreach (var pp in productPageIds)
-                {
-                    dt.Rows.Add(pp);
-                }
-
-                comm.Parameters.AddWithValue("@ProductPageIDs", dt);
-                comm.Parameters.AddWithValue("@CountryID", countryId);
-                comm.Parameters.AddWithValue("@LanguageID", languageId);
-                comm.Parameters.AddWithValue("@Date", useDate);
-                comm.Parameters.AddWithValue("@VisitorID", visitorId);
-                comm.Parameters.AddWithValue("@MemberID", memberId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@IsTrade", tradeAccountId.HasValue);
-                comm.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
-                comm.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
-                comm.Parameters.AddWithValue("@PageID", pageId ?? (object)DBNull.Value);
-
-                conn.Open();
-
-                var reader = comm.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    result.JSON = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                }
-
-                conn.Close();
-            }
-
-            return result;
-        }
-
-
-        public DatabaseJSONResponse ProductPage_Price_Select(PassProductPageIDs objProductPages, long? visitorId, int? memberId, int? tradeAccountId, bool displayTradePrice)
+        public DatabaseJSONResponse ProductPage_Price_Select(PassProductPageIDs objProductPages, VisitorSelect objVisitor)
         {
             var result = new DatabaseJSONResponse();
 
@@ -450,12 +357,12 @@ namespace wwwDesignersGuild.Models.Database
                 comm.Parameters.AddWithValue("@CountryID", objProductPages.objMaster.UrlBreakdown.countryDetails.CountryID);
                 comm.Parameters.AddWithValue("@LanguageID", objProductPages.objMaster.UrlBreakdown.countryDetails.LanguageID);
                 comm.Parameters.AddWithValue("@Date", objProductPages.objMaster.UrlBreakdown.ContentDate);
-                comm.Parameters.AddWithValue("@VisitorID", visitorId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@MemberID", memberId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@TradeAccountID", tradeAccountId ?? (object)DBNull.Value);
-                comm.Parameters.AddWithValue("@IsTrade", tradeAccountId.HasValue);
-                comm.Parameters.AddWithValue("@CountryMatch", Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
-                comm.Parameters.AddWithValue("@DisplayTradePrice", displayTradePrice);
+                comm.Parameters.AddWithValue("@VisitorID", objVisitor.visitorDbId);
+                comm.Parameters.AddWithValue("@MemberID", objVisitor.memberId ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@TradeAccountID", objVisitor.memberTradeAccountID ?? (object)DBNull.Value);
+                comm.Parameters.AddWithValue("@IsTrade", objVisitor.memberTradeAccountID.HasValue);
+                comm.Parameters.AddWithValue("@CountryMatch", objProductPages.objMaster.UrlBreakdown.CountryAwareness.Match);
+                comm.Parameters.AddWithValue("@DisplayTradePrice", objVisitor.memberDisplayTradePrice);
 
                 conn.Open();
 

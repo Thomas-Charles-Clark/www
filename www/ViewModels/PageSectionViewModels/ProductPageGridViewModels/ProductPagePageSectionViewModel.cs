@@ -1154,9 +1154,11 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 				// call SQL pricing select for page
 				var objPrices = objDbContext.ProductPage_Price_Select(
-					productPageIdsToRender,
-					model.Visitor,
-					model.MasterDefinition);
+				new PassProductPageIDs { 
+						productPageIds = productPageIdsToRender, 
+						objMaster = model.MasterDefinition 
+					},
+					model.Visitor);
 
 				var serializer = new JsonSerializer
 				{

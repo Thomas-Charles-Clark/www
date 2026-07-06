@@ -21,7 +21,15 @@ namespace wwwDesignersGuild.Models.CollectionPage
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
         
-        public async Task<cmsCollectionPageDefinition> loadCollectionPageFromCms(short collectionId, byte languageId, short countryId, int? memberId, int? tradeAccountId, bool displayTradePrice, bool countryMatch, DateTime useDate, bool isTrade)
+        public async Task<cmsCollectionPageDefinition> loadCollectionPageFromCms(short collectionId,
+            byte languageId,
+            short countryId,
+            int? memberId,
+            int? tradeAccountId,
+            bool displayTradePrice,
+            bool countryMatch,
+            DateTime useDate,
+            bool isTrade)
         {
 
             //  Is collection in cache?
@@ -56,7 +64,7 @@ namespace wwwDesignersGuild.Models.CollectionPage
 
             if (ppJson == null)
             {
-                ppJson = await Task.FromResult(loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate));
+                ppJson = await Task.FromResult(loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate, countryMatch));
 
                 ppCache.Set(collectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppJson);
             }
@@ -89,11 +97,11 @@ namespace wwwDesignersGuild.Models.CollectionPage
             return collectionStore;
         }
 
-        private PageSectionJSON loadCollectionProductPageGridFromCmsDatabase(short collectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, DateTime useDate)
+        private PageSectionJSON loadCollectionProductPageGridFromCmsDatabase(short collectionId, int? memberId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, DateTime useDate, bool countryCheckMatched)
         {
             using (var dataContext = new databaseDataContext())
             {
-                return dataContext.FetchCollectionProductPageGrid(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate);
+                return dataContext.FetchCollectionProductPageGrid(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate, countryCheckMatched);
             }
         }
     }

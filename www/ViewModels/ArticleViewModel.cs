@@ -267,7 +267,7 @@ namespace wwwDesignersGuild.ViewModels
 
             await base.Initialise();
 
-            await base.InitialiseHotspots(imageIds);
+            await base.InitialiseHotspots(imageIds, this.MasterDefinition.UrlBreakdown.CountryAwareness.Match);
 
             Carousel.Images.ForEach(i =>
             {

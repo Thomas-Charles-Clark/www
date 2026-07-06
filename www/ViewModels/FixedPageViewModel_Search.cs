@@ -453,9 +453,11 @@ namespace wwwDesignersGuild.ViewModels
 
                 // call SQL pricing select for page
                 objPrices = db.ProductPage_Price_Select(
-                    productPageIdsToRender,
-                    Visitor,
-                    MasterDefinition);
+                    new PassProductPageIDs() { 
+                        productPageIds = productPageIdsToRender,
+                        objMaster = MasterDefinition
+					},
+                    Visitor);
 
                 var serializer = new Newtonsoft.Json.JsonSerializer();
 

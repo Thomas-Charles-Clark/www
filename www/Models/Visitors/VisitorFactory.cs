@@ -930,11 +930,11 @@ namespace wwwDesignersGuild.Models.Visitor
             return await db.storeTradeInvoiceAddressChangeRequest(loginCheck, objRequest);
         }
 
-        public quickSearchResult tradeQuickSearch(MertexerV2.Models.Accounts.PassQuickSearch objSearch, int? tradeAccountId, int? memberId, bool displayTradePrice, DateTime useDate)
+        public quickSearchResult tradeQuickSearch(MertexerV2.Models.Accounts.PassQuickSearch objSearch, int? tradeAccountId, int? memberId, bool displayTradePrice, DateTime useDate, bool countryCheckMatched)
         {
             var db = new visitorDb();
 
-            return db.tradeQuickSearch(objSearch, tradeAccountId, displayTradePrice, memberId, useDate);
+            return db.tradeQuickSearch(objSearch, tradeAccountId, displayTradePrice, memberId, useDate, countryCheckMatched);
         }
 
         #region Member Update Name
@@ -1541,18 +1541,18 @@ namespace wwwDesignersGuild.Models.Visitor
 
         #region Moodboard Fetch Sample Ordering
 
-        public async Task<DatabaseJSONResponse> fetchMoodboardProducts(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch)
+        public async Task<DatabaseJSONResponse> fetchMoodboardProducts(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch, bool countryCheckMatched)
         {
-            var result = await Task.FromResult<DatabaseJSONResponse>(fetchMoodboardSampleOrderingAsync(memberId, tradeAccountId, displayTradePrice, objFetch));
+            var result = await Task.FromResult<DatabaseJSONResponse>(fetchMoodboardSampleOrderingAsync(memberId, tradeAccountId, displayTradePrice, objFetch, countryCheckMatched));
 
             return result;
         }
 
 
-        public DatabaseJSONResponse fetchMoodboardSampleOrderingAsync(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch)
+        public DatabaseJSONResponse fetchMoodboardSampleOrderingAsync(int memberId, int? tradeAccountId, bool displayTradePrice, PassMoodboardOrderingFetch objFetch, bool countryCheckMatched)
         {
             visitorDb objDbVisitor = new visitorDb();
-            return objDbVisitor.fetchMoodboardSampleOrdering(memberId, tradeAccountId, displayTradePrice, objFetch);
+            return objDbVisitor.fetchMoodboardSampleOrdering(memberId, tradeAccountId, displayTradePrice, objFetch, countryCheckMatched);
         }
 
         #endregion
