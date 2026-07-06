@@ -22,90 +22,91 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-		public PageSectionJSON Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
+
+		public PageSectionJSON GetOrCreate(
+			long pageSectionId,
+            byte languageId,
+            short countryId,
+            bool tradeSwitch,
+            int? tradeAccountId,
+            bool countryMatch,
+            DateTime useDate,
+			Func<PageSectionJSON> factory)
 		{
-			String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
+			var key = buildKey(pageSectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate);
 
-			var result = (PageSectionJSON)Cache[key];
+			// Fast path: Try to get existing cache without locking
+			var data = (PageSectionJSON)Cache[key];
 
-			return result;
-		}
+			if (data != null)
+				return data;
 
-		public void Set(long pageSectionTypeId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data)
-		{
-            Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool cacheEnabled);
-
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
-
-                var key = buildKey(pageSectionTypeId, languageId, countryId, tradeAccountId, countryMatch, useDate);
-
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-		}
-
-		public void ExplicitSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, DatabaseJSONResponse data, DateTimeOffset expiration)
-		{
-			CacheItemPolicy policy = new CacheItemPolicy
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
 			{
-				AbsoluteExpiration = expiration
-			};
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (PageSectionJSON)Cache[key];
+				if (data != null)
+					return data;
 
-			String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
+				// Execute the creation block passed by the caller
+				data = factory();
 
-			Cache.Add(new CacheItem(key, data), policy);
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
 		}
 
-		public bool IsSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
-            return (Cache[key] != null);
-        }
+		private string buildKey(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
+		{
+			return $"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
 
-
-        public void Invalidate(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+        public void Invalidate(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
         {
-            String key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate);
-            Cache.Remove(key);
+			lock (_syncLock)
+			{
+				Cache.Remove(buildKey(pageSectionId, languageId, countryId, tradeSwitch, tradeAccountId, countryMatch, useDate));
+			}
         }
 
         public string InvalidateMultiple(long pageSectionId, byte languageId, short countryId) 
         {
-            var keys = Cache.Select(x => x.Key);
+			lock (_syncLock)
+			{
+				var keys = Cache.Select(x => x.Key);
 
-            var removalCount = 0;
+				var removalCount = 0;
 
-            foreach (var k in keys) 
-            {
-                if (k.StartsWith($"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}")) 
-                {
-                    Cache.Remove(k);
-                    removalCount++;
-                }
-            }
+				foreach (var k in keys)
+				{
+					if (k.StartsWith($"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}"))
+					{
+						Cache.Remove(k);
+						removalCount++;
+					}
+				}
 
-            return $"Removed {removalCount} of {keys.Count()} keys from the cache";
+				return $"Removed {removalCount} of {keys.Count()} keys from the cache";
+			}
         }
-
-        private string buildKey(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
-        {
-            var tradeSwitch = tradeAccountId.HasValue;
-
-            var key = $"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-
-            System.Diagnostics.Debug.WriteLine("");
-			System.Diagnostics.Debug.WriteLine($"ProductPageGridCacheProvider built key \"{$"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}"}\"");
-			System.Diagnostics.Debug.WriteLine("");
-			return key;
-		}
-	}
+    }
 }

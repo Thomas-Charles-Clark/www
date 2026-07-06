@@ -16,13 +16,14 @@ namespace wwwDesignersGuild.Models.DotDigital
         {
             // Is page in cache?
             var cache = new DotDigitalTrackingBehaviourCacheProvider();
-            var data = cache.Get(countryId, languageId, useDate);
 
-            if (data == null)
-            {
-                data = await Task.FromResult<DotDigitalTrackingBehaviourProfile>(loadDotDigitalBehaviourProfileFromCms(countryId, languageId));
-                cache.Set(countryId, languageId, useDate, data);
-            }
+            var data = cache.GetOrCreate(countryId, languageId, useDate, () => {
+
+                var result = loadDotDigitalBehaviourProfileFromCms(countryId, languageId);
+
+                return result;
+
+			});
 
             return data;
         }

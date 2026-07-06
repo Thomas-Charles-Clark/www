@@ -15,55 +15,25 @@ using static Antlr.Runtime.Tree.TreeWizard;
 
 namespace wwwDesignersGuild.Models.ProductPage
 {
-
-
-    public class cmsProductPage : ICmsProductPageRepository
+    public class cmsProductPage
     {
         public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
         {
-            //  Is page in cache?
             cmsProductPageDefinition productPageStore;
-            ProductPageCacheProvider objProductPageCache = new ProductPageCacheProvider();
-            productPageStore = objProductPageCache.Get(productPageId, languageId, countryId, isTrade, platformSwitch, useDate);
 
-            if (productPageStore == null)
-            {
-                productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch));
-
-                objProductPageCache.Set(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, productPageStore);
-            }
-
-            return productPageStore;
-        }
-
-        public async Task<cmsProductPageDefinition> invalidateProductPageSetExplicitCacheExpiry(byte templateId, int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch, DateTimeOffset expiration)
-        {
             var objProductPageCache = new ProductPageCacheProvider();
-            
-            objProductPageCache.Invalidate(productPageId, languageId, countryId, isTrade, platformSwitch, useDate);
 
-            var productPageStore = await Task.FromResult<cmsProductPageDefinition>(loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch));
+            productPageStore = objProductPageCache.GetOrCreate(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, () => {
 
-            objProductPageCache.ExplicitSet(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, productPageStore, expiration);
+                var result = Task.Run(() => loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch)).Result;
 
-            if (templateId == 2)
-            {
-                objProductPageCache.InvalidateTechInfo(productPageId, languageId, countryId, useDate);
-                var techInfo = await Task.FromResult(loadTechInfoFromCmsDatabase(productPageId, countryId, languageId, useDate));
-                objProductPageCache.ExplicitSetTechInfo(productPageId, languageId, countryId, useDate, techInfo, expiration);
-            }
+                return result;
 
-            if (templateId == 5)
-            {
-                objProductPageCache.InvalidateModularInfo(productPageId, languageId, countryId, useDate);
-                var modularInfo = await Task.FromResult(loadModularInfoFromCmsDatabase(productPageId, countryId, languageId, useDate));
-                objProductPageCache.ExplicitSetModularInfo(productPageId, languageId, countryId, useDate, modularInfo, expiration);
-            }
+            });
 
             return productPageStore;
         }
-
-
+        
         private cmsProductPageDefinition loadProductPageFromCmsDatabase(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
         {
             var dataContext = new databaseDataContext();
@@ -79,52 +49,12 @@ namespace wwwDesignersGuild.Models.ProductPage
             return productPageStore;
         }
 
-
-        //public async Task<cmsRealTimeStock> loadRealtimeStockFromCms(Int64 visitorId, Int32? memberId, int productPageId, byte languageId, short countryId, DateTime useDate, int? memberTradeAccountID, bool displayTradePrice)
-        //{
-        //    cmsRealTimeStock realtimeStockStore;
-        //    realtimeStockStore = await Task.FromResult<cmsRealTimeStock>(loadRealtimeStockFromCmsDatabase(visitorId, memberId, productPageId, languageId, countryId, useDate, memberTradeAccountID, displayTradePrice));
-        //    return realtimeStockStore;
-        //}
-
-
-        //private cmsRealTimeStock loadRealtimeStockFromCmsDatabase(Int64 visitorId, Int32? memberId, int productPageId, byte languageId, short countryId, DateTime useDate, int? memberTradeAccountID, bool displayTradePrice)
-        //{
-
-
-        //    var dataContext = new databaseDataContext();
-
-        //    var  result = dataContext.ProductPage_OrderForm_Select(visitorId, memberId, productPageId, languageId, countryId, useDate, memberTradeAccountID, displayTradePrice, memberTradeAccountID.HasValue);
-
-
-        //    //  Convert from IEnumerable to a List so a collection query can be run multiple times
-        //    _ = new cmsRealTimeStock();
-
-        //    cmsRealTimeStock realtimeStockStore = result.SingleOrDefault();
-
-
-        //    //realtimeStockStore.productPagePrices = results.GetResult<productPagePrice>().ToList<productPagePrice>();
-
-        //    //var products = results.GetResult<productPageProduct>().ToList();
-        //    //realtimeStockStore.productPagePrimarys = products.Where(p => p.PrimaryProduct == true).OrderBy(p => p.SortOrder).ToList();
-        //    //realtimeStockStore.productPageSecondarys = products.Where(p => p.PrimaryProduct == false).OrderBy(p => p.SortOrder).ToList();
-
-        //    //realtimeStockStore.alreadyInBasket = results.GetResult<AlreadyInBasket>().ToList<AlreadyInBasket>();
-        //    //realtimeStockStore.basketLineTypes = results.GetResult<basketLineType>().ToList<basketLineType>();
-
-        //    return realtimeStockStore;
-
-
-        //}
-
-        
         public async Task<quickLookReturn> loadQuickLookFromCms(Int64 visitorId, Int32? memberId, int productPageId, short countryId, byte languageId, DateTime useDate, int? memberTradeAccountID)
         {
             quickLookReturn realtimeStockStore;
             realtimeStockStore = await Task.FromResult<quickLookReturn>(loadQuickLookFromCmsDatabase(visitorId, memberId, productPageId, countryId, languageId, useDate, memberTradeAccountID));
             return realtimeStockStore;
         }
-
 
         private quickLookReturn loadQuickLookFromCmsDatabase(Int64 visitorId, Int32? memberId, int productPageId, short countryId, byte languageId, DateTime useDate, int? memberTradeAccountID)
         {
@@ -164,14 +94,13 @@ namespace wwwDesignersGuild.Models.ProductPage
 
             ProductPageCacheProvider objProductPageCache = new ProductPageCacheProvider();
 
-            var techInfo = objProductPageCache.GetTechInfo(productPageId, languageId, countryId, useDate);
+            var techInfo = objProductPageCache.GetOrCreateTechInfo(productPageId, languageId, countryId, useDate, () => {
 
-            if (techInfo == null)
-            {
-                techInfo = await Task.FromResult<DatabaseJSONResponse>(loadTechInfoFromCmsDatabase(productPageId, countryId, languageId, useDate));
+                var result = Task.Run(() => loadTechInfoFromCmsDatabase(productPageId, countryId, languageId, useDate)).Result;
 
-                objProductPageCache.SetTechInfo(productPageId, languageId, countryId, useDate, techInfo, CacheTimeMinutes);
-            }
+                return result;
+
+            });
 
             return techInfo;
         }
@@ -183,23 +112,17 @@ namespace wwwDesignersGuild.Models.ProductPage
             return dataContext.ProductPage_TechInfo_Select(productPageId, countryId, languageId, useDate);
         }
 
-
-
-
         public async Task<DatabaseJSONResponse> loadModularInfoFromCms(int productPageId, short countryId, byte languageId, DateTime useDate, Int16 CacheTimeMinutes)
         {
-            _ = new Models.Database.databaseDataContext();
+            var objProductPageCache = new ProductPageCacheProvider();
 
-            ProductPageCacheProvider objProductPageCache = new ProductPageCacheProvider();
+            var modularInfo = objProductPageCache.GetOrCreateModularInfo(productPageId, languageId, countryId, useDate, () => {
 
-            var modularInfo = objProductPageCache.GetModularInfo(productPageId, languageId, countryId, useDate);
+                var result = Task.Run(() => loadModularInfoFromCmsDatabase(productPageId, countryId, languageId, useDate)).Result;
 
-            if (modularInfo == null)
-            {
-                modularInfo = await Task.FromResult<DatabaseJSONResponse>(loadModularInfoFromCmsDatabase(productPageId, countryId, languageId, useDate));
+                return result;
 
-                objProductPageCache.SetModularInfo(productPageId, languageId, countryId, useDate, modularInfo, CacheTimeMinutes);
-            }
+            });
 
             return modularInfo;
         }

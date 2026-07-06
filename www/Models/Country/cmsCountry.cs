@@ -23,31 +23,26 @@ namespace wwwDesignersGuild.Models.Country
 
         public async Task<cmsCountryDefinition> countryLanguageSelect(DateTime contentDate)
         {
-
-            //  Is page in cache?
             cmsCountryDefinition countryStore;
-            CountryCacheProvider objCountryCache = new CountryCacheProvider();
-            countryStore = objCountryCache.Get();
 
-            if (countryStore == null)
-            {
-                countryStore = await Task.FromResult(countryLanguageSelectAsync(contentDate));
-                objCountryCache.Set(countryStore);
-            }
+            CountryCacheProvider objCountryCache = new CountryCacheProvider();
+
+            countryStore = objCountryCache.GetOrCreate(() => {
+
+                var result = Task.Run(() => countryLanguageSelectAsync(contentDate)).Result;
+
+                return result;
+
+			});
 
             return countryStore;
-
         }
 
         private cmsCountryDefinition countryLanguageSelectAsync(DateTime contentDate)
         {
-
-
             var dataContext = new databaseDataContext();
 
-
             IMultipleResults results = dataContext.Country_Language_Select(contentDate);
-
 
             //  Convert from IEnumerable to a List so a collection query can be run multiple times
             cmsCountryDefinition countryStore = new cmsCountryDefinition
@@ -57,34 +52,28 @@ namespace wwwDesignersGuild.Models.Country
                 countryTradePriceLists = results.GetResult<countryTradePriceList>().ToList()
             };
 
-
             return countryStore;
-
-
         }
-
 
         #endregion
 
         #region Load Countries for DropDown
 
-
         public async Task<cmsCountryDropDownDefinition> countryDropDownSelectList(DateTime contentDate, byte languageId)
         {
-
-            //  Is page in cache?
             cmsCountryDropDownDefinition countryDropDownStore;
-            CountryDropDownCacheProvider objCountryDropDownCache = new CountryDropDownCacheProvider();
-            countryDropDownStore = objCountryDropDownCache.Get();
 
-            if (countryDropDownStore == null)
-            {
-                countryDropDownStore = await Task.FromResult<cmsCountryDropDownDefinition>(countryDropDownSelectListAsync(contentDate, languageId));
-                objCountryDropDownCache.Set(countryDropDownStore);
-            }
+            CountryDropDownCacheProvider objCountryDropDownCache = new CountryDropDownCacheProvider();
+
+            countryDropDownStore = objCountryDropDownCache.GetOrCreate(() => {
+
+                var result = Task.Run(() => countryDropDownSelectListAsync(contentDate, languageId)).Result;
+
+                return result;
+
+            });
 
             return countryDropDownStore;
-
         }
 
         private cmsCountryDropDownDefinition countryDropDownSelectListAsync(DateTime contentDate, byte languageId)

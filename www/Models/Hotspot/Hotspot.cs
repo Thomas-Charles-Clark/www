@@ -96,27 +96,16 @@ namespace wwwDesignersGuild.Models.Hotspot
         {
             // Is page in cache?
             var cache = new HotspotCacheProvider();
-            var data = cache.Get(objFetch);
 
-            if (data == null)
-            {
-                data = await loadHotspotsFromCms(objFetch, objBase);
+            var data = cache.GetOrCreate(objFetch, () => {
 
-                if (!data.TimedOut)
-                {
-                    cache.Set(objFetch, data);
-                }
-            }
+                var result = Task.Run(() => loadHotspotsFromCms(objFetch, objBase)).Result;
+
+                return result;
+
+			});
 
             return data;
-        }
-
-        public void SetHotspot(
-            PassHotspotCacheFetch objFetch,
-            cmsHotspotDefinition objScrapbook)
-        {
-            var cache = new HotspotCacheProvider();
-            cache.Set(objFetch, objScrapbook);
         }
 
         private async Task<cmsHotspotDefinition> loadHotspotsFromCms(PassHotspotCacheFetch objFetch, BaseViewModel objBase)

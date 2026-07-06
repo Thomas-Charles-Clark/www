@@ -21,13 +21,14 @@ namespace wwwDesignersGuild.Models.Scrapbook
         {
             // Is page in cache?
             var cache = new ScrapbookCacheProvider();
-            var data = cache.Get(visitorId, memberId, countryId, languageId, useDate);
 
-            if (data == null)
-            {
-                data = await Task.FromResult<cmsScrapbookImagesDefinition>(loadScrapbookFromCms(visitorId, memberId, countryId, languageId, useDate));
-                cache.Set(visitorId, memberId, countryId, languageId, useDate, data);
-            }
+            var data = cache.GetOrCreate(visitorId, memberId, countryId, languageId, useDate, () => {
+
+				var result = Task.Run(() => loadScrapbookFromCms(visitorId, memberId, countryId, languageId, useDate)).Result;
+
+                return result;
+
+			});
 
             return data;
         }

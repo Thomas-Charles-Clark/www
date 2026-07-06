@@ -19,14 +19,16 @@ namespace wwwDesignersGuild.Models.ArticleSubType
         {
             // Is page in cache?
             cmsArticleSubTypeDefinition articleSubTypeStore;
-            ArticleSubTypeCacheProvider objArticleSubTypeCache = new ArticleSubTypeCacheProvider();
-            articleSubTypeStore = objArticleSubTypeCache.Get(articleTypeId, languageId, countryId, useDate);
 
-            if (articleSubTypeStore == null)
-            {
-                articleSubTypeStore = await Task.FromResult<cmsArticleSubTypeDefinition>(loadArticleSubTypeFromCmsDatabase(articleTypeId, languageId, countryId, useDate));
-                objArticleSubTypeCache.Set(articleTypeId, languageId, countryId, useDate, articleSubTypeStore);
-            }
+            ArticleSubTypeCacheProvider objArticleSubTypeCache = new ArticleSubTypeCacheProvider();
+
+            articleSubTypeStore = objArticleSubTypeCache.GetOrCreate(articleTypeId, languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadArticleSubTypeFromCmsDatabase(articleTypeId, languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return articleSubTypeStore;
         }

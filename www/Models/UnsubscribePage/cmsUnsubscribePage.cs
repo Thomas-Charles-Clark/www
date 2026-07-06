@@ -16,15 +16,17 @@ namespace wwwDesignersGuild.Models.UnsubscribePage
         {
             //  Is page in cache?
             cmsUnsubscribePageDefinition unsubscribePageStore;
-            UnsubscribePageCacheProvider objUnsubscribePageCache = new UnsubscribePageCacheProvider();
-            unsubscribePageStore = objUnsubscribePageCache.Get(languageId, countryId, useDate);
 
-            if (unsubscribePageStore == null)
-            {
-                unsubscribePageStore = await Task.FromResult(loadUnsubscribePageFromCmsDatabase(languageId, countryId, useDate, isMember, isTrade));
-                objUnsubscribePageCache.Set(languageId, countryId, useDate, unsubscribePageStore);
-            }
+            var objUnsubscribePageCache = new UnsubscribePageCacheProvider();
 
+            unsubscribePageStore = objUnsubscribePageCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadUnsubscribePageFromCmsDatabase(languageId, countryId, useDate, isMember, isTrade)).Result;
+
+                return result;
+
+            });
+            
             return unsubscribePageStore;
 
         }

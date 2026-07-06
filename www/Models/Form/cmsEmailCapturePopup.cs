@@ -16,17 +16,17 @@ namespace wwwDesignersGuild.Models.Form
     {
         public async Task<cmsEmailCapturePopupForm> loadEmailCapturePopupFormFromCms(passEmailCaptureLoad objLoad)
         {
-            //  Is page in cache?
             cmsEmailCapturePopupForm store;
+
             var objEmailCapturePopupFormCache = new EmailCapturePopupFormCacheProvider();
-            store = objEmailCapturePopupFormCache.Get(objLoad.countryId, objLoad.languageId, objLoad.contentDate);
 
-            if (store == null)
-            {
-                store = await Task.FromResult<cmsEmailCapturePopupForm>(loadEmailCapturePopupFromCmsDatabase(objLoad));
+            store = objEmailCapturePopupFormCache.GetOrCreate(objLoad.countryId, objLoad.languageId, objLoad.contentDate, () => {
 
-                objEmailCapturePopupFormCache.Set(objLoad.countryId, objLoad.languageId, objLoad.contentDate, store);
-            }
+                var result = Task.Run(() => loadEmailCapturePopupFromCmsDatabase(objLoad)).Result;
+
+                return result;
+
+            });
 
             return store;
         }

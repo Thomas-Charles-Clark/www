@@ -18,13 +18,14 @@ namespace wwwDesignersGuild.Models
             cmsStockStatusDefinition stockStatusStore;
 
             StockStatusCacheProvider objStockStatusCache = new StockStatusCacheProvider();
-            stockStatusStore = objStockStatusCache.Get(languageId, countryId, useDate);
 
-            if (stockStatusStore == null)
-            {
-                stockStatusStore = await Task.FromResult<cmsStockStatusDefinition>(loadStockStatusFromCmsDatabase(languageId, countryId, useDate));
-                objStockStatusCache.Set(languageId, countryId, useDate, stockStatusStore);
-            }
+            stockStatusStore = objStockStatusCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadStockStatusFromCmsDatabase(languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return stockStatusStore;
         }

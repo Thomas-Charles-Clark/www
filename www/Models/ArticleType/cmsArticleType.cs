@@ -16,16 +16,17 @@ namespace wwwDesignersGuild.Models.ArticleType
     {
         public async Task<cmsArticleTypeDefinition> loadArticleTypeFromCms(byte languageId, short countryId, DateTime useDate)
         {
-            // Is page in cache?
             cmsArticleTypeDefinition articleTypeStore;
-            ArticleTypeCacheProvider objArticleTypeCache = new ArticleTypeCacheProvider();
-            articleTypeStore = objArticleTypeCache.Get(languageId, countryId, useDate);
 
-            if (articleTypeStore == null)
-            {
-                articleTypeStore = await Task.FromResult<cmsArticleTypeDefinition>(loadArticleTypeFromCmsDatabase(languageId, countryId, useDate));
-                objArticleTypeCache.Set(languageId, countryId, useDate, articleTypeStore);
-            }
+            ArticleTypeCacheProvider objArticleTypeCache = new ArticleTypeCacheProvider();
+
+            articleTypeStore = objArticleTypeCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadArticleTypeFromCmsDatabase(languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return articleTypeStore;
         }

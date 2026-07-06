@@ -15,21 +15,9 @@ using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.CollectionPage
 {
-
-
-    public class cmsCollectionPage : ICmsCollectionPageRepository
+    public class cmsCollectionPage
     {
-        private static Logger Logger = LogManager.GetCurrentClassLogger();
-        
-        public async Task<cmsCollectionPageDefinition> loadCollectionPageFromCms(short collectionId,
-            byte languageId,
-            short countryId,
-            int? memberId,
-            int? tradeAccountId,
-            bool displayTradePrice,
-            bool countryMatch,
-            DateTime useDate,
-            bool isTrade)
+        public async Task<cmsCollectionPageDefinition> loadCollectionPageFromCms(short collectionId, byte languageId, short countryId, int? memberId, int? tradeAccountId, bool displayTradePrice, bool countryMatch, DateTime useDate, bool isTrade)
         {
 
             //  Is collection in cache?
@@ -37,37 +25,23 @@ namespace wwwDesignersGuild.Models.CollectionPage
 
             CollectionPageCacheProvider objCollectionPageCache = new CollectionPageCacheProvider();
 
-            collectionPageStore = objCollectionPageCache.Get(collectionId, languageId, countryId, useDate, isTrade);
-            
-            if (collectionPageStore == null)
-            {
-                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["extraRequestTracing"]))
-                {
-                    //Logger.Trace($"NOT CACHED: CollectionID: {collectionId}, FROM {ip}, LanguageID: {languageId}, CountryID: {countryId}, useDate: {useDate}");
-                }
+            collectionPageStore = objCollectionPageCache.GetOrCreate(collectionId, languageId, countryId, useDate, isTrade, () => {
 
-                collectionPageStore = await Task.FromResult<cmsCollectionPageDefinition>(loadCollectionPageFromCmsDatabase(collectionId, languageId, countryId, useDate, isTrade));
+                var result = Task.Run(() => loadCollectionPageFromCmsDatabase(collectionId, languageId, countryId, useDate, isTrade)).Result;
 
-                objCollectionPageCache.Set(collectionId, languageId, countryId, useDate, isTrade, collectionPageStore);
-            }
-            else
-            {
-                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["extraRequestTracing"]))
-                {
-                    //Logger.Trace($"FOUND IN CACHE: CollectionID: {collectionId}, FROM {ip}, LanguageID: {languageId}, CountryID: {countryId}, useDate: {useDate}");
-                }
-            }
+                return result;
+
+            });
 
             var ppCache = new CollectionProductPageGridCacheProvider();
 
-            var ppJson = ppCache.Get(collectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate);
+            var ppJson = ppCache.GetOrCreate(collectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, () => {
 
-            if (ppJson == null)
-            {
-                ppJson = await Task.FromResult(loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate, countryMatch));
+                var result = loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate);
 
-                ppCache.Set(collectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, ppJson);
-            }
+                return result;
+
+			});
 
             collectionPageStore.productPageJson = ppJson;
 

@@ -6,129 +6,77 @@ using System.Runtime.Caching;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Interface;
 using System.Web.Configuration;
+using wwwDesignersGuild.Models.EmailCapturePopupForm;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-    public class LandingPageCacheProvider : ICacheLandingPageProvider
+    public class LandingPageCacheProvider
     {
-
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public cmsLandingPageDefinition Get(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            String key = buildKey(pageId, languageId, countryId, useDate, isTrade);
-            return (cmsLandingPageDefinition)Cache[key];
-        }
+		public cmsLandingPageDefinition GetOrCreate(
+			int pageId,
+            byte languageId,
+            short countryId,
+            DateTime useDate,
+            bool isTrade,
+			Func<cmsLandingPageDefinition> factory)
+		{
+			var key = buildKey(pageId, languageId, countryId, useDate, isTrade);
 
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsLandingPageDefinition)Cache[key];
 
-        public void Set(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade, cmsLandingPageDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
+			if (data != null)
+				return data;
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsLandingPageDefinition)Cache[key];
+				if (data != null)
+					return data;
 
-                var key = buildKey(pageId, languageId, countryId, useDate, isTrade);
+				// Execute the creation block passed by the caller
+				data = factory();
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
-        public bool IsSet(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            String key = buildKey(pageId, languageId, countryId, useDate, isTrade);
-            return (Cache[key] != null);
-        }
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
+			return data;
+		}
+
+		private string buildKey(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
+		{
+			return $"PAGE~{pageId}~{languageId}~{countryId}~{isTrade}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
 
         public void Invalidate(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
         {
-            String key = buildKey(pageId, languageId, countryId, useDate, isTrade);
-            Cache.Remove(key);
-        }
-
-
-        private string buildKey(int pageId, byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            return String.Format("PAGE~{0}~{1}~{2}~{3}~{4}~{5}~{6}", pageId.ToString(), 
-                                                                languageId.ToString(), 
-                                                                countryId.ToString(), 
-                                                                isTrade,
-                                                                useDate.Year.ToString(), 
-                                                                useDate.Month.ToString(), 
-                                                                useDate.Day.ToString());
-        }
-    }
-
-
-
-    public class SiteSectionCacheProvider
-    {
-
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
-
-
-        public byte? Get(int pageId, DateTime useDate)
-        {
-            String key = buildKey(pageId, useDate);
-            return (byte?)Cache[key];
-        }
-
-
-        public void Set(int pageId, DateTime useDate, byte? data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
-
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
-
-                var key = buildKey(pageId, useDate);
-
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
-
-
-        public bool IsSet(int pageId, DateTime useDate)
-        {
-            String key = buildKey(pageId, useDate);
-            return (Cache[key] != null);
-        }
-
-
-        public void Invalidate(int pageId, DateTime useDate)
-        {
-            String key = buildKey(pageId, useDate);
-            Cache.Remove(key);
-        }
-
-
-        private string buildKey(int pageId, DateTime useDate)
-        {
-            return String.Format("SITE-SECTION~{0}~{1}~{2}~{3}", pageId.ToString(),
-                                                                useDate.Year.ToString(),
-                                                                useDate.Month.ToString(),
-                                                                useDate.Day.ToString());
+            lock (_syncLock)
+			{
+				Cache.Remove(buildKey(pageId, languageId, countryId, useDate, isTrade));
+			}
         }
     }
 }

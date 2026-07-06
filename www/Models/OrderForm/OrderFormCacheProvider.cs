@@ -16,96 +16,63 @@ namespace wwwDesignersGuild.Models.OrderForm
     {
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        public cmsRealTimeStock Get(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
-            return (cmsRealTimeStock)Cache[key];
-        }
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public void Set(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate, cmsRealTimeStock data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["orderFormCacheEnabled"], out bool cacheEnabled);
+		public cmsRealTimeStock GetOrCreate(
+			int productPageId,
+            byte languageId,
+            short countryId,
+            int? tradeAccountId,
+            bool displayTradePrice,
+            bool isLifestyle,
+            bool countryMatch,
+            DateTime useDate,
+			Func<cmsRealTimeStock> factory)
+		{
+			var key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["orderFormCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsRealTimeStock)Cache[key];
 
-                var key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
+			if (data != null)
+				return data;
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsRealTimeStock)Cache[key];
+				if (data != null)
+					return data;
 
-        public void ExplicitSet(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate, serverSearchDatabase data, DateTimeOffset expiration)
-        {
-            CacheItemPolicy policy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = expiration
-            };
+				// Execute the creation block passed by the caller
+				data = factory();
 
-            String key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
-            Cache.Add(new CacheItem(key, data), policy);
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-        public bool IsSet(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
-            return (Cache[key] != null);
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
-        public void Invalidate(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {
-            String key = buildKey(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
-            Cache.Remove(key);
-        }
+			return data;
+		}
 
-
-        private string buildKey(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {    
-            return $"ORDERFORMCACHE~{productPageId}~{languageId}~{countryId}~{tradeAccountId}~{displayTradePrice}~{isLifestyle}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-        }
-    }
-
-
-    public class cmsOrderForm
-    {
-        public async Task<cmsRealTimeStock> loadOrderFormFromCms(long visitorId, int? memberId, int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {
-            //  Is result already in cache?
-            cmsRealTimeStock result = null;
-
-            var cache = new OrderFormCacheProvider();
-
-            result = cache.Get(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate);
-
-            if (result == null)
-            {
-                result = await Task.FromResult<cmsRealTimeStock>(loadOrderFormFromDatabase(visitorId, memberId, productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate));
-
-                cache.Set(productPageId, languageId, countryId, tradeAccountId, displayTradePrice, isLifestyle, countryMatch, useDate, result);
-            }
-
-            return result;
-        }
-
-        private cmsRealTimeStock loadOrderFormFromDatabase(long visitorId, int? memberId, int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
-        {
-            var dataContext = new databaseDataContext();
-
-            var result = dataContext.ProductPage_OrderForm_Select(visitorId, memberId, productPageId, languageId, countryId, useDate, tradeAccountId, displayTradePrice, tradeAccountId.HasValue, isLifestyle, countryMatch);
-
-            var realtimeStockStore = result.SingleOrDefault();
-
-            return realtimeStockStore;
-        }
+		private string buildKey(int productPageId, byte languageId, short countryId, int? tradeAccountId, bool displayTradePrice, bool isLifestyle, bool countryMatch, DateTime useDate)
+		{
+			return $"ORDERFORMCACHE~{productPageId}~{languageId}~{countryId}~{tradeAccountId}~{displayTradePrice}~{isLifestyle}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+		}
     }
 }

@@ -9,66 +9,61 @@ using System.Web.Configuration;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-
-
-    public class CountryCacheProvider : ICacheCountryProvider
+    public class CountryCacheProvider
     {
-
+		private static readonly string Key = "COUNTRY";
 
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public cmsCountryDefinition Get()
-        {
-            String key = buildKey();
-            return (cmsCountryDefinition)Cache[key];
-        }
+		public cmsCountryDefinition GetOrCreate(Func<cmsCountryDefinition> factory)
+		{
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsCountryDefinition)Cache[Key];
 
+			if (data != null)
+				return data;
 
-        public void Set(cmsCountryDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsCountryDefinition)Cache[Key];
+				if (data != null)
+					return data;
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+				// Execute the creation block passed by the caller
+				data = factory();
 
-                var key = buildKey();
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
+					Cache.Set(Key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
-        public bool IsSet()
-        {
-            String key = buildKey();
-            return (Cache[key] != null);
-        }
-
+			return data;
+		}
 
         public void Invalidate()
         {
-            String key = buildKey();
-            Cache.Remove(key);
+			lock (_syncLock)
+			{
+				Cache.Remove(Key);
+			}
         }
-
-
-        private string buildKey()
-        {
-            return String.Format("COUNTRY");
-        }
-
-
     }
-
-
 }

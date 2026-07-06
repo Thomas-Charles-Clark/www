@@ -9,62 +9,61 @@ using System.Web.Configuration;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-
-
-    public class CountryDropDownCacheProvider : ICacheCountryDropDownProvider
+    public class CountryDropDownCacheProvider
     {
+		private static readonly string Key = "COUNTRYDROPDOWN";
 
+		private ObjectCache Cache { get { return MemoryCache.Default; } }
 
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
+		public cmsCountryDropDownDefinition GetOrCreate(Func<cmsCountryDropDownDefinition> factory)
+		{
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsCountryDropDownDefinition)Cache[Key];
 
-        public cmsCountryDropDownDefinition Get()
-        {
-            String key = buildKey();
-            return (cmsCountryDropDownDefinition)Cache[key];
-        }
+			if (data != null)
+				return data;
 
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsCountryDropDownDefinition)Cache[Key];
+				if (data != null)
+					return data;
 
-        public void Set(cmsCountryDropDownDefinition data)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool cacheEnabled);
+				// Execute the creation block passed by the caller
+				data = factory();
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["landingCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
-                var key = buildKey();
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["landingCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+					Cache.Set(Key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
+			return data;
+		}
 
-        public bool IsSet()
-        {
-            String key = buildKey();
-            return (Cache[key] != null);
-        }
-
-
-        public void Invalidate()
-        {
-            String key = buildKey();
-            Cache.Remove(key);
-        }
-
-
-        private string buildKey()
-        {
-            return String.Format("COUNTRYDROPDOWN");
-        }
+		public void Invalidate()
+		{
+			lock (_syncLock)
+			{
+				Cache.Remove(Key);
+			}
+		}
     }
 }

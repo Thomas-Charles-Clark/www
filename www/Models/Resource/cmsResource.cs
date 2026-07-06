@@ -9,6 +9,7 @@ using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Cache;
 using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.Models.Interface;
+using Microsoft.Ajax.Utilities;
 
 namespace wwwDesignersGuild.Models.Resource
 {
@@ -16,16 +17,15 @@ namespace wwwDesignersGuild.Models.Resource
     {
         public async Task<cmsResourceDefinition> loadResourceFromCms(byte languageId, short countryId, DateTime useDate)
         {
-            // Is page in cache?
-            cmsResourceDefinition resourceStore = new cmsResourceDefinition();
-            ResourceCacheProvider objResourceCache = new ResourceCacheProvider();
-            resourceStore.resourceSelects = objResourceCache.Get(languageId, countryId, useDate);
+            var objResourceCache = new ResourceCacheProvider();
 
-            if (resourceStore.resourceSelects == null)
-            {
-                resourceStore = await Task.FromResult<cmsResourceDefinition>(loadResourceFromCmsDatabase(languageId, countryId, useDate));
-                objResourceCache.Set(languageId, countryId, useDate, resourceStore.resourceSelects);
-            }
+			var resourceStore = objResourceCache.GetOrCreate(languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadResourceFromCmsDatabase(languageId, countryId, useDate)).Result;
+
+                return result;
+
+            });
 
             return resourceStore;
         }

@@ -9,67 +9,71 @@ using System.Web.Configuration;
 
 namespace wwwDesignersGuild.Models.Cache
 {
-
-
-    public class MenuCacheProvider : ICacheMenuProvider
+    public class MenuCacheProvider
     {
-
-
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
 
-        public cmsMenuDefinition Get(byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            String key = buildKey(languageId, countryId, useDate, isTrade);
-            return (cmsMenuDefinition)Cache[key];
-        }
+		public cmsMenuDefinition GetOrCreate(
+			byte languageId,
+            short countryId,
+            DateTime useDate,
+            bool isTrade,
+			Func<cmsMenuDefinition> factory)
+		{
+			var key = buildKey(languageId, countryId, useDate, isTrade);
 
+			// Fast path: Try to get existing cache without locking
+			var data = (cmsMenuDefinition)Cache[key];
 
-        public void Set(byte languageId, short countryId, DateTime useDate, cmsMenuDefinition data, bool isTrade)
-        {
-            Boolean.TryParse(WebConfigurationManager.AppSettings["menuCacheEnabled"], out bool cacheEnabled);
+			if (data != null)
+				return data;
 
-            if (cacheEnabled)
-            {
-                var policy = new CacheItemPolicy();
-                if (Int16.TryParse(WebConfigurationManager.AppSettings["menuCacheDuration"], out short cacheDurationMinutes))
-                {
-                    policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
-                }
-                else
-                {
-                    policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
-                }
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			lock (_syncLock)
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (cmsMenuDefinition)Cache[key];
+				if (data != null)
+					return data;
 
-                var key = buildKey(languageId, countryId, useDate, isTrade);
+				// Execute the creation block passed by the caller
+				data = factory();
 
-                Cache.Add(new CacheItem(key, data), policy);
-            }
-        }
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["menuCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
 
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["menuCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
 
-        public bool IsSet(byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            String key = buildKey(languageId, countryId, useDate, isTrade);
-            return (Cache[key] != null);
-        }
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
 
+			return data;
+		}
+
+		private string buildKey(byte languageId, short countryId, DateTime useDate, bool isTrade)
+		{
+			return $"MENU~{languageId}~{countryId}~{useDate.Year}~{useDate.Month}~{useDate.Day}~{isTrade}";
+		}
 
         public void Invalidate(byte languageId, short countryId, DateTime useDate, bool isTrade)
         {
-            String key = buildKey(languageId, countryId, useDate, isTrade);
-            Cache.Remove(key);
-        }
-
-
-        private string buildKey(byte languageId, short countryId, DateTime useDate, bool isTrade)
-        {
-            return String.Format("MENU~{0}~{1}~{2}~{3}~{4}~{5}",    languageId.ToString(),
-                                                                        countryId.ToString(),
-                                                                        useDate.Year.ToString(),
-                                                                        useDate.Month.ToString(),
-                                                                        useDate.Day.ToString(),
-                                                                        isTrade.ToString());
+			lock (_syncLock)
+			{
+				Cache.Remove(buildKey(languageId, countryId, useDate, isTrade));
+			}
         }
     }
 }

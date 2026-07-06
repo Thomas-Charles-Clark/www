@@ -112,7 +112,7 @@ namespace wwwDesignersGuild.Controllers
         public void PurgeCareers(PassCachePurge objPurge)
         {
             var cache = new CareersPageCacheProvider();
-
+            
             cache.Invalidate(objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
         }
 
@@ -132,7 +132,7 @@ namespace wwwDesignersGuild.Controllers
             var cache = new SearchProductTypeDropDownCacheProvider();
             var cache2 = new ProductTypeOrderRestrictionCacheProvider();
 
-            cache.Invalidate(objPurge.CountryID, objPurge.LanguageID);
+            cache.Invalidate(objPurge.CountryID, objPurge.LanguageID, objPurge.ContentDate);
             cache2.Invalidate(objPurge.TradeAccountID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
         }
 
@@ -222,30 +222,18 @@ namespace wwwDesignersGuild.Controllers
 
         public void PurgeProductPage(PassCachePurge objPurge)
         {
-            if (objPurge.ExplicitExpiry.HasValue)
-            {
-                var cmspp = new cmsProductPage();
+            var cache = new ProductPageCacheProvider();
 
-                if (objPurge.templateId.HasValue)
-                {
-                    _ = cmspp.invalidateProductPageSetExplicitCacheExpiry(objPurge.templateId.Value, objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate, objPurge.TradeSwitch ?? false, dgFramework.IsMobileDevice(), objPurge.ExplicitExpiry.Value);
-                }
-            }
-            else
+            switch (objPurge.TradeSwitch)
             {
-                var cache = new ProductPageCacheProvider();
-
-                switch (objPurge.TradeSwitch)
-                {
-                    case true:
-                    case false:
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.TradeSwitch.Value, objPurge.PlatformSwitch, objPurge.ContentDate);
-                        break;
-                    case null:
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, false, objPurge.PlatformSwitch, objPurge.ContentDate);
-                        cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, true, objPurge.PlatformSwitch, objPurge.ContentDate);
-                        break;
-                }
+                case true:
+                case false:
+                    cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.TradeSwitch.Value, objPurge.PlatformSwitch, objPurge.ContentDate);
+                    break;
+                case null:
+                    cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, false, objPurge.PlatformSwitch, objPurge.ContentDate);
+                    cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, true, objPurge.PlatformSwitch, objPurge.ContentDate);
+                    break;
             }
         }
 

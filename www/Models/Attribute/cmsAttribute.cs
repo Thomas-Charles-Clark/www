@@ -12,28 +12,23 @@ using wwwDesignersGuild.Models.ProductPage;
 
 namespace wwwDesignersGuild.Models.Attribute
 {
-
-
-    public class cmsAttribute : ICmsAttributeRepository
+    public class cmsAttribute
     {
-
         public async Task<cmsAttributeDefinition> loadAttributeFromCms(byte languageId)
         {
-
-            //  Are attributes in cache?
             cmsAttributeDefinition attributeStore;
-            AttributeCacheProvider objAttributeCache = new AttributeCacheProvider();
-            attributeStore = objAttributeCache.Get(languageId);
 
-            if (attributeStore == null)
-            {
-                attributeStore = await Task.FromResult<cmsAttributeDefinition>(loadAttributeFromCmsDatabaseAsync(languageId));
-                objAttributeCache.Set(languageId, attributeStore);
-            }
+            var objAttributeCache = new AttributeCacheProvider();
+
+            attributeStore = objAttributeCache.GetOrCreate(languageId, () => {
+
+                var result = Task.Run(() => loadAttributeFromCmsDatabaseAsync(languageId)).Result;
+
+                return result;
+
+            });
 
            return attributeStore;
-
-
         }
 
 

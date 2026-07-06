@@ -142,7 +142,6 @@ namespace wwwDesignersGuild.Models.Classes
         public List<menuGroup> menuGroups { get; set; }
         public List<menuItem> menuItems { get; set; }
         public List<MobileMenuItem> MobileMenuItems { get; set; }
-        public bool MenuLoadedFromCache { get; set; }
     }
 
 

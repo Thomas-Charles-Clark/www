@@ -12,26 +12,24 @@ using Newtonsoft.Json;
 
 namespace wwwDesignersGuild.Models.Lifestyle
 {
-
-
-    public class cmsLifestyle : ICmsLifestyleGalleryPopupRepository
+    public class cmsLifestyle
     {
         public async Task<cmsLifestyleGalleryPopupDefinition> loadLifestyleGalleryPopupFromCms(int productPageId, byte languageId, short countryId, bool isTrade, DateTime useDate)
         {
-            //  Is page in cache?
             cmsLifestyleGalleryPopupDefinition lifestyleStore;
-            LifestyleGalleryPopupCacheProvider objLifestyleCache = new LifestyleGalleryPopupCacheProvider();
-            lifestyleStore = objLifestyleCache.Get(productPageId, languageId, countryId, useDate);
 
-            if (lifestyleStore == null)
-            {
-                lifestyleStore = await Task.FromResult<cmsLifestyleGalleryPopupDefinition>(loadLifestyleGalleryPopupFromCmsDatabase(productPageId, languageId, countryId, isTrade, useDate));
-                objLifestyleCache.Set(productPageId, languageId, countryId, useDate, lifestyleStore);
-            }
+            LifestyleGalleryPopupCacheProvider objLifestyleCache = new LifestyleGalleryPopupCacheProvider();
+
+            lifestyleStore = objLifestyleCache.GetOrCreate(productPageId, languageId, countryId, useDate, () => {
+
+                var result = Task.Run(() => loadLifestyleGalleryPopupFromCmsDatabase(productPageId, languageId, countryId, isTrade, useDate)).Result;
+
+                return result;
+
+            });
 
             return lifestyleStore;
         }
-
 
         private cmsLifestyleGalleryPopupDefinition loadLifestyleGalleryPopupFromCmsDatabase(int productPageId, byte languageId, short countryId, bool isTrade, DateTime useDate)
         {
