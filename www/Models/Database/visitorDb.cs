@@ -3064,7 +3064,7 @@ namespace wwwDesignersGuild.Models.Database
                     cmd.Parameters.AddWithValue("@TradeAccountID", objFetch.TradeAccountID);
                     cmd.Parameters.AddWithValue("@IsTrade", objFetch.TradeAccountID.HasValue);
                     cmd.Parameters.AddWithValue("@DisplayTradePrice", objFetch.DisplayTradePrice);
-                    cmd.Parameters.AddWithValue("@CountryMatch", objFetch.CountryCheckMatched);
+                    cmd.Parameters.AddWithValue("@CountryMatch", objFetch.CountryMatch);
 
                     cmd.CommandTimeout = 3;
 

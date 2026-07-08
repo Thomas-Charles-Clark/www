@@ -648,7 +648,7 @@ namespace wwwDesignersGuild.ViewModels
                     Visitor.memberTradeAccountID,
                     Visitor.memberDisplayTradePrice,
                     HttpContext.Current.Request.QueryString.AllKeys.Contains("lifestyle"),
-                    Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
+					base.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
                     MasterDefinition.UrlBreakdown.ContentDate
                 );
 
@@ -664,7 +664,7 @@ namespace wwwDesignersGuild.ViewModels
 
             if (fetchHotspots)
             {
-                var hotspotsTask = base.InitialiseHotspots(imageIds, Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]));
+                var hotspotsTask = base.InitialiseHotspots(imageIds, base.MasterDefinition.UrlBreakdown.CountryAwareness.Match);
 
                 await Task.WhenAll(stockTask, techInfoTask, hotspotsTask);
 

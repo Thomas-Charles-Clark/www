@@ -37,8 +37,6 @@ namespace wwwDesignersGuild.Models.Hotspot
         public short CountryID { get; set; }
         public byte LanguageID { get; set; }
 
-        public bool CountryCheckMatched { get; set; }
-
         [JsonIgnore]
         public DateTime ContentDate { get; set; }
 
