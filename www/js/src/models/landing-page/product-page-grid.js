@@ -638,30 +638,34 @@
     });
 
     self.fetchParentDefinition = () => {
-        fetch('/api/generalApi/FetchProductPageGridDefinition', {
-            method: 'POST',
-            headers: window.fetchHeaders,
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            body: JSON.stringify({
-                pageSectionId: self.parent.pageSectionId,
-                languageId: window.getLanguageId(),
-                countryId: window.getCountryId()
-            })
-        }).then(window.handleFetchResponse)
-            .then(definition => {
+        // this behaviour is not desired in Search
+        if (self.parent.type != "SearchResults") {
+            fetch('/api/generalApi/FetchProductPageGridDefinition', {
+                method: 'POST',
+                headers: window.fetchHeaders,
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    pageSectionId: self.parent.pageSectionId,
+                    languageId: window.getLanguageId(),
+                    countryId: window.getCountryId(),
+                    base: window.getBase()
+                })
+            }).then(window.handleFetchResponse)
+                .then(definition => {
 
-                let currentData = self.parent.data() ?? {};
+                    let currentData = self.parent.data() ?? {};
 
-                let updatedData = Object.assign(currentData, definition);
+                    let updatedData = Object.assign(currentData, definition);
 
-                self.parent.Definition = definition;
+                    self.parent.Definition = definition;
 
-                self.parent.data(updatedData);
-            })
-            .catch(err => {
-                window.window.catchFetchErrors(err);
-            })
+                    self.parent.data(updatedData);
+                })
+                .catch(err => {
+                    window.window.catchFetchErrors(err);
+                })
+        }
     };
 
     self.attrSub = self.attributes.subscribe(nvs => {

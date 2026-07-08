@@ -4,6 +4,7 @@ using System.Data.Linq.Mapping;
 using System.Reflection;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.ProductPage;
+using wwwDesignersGuild.Models.Redirect;
 using wwwDesignersGuild.Models.Redirects;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 

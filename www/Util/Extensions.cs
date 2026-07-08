@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.SessionState;
 using System.Web.UI;
 
 namespace wwwDesignersGuild.Util
@@ -61,10 +64,57 @@ namespace wwwDesignersGuild.Util
 
             // get context wrapper from HttpContext if available
             HttpContextBase wrapper;
-            if (System.Web.HttpContext.Current != null)
+
+
+			// 1. Create the base dummy context
+			var request = new SimpleWorkerRequest("", "", new StringWriter());
+			var fakeContext = new HttpContext(request);
+
+			// 2. Build the fake session storage container
+			var sessionItems = new SessionStateItemCollection();
+			// Optional: Preload any data your view needs here
+			// sessionItems["SomeKey"] = "SomeValue";
+
+			var sessionContainer = new HttpSessionStateContainer(
+				id: $"FakeSessionId-{DateTime.Now.Ticks}",
+				sessionItems: sessionItems,
+				staticObjects: new HttpStaticObjectsCollection(),
+				timeout: 20,
+				newSession: true,
+				cookieMode: HttpCookieMode.UseCookies,
+				mode: SessionStateMode.InProc,
+				isReadonly: false
+			);
+
+			// 3. Use reflection to build the internal HttpSessionState wrapper
+			var sessionStateType = typeof(HttpSessionState);
+			var constructor = sessionStateType.GetConstructor(
+				BindingFlags.NonPublic | BindingFlags.Instance,
+				null,
+				new Type[] { typeof(IHttpSessionState) },
+				null
+			);
+
+			if (constructor == null)
+			{
+				throw new InvalidOperationException("Could not find internal HttpSessionState constructor.");
+			}
+
+			var actualSessionState = (HttpSessionState)constructor.Invoke(new object[] { sessionContainer });
+
+			// 4. CRITICAL: Force the HttpContext to cache the session by setting the internal field
+			var sessionField = typeof(HttpContext).GetField("_session", BindingFlags.NonPublic | BindingFlags.Instance);
+			if (sessionField != null)
+			{
+				sessionField.SetValue(fakeContext, actualSessionState);
+			}
+
+			if (System.Web.HttpContext.Current != null)
                 wrapper = new HttpContextWrapper(System.Web.HttpContext.Current);
             else
-                throw new InvalidOperationException("Can't create Controller Context if no active HttpContext instance is available.");
+            {
+                wrapper = new HttpContextWrapper(fakeContext);
+			}
 
             if (routeData == null)
                 routeData = new RouteData();

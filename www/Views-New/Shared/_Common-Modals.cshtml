@@ -706,6 +706,7 @@
                                    class="form-control"
                                    type="text"
                                    aria-errormessage="email-error"
+                                   autocomplete="email"
                                    data-bind="keepElement: email,
                                             textInput: email,
                                             attr:{
@@ -735,6 +736,7 @@
                             <select id="country"
                                     name="country"
                                     class="form-select"
+                                    autocomplete="country"
                                     data-bind="keepElement: marketingCountryId,
                                             options: availableCountries,
                                             optionsText: 'Name',
@@ -750,7 +752,7 @@
                         <div style="display: none"
                              class="mb-3"
                              data-bind="visible: currentlyAvailableLanguages().length > 1">
-                            <label for="country" class="form-label">
+                            <label for="register-language" class="form-label">
                                 @HtmlHelperExtra.Resource("FormsLanguage", l, c, d)
                             </label>
                             <select id="register-language"

@@ -181,7 +181,7 @@ namespace wwwDesignersGuild.Controllers
 #endif
 
             var viewModel = new FixedPageViewModel_Search(objSearchResult, objBase);
-           
+
             return PartialView("~/Views-New/LandingPages/FixedPages/_Search.cshtml", viewModel);
         }
 

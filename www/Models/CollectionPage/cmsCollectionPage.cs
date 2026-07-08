@@ -37,7 +37,7 @@ namespace wwwDesignersGuild.Models.CollectionPage
 
             var ppJson = ppCache.GetOrCreate(collectionId, languageId, countryId, isTrade, tradeAccountId, countryMatch, useDate, () => {
 
-                var result = loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate);
+                var result = loadCollectionProductPageGridFromCmsDatabase(collectionId, memberId, languageId, countryId, tradeAccountId, displayTradePrice, useDate, countryMatch);
 
                 return result;
 

@@ -209,7 +209,7 @@ namespace wwwDesignersGuild.Models.Search
 #endif
             var search = new cmsSearch();
 
-            var objSearchResultReturn = await search.loadSearchFromCms(productPageTable, languageId, countryId, searchTerm, tradeAccountId, productTypeId, useDate);
+            var objSearchResultReturn = await search.loadSearchFromCms(productPageTable, languageId, countryId, searchTerm, tradeAccountId, useDate, productTypeId);
 
             Parallel.ForEach(objSearchResultReturn.searchResultCores, tempResult =>
             {

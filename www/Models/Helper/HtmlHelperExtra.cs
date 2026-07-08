@@ -19,6 +19,10 @@ using DevExpress.Web.Rendering;
 using wwwDesignersGuild.Models.Hotspot;
 using System.Threading.Tasks;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
+using System.IO;
+using System.Web.Hosting;
+using System.Web.SessionState;
+using System.Reflection;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -1003,8 +1007,52 @@ namespace wwwDesignersGuild.Models.Helper
             IEnumerable<long> imageIds,
             IEnumerable<ImageHotspot> imageHotspots,
             BaseViewModel objBase)
-        {
-            var controller = ViewRenderer.CreateController<GenericController>();
+		{
+			// 1. Create the base dummy context
+			var request = new SimpleWorkerRequest("", "", new StringWriter());
+			var fakeContext = new HttpContext(request);
+
+			// 2. Build the fake session storage container
+			var sessionItems = new SessionStateItemCollection();
+			// Optional: Preload any data your view needs here
+			// sessionItems["SomeKey"] = "SomeValue";
+
+			var sessionContainer = new HttpSessionStateContainer(
+				id: $"FakeSessionId-{DateTime.Now.Ticks}",
+				sessionItems: sessionItems,
+				staticObjects: new HttpStaticObjectsCollection(),
+				timeout: 20,
+				newSession: true,
+				cookieMode: HttpCookieMode.UseCookies,
+				mode: SessionStateMode.InProc,
+				isReadonly: false
+			);
+
+			// 3. Use reflection to build the internal HttpSessionState wrapper
+			var sessionStateType = typeof(HttpSessionState);
+			var constructor = sessionStateType.GetConstructor(
+				BindingFlags.NonPublic | BindingFlags.Instance,
+				null,
+				new Type[] { typeof(IHttpSessionState) },
+				null
+			);
+
+			if (constructor == null)
+			{
+				throw new InvalidOperationException("Could not find internal HttpSessionState constructor.");
+			}
+
+			var actualSessionState = (HttpSessionState)constructor.Invoke(new object[] { sessionContainer });
+
+			// 4. CRITICAL: Force the HttpContext to cache the session by setting the internal field
+			var sessionField = typeof(HttpContext).GetField("_session", BindingFlags.NonPublic | BindingFlags.Instance);
+			if (sessionField != null)
+			{
+				sessionField.SetValue(fakeContext, actualSessionState);
+			}
+
+			// No worries if your current context is already dead! Which it can be because you might well be calling this function in a background thread!
+			var controller = ViewRenderer.CreateController<GenericController>();
 
             var doc = new HtmlDocument();
 

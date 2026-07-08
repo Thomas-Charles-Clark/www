@@ -22,6 +22,99 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 	{
         private ObjectCache Cache { get { return MemoryCache.Default; } }
 
+		// Static lock ensures all instances of this provider in the same w3wp.exe share it
+		private static readonly object _syncLock = new object();
+
+		public ProductPageGridPageSection GetOrCreate(
+			long pageSectionId,
+			byte languageId,
+			short countryId,
+			int? tradeAccountId,
+			bool countryMatch,
+			DateTime useDate,
+			bool shouldLock,
+			Func<ProductPageGridPageSection> factory)
+		{
+			var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Get");
+
+			// Fast path: Try to get existing cache without locking
+			var data = (ProductPageGridPageSection)Cache[key];
+
+			if (data != null)
+				return data;
+
+			// Slow path: Lock to prevent multiple threads from generating the same key
+			// can't lock twice in a row: see GeneralAPIController, FetchProductPageGridDefinition
+			if (shouldLock)
+			{
+				lock (_syncLock)
+				{
+					// Necessary double-check pattern: Has another thread built it while we waited?
+					data = (ProductPageGridPageSection)Cache[key];
+					if (data != null)
+						return data;
+
+					// Execute the creation block passed by the caller
+					data = factory();
+
+					// Cache it if caching is enabled
+					if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool enabled) && enabled)
+					{
+						var policy = new CacheItemPolicy();
+
+						if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheDuration"], out short cacheDurationMinutes))
+						{
+							policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+						}
+						else
+						{
+							policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+						}
+
+						Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+					}
+				}
+			}
+			else
+			{
+				// Necessary double-check pattern: Has another thread built it while we waited?
+				data = (ProductPageGridPageSection)Cache[key];
+				if (data != null)
+					return data;
+
+				// Execute the creation block passed by the caller
+				data = factory();
+
+				// Cache it if caching is enabled
+				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool enabled) && enabled)
+				{
+					var policy = new CacheItemPolicy();
+
+					if (Int16.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheDuration"], out short cacheDurationMinutes))
+					{
+						policy.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMinutes(cacheDurationMinutes);
+					}
+					else
+					{
+						policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
+					}
+
+					Cache.Set(key, data, policy); // Use Set instead of Add to safely overwrite/insert
+				}
+			}
+
+			return data;
+		}
+
+		private string buildKey(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, string from)
+		{
+			var tradeSwitch = tradeAccountId.HasValue;
+
+			var key = $"PRODUCTPAGEGRID~PAGESECTION~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+
+			return key;
+		}
+
 		public ProductPageGridPageSection Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
 		{
             var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Get");
@@ -95,18 +188,5 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 
             return $"Removed {removalCount} of {keys.Count()} keys from the cache";
         }
-
-        private string buildKey(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, string from)
-        {
-            var tradeSwitch = tradeAccountId.HasValue;
-
-            var key = $"PRODUCTPAGEGRID~PAGESECTION~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
-
-            System.Diagnostics.Debug.WriteLine("");
-			System.Diagnostics.Debug.WriteLine($"ProductPageGridPageSectionCacheProvider called through {from} built key \"{key}\" ");
-			System.Diagnostics.Debug.WriteLine("");
-
-			return key;
-		}
 	}
 }

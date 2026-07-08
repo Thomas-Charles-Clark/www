@@ -307,6 +307,8 @@ namespace wwwDesignersGuild.Controllers
 
 			#region Get VisitorID, set a few variables in Session
 
+			var mustUpdateVisitorCulture = false;
+
 			//  Get the session identifier
 			if (Session["visitorIdFromDatabase"] == null)
 			{
@@ -357,7 +359,10 @@ namespace wwwDesignersGuild.Controllers
 				objVisitorSelect.VisitorCreatedDT = (DateTime)Session["visitorCreatedDT"];
 				objVisitorSelect.tradePriceListId = (short?)Session["memberTradePriceListID"];
 
-				if (Session["visitorCulture"] == null) { }
+				if (Session["visitorCulture"] == null) 
+				{
+					mustUpdateVisitorCulture = true;
+				}
 				else
 				{
 					objVisitorSelect.Culture = Session["visitorCulture"].ToString();
@@ -452,11 +457,15 @@ namespace wwwDesignersGuild.Controllers
 					}
 					else
 					{
-						if (objVisitorSelect.Culture == urlData.countryDetails.URL)
+						if (mustUpdateVisitorCulture || (objVisitorSelect.Culture == urlData.countryDetails.URL))
 						{
-							// No need to update mbr.Visitor
+							forceTradeAccountCheck = true;
+
+							Boolean tmpSuccess = await updateVisitor(objVisitorSelect.visitorDbId, dgFramework.getIPAddress(), urlData.countryDetails.URL, Request.Headers["CF-IPCountry"], Request.Headers["CF-Device-Type"]);
+
+							Session["visitorCulture"] = urlData.countryDetails.URL;
 						}
-						else
+						else if (objVisitorSelect.Culture != urlData.countryDetails.URL)
 						{
 							forceTradeAccountCheck = true;
 
@@ -1166,9 +1175,9 @@ namespace wwwDesignersGuild.Controllers
 				}
 
 				//#if DEBUG
-				//              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.eu/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
+				//    Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.eu/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
 				//#else
-				//              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.com/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
+				//    Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.com/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
 				//#endif
 
 				var pageView = new logPageView()

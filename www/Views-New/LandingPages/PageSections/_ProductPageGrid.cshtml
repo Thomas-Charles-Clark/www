@@ -61,23 +61,26 @@
     //});
 </script>
 <form id="page-section-@(Model.PageSection.PageSectionID)-form" action="@Request.Url" method="GET">
-	
+
 	@if (grid.Searchable)
 	{
 		<input type="hidden" name="search-term" value="@(Model.Base.SearchTerm)" />
 	}
-	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
-		@Html.Encode(Html.Raw(Model.ToString()))
-	</span>
-	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
-		@Model.Base.AttributeFilterText
-	</span>
-	<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
-		@grid.OriginalTitle
-	</span>
-	<div class="d-none" data-bind="init: { convert: JSON.parse }, html: productPageGrid.attributeSignatures">
-		@Html.Raw(Html.Encode(grid.AttributeCombinationsString))
-	</div>
+	else
+	{
+		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
+			@Html.Encode(Html.Raw(Model.ToString()))
+		</span>
+		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.filterText">
+			@(Model.Base.AttributeFilterText ?? "")
+		</span>
+		<span class="d-none" data-bind="init: { convert: parseString }, text: productPageGrid.originalTitle">
+			@(@grid.OriginalTitle ?? "")
+		</span>
+		<div class="d-none" data-bind="init: { convert: JSON.parse }, html: productPageGrid.attributeSignatures">
+			@Html.Raw(String.IsNullOrWhiteSpace(Html.Encode(grid.AttributeCombinationsString)) ? "[]" : Html.Encode(grid.AttributeCombinationsString))
+		</div>
+	}
 	<span class="d-none" data-bind="init: { convert: parseBool }, text: productPageGrid.searchable">
 		@grid.Searchable
 	</span>
@@ -88,10 +91,7 @@
 		</span>
 	}
 	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-		@Html.Raw(grid.ProductPageIDs)
-	</span>
-	<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.allProductPages, css: { 'ready': productPageGrid.allProductPagesInitialised() }">
-		@Html.Raw(grid.ProductPageIDs)
+		@Html.Raw(String.IsNullOrEmpty(grid.ProductPageIDs) ? "[]" : grid.ProductPageIDs)
 	</span>
 
 	@if (grid.AttributeGroups.Any())
@@ -148,7 +148,7 @@
 							var i = ptObj.index;
 							<!-- ko with: productPageGrid.productTypes()[@(i)] -->
 							<span class="d-none" data-bind="init: { convert: JSON.parse }, text: data">
-								@Html.Raw(JsonConvert.SerializeObject(pt))
+								@Html.Raw(JsonConvert.SerializeObject(pt == null ? new object() : pt))
 							</span>
 							<!-- /ko -->
 						}
@@ -266,7 +266,7 @@
 	{
 		<span data-bind="init: { field: productPageGrid.productType, value: '@(String.IsNullOrEmpty(grid.ProductType) ? grid.ProductTypes.FirstOrDefault()?.FormValue : grid.ProductType)' }, remove"></span>
 		<span class="d-none" data-bind="init: { convert: JSON.parse }, text: productPageGrid.productTypes, remove">
-			@Html.Raw(JsonConvert.SerializeObject(grid.ProductTypes))
+			@Html.Raw(JsonConvert.SerializeObject(grid.ProductTypes ?? new List<ProductType>()))
 		</span>
 	}
 	@if (!String.IsNullOrEmpty(Model.PageSection.Heading))

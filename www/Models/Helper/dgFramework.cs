@@ -28,6 +28,7 @@ using System.Web.Routing;
 using wwwDesignersGuild.Controllers;
 using Microsoft.Owin.Security.Provider;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
+using DocumentFormat.OpenXml.Drawing;
 
 namespace wwwDesignersGuild.Models.Helper
 {
@@ -2009,9 +2010,9 @@ namespace wwwDesignersGuild.Models.Helper
             MobileDetectionCacheProvider objMobileDetectionCache = new MobileDetectionCacheProvider();
 
             // Check in cache before performing request to 51 degrees
-            string cloudflareDeviceTypeHeader = (HttpContext.Current.Request.Headers["CF-Device-Type-Override"] ??
-                                                HttpContext.Current.Request.Headers["CF-Device-Type"] ?? 
-                                                "mobile")?.ToLowerInvariant();
+            string cloudflareDeviceTypeHeader = (HttpContext.Current?.Request?.Headers["CF-Device-Type-Override"] ??
+                                                HttpContext.Current?.Request?.Headers["CF-Device-Type"]?? 
+                                                "desktop")?.ToLowerInvariant();
 
 
             var mobileDetectionResult = objMobileDetectionCache.GetOrCreate(cloudflareDeviceTypeHeader, () => { 

@@ -55,8 +55,6 @@ namespace wwwDesignersGuild.Controllers
 {
     public class ProductPageAPIController : ApiController
 	{
-		private static Logger Logger = LogManager.GetCurrentClassLogger();
-
 		[HttpPost]
         public async Task<IHttpActionResult> fetchModuleDetail([FromBody] PassModuleOption module)
         {
@@ -160,8 +158,6 @@ namespace wwwDesignersGuild.Controllers
 		[HttpPost]
 		public async Task<IHttpActionResult> FetchProductPageGridPortion([FromBody]ProductPageGrid_PagingDTO dto)
 		{
-			Logger.Log(LogLevel.Debug, "FetchProductPageGridPortion was called:\r\n\r\n{0}", dto);
-
 			var session = HttpContext.Current.Session;
 
 			Int32? memberId = null;
@@ -182,6 +178,8 @@ namespace wwwDesignersGuild.Controllers
 				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
 			}
 
+			var rawUrl = HttpContext.Current.Request.RawUrl;
+
 			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
 
 			var Definition = await new cmsLandingPage().loadLandingPageFromCms(
@@ -200,36 +198,53 @@ namespace wwwDesignersGuild.Controllers
 
 			var ppgCacheProvider = new ProductPageGridPageSectionCacheProvider();
 
-			var productPageGridPageSection = ppgCacheProvider.Get(
+			var productPageGridPageSection = ppgCacheProvider.GetOrCreate(
 				dto.PageSectionID,
 				dto.LanguageID,
 				dto.CountryID,
 				tradeAccountId,
 				dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
-				dto.MasterDefinition.UrlBreakdown.ContentDate);
+				dto.MasterDefinition.UrlBreakdown.ContentDate, 
+				true,
+				() =>
+				{ 
+					var result = Task.Run(() => ProductPageGridPageSection.CreateAsync(
+						originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
+						productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
+						pagingEnabled: true,
+						filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+						isShop: Definition.PageDetails.IsShop,
+						isLifestyleGallery: false,
+						tradeAccountId,
+						rawUrl,
+						model: dto.Base
+					)).Result;
 
-			if (productPageGridPageSection == null)
-			{
-				productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
-					originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
-					productPage:  Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
-					pagingEnabled: true,
-					filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-					isShop: Definition.PageDetails.IsShop,
-					isLifestyleGallery: false,
-					model: dto.Base
-				);
+					return result;
+				});
 
-				ppgCacheProvider.Set(
-					productPageGridPageSection.PageSectionID,
-					dto.LanguageID,
-					dto.CountryID,
-					tradeAccountId,
-					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
-					dto.MasterDefinition.UrlBreakdown.ContentDate,
-					productPageGridPageSection
-				);
-			}
+			//if (productPageGridPageSection == null)
+			//{
+			//	productPageGridPageSection = await ProductPageGridPageSection.CreateAsync(
+			//		originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
+			//		productPage:  Definition.productPageGridSections.Single(p => p.PageSectionID == dto.PageSectionID),
+			//		pagingEnabled: true,
+			//		filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+			//		isShop: Definition.PageDetails.IsShop,
+			//		isLifestyleGallery: false,
+			//		model: dto.Base
+			//	);
+
+			//	ppgCacheProvider.Set(
+			//		productPageGridPageSection.PageSectionID,
+			//		dto.LanguageID,
+			//		dto.CountryID,
+			//		tradeAccountId,
+			//		dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+			//		dto.MasterDefinition.UrlBreakdown.ContentDate,
+			//		productPageGridPageSection
+			//	);
+			//}
 
 			//##############################################################################################################
 
@@ -288,121 +303,31 @@ namespace wwwDesignersGuild.Controllers
 
 			var ppgCache = new ProductPageGridCacheProvider();
 
-			var ppg = ppgCache.Get(dto.PageSectionID,
+			var ppg = ppgCache.GetOrCreate(dto.PageSectionID,
 				dto.LanguageID,
 				dto.CountryID,
+				tradeAccountId.HasValue,
 				tradeAccountId,
 				countryMatched,
-				useDate);
+				useDate, 
+				() => {
+					var result = Task.Run(() =>
+						new cmsLandingPage().loadProductPageGridFromCmsDatabase(
+						dto.PageSectionID,
+						memberId,
+						dto.LanguageID,
+						dto.CountryID,
+						tradeAccountId,
+						dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
+						displayTradePrice,
+						useDate)
+					).Result;
 
-			if (ppg == null)
-			{
-#if DEBUG
-				debugString = "FetchProductPageGridPortion Checkpoint C.i) - ProductPageGridCacheProvider returned null in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-				
-				sw.Restart();
-#endif
-
-				ppg = await Task.FromResult(new cmsLandingPage().loadProductPageGridFromCmsDatabase(
-					dto.PageSectionID, 
-					memberId, 
-					dto.LanguageID, 
-					dto.CountryID, 
-					tradeAccountId, 
-					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
-					displayTradePrice,
-					useDate));
+				return result;
+			});
 
 #if DEBUG
-				System.Diagnostics.Trace.WriteLine($@"
-loadProductPageGridFromCmsDatabase called with: 
-    pageSectionId = {dto.PageSectionID},
-    memberId = {memberId},
-    languageId = {dto.LanguageID},
-    countryId = {dto.CountryID},
-    tradeAccountId = {tradeAccountId},
-    countryMatch = {dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match},
-    displayTradePrice = {displayTradePrice},
-    useDate = {useDate}");
-				System.Diagnostics.Trace.WriteLine("");
-#endif
-
-#if DEBUG
-				debugString = "FetchProductPageGridPortion Checkpoint C.ii) - cmsLandingPage.loadProductPageGridFromCmsDatabase returned in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-				sw.Restart();
-#endif
-
-				ppgCache.Set(dto.PageSectionID, 
-					dto.LanguageID, 
-					dto.CountryID, 
-					tradeAccountId,
-					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match, 
-					useDate, 
-					ppg);
-
-#if DEBUG
-				debugString = "FetchProductPageGridPortion Checkpoint C.iii) - ProductPageGridCache.Set returned in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-				sw.Restart();
-#endif
-			}
-			else
-			{
-#if DEBUG
-				debugString = "FetchProductPageGridPortion Checkpoint C.0) - ProductPageGridCacheProvider returned non-null in";
-
-				longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
-
-				System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
-
-				sw.Restart();
-#endif
-			}
-
-			var filteredProductPages = new List<int>();
-
-			if (dto.Attributes.Any())
-			{
-				var attributesGrouped = dto.Attributes.GroupBy(a => new { a.AttributeGroupID, a.AttributeOperator }).ToList();
-
-				var allAttributeGroupProductPageIds = new List<List<int>>();
-
-				attributesGrouped.ForEach(ag => 
-				{
-					var thisGroupProductPageIDs = new List<int>();
-
-					// ag.Key is the AttributeGroupID
-					switch(ag.Key.AttributeOperator)
-					{
-						case "AND":
-							thisGroupProductPageIDs.AddRange(ag.Select(a => a.ProductPageIDs).Aggregate((previous, next) => previous.Intersect(next)));
-							break;
-						case "OR":
-							thisGroupProductPageIDs.AddRange(ag.SelectMany(p => p.ProductPageIDs));
-							break;
-					}
-
-					allAttributeGroupProductPageIds.Add(thisGroupProductPageIDs);
-				});
-
-				filteredProductPages = Framework.IntersectAll(allAttributeGroupProductPageIds).ToList();
-			}
-
-#if DEBUG
-			debugString = "FetchProductPageGridPortion Checkpoint D) - attributeGroups parsed in";
+			debugString = "FetchProductPageGridPortion Checkpoint C.0) - ProductPageGridCacheProvider returned non-null in";
 
 			longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
 
@@ -410,35 +335,74 @@ loadProductPageGridFromCmsDatabase called with:
 
 			sw.Restart();
 #endif
-
-			// we need a way to use the attributes as given to reduce this potentially enormous list
-			// as efficiently as possible
-			// as quickly as possible
-			//
-			// right so now we have ProductPageIDs on each Attribute coming in...
-			// and each attribute declares which operator its group uses: AND or OR
-			// that means... that means that we need to group them by attribute group
-			// and apply 
-			//
-			// between attribute groups themselves, the operator is always AND
-
-			// If we have been given any filtering instructions
-			// then we need only read those precise productPageIDs from the in-memory cache
-			// and then we can apply our sorting to that set (before paging it).
-			var results = new List<ProductPageFilterablePod>();
 			
-			if (filteredProductPages.Any())
+		var filteredProductPages = new List<int>();
+
+		if (dto.Attributes.Any())
+		{
+			var attributesGrouped = dto.Attributes.GroupBy(a => new { a.AttributeGroupID, a.AttributeOperator }).ToList();
+
+			var allAttributeGroupProductPageIds = new List<List<int>>();
+
+			attributesGrouped.ForEach(ag => 
 			{
-				results = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages, dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
-					.Select(p => p.ProductPage)
-					.ToList();
-			}
-			else
-			{
-				results = Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
-					.Select(p => p.ProductPage)
-					.ToList();
-			}
+				var thisGroupProductPageIDs = new List<int>();
+
+				// ag.Key is the AttributeGroupID
+				switch(ag.Key.AttributeOperator)
+				{
+					case "AND":
+						thisGroupProductPageIDs.AddRange(ag.Select(a => a.ProductPageIDs).Aggregate((previous, next) => previous.Intersect(next)));
+						break;
+					case "OR":
+						thisGroupProductPageIDs.AddRange(ag.SelectMany(p => p.ProductPageIDs));
+						break;
+				}
+
+				allAttributeGroupProductPageIds.Add(thisGroupProductPageIDs);
+			});
+
+			filteredProductPages = Framework.IntersectAll(allAttributeGroupProductPageIds).ToList();
+		}
+
+#if DEBUG
+		debugString = "FetchProductPageGridPortion Checkpoint D) - attributeGroups parsed in";
+
+		longestWait.Add(new Tuple<string, TimeSpan>(debugString, sw.Elapsed));
+
+		System.Diagnostics.Trace.WriteLine($"{debugString} {sw.Elapsed}");
+
+		sw.Restart();
+#endif
+
+		// we need a way to use the attributes as given to reduce this potentially enormous list
+		// as efficiently as possible
+		// as quickly as possible
+		//
+		// right so now we have ProductPageIDs on each Attribute coming in...
+		// and each attribute declares which operator its group uses: AND or OR
+		// that means... that means that we need to group them by attribute group
+		// and apply 
+		//
+		// between attribute groups themselves, the operator is always AND
+
+		// If we have been given any filtering instructions
+		// then we need only read those precise productPageIDs from the in-memory cache
+		// and then we can apply our sorting to that set (before paging it).
+		var results = new List<ProductPageFilterablePod>();
+			
+		if (filteredProductPages.Any())
+		{
+			results = Framework.StreamingJsonReduction(ppg.JSON, filteredProductPages, dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
+				.Select(p => p.ProductPage)
+				.ToList();
+		}
+		else
+		{
+			results = Framework.StreamSegmentOfJsonArray(ppg.JSON, "productPages", dto.PageSize * (dto.Page - 1), dto.PageSize, dto.Sort)
+				.Select(p => p.ProductPage)
+				.ToList();
+		}
 
 //#if DEBUG
 //			debugString = "FetchProductPageGridPortion Checkpoint E) - Framework.StreamingJsonReduction returned in";

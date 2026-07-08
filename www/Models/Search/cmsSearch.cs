@@ -12,7 +12,7 @@ namespace wwwDesignersGuild.Models.Search
 {
 	public class cmsSearch
 	{
-		public async Task<serverSearchDatabase> loadSearchFromCms(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, DateTime useDate)
+		public async Task<serverSearchDatabase> loadSearchFromCms(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, DateTime useDate, byte? productTypeId)
 		{
 			//  Is result already in cache?
 			serverSearchDatabase searchResult = null;
@@ -21,7 +21,7 @@ namespace wwwDesignersGuild.Models.Search
 
 			searchResult = cache.GetOrCreate(languageId, countryId, searchTerm, tradeAccountId, useDate, () => {
 
-				var result = Task.Run(() => loadSearchFromDatabase(productPageTable, languageId, countryId, searchTerm, tradeAccountId, useDate)).Result;
+				var result = Task.Run(() => loadSearchFromDatabase(productPageTable, languageId, countryId, searchTerm, tradeAccountId, useDate, productTypeId)).Result;
 
 				return result;
 
@@ -30,7 +30,7 @@ namespace wwwDesignersGuild.Models.Search
 			return searchResult;
 		}
 
-		private serverSearchDatabase loadSearchFromDatabase(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, DateTime useDate)
+		private serverSearchDatabase loadSearchFromDatabase(DataTable productPageTable, byte languageId, short countryId, string searchTerm, int? tradeAccountId, DateTime useDate, byte? productTypeId)
 		{
 			var objDbSearchResults = new searchDb();
 			return objDbSearchResults.generateServerSearchResults(productPageTable,
@@ -39,7 +39,8 @@ namespace wwwDesignersGuild.Models.Search
 				useDate,
 				String.IsNullOrEmpty(searchTerm),
 				tradeAccountId,
-				tradeAccountId.HasValue);
+				tradeAccountId.HasValue,
+				productTypeId);
 		}
 	}
 }

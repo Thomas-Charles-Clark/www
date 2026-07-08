@@ -2,6 +2,7 @@
 
 using DocumentFormat.OpenXml.EMMA;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
@@ -333,6 +334,7 @@ namespace wwwDesignersGuild.ViewModels
                 initialProductPageIds = initialProductPageIds.Intersect(appid.ProductPageIDs).ToList();
             });
 
+            ProductPageGrid.ProductPageIDs = JsonConvert.SerializeObject(completeResultSet.Select(p => p.ProductPageID));
             ProductPageGrid.FilteredIDs = initialProductPageIds;
 
             // What do we use FilteredProductPageIDs for...?

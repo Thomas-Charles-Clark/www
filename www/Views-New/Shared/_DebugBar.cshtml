@@ -43,6 +43,12 @@
                 SessionID @(HttpContext.Current.Session.SessionID)
             </label>
             <label>
+                w3wp.exe PID: @(System.Diagnostics.Process.GetCurrentProcess().Id)
+            </label>
+            <label>
+                ThreadID: @(System.Threading.Thread.CurrentThread.ManagedThreadId)
+            </label>
+            <label>
                 Login @(Session["loginStatus"])
             </label>
        @if (!String.IsNullOrEmpty(Session["checkoutId"]?.ToString()))

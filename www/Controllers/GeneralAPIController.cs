@@ -1,4 +1,6 @@
-﻿using Kendo.Mvc.Extensions;
+﻿using DevExpress.Web.Mvc.Internal;
+
+using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 
 using MertexerV2.Models.Accounts;
@@ -432,9 +434,9 @@ namespace wwwDesignersGuild.Controllers
 
 			var isLifestyle = HttpContext.Current.Request.QueryString.AllKeys.FirstOrDefault(k => k == "lifestyle") != null;
 
-			var countryId = dto.masterDefinition.UrlBreakdown.countryDetails.CountryID;
+			var countryId = dto.@base.MasterDefinition.UrlBreakdown.countryDetails.CountryID;
 
-			var languageId = dto.masterDefinition.UrlBreakdown.countryDetails.LanguageID;
+			var languageId = dto.@base.MasterDefinition.UrlBreakdown.countryDetails.LanguageID;
 
 			if (!String.IsNullOrEmpty(countryOverride))
 			{
@@ -471,7 +473,7 @@ namespace wwwDesignersGuild.Controllers
 				 Convert.ToBoolean(HttpContext.Current.Session["memberDisplayTradePrice"]),
 				productPageToRenderTable,
 				useDate,
-				dto.masterDefinition.UrlBreakdown.countryDetails,
+				dto.@base.MasterDefinition.UrlBreakdown.countryDetails,
 				$"{useDate:O}",
 				countryOverride);
 
@@ -486,12 +488,12 @@ namespace wwwDesignersGuild.Controllers
 			{
 				productPageIds = dto.productPageIds,
 				objVisitor = visitor,
-				objMaster = dto.masterDefinition,
+				objMaster = dto.@base.MasterDefinition,
 				isLifestyle = isLifestyle,
-				countryCheckMatched = dto.masterDefinition.UrlBreakdown.CountryAwareness.Match,
+				countryCheckMatched = dto.@base.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
 				displayTradePrice = visitor.memberDisplayTradePrice,
-				countryId = dto.masterDefinition.UrlBreakdown.countryDetails.CountryID,
-				languageId = dto.masterDefinition.UrlBreakdown.countryDetails.LanguageID,
+				countryId = dto.@base.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+				languageId = dto.@base.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
 				useDate = useDate,
 				pageId = null
 			});
@@ -620,52 +622,58 @@ namespace wwwDesignersGuild.Controllers
 
 			var cacheProvider = new ProductPageGridPageSectionCacheProvider();
 
-			var result = cacheProvider.Get(
+			var countryCheckMatched = Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]);
+
+			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+
+			var tradeAccountID = (int?)HttpContext.Current.Session["memberTradeAccountID"];
+
+			var rawUrl = HttpContext.Current.Request.RawUrl;
+
+			var result = cacheProvider.GetOrCreate(
 				pageSectionId: dto.pageSectionId,
 				languageId: dto.languageId,
 				countryId: dto.countryId,
-				tradeAccountId: (int?)HttpContext.Current.Session["memberTradeAccountID"],
-				countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
-				useDate: useDate);
+				tradeAccountId: tradeAccountId,
+				countryMatch: countryCheckMatched,
+				useDate: useDate, 
+				shouldLock: false,
+				factory: () => {
 
-			if (result == null)
-			{
-				var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
+					var creationResult = Task.Run(() => {
 
-				var Definition = await new cmsLandingPage().loadLandingPageFromCms(
-					memberId: memberId,
-					pageId: dto.MasterDefinition.UrlBreakdown.ContentId,
-					languageId: dto.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
-					countryId: dto.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
-					useDate: dto.MasterDefinition.UrlBreakdown.ContentDate,
-					isMember: memberId.HasValue,
-					isTrade: dto.MasterDefinition.TradeMember,
-					countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
-					displayTradePrice: displayTradePrice,
-					tradeAccountId: tradeAccountId,
-					productPageGridPage: dto.page,
-					productPageGridPageSize: dto.pageSize);
+						var Definition = Task.Run(() => new cmsLandingPage().loadLandingPageFromCms(
+							memberId: memberId,
+							pageId: dto.MasterDefinition.UrlBreakdown.ContentId,
+							languageId: dto.MasterDefinition.UrlBreakdown.countryDetails.LanguageID,
+							countryId: dto.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+							useDate: dto.MasterDefinition.UrlBreakdown.ContentDate,
+							isMember: memberId.HasValue,
+							isTrade: dto.MasterDefinition.TradeMember,
+							countryMatch: countryCheckMatched,
+							displayTradePrice: displayTradePrice,
+							tradeAccountId: tradeAccountId,
+							productPageGridPage: dto.page,
+							productPageGridPageSize: dto.pageSize)).Result;
 
-				result = await ProductPageGridPageSection.CreateAsync(
-					originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
-					productPage: Definition.productPageGridSections.Single(p => p.PageSectionID == dto.pageSectionId),
-					pagingEnabled: true,
-					filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
-					isShop: Definition.PageDetails.IsShop,
-					isLifestyleGallery: false,
-					model: dto.@base
-				);
+						var Section = Task.Run(() => ProductPageGridPageSection.CreateAsync(
+							originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
+							productPage: Definition.productPageGridSections.SingleOrDefault(p => p.PageSectionID == dto.pageSectionId),
+							pagingEnabled: true,
+							filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
+							isShop: Definition.PageDetails.IsShop,
+							isLifestyleGallery: false,
+							tradeAccountID,
+							rawUrl,
+							model: dto.@base
+						)).Result;
 
-				cacheProvider.Set(
-					result.PageSectionID,
-					dto.languageId,
-					dto.countryId,
-					tradeAccountId,
-					dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
-					dto.MasterDefinition.UrlBreakdown.ContentDate,
-					result
-				);
-			}
+						return Section;
+
+					}).Result;
+
+					return creationResult;
+				});
 
 			return Ok(result);
 		}

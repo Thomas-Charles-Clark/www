@@ -395,7 +395,7 @@
 <body>
 	@Html.Partial("~/Views-New/Shared/_Large-Image-Modal.cshtml")
 	@Html.Partial("~/Views-New/Shared/_Common-Modals.cshtml")
-	<div id="body-content">
+	<main id="body-content">
 		@if (!dgFramework.isPagePartOfCheckOutProcess(Model.ContentType, Model.ContentID))
 		{
 			<div id="body-inner">
@@ -516,7 +516,7 @@
 				}
 			</footer>
 		}
-	</div>
+	</main>
 
 	@Html.Partial("~/Views-New/Shared/_Layout-Late-JS.cshtml")
 	

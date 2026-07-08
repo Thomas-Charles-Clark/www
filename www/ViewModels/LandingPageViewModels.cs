@@ -194,6 +194,8 @@ namespace wwwDesignersGuild.ViewModels
 				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
 			}
 
+            var rawUrl = HttpContext.Current.Request.RawUrl;
+
 			Definition = await new cmsLandingPage().loadLandingPageFromCms(
                 memberId: Visitor.memberId,
                 pageId: MasterDefinition.UrlBreakdown.ContentId,
@@ -270,6 +272,8 @@ namespace wwwDesignersGuild.ViewModels
                             filterIndexingEnabled: Definition.PageDetails.EnableFilterIndexing,
                             isShop: Definition.PageDetails.IsShop,
                             isLifestyleGallery: pageSection.IsLifestyleGallery,
+                            tradeAccountId,
+                            rawUrl,
                             model: this
                         );
 
