@@ -55,7 +55,9 @@ namespace wwwDesignersGuild.Models.Hotspot
         }
 
         public IEnumerable<long> ImageIDs { get; set; }
-        
+
+        public bool CountryMatch { get; set; }
+
         public PassHotspotCacheFetch(
             int contentId,
             dgContentType contentType,
@@ -67,7 +69,7 @@ namespace wwwDesignersGuild.Models.Hotspot
             byte languageId,
             DateTime contentDate,
             IEnumerable<long> imageIds,
-            bool countryCheckMatched
+            bool countryMatch
             )
         {
             ContentID = contentId;
@@ -80,7 +82,7 @@ namespace wwwDesignersGuild.Models.Hotspot
             LanguageID = languageId;
             ContentDate = contentDate;
             ImageIDs = imageIds.Distinct().OrderBy(i => i);
-            CountryCheckMatched = countryCheckMatched;
+            CountryMatch = countryMatch;
         }
 
         public override string ToString()
