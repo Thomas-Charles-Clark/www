@@ -514,7 +514,8 @@ namespace wwwDesignersGuild.ViewModels
                     CountryID,
                     LanguageID,
                     Date,
-                    imageIds.Distinct()
+                    imageIds.Distinct(),
+                    this.MasterDefinition.UrlBreakdown.CountryAwareness.Match
                 );
 
                 var result = await objHotspotHouse.loadHotspotsFromCmsAsync(objFetch, this);
