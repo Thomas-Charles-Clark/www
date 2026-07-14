@@ -31,11 +31,8 @@ namespace wwwDesignersGuild.Models.Attribute
            return attributeStore;
         }
 
-
         private cmsAttributeDefinition loadAttributeFromCmsDatabaseAsync(byte languageId)
         {
-
-            
             var dataContext = new databaseDataContext();
 
             IMultipleResults results = dataContext.Attribute_GenerateMultiple(languageId);
@@ -50,12 +47,7 @@ namespace wwwDesignersGuild.Models.Attribute
                 attributeGroupGroups = results.GetResult<AttributeGroupGroup>().ToList(),
             };
 
-
             return  attributeStore;
-
-
         }
-
     }
-
 }

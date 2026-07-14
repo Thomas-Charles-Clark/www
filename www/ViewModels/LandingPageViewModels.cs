@@ -184,8 +184,10 @@ namespace wwwDesignersGuild.ViewModels
             await base.Initialise();
 
 			var pager = new PagerViewModel(-1, true, true, null, false, null);
-			
-            pager.InitialisePager();
+
+            var queryString = HttpContext.Current.Request.QueryString;
+
+			pager.InitialisePager(queryString);
             
 			int? tradeAccountId = null;
 
@@ -273,7 +275,7 @@ namespace wwwDesignersGuild.ViewModels
                             isShop: Definition.PageDetails.IsShop,
                             isLifestyleGallery: pageSection.IsLifestyleGallery,
                             tradeAccountId,
-                            rawUrl,
+                            queryString,
                             model: this
                         );
 

@@ -130,7 +130,7 @@ namespace wwwDesignersGuild.ViewModels
 
             ProductPageGrid.Searchable = true;
 
-            ProductPageGrid.InitialisePager(); // This to force Sort to pull from Request.QueryString
+            ProductPageGrid.InitialisePager(HttpContext.Current.Request.QueryString); // This to force Sort to pull from Request.QueryString
 
             // Product Type IDs as lent by the search results
             var searchResultProductTypes = Definition.searchResultCores.Select(p => p.ProductTypeID).Distinct();
@@ -382,7 +382,7 @@ namespace wwwDesignersGuild.ViewModels
             #region Initialise Pager
 
             // The call to InitialisePager is necessary to cause the PagerViewModel to carry appropriate values for things like page, pageCount, pageSize.
-            ProductPageGrid.InitialisePager();
+            ProductPageGrid.InitialisePager(HttpContext.Current.Request.QueryString);
 
             #endregion
 

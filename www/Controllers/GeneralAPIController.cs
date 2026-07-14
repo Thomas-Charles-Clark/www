@@ -14,6 +14,7 @@ using NLog;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
@@ -628,7 +629,11 @@ namespace wwwDesignersGuild.Controllers
 
 			var tradeAccountID = (int?)HttpContext.Current.Session["memberTradeAccountID"];
 
+			var sort = HttpContext.Current.Session["sort"];
+
 			var rawUrl = HttpContext.Current.Request.RawUrl;
+
+			var queryString = HttpContext.Current.Request.QueryString;
 
 			var result = cacheProvider.GetOrCreate(
 				pageSectionId: dto.pageSectionId,
@@ -638,7 +643,9 @@ namespace wwwDesignersGuild.Controllers
 				countryMatch: countryCheckMatched,
 				useDate: useDate, 
 				shouldLock: false,
-				factory: () => {
+				isSearch: false,
+				queryString: queryString,
+				factory: (NameValueCollection qs) => {
 
 					var creationResult = Task.Run(() => {
 
@@ -664,7 +671,7 @@ namespace wwwDesignersGuild.Controllers
 							isShop: Definition.PageDetails.IsShop,
 							isLifestyleGallery: false,
 							tradeAccountID,
-							rawUrl,
+							queryString,
 							model: dto.@base
 						)).Result;
 

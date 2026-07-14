@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +17,10 @@ namespace wwwDesignersGuild.Models.ProductPage
 		public int pageSize { get; set; } = 48;
 		public byte languageId { get; set; }
 		public short countryId { get; set; }
+
+		[JsonProperty("base")]
 		public BaseViewModel @base { get; set; }
+
 		public NewMasterDefinition MasterDefinition 
 		{
 			get 

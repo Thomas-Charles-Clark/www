@@ -1,4 +1,5 @@
 ﻿    using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Math;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -77,7 +78,16 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 
 		private string buildKey(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)
 		{
-			return $"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+			var key = $"PRODUCTPAGEGRID~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+
+#if DEBUG
+			if (pageSectionId == 0)
+			{
+				throw new Exception($"ProductPageGridCacheProvider.buildKey built \"{key}\"");
+			}
+#endif
+
+			return key;
 		}
 
         public void Invalidate(long pageSectionId, byte languageId, short countryId, bool tradeSwitch, int? tradeAccountId, bool countryMatch, DateTime useDate)

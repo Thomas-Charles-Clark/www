@@ -70,7 +70,16 @@ namespace wwwDesignersGuild.Models.Cache
 
 		private string buildKey(byte languageId)
 		{
-			return $"ATTRIBUTE~{languageId}";
+			var key = $"ATTRIBUTE~{languageId}";
+
+#if DEBUG
+			if (languageId == 0)
+			{
+				throw new Exception($"AttributeCacheProvider.buildKey built \"{key}\"");
+			}
+#endif
+
+			return key;
 		}
     }
 }

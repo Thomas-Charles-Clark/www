@@ -332,7 +332,7 @@ namespace wwwDesignersGuild.ViewModels
 
             Base = baseViewModel;
 
-            Basket = baseViewModel.Basket;
+            Basket = baseViewModel?.Basket;
 
             Solitary = false;
 

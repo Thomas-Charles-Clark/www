@@ -4,6 +4,8 @@
         ProductPageIDs: availableProductPageIds
     };
 
+    console.log(`attributeViewModel being instantiated with ${self.ProductPageIDs.length} productPageIds`);
+
     self.data = ko.observable();
 
     // rather than setting this all the damned time, have it... calculate itself?

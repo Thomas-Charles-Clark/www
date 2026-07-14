@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 
@@ -163,20 +164,20 @@ namespace wwwDesignersGuild.ViewModels
             FilteredIDs = new List<int>();
         }
 
-        public void InitialisePager()
+        public void InitialisePager(NameValueCollection queryString)
         {
-            Sort = HttpContext.Current.Request.QueryString["sort"];
+            Sort = queryString["sort"];
 
-            Page = Int32.Parse(HttpContext.Current.Request.QueryString["Page"] ?? "1");
+            Page = Int32.Parse(queryString["Page"] ?? "1");
 
-            PageSize = Int32.Parse(HttpContext.Current.Request.QueryString["PageSize"] ?? "48");
+            PageSize = Int32.Parse(queryString["PageSize"] ?? "48");
 
             // Does product type really belong on the pager...?
             if (String.IsNullOrEmpty(ProductType)) // can be non-null if being initialised by a ProductPageGrid in LandingPageViewModel.cs
             {
-                ProductType = String.IsNullOrEmpty(HttpContext.Current.Request.QueryString["product-type"])
+                ProductType = String.IsNullOrEmpty(queryString["product-type"])
                     ? ""
-                    : HttpContext.Current.Request.QueryString["product-type"];
+                    : queryString["product-type"];
             }
 
             if (Page > PageCount)

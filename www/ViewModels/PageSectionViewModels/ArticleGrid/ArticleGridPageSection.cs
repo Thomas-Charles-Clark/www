@@ -137,7 +137,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			result.FilteredIDs = result.Articles.Select(a => a.ArticleID).ToList();
 
-			result.InitialisePager();
+			result.InitialisePager(HttpContext.Current.Request.QueryString);
 
 			return result;
 		}

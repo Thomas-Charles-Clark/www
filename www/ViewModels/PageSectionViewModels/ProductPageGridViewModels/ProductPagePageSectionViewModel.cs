@@ -31,6 +31,7 @@ using wwwDesignersGuild.Models.Cache.ProductPages;
 using DocumentFormat.OpenXml.Math;
 using Braintree;
 using Microsoft.Ajax.Utilities;
+using System.Collections.Specialized;
 
 namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 {
@@ -284,7 +285,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 			bool isShop,
 			bool isLifestyleGallery,
 			int? tradeAccountId,
-			string rawUrl,
+			NameValueCollection queryString,
 			BaseViewModel model
 			)
 		{
@@ -321,12 +322,6 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			#endregion
 
-			#region Set the RequestURL on the BVM
-
-			model.RequestURL = rawUrl;
-
-			#endregion
-
 			#region Check the Cache
 
 			var wasCacheHit = true;
@@ -338,8 +333,10 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 				tradeAccountId,
 				model.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
 				model.Date,
+				false,
 				true,
-				() =>
+				queryString,
+				(NameValueCollection qs) =>
 				{
 					// Cache was not hit: we need to execute this factory function
 					wasCacheHit = false;
@@ -486,7 +483,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 					#region Run the result.InitialisePager routine
 
-					result.InitialisePager();
+					result.InitialisePager(queryString);
 
 					#endregion
 
@@ -566,7 +563,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			completeResultSet.ForEach(c => c.IsLifestyle = isLifestyleGallery);
 
-			result.InitialisePager();
+			result.InitialisePager(queryString);
 
 			if (result.Contents.Count() < result.PageSize)
 				result.TakeCount = result.Contents.Count();
@@ -586,7 +583,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			result.AttributeGroups.ForEach(ag =>
 			{
-				var attributeNames = HttpContext.Current.Request.QueryString[$"{HttpUtility.UrlEncode(ag.Name.ToLowerInvariant())}"]?
+				var attributeNames = queryString[$"{HttpUtility.UrlEncode(ag.Name.ToLowerInvariant())}"]?
 										.Split(Framework.CommaDelimiter)
 										.ToList();
 
@@ -641,7 +638,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 
 			#region URLKeyword based attribute determination dance
 
-			var url = HttpContext.Current.Request.Url.ToString();
+			var url = model.MasterDefinition.UrlBreakdown.SemanticString;
 
 			if (!String.IsNullOrEmpty(originalUrlKeywords))
 				url = url.Replace(originalUrlKeywords, "");
@@ -1043,7 +1040,7 @@ namespace wwwDesignersGuild.ViewModels.PageSectionViewModels
 													.ToList();
 			}
 
-			result.InitialisePager();
+			result.InitialisePager(queryString);
 
 			return result;
 		}

@@ -14,6 +14,7 @@ using MertexerV2.Models;
 using MertexerV2.SQLFunctions;
 
 using Microsoft.Ajax.Utilities;
+using Microsoft.Owin;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,6 +23,7 @@ using NLog;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -178,6 +180,8 @@ namespace wwwDesignersGuild.Controllers
 				tradeAccountId = Convert.ToInt32(HttpContext.Current.Session["memberTradeAccountID"].ToString());
 			}
 
+			var queryString = HttpContext.Current.Request.QueryString;
+
 			var rawUrl = HttpContext.Current.Request.RawUrl;
 
 			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
@@ -206,7 +210,9 @@ namespace wwwDesignersGuild.Controllers
 				dto.MasterDefinition.UrlBreakdown.CountryAwareness.Match,
 				dto.MasterDefinition.UrlBreakdown.ContentDate, 
 				true,
-				() =>
+				isSearch: false,
+				queryString,
+				(NameValueCollection qs) =>
 				{ 
 					var result = Task.Run(() => ProductPageGridPageSection.CreateAsync(
 						originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,
@@ -216,7 +222,7 @@ namespace wwwDesignersGuild.Controllers
 						isShop: Definition.PageDetails.IsShop,
 						isLifestyleGallery: false,
 						tradeAccountId,
-						rawUrl,
+						qs,
 						model: dto.Base
 					)).Result;
 

@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -14,6 +15,7 @@ using Tweetinvi.Core.Events;
 
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
 
 namespace wwwDesignersGuild.Models.Cache.ProductPages
@@ -33,9 +35,11 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 			bool countryMatch,
 			DateTime useDate,
 			bool shouldLock,
-			Func<ProductPageGridPageSection> factory)
+			bool isSearch,
+			NameValueCollection queryString,
+			Func<NameValueCollection, ProductPageGridPageSection> factory)
 		{
-			var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Get");
+			var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "Get");
 
 			// Fast path: Try to get existing cache without locking
 			var data = (ProductPageGridPageSection)Cache[key];
@@ -55,7 +59,7 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 						return data;
 
 					// Execute the creation block passed by the caller
-					data = factory();
+					data = factory(queryString);
 
 					// Cache it if caching is enabled
 					if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool enabled) && enabled)
@@ -83,7 +87,7 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 					return data;
 
 				// Execute the creation block passed by the caller
-				data = factory();
+				data = factory(queryString);
 
 				// Cache it if caching is enabled
 				if (data != null && Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool enabled) && enabled)
@@ -106,25 +110,32 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
 			return data;
 		}
 
-		private string buildKey(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, string from)
+		private string buildKey(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, bool isSearch, string from)
 		{
 			var tradeSwitch = tradeAccountId.HasValue;
 
 			var key = $"PRODUCTPAGEGRID~PAGESECTION~{pageSectionId}~{languageId}~{countryId}~{tradeSwitch}~{tradeAccountId}~{countryMatch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
 
+#if DEBUG
+			if (pageSectionId == 0)
+			{
+				throw new Exception($"ProductPageGridPageSectionCacheProvider.buildKey built \"{key}\"");
+			}
+#endif
+
 			return key;
 		}
 
-		public ProductPageGridPageSection Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+		public ProductPageGridPageSection Get(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool isSearch, DateTime useDate)
 		{
-            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Get");
+            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "Get");
 
 			var result = Cache[key];
 
             return (ProductPageGridPageSection)result;
 		}
 
-		public void Set(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, ProductPageGridPageSection data)
+		public void Set(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool isSearch, DateTime useDate, ProductPageGridPageSection data)
 		{
             Boolean.TryParse(WebConfigurationManager.AppSettings["productPageGridCacheEnabled"], out bool cacheEnabled);
 
@@ -140,34 +151,34 @@ namespace wwwDesignersGuild.Models.Cache.ProductPages
                     policy.AbsoluteExpiration = DateTime.Today.AddDays(1).Date;
                 }
 
-                var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Set");
+                var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "Set");
 
                 Cache.Add(new CacheItem(key, data), policy);
-            }
+			}
 		}
 
-		public void ExplicitSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate, ProductPageGridPageSection data, DateTimeOffset expiration)
+		public void ExplicitSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool isSearch, DateTime useDate, ProductPageGridPageSection data, DateTimeOffset expiration)
 		{
 			CacheItemPolicy policy = new CacheItemPolicy
 			{
 				AbsoluteExpiration = expiration
 			};
 
-			var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "ExplicitSet");
+			var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "ExplicitSet");
 
 			Cache.Add(new CacheItem(key, data), policy);
 		}
 
-		public bool IsSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+		public bool IsSet(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool isSearch, DateTime useDate)
         {
-            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "IsSet");
+            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "IsSet");
             return (Cache[key] != null);
         }
 
 
-        public void Invalidate(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, DateTime useDate)
+        public void Invalidate(long pageSectionId, byte languageId, short countryId, int? tradeAccountId, bool countryMatch, bool isSearch, DateTime useDate)
         {
-            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, "Invalidate");
+            var key = buildKey(pageSectionId, languageId, countryId, tradeAccountId, countryMatch, useDate, isSearch, "Invalidate");
             Cache.Remove(key);
         }
 
