@@ -514,6 +514,7 @@ namespace wwwDesignersGuild.Controllers
 			if (objRedirect != null)
 			{
 				// Redirect!
+				Response.Headers.Add("debug-point", "alpha");
 				return new RedirectResult(objRedirect.RedirectURL, objRedirect.Permanent);
 			}
 
@@ -860,6 +861,8 @@ namespace wwwDesignersGuild.Controllers
 						// become 301's instead of 302's, but with a cache-control: nocache
 						Response.Headers.Add("cache-control", "no-cache");
 
+						Response.Headers.Add("debug-point", "beta");
+
 						return new RedirectResult(tempUrl, true);
 					}
 
@@ -905,6 +908,8 @@ namespace wwwDesignersGuild.Controllers
 						// become 301's instead of 302's, but with a cache-control: nocache
 						Response.Headers.Add("cache-control", "no-cache");
 
+						Response.Headers.Add("debug-point", "charlie");
+
 						return new RedirectResult(tempUrl, true);
 					}
 
@@ -922,16 +927,19 @@ namespace wwwDesignersGuild.Controllers
 
 						Session["productPageGridDeselectedAttributesNotice"] = ds;
 
+						var nvc = Request.QueryString;
+
+						nvc.Remove(ds);
+
 						//  Self-healing URL (note: dateOverride is built up after url)
 						var tempUrl = dgFramework.buildUrl(
 							urlData.countryDetails,
 							landingPageViewModel.Definition.PageDetails.URLKeywords,
 							dgContentType.landingPage,
 							urlData.ContentId,
-							!Framework.ProductionVersion ? Request.QueryString["dateOverride"] : null,
-							!Framework.ProductionVersion ? Request.QueryString["countryOverride"] : null,
-							Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
-
+							!Framework.ProductionVersion ? nvc["dateOverride"] : null,
+							!Framework.ProductionVersion ? nvc["countryOverride"] : null,
+							nvc.Count > 0 ? $"{nvc}" : null);
 
 						// Don't index the approached URL: it required correction
 						// Response.Headers.Add("X-Robots-Tag", "noindex");
@@ -941,6 +949,8 @@ namespace wwwDesignersGuild.Controllers
 						// 03/04/2023: Amine has told us that he wants to see these URLKeyword correcting redirects 
 						// become 301's instead of 302's, but with a cache-control: nocache
 						Response.Headers.Add("cache-control", "no-cache");
+
+						Response.Headers.Add("debug-point", $"delta: {ds} was deselected");
 
 						return new RedirectResult(tempUrl, true);
 					}
@@ -1016,6 +1026,8 @@ namespace wwwDesignersGuild.Controllers
 
 					Response.Headers.Add("cache-control", "no-cache");
 
+					Response.Headers.Add("debug-point", "echo");
+
 					return new RedirectResult(url, true);
 				}
 
@@ -1089,6 +1101,8 @@ namespace wwwDesignersGuild.Controllers
 																Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
 					Response.Headers.Add("cache-control", "no-cache");
+
+					Response.Headers.Add("debug-point", "foxtrot");
 
 					return new RedirectResult(tempUrl, true);
 				}
@@ -1170,6 +1184,8 @@ namespace wwwDesignersGuild.Controllers
 																Request.QueryString.AllKeys.Any() ? $"{Request.QueryString}" : null);
 
 					Response.Headers.Add("cache-control", "no-cache");
+
+					Response.Headers.Add("debug-point", "golf");
 
 					return new RedirectResult(tempUrl, true);
 				}
@@ -1431,6 +1447,8 @@ namespace wwwDesignersGuild.Controllers
 
 					Response.Headers.Add("cache-control", "no-cache");
 
+					Response.Headers.Add("debug-point", "hotel");
+
 					return new RedirectResult(tempUrl, true);
 				}
 
@@ -1499,6 +1517,8 @@ namespace wwwDesignersGuild.Controllers
 
 					Response.Headers.Add("cache-control", "no-cache");
 
+					Response.Headers.Add("debug-point", "india");
+
 					return new RedirectResult(url, true);
 				}
 				else if (dgFramework.isCheckoutSessionValid(Session["checkoutExpiry"]) == false)
@@ -1516,6 +1536,8 @@ namespace wwwDesignersGuild.Controllers
 					Response.Headers.Add("X-Robots-Tag", "noindex");
 
 					Response.Headers.Add("cache-control", "no-cache");
+
+					Response.Headers.Add("debug-point", "juliet");
 
 					return new RedirectResult(url, true);
 				}
