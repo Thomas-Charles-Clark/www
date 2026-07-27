@@ -517,12 +517,21 @@ namespace wwwDesignersGuild.Controllers
 
         }
 
-
-        [HttpPost]
+		// Break this apart into a new controller which you then decorate with:
+		// [SessionState(SessionStateBehavior.ReadOnly)]
+        // Ensure that hits to it do perpetuate sessions
+		[HttpPost]
         public void keepSessionAlive()
         {
-            //  Get the session identifier
-            var session = HttpContext.Current.Session;
+			//https://share.google/aimode/eOIGtcY1hs29JQl8C
+
+			//https://chatgpt.com/share/6a67820c-9d2c-83eb-bb93-9f7d91229936
+
+			// Might not need to be doing this:
+			//  Get the session identifier
+			var session = HttpContext.Current.Session;
+
+            // Definitely don't need to be doing this:
             session["keepSessionAlive"] = DateTime.Now.ToString();
         }
 
