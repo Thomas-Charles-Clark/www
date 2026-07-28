@@ -185,12 +185,12 @@ window.lazyImages();
 window.keepAliveTimer = 0;
 
 window.keepAliveFn = function (event) {
-    fetch('/api/member/keepSessionAlive', {
+
+    fetch('/heartbeat/bradycardia', {
         method: 'POST',
         headers: window.fetchHeaders,
         cache: 'no-store',
-        credentials: 'same-origin',
-        body: null
+        credentials: 'same-origin'
     });
 
     if (window.ecommerceGeneralPopupModel) {

@@ -20,7 +20,13 @@ namespace wwwDesignersGuild
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/)(.*).pdf" });
             routes.Ignore("{*pdf}", new { pdf = @"(pdf/furniturepdfs/)(.*).pdf" });
 
-            routes.MapRoute(
+			routes.MapRoute(
+				name: "Heartbeat",
+				url: "heartbeat/bradycardia",
+				defaults: new { controller = "Heartbeat", action = "Bradycardia" }
+			);
+
+			routes.MapRoute(
                 name: "GiftVoucherViewer",
                 url: "gift-voucher",
                 defaults: new { controller = "GiftVoucher", action = "View" }

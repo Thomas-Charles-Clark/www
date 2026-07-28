@@ -247,7 +247,6 @@ namespace wwwDesignersGuild
             HttpContext.Current.Session.Add("memberName", null); // definitely used
             HttpContext.Current.Session.Add("memberEmail", null); // definitely used
             HttpContext.Current.Session.Add("visitorIdFromDatabase", null); // definitely used
-            HttpContext.Current.Session.Add("keepSessionAlive", DateTime.Now.ToString()); // definitely used
             HttpContext.Current.Session.Add("checkoutId", null); // definitely used, maintains checkoutId
             HttpContext.Current.Session.Add("checkoutExpiry", null); // definitely used, expires checkout
             HttpContext.Current.Session.Add("checkoutDisplayGiftTab", false); // not used?
