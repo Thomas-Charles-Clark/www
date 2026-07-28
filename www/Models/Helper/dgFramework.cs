@@ -4027,7 +4027,22 @@ table.button.small-expand table a,
                 return writer.ToString();
             }
         }
-    }
+
+		internal static void setVerifiedBot(ref VisitorSelect objVisitorSelect)
+		{
+			// Falsify in order to avoid touching mbr.Visitor wherever we can
+			objVisitorSelect.visitorDbId = 0L;
+			objVisitorSelect.memberTradeAccountNumber = null;
+			objVisitorSelect.memberTradeAccountID = (int?)null;
+			objVisitorSelect.memberId = (int?)null;
+			objVisitorSelect.Email = null;
+			objVisitorSelect.memberDisplayTradePrice = false;
+			objVisitorSelect.memberTradeDataSourceJson = null;
+			objVisitorSelect.VisitorCreatedDT = DateTime.Now;
+			objVisitorSelect.tradePriceListId = (short?)null;
+			objVisitorSelect.Culture = "en-GB";
+		}
+	}
 
     public class loggedInMemberDetail
     {

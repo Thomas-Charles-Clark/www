@@ -1,6 +1,8 @@
 ﻿using Kendo.Mvc;
 
 using NLog;
+using NLog.Time;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -9,6 +11,7 @@ using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Http.Routing.Constraints;
 using System.Web.Mvc;
 
 using wwwDesignersGuild.Models;
@@ -287,66 +290,114 @@ namespace wwwDesignersGuild.Controllers
             var objCountryData = await objCountry.countryLanguageSelect(useDate);
 
             #endregion
-            
 
-            #region Get VisitorID, set a few variables in Session
+            // Publish Flock-Dev but with Production variables, having aditionally pulled CF's VerifiedBot and BotScore
+            // If you're a Verified Bot, we want to AVOID ALL SQL EVERYWHERE
 
-            //  Get the session identifier
-            if (Session["visitorIdFromDatabase"] == null)
+
+            #region Get VisitorID, check if we're dealing with a CF Verified Bot, set a few variables in Session
+
+            var cfVerifiedBot = Request.Headers["cf-verified-bot"];
+            var cfBotScore = Request.Headers["cf-bot-score"];
+            var ja3fingerprints = Request.Headers["cf-ja3-hash"];
+            var ja4fingerprints = Request.Headers["cf-ja4-hash"];
+
+            if (!String.IsNullOrEmpty(cfVerifiedBot))
+			{
+				Response.Headers.Add("cf-verified-bot", cfVerifiedBot);
+			}
+
+            if (!String.IsNullOrEmpty(cfBotScore))
             {
-                // Looks for VisitorID using GUID in cookie
-
-                string cookieGuid = dgFramework.getIdentificationFromCookie();
-                
-                objVisitorSelect = await dgFramework.identifySession(objVisitorSelect, objVisitorFactory, cookieGuid, Request.Headers["CF-IPCountry"], Request.Headers["CF-Device-Type"]);
-                
-                //Rebuild session variables from objVisitorSelect
-                Session["memberName"] = objVisitorSelect.FullName;
-                Session["memberEmail"] = objVisitorSelect.Email;
-                Session["visitorCulture"] = objVisitorSelect.Culture;
-                Session["memberTradeAccountNumber"] = objVisitorSelect.memberTradeAccountNumber;
-                Session["memberTradeAccountID"] = objVisitorSelect.memberTradeAccountID;
-                Session["memberTradePriceListID"] = objVisitorSelect.tradePriceListId;
-                Session["memberDisplayTradePrice"] = objVisitorSelect.memberDisplayTradePrice;
-                Session["memberTradeDataSourceJson"] = objVisitorSelect.memberTradeDataSourceJson;
-                Session["visitorCreatedDT"] = objVisitorSelect.VisitorCreatedDT;
-                
-                // And identifySession may have returned a visitorDbId of -1
-                if (objVisitorSelect.visitorDbId == -1)
-                {
-                    Session["loginStatus"] = dgLoginStatus.notLoggedIn.ToString();
-                }
-                else
-                {
-                    // however, if identifySession didn't return -1 then store the visitorDbId in Session.
-                    Session["visitorIdFromDatabase"] = objVisitorSelect.visitorDbId.ToString();
-                    Session["memberIdFromDatabase"] = objVisitorSelect.memberId;
-                    
-                    if (objVisitorSelect.FullName == null && objVisitorSelect.Email == null) { }
-                    else
-                    {
-                        Session["loginStatus"] = dgLoginStatus.previousLogin.ToString();
-                    }
-                }
+                Response.Headers.Add("cf-bot-score", cfBotScore);
             }
+
+            if (!String.IsNullOrEmpty(ja3fingerprints))
+			{
+				Response.Headers.Add("cf-ja3-hash", ja3fingerprints);
+			}
+
+            if (!String.IsNullOrEmpty(ja4fingerprints))
+			{
+				Response.Headers.Add("cf-ja4-hash", ja4fingerprints);
+			}
+
+			var verifiedBot = false;
+            var botScore = 100;
+
+            if (Boolean.TryParse(cfVerifiedBot, out bool v))
+            {
+                verifiedBot = v;
+            }
+
+            if (Int32.TryParse(cfBotScore, out int bs))
+            {
+                botScore = bs;
+            }
+
+            if (verifiedBot)
+            {
+                dgFramework.setVerifiedBot(ref objVisitorSelect);
+			}
             else
-            {
-                objVisitorSelect.visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
-                objVisitorSelect.memberTradeAccountNumber = (string)Session["memberTradeAccountNumber"];
-                objVisitorSelect.memberTradeAccountID = (int?)Session["memberTradeAccountID"];
-                objVisitorSelect.memberId = (Int32?)Session["memberIdFromDatabase"];
-                objVisitorSelect.Email = (string)Session["memberEmail"];
-                objVisitorSelect.memberDisplayTradePrice = (Boolean)Session["memberDisplayTradePrice"];
-                objVisitorSelect.memberTradeDataSourceJson = (string)Session["memberTradeDataSourceJson"];
-                objVisitorSelect.VisitorCreatedDT = (DateTime)Session["visitorCreatedDT"];
-                objVisitorSelect.tradePriceListId = (short?)Session["memberTradePriceListID"];
+			{
+				//  Get the session identifier
+				if (Session["visitorIdFromDatabase"] == null)
+				{
+					// Looks for VisitorID using GUID in cookie
 
-                if (Session["visitorCulture"] == null) { }
-                else
-                {
-                    objVisitorSelect.Culture = Session["visitorCulture"].ToString();
-                }
-            }
+					string cookieGuid = dgFramework.getIdentificationFromCookie();
+
+					objVisitorSelect = await dgFramework.identifySession(objVisitorSelect, objVisitorFactory, cookieGuid, Request.Headers["CF-IPCountry"], Request.Headers["CF-Device-Type"]);
+
+					//Rebuild session variables from objVisitorSelect
+					Session["memberName"] = objVisitorSelect.FullName;
+					Session["memberEmail"] = objVisitorSelect.Email;
+					Session["visitorCulture"] = objVisitorSelect.Culture;
+					Session["memberTradeAccountNumber"] = objVisitorSelect.memberTradeAccountNumber;
+					Session["memberTradeAccountID"] = objVisitorSelect.memberTradeAccountID;
+					Session["memberTradePriceListID"] = objVisitorSelect.tradePriceListId;
+					Session["memberDisplayTradePrice"] = objVisitorSelect.memberDisplayTradePrice;
+					Session["memberTradeDataSourceJson"] = objVisitorSelect.memberTradeDataSourceJson;
+					Session["visitorCreatedDT"] = objVisitorSelect.VisitorCreatedDT;
+
+					// And identifySession may have returned a visitorDbId of -1
+					if (objVisitorSelect.visitorDbId == -1)
+					{
+						Session["loginStatus"] = dgLoginStatus.notLoggedIn.ToString();
+					}
+					else
+					{
+						// however, if identifySession didn't return -1 then store the visitorDbId in Session.
+						Session["visitorIdFromDatabase"] = objVisitorSelect.visitorDbId.ToString();
+						Session["memberIdFromDatabase"] = objVisitorSelect.memberId;
+
+						if (objVisitorSelect.FullName == null && objVisitorSelect.Email == null) { }
+						else
+						{
+							Session["loginStatus"] = dgLoginStatus.previousLogin.ToString();
+						}
+					}
+				}
+				else
+				{
+					objVisitorSelect.visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
+					objVisitorSelect.memberTradeAccountNumber = (string)Session["memberTradeAccountNumber"];
+					objVisitorSelect.memberTradeAccountID = (int?)Session["memberTradeAccountID"];
+					objVisitorSelect.memberId = (Int32?)Session["memberIdFromDatabase"];
+					objVisitorSelect.Email = (string)Session["memberEmail"];
+					objVisitorSelect.memberDisplayTradePrice = (Boolean)Session["memberDisplayTradePrice"];
+					objVisitorSelect.memberTradeDataSourceJson = (string)Session["memberTradeDataSourceJson"];
+					objVisitorSelect.VisitorCreatedDT = (DateTime)Session["visitorCreatedDT"];
+					objVisitorSelect.tradePriceListId = (short?)Session["memberTradePriceListID"];
+
+					if (Session["visitorCulture"] == null) { }
+					else
+					{
+						objVisitorSelect.Culture = Session["visitorCulture"].ToString();
+					}
+				}
+			}
 
             if (Session["loginStatus"] == null)
             {
@@ -577,6 +628,11 @@ namespace wwwDesignersGuild.Controllers
             if (Session["memberTradeChecksPassed"] == null || forceTradeAccountCheck)
             {
                 await tradeAccountCheck(objCountryData, urlData, objVisitorSelect);
+            }
+
+            if (verifiedBot)
+            {
+                forceTradeAccountCheck = false;
             }
 
             if (forceTradeAccountCheck)
@@ -947,7 +1003,10 @@ namespace wwwDesignersGuild.Controllers
                     GoogleContent = Request.QueryString["utm_content"]
                 };
 
-                objVisitorFactory.logPageView(pageView);
+                if (objVisitorSelect.visitorDbId != 0)
+				{
+					objVisitorFactory.logPageView(pageView); // also skip any basket interaction if visitorDbId == 0, also skip any recentlyViewed action
+				}
 
                 if (landingPageViewModel.ContentID == (int)dgFixedPage.globalSiteSelector)
                 {
