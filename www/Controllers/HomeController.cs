@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Web;
@@ -231,6 +232,8 @@ namespace wwwDesignersGuild.Controllers
 
             var forceTradeAccountCheck = false;
 
+            var isRequestCacheRefill = Request.UserAgent == "DesignersGuild_Cache_Fill";
+
             #endregion
 
 
@@ -301,8 +304,9 @@ namespace wwwDesignersGuild.Controllers
             var cfBotScore = Request.Headers["cf-bot-score"];
             var ja3fingerprints = Request.Headers["cf-ja3-hash"];
             var ja4fingerprints = Request.Headers["cf-ja4-hash"];
+            var connectingIp = Request.Headers["CF-Connecting-IP"];
 
-            if (!String.IsNullOrEmpty(cfVerifiedBot))
+			if (!String.IsNullOrEmpty(cfVerifiedBot))
 			{
 				Response.Headers.Add("cf-verified-bot", cfVerifiedBot);
 			}
@@ -321,6 +325,12 @@ namespace wwwDesignersGuild.Controllers
 			{
 				Response.Headers.Add("cf-ja4-hash", ja4fingerprints);
 			}
+
+			if (!String.IsNullOrEmpty(connectingIp))
+			{
+				Response.Headers.Add("cf-connecting-ip", connectingIp);
+			}
+
 
 			var verifiedBot = false;
             var botScore = 100;
@@ -1171,12 +1181,18 @@ namespace wwwDesignersGuild.Controllers
                 var objProductPage = new cmsProductPage();
 
                 var objProductData = await objProductPage.loadProductPageFromCms(
-                        urlData.ContentId,
-                        urlData.countryDetails.LanguageID,
-                        urlData.countryDetails.CountryID,
-                        urlData.ContentDate,
-                        Session["memberTradeAccountID"] != null,
-                        dgFramework.IsMobileDevice());
+                    urlData.ContentId,
+                    urlData.countryDetails.LanguageID,
+                    urlData.countryDetails.CountryID,
+                    urlData.ContentDate,
+                    Session["memberTradeAccountID"] != null,
+                    dgFramework.IsMobileDevice(),
+                    Response);
+
+                if (isRequestCacheRefill) // Returns HTTP 204 No Content
+				{
+					return new HttpStatusCodeResult(HttpStatusCode.NoContent);
+				}
 
                 if (objProductData.objCacheSelect == null)
                 {

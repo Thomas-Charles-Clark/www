@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -27,62 +29,113 @@ namespace wwwDesignersGuild.Util
 
         public Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
         {
-            // 1. Look for credentials in the request.
-            HttpRequestMessage request = context.Request;
-            AuthenticationHeaderValue authorization = request.Headers.Authorization;
-            var cacheBustingHeader = request.Headers.Where(p => p.Key == "cacheBustingKey").SingleOrDefault();
+            AuthenticationHeaderValue authorization = context.Request.Headers.Authorization;
 
-            if (String.IsNullOrEmpty(cacheBustingHeader.Key))
+            var headers = context.Request.Headers.Select(p => new { p.Key, p.Value });
+
+			var cacheBustingHeader = headers?.Where(p => p.Key == "cacheBustingKey".ToLowerInvariant()).SingleOrDefault();
+
+			if (String.IsNullOrEmpty(cacheBustingHeader?.Value.FirstOrDefault()))
             {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
+                var message = new
+                {
+                    Reason = "Missing Credentials A",
+                    Headers = headers
+                };
+
+                context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
                 return Task.FromResult(0);
             }
-            else if (cacheBustingHeader.Value.Count() != 1)
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
-                return Task.FromResult(0);
+            else if (cacheBustingHeader?.Value.Count() != 1)
+			{
+				var message = new
+				{
+					Reason = "Missing Credentials B",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
             }
-            else if (cacheBustingHeader.Value.First() != "9079C890-8ADB-47C2-8D26-458C773EFEDA")
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
-                return Task.FromResult(0);
+            else if (cacheBustingHeader?.Value.FirstOrDefault() != "9079C890-8ADB-47C2-8D26-458C773EFEDA")
+			{
+				var message = new
+				{
+					Reason = "Missing Credentials C",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
             }
 
             // 2. If there are no credentials, do nothing.
             if (authorization == null)
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
-                return Task.FromResult(0);
+			{
+				var message = new
+				{
+					Reason = "Missing Credentials D",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
             }
 
             // 3. If there are credentials but the filter does not recognize the 
             //    authentication scheme, do nothing.
             if (authorization.Scheme != "Basic")
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
-                return Task.FromResult(0);
+			{
+				var message = new
+				{
+					Reason = "Missing Credentials E",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
             }
 
             // 4. If there are credentials that the filter understands, try to validate them:
 
             // 5. If the credentials are bad, set the error result.
             if (String.IsNullOrEmpty(authorization.Parameter))
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Missing credentials" }, context.Request);
-                return Task.FromResult(0);
+			{
+				var message = new
+				{
+					Reason = "Missing Credentials F",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
             }
 
             Tuple<string, string> userNameAndPassword = ExtractUserNameAndPassword(authorization.Parameter);
 
             if (userNameAndPassword == null)
-            {
-                context.ErrorResult = new AuthenticationFailureResult(new { Message = "Invalid credentials" }, context.Request);
-            }
+			{
+				var message = new
+				{
+					Reason = "Invalid Credentials G",
+					Headers = headers
+				};
+
+				context.ErrorResult = new AuthenticationFailureResult(message, context.Request);
+
+				return Task.FromResult(0);
+			}
 
             string userName = userNameAndPassword.Item1;
             string password = userNameAndPassword.Item2;
 
-            if (userName == "CAdmin" && password == "D3s1gner5")
+            if (userName == "CAdmin" && password == "TapestryFlower22")
             {
                 string identity = "";
 

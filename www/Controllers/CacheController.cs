@@ -89,7 +89,7 @@ namespace wwwDesignersGuild.Controllers
             return Ok(new { });
         }
 
-        public void PurgeBanner(PassCachePurge objPurge)
+		public void PurgeBanner(PassCachePurge objPurge)
         {
             var cache = new BannerCacheProvider();
 

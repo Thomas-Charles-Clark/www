@@ -475,6 +475,7 @@
     <Compile Include="Models\Cache\Collection\CollectionProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\General\HotspotCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\SiteSectionCacheProvider.cs" />
+    <Compile Include="Models\Cache\PassCachePurgeWrapper.cs" />
     <Compile Include="Models\Careers\Careers.cs" />
     <Compile Include="Models\Checkout\Checkout.cs" />
     <Compile Include="Models\ClientError\ClientError.cs" />

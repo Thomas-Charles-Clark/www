@@ -17,13 +17,13 @@ namespace wwwDesignersGuild.Models.ProductPage
 {
     public class cmsProductPage
     {
-        public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch)
+        public async Task<cmsProductPageDefinition> loadProductPageFromCms(int productPageId, byte languageId, short countryId, DateTime useDate, bool isTrade, bool? platformSwitch, HttpResponseBase response)
         {
             cmsProductPageDefinition productPageStore;
 
             var objProductPageCache = new ProductPageCacheProvider();
 
-            productPageStore = objProductPageCache.GetOrCreate(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, () => {
+            productPageStore = objProductPageCache.GetOrCreate(productPageId, languageId, countryId, isTrade, platformSwitch, useDate, response, () => {
 
                 var result = Task.Run(() => loadProductPageFromCmsDatabase(productPageId, languageId, countryId, useDate, isTrade, platformSwitch)).Result;
 
