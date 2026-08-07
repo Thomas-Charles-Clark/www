@@ -125,7 +125,7 @@ namespace wwwDesignersGuild.Controllers
                 var orderFormItemViewModel = new OrderFormItemViewModel(
                     JObject.FromObject(fabricOrderForm.orderForm).SelectToken("products")?.FirstOrDefault(),
                     module.MasterDefinition,
-                    new BaseViewModel()
+                    new BaseViewModel(verifiedBot: false)
                     {
                         Basket = basket,
                         MasterDefinition = module.MasterDefinition

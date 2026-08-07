@@ -50,22 +50,22 @@ namespace wwwDesignersGuild.ViewModels
 
         protected CollectionViewModel(
             NewMasterDefinition objMaster,
-            VisitorSelect objVisitor) : base(objMaster,
-                                             objVisitor)
+            VisitorSelect objVisitor,
+            bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             SocialMediaViewModel = new SocialMediaShareViewModel(directionClass: "dropdown", buttonOnly: false, objBase: this);
         }
 
-        public static async Task<CollectionViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor)
+        public static async Task<CollectionViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool verifiedBot)
         {
-            var result = new CollectionViewModel(objMaster, objVisitor);
+            var result = new CollectionViewModel(objMaster, objVisitor, verifiedBot);
 
             await result.Initialise();
 
             return result;
         }
 
-        new protected async Task Initialise()
+        protected async Task Initialise()
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -115,7 +115,7 @@ namespace wwwDesignersGuild.ViewModels
 
             var imageIds = Carousel.Images.Select(i => i.ImageID);
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
             await base.InitialiseHotspots(imageIds);
 

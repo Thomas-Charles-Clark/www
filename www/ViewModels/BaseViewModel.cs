@@ -210,14 +210,6 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
-        public bool IsBot
-        {
-            get
-            {
-                return Convert.ToBoolean(HttpContext.Current.Request.Headers["X-Bot"] ?? "false");
-            }
-        }
-
         public ProductType CategoryPageProductType { get; set; }
 
         public tradeContactUsDetail TradeCustomerServicesContactDetail { get; set; }
@@ -226,7 +218,7 @@ namespace wwwDesignersGuild.ViewModels
         {
             get
             {
-                return !IsBot && 
+                return !VerifiedBot && 
                     String.IsNullOrEmpty(Partial) && 
                     HttpContext.Current.Request.Cookies["dg-trade-signin"] != null &&
                     Convert.ToBoolean(HttpContext.Current.Session["tradeLoginPromptDismissed"]) == false &&
@@ -235,35 +227,37 @@ namespace wwwDesignersGuild.ViewModels
             }
         }
 
+        public bool VerifiedBot { get; set; }
+
         // This sucks but is temporarily necessary to get the mobile menu updated throughout
-        [Obsolete("Unsure if this is ever called anywhere 20/10/2025")]
-        public BaseViewModel(masterDefinition objMaster)
-        {
-            MasterDefinition = NewMasterDefinition.Create(objMaster.TitleTag,
-                objMaster.MetaDescription,
-                objMaster.BackInStockReminder,
-                objMaster.ItemsInBasket,
-                objMaster.UrlBreakdown,
-                objMaster.googleHrefs,
-                HttpContext.Current.Session["memberTradeAccountID"] != null);
+        //[Obsolete("Unsure if this is ever called anywhere 20/10/2025")]
+        //public BaseViewModel(masterDefinition objMaster)
+        //{
+        //    MasterDefinition = NewMasterDefinition.Create(objMaster.TitleTag,
+        //        objMaster.MetaDescription,
+        //        objMaster.BackInStockReminder,
+        //        objMaster.ItemsInBasket,
+        //        objMaster.UrlBreakdown,
+        //        objMaster.googleHrefs,
+        //        HttpContext.Current.Session["memberTradeAccountID"] != null);
 
-            HeaderBanners = new List<bannerLocation>();
-            FooterBanners = new List<bannerLocation>();
-            EcommerceEmailCaptureBanners = new List<bannerLocation>();
-            EcommerceGeneralPopupBanners = new List<bannerLocation>();
-            Banners = new List<bannerLocation>();
-            Hotspots = new List<ImageHotspot>();
-            ShowRecentlyViewed = true;
-            PrefetchedResources = new List<ResourceResult>();
-            PrefetchedSnippets = new List<Snippet>();
-            NoFollow = false;
-            NoIndex = false;
-            CustomCanonical = null;
-            CategoryPageProductType = null;
-            TradeCustomerServicesContactDetail = null;
-        }
+        //    HeaderBanners = new List<bannerLocation>();
+        //    FooterBanners = new List<bannerLocation>();
+        //    EcommerceEmailCaptureBanners = new List<bannerLocation>();
+        //    EcommerceGeneralPopupBanners = new List<bannerLocation>();
+        //    Banners = new List<bannerLocation>();
+        //    Hotspots = new List<ImageHotspot>();
+        //    ShowRecentlyViewed = true;
+        //    PrefetchedResources = new List<ResourceResult>();
+        //    PrefetchedSnippets = new List<Snippet>();
+        //    NoFollow = false;
+        //    NoIndex = false;
+        //    CustomCanonical = null;
+        //    CategoryPageProductType = null;
+        //    TradeCustomerServicesContactDetail = null;
+        //}
 
-        protected BaseViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor)
+        protected BaseViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool verifiedBot)
         {
             MasterDefinition = objMaster;
             Visitor = objVisitor;
@@ -282,6 +276,7 @@ namespace wwwDesignersGuild.ViewModels
             CustomCanonical = null;
             CategoryPageProductType = null;
             TradeCustomerServicesContactDetail = null;
+            VerifiedBot = verifiedBot;
         }
 
         protected BaseViewModel(BaseViewModel bvm)
@@ -303,12 +298,12 @@ namespace wwwDesignersGuild.ViewModels
             CustomCanonical = bvm.CustomCanonical;
             CategoryPageProductType = bvm.CategoryPageProductType;
             TradeCustomerServicesContactDetail = null;
-        }
+			VerifiedBot = bvm.VerifiedBot;
+		}
 
-        public BaseViewModel()
+        public BaseViewModel(bool verifiedBot)
         {
             RecentlyViewed = new List<ProductPagePodViewModel>();
-
             HeaderBanners = new List<bannerLocation>();
             FooterBanners = new List<bannerLocation>();
             EcommerceEmailCaptureBanners = new List<bannerLocation>();
@@ -323,9 +318,10 @@ namespace wwwDesignersGuild.ViewModels
             CustomCanonical = null;
             CategoryPageProductType = null;
             TradeCustomerServicesContactDetail = null;
+            VerifiedBot = verifiedBot;
         }
 
-        protected async Task Initialise()
+        protected async Task Initialise(bool verifiedBot)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -685,7 +681,7 @@ namespace wwwDesignersGuild.ViewModels
 
             Banners = availableBanners;
 
-            if (dgFramework.IsBot)
+            if (VerifiedBot)
             {
                 // Make 100% sure you remove the eComm popup banners: bannerLocationIds 54 and 55.
                 EcommerceEmailCaptureBanners = new List<bannerLocation>();

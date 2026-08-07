@@ -207,8 +207,9 @@ namespace wwwDesignersGuild.ViewModels
         protected ArticleViewModel(
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
-            cmsArticlePageDefinition objDefinition) : base(objMaster,
-                                             objVisitor)
+            cmsArticlePageDefinition objDefinition,
+            bool verifiedBot) : base(objMaster,
+                                             objVisitor, verifiedBot)
         {
             Definition = objDefinition;
             SocialMediaViewModel = new SocialMediaShareViewModel(directionClass: "dropdown", buttonOnly: false, objBase: this);
@@ -217,9 +218,10 @@ namespace wwwDesignersGuild.ViewModels
         public static async Task<ArticleViewModel> CreateAsync(
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
-            cmsArticlePageDefinition objDefinition)
+            cmsArticlePageDefinition objDefinition,
+            bool verifiedBot)
         {
-            var result = new ArticleViewModel(objMaster, objVisitor, objDefinition);
+            var result = new ArticleViewModel(objMaster, objVisitor, objDefinition, verifiedBot);
 
             await result.Initialise();
 
@@ -264,7 +266,7 @@ namespace wwwDesignersGuild.ViewModels
                 );
             }
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
             await base.InitialiseHotspots(imageIds);
 

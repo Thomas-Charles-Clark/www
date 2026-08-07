@@ -45,12 +45,16 @@ namespace wwwDesignersGuild.Models.Scrapbook
             cache.Set(visitorId, memberId, countryId, languageId, useDate, objScrapbook);
         }
 
-        private cmsScrapbookImagesDefinition loadScrapbookFromCms(long visitorId, int? memberId, short countryId, byte languageId, DateTime useDate)
+        private async Task<cmsScrapbookImagesDefinition> loadScrapbookFromCms(long visitorId, int? memberId, short countryId, byte languageId, DateTime useDate)
         {
-            return new cmsScrapbookImagesDefinition()
+            var imagesResult = await new visitorDb().fetchCompleteScrapbookAsync(visitorId, memberId, countryId, languageId, useDate);
+
+			var result = new cmsScrapbookImagesDefinition()
             {
-                Images = new visitorDb().fetchCompleteScrapbookAsync(visitorId, memberId, countryId, languageId, useDate).ToList()
+                Images = imagesResult
             };
+
+            return result;
         }
     }
 }

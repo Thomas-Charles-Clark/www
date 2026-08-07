@@ -2173,14 +2173,6 @@ namespace wwwDesignersGuild.Models.Helper
 
         private static System.Text.RegularExpressions.Regex BotRegex = new System.Text.RegularExpressions.Regex(@"(Googlebot)|(AdsBot-Google)|(AdsBot-Google-Mobile)|(http:\/\/www\.google\.com\/bot\.html)|(APIs-Google)|(GoogleOther)|(Google-InspectionTool)|(Storebot-Google)|(Mediapartners-Google)|(bingbot)|(MicrosoftPreview)", RegexOptions);
 
-        public static bool IsBot
-        {
-            get 
-            {
-                return BotRegex.IsMatch(HttpContext.Current?.Request?.UserAgent ?? "");
-            }
-        }
-
         #endregion
 
         public static DateTime DetermineContentDate (string dateOverride)

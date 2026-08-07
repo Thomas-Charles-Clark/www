@@ -345,6 +345,13 @@ namespace wwwDesignersGuild.Controllers
                 botScore = bs;
             }
 
+            if (Request.UserAgent == "DesignersGuild_Cache_Bust" || 
+                Request.UserAgent == "DesignersGuild_Cache_Fill" ||
+                Request.UserAgent == "DG_K6_FloodTest_UserAgentString/1.0")
+            {
+                verifiedBot = true;
+            }
+
             if (verifiedBot)
             {
                 dgFramework.setVerifiedBot(ref objVisitorSelect);
@@ -536,7 +543,12 @@ namespace wwwDesignersGuild.Controllers
 
             var objBasket = new basketRoutines();
 
-            var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, objVisitorSelect.memberId, urlData.countryDetails.CountryID);
+            var basketTotalData = new BasketTotalQuantity();
+                
+            if (!verifiedBot)
+            {
+				basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, objVisitorSelect.memberId, urlData.countryDetails.CountryID);
+			}
 
             #endregion
 
@@ -566,7 +578,8 @@ namespace wwwDesignersGuild.Controllers
                 return await ReturnGeneric404(
                     urlData,
                     basketTotalData.TotalQuantity,
-                    objVisitorSelect);
+                    objVisitorSelect,
+                    verifiedBot);
             }
 
             #endregion
@@ -849,15 +862,17 @@ namespace wwwDesignersGuild.Controllers
                             tradeMember: Session["memberTradeAccountID"] != null
                         ),
                         objVisitor: objVisitorSelect,
-                        isShop: IsShop
-                    );
+                        isShop: IsShop,
+					    verifiedBot: verifiedBot
+					);
                 }
                 catch (PageNotFoundException)
                 {
                     return await ReturnGeneric404(
                         urlData,
                         basketTotalData.TotalQuantity,
-                        objVisitorSelect);
+                        objVisitorSelect,
+                        verifiedBot);
                 }
 
                 if (landingPageViewModel.Definition.PageDetails.EnableFilterIndexing)
@@ -1079,8 +1094,9 @@ namespace wwwDesignersGuild.Controllers
                             googleHrefs: null,// objMaster.googleHrefs,
                             tradeMember: Session["memberTradeAccountID"] != null
                         ),
-                        objVisitor: objVisitorSelect
-                    );
+                        objVisitor: objVisitorSelect,
+						verifiedBot: verifiedBot
+					);
 
                 // We have no collection selected: redirect as appropriate.
                 if (collectionModel.Definition.CollectionDetails == null)
@@ -1099,8 +1115,9 @@ namespace wwwDesignersGuild.Controllers
                                     googleHrefs: new List<googleHref>(),
                                     tradeMember: Session["memberTradeAccountID"] != null
                                 ),
-                                objVisitor: objVisitorSelect
-                            );
+                                objVisitor: objVisitorSelect,
+								verifiedBot: verifiedBot
+							);
 
                         Response.StatusCode = 404;
 
@@ -1110,7 +1127,8 @@ namespace wwwDesignersGuild.Controllers
                     return await ReturnGeneric404(
                         urlData,
                         basketTotalData.TotalQuantity,
-                        objVisitorSelect);
+                        objVisitorSelect,
+                        verifiedBot);
                 }
                 else
                 {
@@ -1141,7 +1159,7 @@ namespace wwwDesignersGuild.Controllers
 
                 #endregion
 
-                await FetchBanners(collectionModel.MasterDefinition, null);
+                await FetchBanners(collectionModel.MasterDefinition, null, verifiedBot);
 
                 var pageView = new logPageView()
                 {
@@ -1201,7 +1219,8 @@ namespace wwwDesignersGuild.Controllers
                         return await ReturnGeneric404(
                             urlData,
                             basketTotalData.TotalQuantity,
-                            objVisitorSelect);
+                            objVisitorSelect,
+                            verifiedBot);
                     }
                 }
 
@@ -1266,7 +1285,8 @@ namespace wwwDesignersGuild.Controllers
                                 tradeMember: Session["memberTradeAccountID"] != null
                             ),
                             objVisitor: objVisitorSelect,
-                            isShop: IsShop
+                            isShop: IsShop,
+                            verifiedBot: verifiedBot
                         );
 
                     Response.StatusCode = 404;
@@ -1291,12 +1311,13 @@ namespace wwwDesignersGuild.Controllers
                             ),
                             objVisitor: objVisitorSelect,
                             objCacheSelect: objProductData.objCacheSelect,
-                            isShop: IsShop
-                        );
+                            isShop: IsShop,
+								verifiedBot: verifiedBot
+						);
 
-                        await FetchBanners(fabricWallpaperModel.MasterDefinition, null);
+                        await FetchBanners(fabricWallpaperModel.MasterDefinition, null, verifiedBot);
 
-                        return View(dgFramework.GetPreferredDeviceView("~/Views-New/ProductPages/FabricWallpaper.cshtml"), fabricWallpaperModel);
+                        return View("~/Views-New/ProductPages/FabricWallpaper.cshtml", fabricWallpaperModel);
 
                     case 3: // Shop
                         var shopModel = await ProductPageViewModel_Standard.CreateAsync
@@ -1312,12 +1333,13 @@ namespace wwwDesignersGuild.Controllers
                                 ),
                                 objVisitor: objVisitorSelect,
                                 objCacheSelect: objProductData.objCacheSelect,
-                                isShop: IsShop
-                            );
+                                isShop: IsShop,
+								verifiedBot: verifiedBot
+							);
 
-                        await FetchBanners(shopModel.MasterDefinition, null);
+                        await FetchBanners(shopModel.MasterDefinition, null, verifiedBot);
 
-                        return View(dgFramework.GetPreferredDeviceView("~/Views-New/ProductPages/Standard.cshtml"), shopModel);
+                        return View("~/Views-New/ProductPages/Standard.cshtml", shopModel);
 
                     case 4: // Furniture
                         var furnitureModel = await ProductPageViewModel_Furniture_Wholesale.CreateAsync
@@ -1333,12 +1355,13 @@ namespace wwwDesignersGuild.Controllers
                                 ),
                                 objVisitor: objVisitorSelect,
                                 objCacheSelect: objProductData.objCacheSelect,
-                                isShop: IsShop
+                                isShop: IsShop,
+                                verifiedBot: verifiedBot
                             );
 
-                        await FetchBanners(furnitureModel.MasterDefinition, null);
+                        await FetchBanners(furnitureModel.MasterDefinition, null, verifiedBot);
 
-                        return View(dgFramework.GetPreferredDeviceView("~/Views-New/ProductPages/Furniture-Wholesale.cshtml"), furnitureModel);
+                        return View("~/Views-New/ProductPages/Furniture-Wholesale.cshtml", furnitureModel);
 
                     case 5: // Modular Product Page
                         var modularModel = await ProductPageViewModel_Furniture_Modular.CreateAsync
@@ -1354,10 +1377,11 @@ namespace wwwDesignersGuild.Controllers
                                 ),
                                 objVisitor: objVisitorSelect,
                                 objCacheSelect: objProductData.objCacheSelect,
-                                isShop: IsShop
-                            );
+                                isShop: IsShop,
+								verifiedBot: verifiedBot
+							);
 
-                        await FetchBanners(modularModel.MasterDefinition, null);
+                        await FetchBanners(modularModel.MasterDefinition, null, verifiedBot);
 
                         return View("~/Views-New/ProductPages/Furniture-Modular.cshtml", modularModel);
 
@@ -1375,13 +1399,14 @@ namespace wwwDesignersGuild.Controllers
                                 ),
                                 objVisitor: objVisitorSelect,
                                 objCacheSelect: objProductData.objCacheSelect,
-                                isShop: IsShop
-                            );
+                                isShop: IsShop,
+								verifiedBot: verifiedBot
+							);
 
                         consolidatedOrderFormViewModel.UseOrderFormGrouping = true;
                         consolidatedOrderFormViewModel.UseSizeButtons = true;
 
-                        await FetchBanners(consolidatedOrderFormViewModel.MasterDefinition, null);
+                        await FetchBanners(consolidatedOrderFormViewModel.MasterDefinition, null, verifiedBot);
 
                         return View("~/Views-New/ProductPages/Standard.cshtml", consolidatedOrderFormViewModel);
 
@@ -1400,10 +1425,11 @@ namespace wwwDesignersGuild.Controllers
                             ),
                             objVisitor: objVisitorSelect,
                             objCacheSelect: objProductData.objCacheSelect,
-                            isShop: IsShop
-                        );
+                            isShop: IsShop,
+							verifiedBot: verifiedBot
+						);
 
-                        await FetchBanners(paintModel.MasterDefinition, null);
+                        await FetchBanners(paintModel.MasterDefinition, null, verifiedBot);
 
                         return View("~/Views-New/ProductPages/Paint.cshtml", paintModel);
 
@@ -1421,10 +1447,11 @@ namespace wwwDesignersGuild.Controllers
                                 ),
                                 objVisitor: objVisitorSelect,
                                 objCacheSelect: objProductData.objCacheSelect,
-                                isShop: IsShop
-                            );
+                                isShop: IsShop,
+								verifiedBot: verifiedBot
+							);
 
-                        await FetchBanners(modularModelNew.MasterDefinition, null);
+                        await FetchBanners(modularModelNew.MasterDefinition, null, verifiedBot);
 
                         return View("~/Views-New/ProductPages/Furniture-Modular-New.cshtml", modularModelNew);
 
@@ -1462,7 +1489,8 @@ namespace wwwDesignersGuild.Controllers
                     return await ReturnGeneric404(
                         urlData,
                         basketTotalData.TotalQuantity,
-                        objVisitorSelect);
+                        objVisitorSelect,
+                        verifiedBot);
                 }
 
 
@@ -1491,8 +1519,9 @@ namespace wwwDesignersGuild.Controllers
                         tradeMember: Session["memberTradeAccountID"] != null
                     ),
                     objVisitor: objVisitorSelect,
-                    objDefinition: objArticleData
-                );
+                    objDefinition: objArticleData,
+			        verifiedBot: verifiedBot
+				);
 
                 var pageView = new logPageView()
                 {
@@ -1576,8 +1605,9 @@ namespace wwwDesignersGuild.Controllers
                         tradeMember: Session["memberTradeAccountID"] != null
                     ),
                     objVisitor: objVisitorSelect,
-                    isShop: IsShop
-                );
+                    isShop: IsShop,
+					verifiedBot: verifiedBot
+				);
 
                 // Don't index the approached URL: it's part of the checkout
                 Response.Headers.Add("X-Robots-Tag", "noindex");
@@ -1595,7 +1625,8 @@ namespace wwwDesignersGuild.Controllers
             return await ReturnGeneric404(
                 urlData,
                 basketTotalData.TotalQuantity,
-                objVisitorSelect);
+                objVisitorSelect,
+                verifiedBot);
 
             #endregion
         }
@@ -1910,7 +1941,7 @@ namespace wwwDesignersGuild.Controllers
             return result;
         }
 
-        private async Task FetchBanners(NewMasterDefinition objMaster, byte? siteSectionId)
+        private async Task FetchBanners(NewMasterDefinition objMaster, byte? siteSectionId, bool verifiedBot)
         {
             var banners = new cmsBanner();
 
@@ -2013,7 +2044,7 @@ namespace wwwDesignersGuild.Controllers
 
             ViewBag.footerBanners = footerBannersUnrestrictedByPage.Concat(footerBannersRestrictedByPage).ToList();
 
-            if (dgFramework.IsBot)
+            if (verifiedBot)
             {
                 availableBanners = availableBanners.Where(b => b.id != 54 && b.id != 55).ToList();
             }
@@ -2184,7 +2215,7 @@ namespace wwwDesignersGuild.Controllers
 
                                 var correctTradePriceList = objCountryData.countryTradePriceLists.SingleOrDefault(tpl => tpl.TradePriceListID == objVisitorSelect.tradePriceListId);
 
-                                var correctSiteCulture = objCountryData.countryItems.SingleOrDefault(ci => ci.PriceListID == correctTradePriceList?.PriceListID);
+                                var correctSiteCulture = objCountryData.countryItems.FirstOrDefault(ci => ci.PriceListID == correctTradePriceList?.PriceListID);
 
                                 Session["memberTradeCorrectSiteCulture"] = correctSiteCulture;
                             }
@@ -2238,7 +2269,8 @@ namespace wwwDesignersGuild.Controllers
         public async Task<ActionResult> ReturnGeneric404(
             urlBreakdown urlBreakdown,
             decimal basketTotalQuantity,
-            VisitorSelect objVisitorSelect
+            VisitorSelect objVisitorSelect,
+            bool verifiedBot
             )
         {
             if (Convert.ToBoolean(Session["memberTradeChecksPassed"]) == true &&
@@ -2258,7 +2290,8 @@ namespace wwwDesignersGuild.Controllers
                         googleHrefs: new List<googleHref>(),
                         tradeMember: Session["memberTradeAccountID"] != null
                     ),
-                objVisitor: objVisitorSelect);
+                objVisitor: objVisitorSelect,
+				verifiedBot: verifiedBot);
 
             // Don't index this URL: it was invalid!
             Response.Headers.Add("X-Robots-Tag", "noindex");

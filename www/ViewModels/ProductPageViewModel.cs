@@ -602,8 +602,8 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster, 
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop) : base(objMaster, 
-                                             objVisitor)
+            bool isShop,
+            bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             UseSizeButtons = false;
             UseOrderFormGrouping = false;
@@ -621,7 +621,7 @@ namespace wwwDesignersGuild.ViewModels
             sw.Start();
 #endif
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
             var imageIds = Definition.Images.Select(p => p.imageId).Distinct().ToList();
 

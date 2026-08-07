@@ -850,13 +850,13 @@ namespace wwwDesignersGuild.Models.Classes
         public bool? isNew { get; set; }
         public Byte? top { get; set; }
         public masterDefinition masterDefinition { get; set; }
-        public List<ScrapbookImage> scrapbookImages { get; set; }
+        public IEnumerable<ScrapbookImage> scrapbookImages { get; set; }
         public string displayClass { get; set; }
     }
 
     public class cmsScrapbookImagesDefinition
     {
-        public List<ScrapbookImage> Images { get; set; }
+        public IEnumerable<ScrapbookImage> Images { get; set; }
     }
 
     public class ScrapbookImage

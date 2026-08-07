@@ -13,10 +13,11 @@ using System.Collections.Generic;
 using wwwDesignersGuild.Models.Country;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Web.SessionState;
 
 namespace wwwDesignersGuild.Controllers
 {
-    public class CacheController : ApiController
+	public class CacheController : ApiController
     {
         [HttpPost]
         [CacheAuthentication]

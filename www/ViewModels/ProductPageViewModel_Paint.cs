@@ -55,12 +55,15 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop)
+            bool isShop,
+            bool verifiedBot)
         {
-            var result = new ProductPageViewModel_Paint(objMaster,
+            var result = new ProductPageViewModel_Paint(
+                objMaster,
                 objVisitor,
                 objCacheSelect,
-                isShop);
+                isShop,
+                verifiedBot);
 
             await result.Initialise();
 
@@ -71,11 +74,12 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop) : base(
-            objMaster,
-            objVisitor,
-            objCacheSelect,
-            isShop)
+            bool isShop,
+            bool verifiedBot) : base(objMaster,
+                                     objVisitor,
+                                     objCacheSelect,
+                                     isShop,
+                                     verifiedBot)
         {
             UsePaintOrderForm = true;
             UseOrderFormGrouping = false;

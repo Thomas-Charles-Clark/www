@@ -205,6 +205,7 @@ namespace wwwDesignersGuild.Controllers
                                                                                     objVisitorSelect.memberTradeAccountID);
 
             basketRoutines objBasket = new basketRoutines();
+
             var basketTotalData = await objBasket.loadBasketTotalQuantity(objVisitorSelect.visitorDbId, objVisitorSelect.memberId, countryId);
 
             objMaster.TitleTag = objPageData.PageDetails.TitleTag;

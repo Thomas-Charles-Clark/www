@@ -94,7 +94,9 @@ namespace wwwDesignersGuild
                                                  // .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
                 );
             }
-        }
+
+			System.Threading.ThreadPool.SetMinThreads(1000, 1000);
+		}
 
         protected void Application_BeginRequest()
         {
@@ -117,7 +119,32 @@ namespace wwwDesignersGuild
                     MiniProfiler.StartNew();
                 }
             }
-        }
+			
+            if (HttpContext.Current.Request.Headers["UserAgent"] == "DesignersGuild_Cache_Bust" ||
+				HttpContext.Current.Request.Headers["UserAgent"] == "DesignersGuild_Cache_Fill" ||
+				HttpContext.Current.Request.Headers["UserAgent"] == "DG_K6_FloodTest_UserAgentString/1.0")
+			{
+				var path = HttpContext.Current.Request.Url.AbsolutePath;
+
+				// Look for "cache" anywhere in the requested URL path, ignoring case
+				if (path.IndexOf("/api/cache", StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					// Tell the async module to completely ignore this request
+					HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Disabled);
+
+					// Physically remove the ASP.NET session cookie from the incoming headers
+					if (HttpContext.Current.Request.Cookies["ASP.NET_SessionId"] != null)
+					{
+						HttpContext.Current.Request.Cookies.Remove("ASP.NET_SessionId");
+					}
+				}
+
+				if (Request.UserAgent == "DesignersGuild_Cache_Fill")
+				{
+					HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.ReadOnly);
+				}
+			}
+		}
 
         protected void Application_EndRequest()
         {

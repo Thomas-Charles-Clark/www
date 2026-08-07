@@ -131,9 +131,9 @@ namespace wwwDesignersGuild.ViewModels
             return new HtmlString($@"<ul class=""breadcrumb"">{breadcrumbs}</ul>");
         }
 
-        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop)
+        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop, bool verifiedBot)
         {
-            var result = new LandingPageViewModel(objMaster, objVisitor);
+            var result = new LandingPageViewModel(objMaster, objVisitor, verifiedBot);
 
             await result.Initialise(isShop);
 
@@ -167,7 +167,7 @@ namespace wwwDesignersGuild.ViewModels
 
 
 
-        private LandingPageViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor) : base(objMaster, objVisitor)
+        private LandingPageViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             PagingOverride = false;
             PageSections = new List<PageSectionViewModel>();
@@ -182,7 +182,7 @@ namespace wwwDesignersGuild.ViewModels
             sw.Start();
 #endif
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
             Definition = await new cmsLandingPage().loadLandingPageFromCms(
                 memberId: Visitor.memberId,
