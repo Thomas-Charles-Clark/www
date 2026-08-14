@@ -1,28 +1,74 @@
-﻿using NLog;
+﻿using Microsoft.AspNet.SignalR;
+
+using NLog;
+
+using StackExchange.Profiling;
+using StackExchange.Profiling.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using System.Web.Http;
 using System.Web.SessionState;
-using wwwDesignersGuild.Models.Helper;
-using wwwDesignersGuild.Models.Database;
 using System.Web.WebPages;
-using StackExchange.Profiling;
-using StackExchange.Profiling.Mvc;
-using wwwDesignersGuild.Util;
-using Microsoft.AspNet.SignalR;
+
+using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.SignalR;
+using wwwDesignersGuild.Util;
 
 namespace wwwDesignersGuild
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+		// Thread-safe dictionary to store and access your singleton caches
+		public static Dictionary<string, MemoryCache> CacheSingletons { get; private set; } = new Dictionary<string, MemoryCache>();
+
+		internal static readonly List<string> cacheNames = new List<string>()
+		{
+			"Attributes",
+			"Articles",
+			"ArticleTypes",
+			"ArticleSubTypes",
+			"Banners",
+			"BraintreeErrorResponses",
+			"CareersPage",
+			"Collections",
+			"CollectionProductPageGrids",
+			"ContactDetails",
+			"Countries",
+			"CountryDropDownCountries",
+			"DotDigitalTrackingBehaviours",
+			"EmailCapturePopupForms",
+            "FilterIndexAttributeCombinations",
+			"LandingPages",
+			"LifestyleGalleryPopups",
+			"Hotspots",
+			"MobileDetections",
+			"Menus",
+            "OrderForms",
+			"ProductPages",
+			"ProductPageGrids",
+			"ProductTypeOrderRestrictions",
+			"Resources",
+            "Redirects",
+			"Scrapbooks",
+            "Searches",
+			"SearchProductTypes",
+			"SiteSections",
+			"Snippets",
+			"StockStatuses",
+			"TradeAccountRequestForms",
+			"UnsubscribePages"
+		};
+
+		private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         #region WebApi SessionState Allow
 
@@ -47,7 +93,13 @@ namespace wwwDesignersGuild
 
         protected void Application_Start()
         {
-            GlobalConfiguration.Configure(WebApiConfig.Register);
+			// 2. Instantiate and store each MemoryCache exactly once
+			foreach (string name in cacheNames)
+			{
+				CacheSingletons[name] = new MemoryCache(name);
+			}
+
+			GlobalConfiguration.Configure(WebApiConfig.Register);
 
             GlobalHost.DependencyResolver.Register(typeof(IUserIdProvider), () => new UserIdProvider());
 

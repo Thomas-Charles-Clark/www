@@ -1006,34 +1006,34 @@ namespace wwwDesignersGuild.Controllers
                     Response.Headers.Add("X-Robots-Tag", "noindex");
                 }
 
-                var pageView = new logPageView()
-                {
-                    Site = Framework.ProductionVersion ? 'L' : 'P',
-                    URL = Request.Url.AbsoluteUri,
-                    CountryID = urlData.countryDetails.CountryID,
-                    LanguageID = urlData.countryDetails.LanguageID,
-                    PageID = urlData.ContentId,
-                    Date = urlData.ContentDate,
-                    VisitorID = objVisitorSelect.visitorDbId,
-                    MemberID = objVisitorSelect.memberId,
-                    TradeAccountID = objVisitorSelect.memberTradeAccountID,
-                    UserAgent = Request.UserAgent,
-                    CFIPCountry = Request.Headers["CF-IPCountry"],
-                    CloudFlareDevice = Request.Headers["CF-Device-Type"],
-                    SessionID = Session.SessionID,
-                    GoogleSource = Request.QueryString["utm_source"],
-                    GoogleMedium = Request.QueryString["utm_medium"],
-                    GoogleCampaign = Request.QueryString["utm_campaign"],
-                    GoogleTerm = Request.QueryString["utm_term"],
-                    GoogleContent = Request.QueryString["utm_content"]
-                };
-
-                if (objVisitorSelect.visitorDbId != 0)
+				if (!verifiedBot)
 				{
+					var pageView = new logPageView()
+					{
+						Site = Framework.ProductionVersion ? 'L' : 'P',
+						URL = Request.Url.AbsoluteUri,
+						CountryID = urlData.countryDetails.CountryID,
+						LanguageID = urlData.countryDetails.LanguageID,
+						PageID = urlData.ContentId,
+						Date = urlData.ContentDate,
+						VisitorID = objVisitorSelect.visitorDbId,
+						MemberID = objVisitorSelect.memberId,
+						TradeAccountID = objVisitorSelect.memberTradeAccountID,
+						UserAgent = Request.UserAgent,
+						CFIPCountry = Request.Headers["CF-IPCountry"],
+						CloudFlareDevice = Request.Headers["CF-Device-Type"],
+						SessionID = Session.SessionID,
+						GoogleSource = Request.QueryString["utm_source"],
+						GoogleMedium = Request.QueryString["utm_medium"],
+						GoogleCampaign = Request.QueryString["utm_campaign"],
+						GoogleTerm = Request.QueryString["utm_term"],
+						GoogleContent = Request.QueryString["utm_content"]
+					};
+
 					objVisitorFactory.logPageView(pageView); // also skip any basket interaction if visitorDbId == 0, also skip any recentlyViewed action
 				}
 
-                if (landingPageViewModel.ContentID == (int)dgFixedPage.globalSiteSelector)
+				if (landingPageViewModel.ContentID == (int)dgFixedPage.globalSiteSelector)
                 {
                     var viewModel = await FixedPageViewModel_GlobalSiteSelector.CreateAsync(Request.Headers["CF-IPCountry"], landingPageViewModel);
 
@@ -1155,35 +1155,34 @@ namespace wwwDesignersGuild.Controllers
                 // (not a redirect)
                 //
 
-                #region LOG PAGEVIEW
-
-                #endregion
-
                 await FetchBanners(collectionModel.MasterDefinition, null, verifiedBot);
 
-                var pageView = new logPageView()
-                {
-                    Site = Framework.ProductionVersion ? 'L' : 'P',
-                    URL = Request.Url.AbsoluteUri,
-                    CountryID = urlData.countryDetails.CountryID,
-                    LanguageID = urlData.countryDetails.LanguageID,
-                    CollectionID = (short?)urlData.ContentId,
-                    Date = urlData.ContentDate,
-                    VisitorID = objVisitorSelect.visitorDbId,
-                    MemberID = objVisitorSelect.memberId,
-                    TradeAccountID = objVisitorSelect.memberTradeAccountID,
-                    UserAgent = Request.UserAgent,
-                    CFIPCountry = Request.Headers["CF-IPCountry"],
-                    CloudFlareDevice = Request.Headers["CF-Device-Type"],
-                    SessionID = Session.SessionID,
-                    GoogleSource = Request.QueryString["utm_source"],
-                    GoogleMedium = Request.QueryString["utm_medium"],
-                    GoogleCampaign = Request.QueryString["utm_campaign"],
-                    GoogleTerm = Request.QueryString["utm_term"],
-                    GoogleContent = Request.QueryString["utm_content"]
-                };
+				if (!verifiedBot)
+				{
+					var pageView = new logPageView()
+					{
+						Site = Framework.ProductionVersion ? 'L' : 'P',
+						URL = Request.Url.AbsoluteUri,
+						CountryID = urlData.countryDetails.CountryID,
+						LanguageID = urlData.countryDetails.LanguageID,
+						CollectionID = (short?)urlData.ContentId,
+						Date = urlData.ContentDate,
+						VisitorID = objVisitorSelect.visitorDbId,
+						MemberID = objVisitorSelect.memberId,
+						TradeAccountID = objVisitorSelect.memberTradeAccountID,
+						UserAgent = Request.UserAgent,
+						CFIPCountry = Request.Headers["CF-IPCountry"],
+						CloudFlareDevice = Request.Headers["CF-Device-Type"],
+						SessionID = Session.SessionID,
+						GoogleSource = Request.QueryString["utm_source"],
+						GoogleMedium = Request.QueryString["utm_medium"],
+						GoogleCampaign = Request.QueryString["utm_campaign"],
+						GoogleTerm = Request.QueryString["utm_term"],
+						GoogleContent = Request.QueryString["utm_content"]
+					};
 
-                objVisitorFactory.logPageView(pageView);
+					objVisitorFactory.logPageView(pageView); // also skip any basket interaction if visitorDbId == 0, also skip any recentlyViewed action
+				}
 
                 return View("~/Views-New/Collections/Collection.cshtml", collectionModel);
             }
@@ -1237,36 +1236,39 @@ namespace wwwDesignersGuild.Controllers
 
                     return new RedirectResult(tempUrl, true);
                 }
-                
-                //#if DEBUG
-                //              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.eu/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
-                //#else
-                //              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.com/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
-                //#endif
 
-                var pageView = new logPageView()
-                {
-                    Site = Framework.ProductionVersion ? 'L' : 'P',
-                    URL = Request.Url.AbsoluteUri,
-                    CountryID = urlData.countryDetails.CountryID,
-                    LanguageID = urlData.countryDetails.LanguageID,
-                    ProductPageID = urlData.ContentId,
-                    Date = urlData.ContentDate,
-                    VisitorID = objVisitorSelect.visitorDbId,
-                    MemberID = objVisitorSelect.memberId,
-                    TradeAccountID = objVisitorSelect.memberTradeAccountID,
-                    UserAgent = Request.UserAgent,
-                    CFIPCountry = Request.Headers["CF-IPCountry"],
-                    CloudFlareDevice = Request.Headers["CF-Device-Type"],
-                    SessionID = Session.SessionID,
-                    GoogleSource = Request.QueryString["utm_source"],
-                    GoogleMedium = Request.QueryString["utm_medium"],
-                    GoogleCampaign = Request.QueryString["utm_campaign"],
-                    GoogleTerm = Request.QueryString["utm_term"],
-                    GoogleContent = Request.QueryString["utm_content"]
-                };
+				//#if DEBUG
+				//              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.eu/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
+				//#else
+				//              Response.Headers.Add("Content-Security-Policy", "default-src 'unsafe-inline' http://localhost:* ws://localhost:* 'self'; script-src 'unsafe-inline' http://localhost:* 'self' 'unsafe-eval' https://static.trackedweb.net/js/_dmptv4.js https://connect.facebook.net/en_US/sdk.js https://assets.pinterest.com:* https://www.googletagmanager.com:* https://www.google-analytics.com:* https://salesiq.zoho.eu:* https://salesiq.zoho.com:* https://js.zohocdn.com:*; img-src https://site.feefo.com https://www.designersguild.com https://www.facebook.com https://log.pinterest.com/ https://www.google-analytics.com/ 'self' data:; style-src 'unsafe-inline' 'self' https://css.zohostatic.eu/ https://css.zohostatic.com/ https://css.zohocdn.com/; font-src 'self' https://css.zohocdn.com; connect-src 'self' https://salesiq.zoho.eu/ https://salesiq.zoho.com/ wss://vts.zohopublic.com/ https://r1.trackedweb.net/ https://localhost:* wss://localhost:*");
+				//#endif
 
-                objVisitorFactory.logPageView(pageView);
+				if (!verifiedBot)
+				{
+					var pageView = new logPageView()
+					{
+						Site = Framework.ProductionVersion ? 'L' : 'P',
+						URL = Request.Url.AbsoluteUri,
+						CountryID = urlData.countryDetails.CountryID,
+						LanguageID = urlData.countryDetails.LanguageID,
+						ProductPageID = urlData.ContentId,
+						Date = urlData.ContentDate,
+						VisitorID = objVisitorSelect.visitorDbId,
+						MemberID = objVisitorSelect.memberId,
+						TradeAccountID = objVisitorSelect.memberTradeAccountID,
+						UserAgent = Request.UserAgent,
+						CFIPCountry = Request.Headers["CF-IPCountry"],
+						CloudFlareDevice = Request.Headers["CF-Device-Type"],
+						SessionID = Session.SessionID,
+						GoogleSource = Request.QueryString["utm_source"],
+						GoogleMedium = Request.QueryString["utm_medium"],
+						GoogleCampaign = Request.QueryString["utm_campaign"],
+						GoogleTerm = Request.QueryString["utm_term"],
+						GoogleContent = Request.QueryString["utm_content"]
+					};
+
+					objVisitorFactory.logPageView(pageView); // also skip any basket interaction if visitorDbId == 0, also skip any recentlyViewed action
+				}
 
                 if (objProductData.objCacheSelect == null &&
                     objProductData.objUnavailabilityRedirect != null &&
@@ -1523,29 +1525,32 @@ namespace wwwDesignersGuild.Controllers
 			        verifiedBot: verifiedBot
 				);
 
-                var pageView = new logPageView()
-                {
-                    Site = Framework.ProductionVersion ? 'L' : 'P',
-                    URL = Request.Url.AbsoluteUri,
-                    CountryID = urlData.countryDetails.CountryID,
-                    LanguageID = urlData.countryDetails.LanguageID,
-                    ArticleID = urlData.ContentId,
-                    Date = urlData.ContentDate,
-                    VisitorID = objVisitorSelect.visitorDbId,
-                    MemberID = objVisitorSelect.memberId,
-                    TradeAccountID = objVisitorSelect.memberTradeAccountID,
-                    UserAgent = Request.UserAgent,
-                    CFIPCountry = Request.Headers["CF-IPCountry"],
-                    CloudFlareDevice = Request.Headers["CF-Device-Type"],
-                    SessionID = Session.SessionID,
-                    GoogleSource = Request.QueryString["utm_source"],
-                    GoogleMedium = Request.QueryString["utm_medium"],
-                    GoogleCampaign = Request.QueryString["utm_campaign"],
-                    GoogleTerm = Request.QueryString["utm_term"],
-                    GoogleContent = Request.QueryString["utm_content"]
-                };
+				if (!verifiedBot)
+				{
+					var pageView = new logPageView()
+					{
+						Site = Framework.ProductionVersion ? 'L' : 'P',
+						URL = Request.Url.AbsoluteUri,
+						CountryID = urlData.countryDetails.CountryID,
+						LanguageID = urlData.countryDetails.LanguageID,
+						ArticleID = urlData.ContentId,
+						Date = urlData.ContentDate,
+						VisitorID = objVisitorSelect.visitorDbId,
+						MemberID = objVisitorSelect.memberId,
+						TradeAccountID = objVisitorSelect.memberTradeAccountID,
+						UserAgent = Request.UserAgent,
+						CFIPCountry = Request.Headers["CF-IPCountry"],
+						CloudFlareDevice = Request.Headers["CF-Device-Type"],
+						SessionID = Session.SessionID,
+						GoogleSource = Request.QueryString["utm_source"],
+						GoogleMedium = Request.QueryString["utm_medium"],
+						GoogleCampaign = Request.QueryString["utm_campaign"],
+						GoogleTerm = Request.QueryString["utm_term"],
+						GoogleContent = Request.QueryString["utm_content"]
+					};
 
-                objVisitorFactory.logPageView(pageView);
+					objVisitorFactory.logPageView(pageView); // also skip any basket interaction if visitorDbId == 0, also skip any recentlyViewed action
+				}
 
                 return View("~/Views-New/Articles/Article.cshtml", articleViewModel);
             }

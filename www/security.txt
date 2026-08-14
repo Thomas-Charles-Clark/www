@@ -1,0 +1,11 @@
+# Contact Information
+Contact: mailto:security@designersguild.com
+
+# Link to our full disclosure and reward policy
+Policy: https://www.designersguild.com/security-policy.txt
+
+# Preferred Language
+Preferred-Languages: en
+
+# Expiry Date
+Expires: 2027-08-11T14:00:00.000Z

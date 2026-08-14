@@ -11,7 +11,7 @@ namespace wwwDesignersGuild.Models.Cache
 {
     public class StockStatusCacheProvider
     {
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
+        public MemoryCache Cache = MvcApplication.CacheSingletons["StockStatuses"];
 
 		// Static lock ensures all instances of this provider in the same w3wp.exe share it
 		private static readonly object _syncLock = new object();

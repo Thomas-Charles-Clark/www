@@ -1474,6 +1474,7 @@ namespace wwwDesignersGuild.Models.Classes
             }
         }
 
+        [JsonIgnore]
         public string PageJSON { get; set; }
 
         public object json 

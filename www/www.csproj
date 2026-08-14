@@ -509,6 +509,7 @@
     <Compile Include="Models\Basket\Basket.cs" />
     <Compile Include="Models\BootstrapBreakpoint\BootstrapBreakpoint.cs" />
     <Compile Include="Models\Breadcrumb\Breadcrumb.cs" />
+    <Compile Include="Models\Cache\CacheEntryMetadata.cs" />
     <Compile Include="Models\Cache\Collection\CollectionProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\General\HotspotCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\SiteSectionCacheProvider.cs" />
@@ -722,6 +723,7 @@
     <Compile Include="Models\UPS\LocatorRequest.cs" />
     <Compile Include="Models\UPS\LocatorResponse.cs" />
     <Compile Include="Models\UPS\OAuthResponse.cs" />
+    <Compile Include="Util\CacheMetadataExtractor.cs" />
     <Compile Include="ViewModels\Trade\TradeMyAccountViewModel.cs" />
     <Compile Include="Models\Twitter\Twitter.cs" />
     <Compile Include="Models\UnsubscribePage\cmsUnsubscribePage.cs" />
@@ -3052,6 +3054,8 @@
     <Content Include="Scripts\jquery-3.6.0.slim.min.js" />
     <Content Include="Scripts\jquery-ui-1.13.2.js" />
     <Content Include="Scripts\jquery-ui-1.13.2.min.js" />
+    <Content Include="security-policy.txt" />
+    <Content Include="security.txt" />
     <Content Include="Views-New\LandingPages\PageSections\_PageSectionPager.cshtml" />
     <Content Include="Content\images\logo\dg-logo-b2b-1340-73.webp" />
     <Content Include="Content\images\logo\dg-logo-b2b-2680-145.webp" />

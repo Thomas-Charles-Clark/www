@@ -76,6 +76,10 @@ footer p {
   margin-bottom: 0;
 }
 
+.mobile-text-center {
+  text-align: center !important;
+}
+
 #site-selector-background {
   height: 100%;
   background-position: center;

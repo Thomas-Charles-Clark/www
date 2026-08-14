@@ -1981,6 +1981,9 @@ namespace wwwDesignersGuild.Models.Helper
             MobileDetectionDefinition mobileDetectionResult = getDeviceData();
             bool isMobile = !mobileDetectionResult.IsTablet && mobileDetectionResult.IsMobile;
 
+#if DEBUG
+            isMobile = true;
+#endif
             //if (mobileDetectionResult.ScreenInchesDiagonal > 0)
             //{
             //    isMobile = (mobileDetectionResult.ScreenInchesDiagonal < 8);
@@ -2165,7 +2168,7 @@ namespace wwwDesignersGuild.Models.Helper
         //    return mobileDetectionResult;
         //}
 
-        #endregion
+#endregion
 
         #region Bot Detection
 
@@ -2343,7 +2346,7 @@ namespace wwwDesignersGuild.Models.Helper
   width: 100%;
 }
 
-#outlook a {
+# outlook a {
   padding: 0;
 }
 
@@ -2372,7 +2375,7 @@ body {
   line-height: 100%;
 }
 
-#backgroundTable {
+# backgroundTable {
   margin: 0;
   Margin: 0;
   padding: 0;

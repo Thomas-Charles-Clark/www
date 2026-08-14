@@ -257,6 +257,28 @@ namespace wwwDesignersGuild.ViewModels
         //    TradeCustomerServicesContactDetail = null;
         //}
 
+        public BaseViewModel()
+        {
+			MasterDefinition = null;
+			Visitor = null;
+			RecentlyViewed = new List<ProductPagePodViewModel>();
+			HeaderBanners = new List<bannerLocation>();
+			FooterBanners = new List<bannerLocation>();
+			EcommerceEmailCaptureBanners = new List<bannerLocation>();
+			EcommerceGeneralPopupBanners = new List<bannerLocation>();
+			Banners = new List<bannerLocation>();
+			Hotspots = new List<ImageHotspot>();
+			ShowRecentlyViewed = true;
+			PrefetchedResources = new List<ResourceResult>();
+			PrefetchedSnippets = new List<Snippet>();
+			NoFollow = false;
+			NoIndex = false;
+			CustomCanonical = null;
+			CategoryPageProductType = null;
+			TradeCustomerServicesContactDetail = null;
+			VerifiedBot = false;
+		}
+
         protected BaseViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool verifiedBot)
         {
             MasterDefinition = objMaster;
