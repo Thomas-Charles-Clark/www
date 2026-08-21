@@ -13,12 +13,14 @@ namespace wwwDesignersGuild.ViewModels
         public static async Task<ProductPageViewModel_FabricWallpaper> CreateAsync(NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop)
+            bool isShop,
+            bool verifiedBot)
         {
             var result = new ProductPageViewModel_FabricWallpaper(objMaster,
                 objVisitor,
                 objCacheSelect,
-                isShop);
+                isShop,
+                verifiedBot);
 
             await result.Initialise();
 
@@ -28,12 +30,13 @@ namespace wwwDesignersGuild.ViewModels
         private ProductPageViewModel_FabricWallpaper(NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop) : base(objMaster, objVisitor, objCacheSelect, isShop)
+            bool isShop,
+            bool verifiedBot) : base(objMaster, objVisitor, objCacheSelect, isShop, verifiedBot)
         {
 
         }
 
-        new protected async Task Initialise()
+        protected async Task Initialise()
         {
 
             var resourceDefinition = new cmsResource().loadResourceFromCms(

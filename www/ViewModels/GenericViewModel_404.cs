@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows.Media.Converters;
+
 using wwwDesignersGuild.Models.Carousel;
 using wwwDesignersGuild.Models.Classes;
 using wwwDesignersGuild.Models.CollectionPage;
@@ -19,8 +21,8 @@ namespace wwwDesignersGuild.ViewModels
         protected GenericViewModel_404(
             string redirectUrl,
             NewMasterDefinition objMaster,
-            VisitorSelect objVisitor) : base(objMaster,
-                                             objVisitor)
+            VisitorSelect objVisitor,
+            bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             RedirectURL = redirectUrl;
         }
@@ -28,16 +30,17 @@ namespace wwwDesignersGuild.ViewModels
         public static async Task<GenericViewModel_404> CreateAsync(
             string redirectUrl,
             NewMasterDefinition objMaster, 
-            VisitorSelect objVisitor)
+            VisitorSelect objVisitor,
+            bool verifiedBot)
         {
-            var result = new GenericViewModel_404(redirectUrl, objMaster, objVisitor);
+            var result = new GenericViewModel_404(redirectUrl, objMaster, objVisitor, verifiedBot);
 
             await result.Initialise();
 
             return result;
         }
 
-        new protected async Task Initialise()
+        protected async Task Initialise()
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -48,7 +51,7 @@ namespace wwwDesignersGuild.ViewModels
 
             NoFollow = true;
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
 #if DEBUG
             sw.Stop();

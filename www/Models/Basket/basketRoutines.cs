@@ -11,6 +11,9 @@ using wwwDesignersGuild.Models.Interface;
 using System.Configuration;
 using Newtonsoft.Json;
 using wwwDesignersGuild.ViewModels;
+using Dapper;
+using static Antlr.Runtime.Tree.TreeWizard;
+using Braintree;
 
 namespace wwwDesignersGuild.Models.BasketClasses
 {
@@ -117,20 +120,19 @@ namespace wwwDesignersGuild.Models.BasketClasses
         #region Get Basket Total Quantity
         public async Task<BasketTotalQuantity> loadBasketTotalQuantity(Int64 visitorDbId, Int32? memberId, short countryId)
         {
-            var basketTotalQuantity = await Task.FromResult<BasketTotalQuantity>(loadBasketTotalQuantityAsync(visitorDbId, memberId, countryId));
-            return basketTotalQuantity;
-        }
+            var dbConnection = new databaseDataContext();
+            
+            var result = await dbConnection.Connection.QuerySingleAsync<BasketTotalQuantity>("[pub].[Basket_TotalQuantity_Select]", new
+            {
+                VisitorID = visitorDbId,
+                MemberId = memberId,
+                CountryID = countryId
+            }, null, 30, CommandType.StoredProcedure);
 
-        public BasketTotalQuantity loadBasketTotalQuantityAsync(Int64 visitorDbId, Int32? memberId, short countryId)
-        {
-            var dataContext = new databaseDataContext();
+			if (result == null)
+				result = new BasketTotalQuantity();
 
-            var result = dataContext.Basket_TotalQuantity_Select(visitorDbId, memberId, countryId).Single();
-
-            if (result == null)
-                result = new BasketTotalQuantity();
-
-            return result;
+			return result;
         }
 
         #endregion

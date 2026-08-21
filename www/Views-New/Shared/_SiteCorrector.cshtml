@@ -23,7 +23,7 @@
         tradeMode = true;
     }
 }
-@if (!Model.IsBot && !Model.UserInCorrectSite && !Model.CountryCorrectorDismissed && String.IsNullOrEmpty(Model.Partial))
+@if (!Model.VerifiedBot && !Model.UserInCorrectSite && !Model.CountryCorrectorDismissed && String.IsNullOrEmpty(Model.Partial))
 {
     if (tradeMode == false)
     {

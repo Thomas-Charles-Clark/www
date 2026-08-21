@@ -180,9 +180,11 @@
         //});
 
         self.show();
-        window.setTimeout(() => {
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        }, 300);
+        if (window.location.hash == null || window.location.hash === '') {
+            window.setTimeout(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            }, 300);
+        }
     }
 
     //#endregion

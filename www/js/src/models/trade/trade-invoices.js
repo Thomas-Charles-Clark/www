@@ -498,7 +498,8 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            window.open(dataItem.InvoiceURI);
+            //window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
         },
         excelExport: self.exportToExcel
     };
@@ -608,7 +609,8 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            window.open('/downloads/trade-document?docref=' + dataItem.InvoiceHead + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            window.open(dataItem.InvoiceURI);
+            //window.open('/downloads/trade-document?docref=' + dataItem.InvoiceHead + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
         },
         excelExport: self.exportToExcel
     };
@@ -652,7 +654,8 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
+            window.open(dataItem.InvoiceURI);
+            //window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
         },
         excelExport: self.exportToExcel
     }
@@ -833,8 +836,8 @@
         selectable: 'row',
         change: function (e) {
             var dataItem = this.dataItem(this.select());
-            //window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
             window.open(`${dataItem.InvoiceURI}`, '_blank');
+            //window.open('/downloads/trade-document?docref=' + dataItem.DocumentKey + '&c=' + getCountryId() + '&l=' + getLanguageId(), '_blank');
         },
         excelExport: self.exportToExcel
     };

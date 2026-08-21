@@ -14,7 +14,7 @@ namespace wwwDesignersGuild.Models
 {
     public class FilterIndexAttributeCombinationCacheProvider
     {
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
+        public MemoryCache Cache = MvcApplication.CacheSingletons["FilterIndexAttributeCombinations"];
 
 		// Static lock ensures all instances of this provider in the same w3wp.exe share it
 		private static readonly object _syncLock = new object();

@@ -19,8 +19,8 @@ namespace wwwDesignersGuild.ViewModels
         protected CollectionViewModel_404(
             string redirectUrl,
             NewMasterDefinition objMaster,
-            VisitorSelect objVisitor) : base(objMaster,
-                                             objVisitor)
+            VisitorSelect objVisitor,
+            bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             RedirectURL = redirectUrl;
         }
@@ -28,9 +28,10 @@ namespace wwwDesignersGuild.ViewModels
         public static async Task<CollectionViewModel_404> CreateAsync(
             string redirectUrl,
             NewMasterDefinition objMaster, 
-            VisitorSelect objVisitor)
+            VisitorSelect objVisitor,
+            bool verifiedBot)
         {
-            var result = new CollectionViewModel_404(redirectUrl, objMaster, objVisitor);
+            var result = new CollectionViewModel_404(redirectUrl, objMaster, objVisitor, verifiedBot);
 
             await result.Initialise();
 
@@ -48,7 +49,7 @@ namespace wwwDesignersGuild.ViewModels
 
             NoFollow = true;
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
 
 #if DEBUG
             sw.Stop();

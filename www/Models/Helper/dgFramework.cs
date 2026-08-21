@@ -1983,6 +1983,9 @@ namespace wwwDesignersGuild.Models.Helper
             MobileDetectionDefinition mobileDetectionResult = getDeviceData();
             bool isMobile = !mobileDetectionResult.IsTablet && mobileDetectionResult.IsMobile;
 
+#if DEBUG
+            isMobile = true;
+#endif
             //if (mobileDetectionResult.ScreenInchesDiagonal > 0)
             //{
             //    isMobile = (mobileDetectionResult.ScreenInchesDiagonal < 8);
@@ -2167,21 +2170,13 @@ namespace wwwDesignersGuild.Models.Helper
         //    return mobileDetectionResult;
         //}
 
-        #endregion
+#endregion
 
         #region Bot Detection
 
         private static RegexOptions RegexOptions = RegexOptions.Multiline | RegexOptions.CultureInvariant;
 
         private static System.Text.RegularExpressions.Regex BotRegex = new System.Text.RegularExpressions.Regex(@"(Googlebot)|(AdsBot-Google)|(AdsBot-Google-Mobile)|(http:\/\/www\.google\.com\/bot\.html)|(APIs-Google)|(GoogleOther)|(Google-InspectionTool)|(Storebot-Google)|(Mediapartners-Google)|(bingbot)|(MicrosoftPreview)", RegexOptions);
-
-        public static bool IsBot
-        {
-            get 
-            {
-                return BotRegex.IsMatch(HttpContext.Current?.Request?.UserAgent ?? "");
-            }
-        }
 
         #endregion
 
@@ -2353,7 +2348,7 @@ namespace wwwDesignersGuild.Models.Helper
   width: 100%;
 }
 
-#outlook a {
+# outlook a {
   padding: 0;
 }
 
@@ -2382,7 +2377,7 @@ body {
   line-height: 100%;
 }
 
-#backgroundTable {
+# backgroundTable {
   margin: 0;
   Margin: 0;
   padding: 0;
@@ -4029,7 +4024,22 @@ table.button.small-expand table a,
                 return writer.ToString();
             }
         }
-    }
+
+		internal static void setVerifiedBot(ref VisitorSelect objVisitorSelect)
+		{
+			// Falsify in order to avoid touching mbr.Visitor wherever we can
+			objVisitorSelect.visitorDbId = 0L;
+			objVisitorSelect.memberTradeAccountNumber = null;
+			objVisitorSelect.memberTradeAccountID = (int?)null;
+			objVisitorSelect.memberId = (int?)null;
+			objVisitorSelect.Email = null;
+			objVisitorSelect.memberDisplayTradePrice = false;
+			objVisitorSelect.memberTradeDataSourceJson = null;
+			objVisitorSelect.VisitorCreatedDT = DateTime.Now;
+			objVisitorSelect.tradePriceListId = (short?)null;
+			objVisitorSelect.Culture = "en-GB";
+		}
+	}
 
     public class loggedInMemberDetail
     {

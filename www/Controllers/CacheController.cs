@@ -1,24 +1,32 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
-using wwwDesignersGuild.Util;
-using wwwDesignersGuild.Models.Cache;
-using System.Diagnostics;
-using wwwDesignersGuild.Models.ProductPage;
-using wwwDesignersGuild.Models.Helper;
-using wwwDesignersGuild.Models.Cache.ProductPages;
-using wwwDesignersGuild.Models;
-using System.Collections.Generic;
-using wwwDesignersGuild.Models.Country;
+using System.Net.Http.Headers;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
-using System.Linq;
+using System.Web.Http;
+using System.Web.Http.Results;
+
+using wwwDesignersGuild.Models.Cache;
+using wwwDesignersGuild.Models.Cache.Collection;
+using wwwDesignersGuild.Models.Cache.General;
+using wwwDesignersGuild.Models.Cache.ProductPages;
+using wwwDesignersGuild.Models.Cache.Resources;
+using wwwDesignersGuild.Models.Country;
+using wwwDesignersGuild.Models.Redirect;
+using wwwDesignersGuild.Util;
 
 namespace wwwDesignersGuild.Controllers
 {
-    public class CacheController : ApiController
+	public class CacheController : ApiController
     {
-        [HttpPost]
+		[HttpPost]
         [CacheAuthentication]
         public async Task<IHttpActionResult> Purge([FromBody]PassCachePurge objPurge)
         {
@@ -89,7 +97,7 @@ namespace wwwDesignersGuild.Controllers
             return Ok(new { });
         }
 
-        public void PurgeBanner(PassCachePurge objPurge)
+		public void PurgeBanner(PassCachePurge objPurge)
         {
             var cache = new BannerCacheProvider();
 
@@ -262,6 +270,198 @@ namespace wwwDesignersGuild.Controllers
 
             cache.Invalidate(objPurge.ContentID, objPurge.LanguageID, objPurge.CountryID, objPurge.ContentDate);
         }
+
+        [HttpGet]
+        public IHttpActionResult List()
+        {
+            return Json(MvcApplication.cacheNames);
+        }
+
+        [HttpGet]
+        public IHttpActionResult Inspect(string cacheName)
+        {
+			var cache = (MemoryCache)null;
+
+            if (!MvcApplication.cacheNames.Contains(cacheName))
+            {
+                throw new Exception($"Cache Name Not Found: \"{cacheName}\"");
+            }
+            else
+            {
+                switch (cacheName)
+                {
+                    case "Attributes":
+                        var attributesProvider = new AttributeCacheProvider();
+                        cache = attributesProvider.Cache;
+                        break;
+                    case "Articles":
+                        var articlesProvider = new ArticlePageCacheProvider();
+                        cache = articlesProvider.Cache;
+                        break;
+                    case "ArticleTypes":
+                        var articleTypesProvider = new ArticleTypeCacheProvider();
+                        cache = articleTypesProvider.Cache;
+                        break;
+                    case "ArticleSubTypes":
+                        var articleSubTypesProvider = new ArticleSubTypeCacheProvider();
+                        cache = articleSubTypesProvider.Cache;
+                        break;
+                    case "Banners":
+                        var bannersProvider = new BannerCacheProvider();
+                        cache = bannersProvider.Cache;
+                        break;
+                    case "BraintreeErrorResponses":
+                        var braintreeErrorResponsesProvider = new BraintreeErrorResponseCacheProvider();
+                        cache = braintreeErrorResponsesProvider.Cache;
+                        break;
+                    case "CareersPage":
+                        var careersPageProvider = new CareersPageCacheProvider();
+                        cache = careersPageProvider.Cache;
+                        break;
+                    case "Collections":
+                        var collectionsProvider = new CollectionPageCacheProvider();
+                        cache = collectionsProvider.Cache;
+                        break;
+                    case "CollectionProductPageGrids":
+                        var collectionProductPageGridProvider = new CollectionProductPageGridCacheProvider();
+                        cache = collectionProductPageGridProvider.Cache;
+                        break;
+                    case "ContactDetails":
+                        var contactDetailsProvider = new ContactDetailsCacheProvider();
+                        cache = contactDetailsProvider.Cache;
+                        break;
+                    case "Countries":
+                        var countryProvider = new CountryCacheProvider();
+                        cache = countryProvider.Cache;
+                        break;
+                    case "CountryDropDownCountries":
+                        var countryDropDownCacheProvider = new CountryDropDownCacheProvider();
+                        cache = countryDropDownCacheProvider.Cache;
+                        break;
+                    case "DotDigitalTrackingBehaviours":
+                        var dotDigitalTrackingBehaviourCacheProvider = new DotDigitalTrackingBehaviourCacheProvider();
+                        cache = dotDigitalTrackingBehaviourCacheProvider.Cache;
+                        break;
+                    case "EmailCapturePopupForms":
+                        var emailCapturePopupFormsProvider = new EmailCapturePopupFormCacheProvider();
+                        cache = emailCapturePopupFormsProvider.Cache;
+                        break;
+                    case "LandingPages":
+                        var landingPagesProvider = new LandingPageCacheProvider();
+                        cache = landingPagesProvider.Cache;
+                        break;
+                    case "LifestyleGalleryPopups":
+                        var lifestyleGalleryPopupsProvider = new LifestyleGalleryPopupCacheProvider();
+                        cache = lifestyleGalleryPopupsProvider.Cache;
+                        break;
+                    case "Hotspots":
+                        var hotspotsProvider = new HotspotCacheProvider();
+                        cache = hotspotsProvider.Cache;
+                        break;
+                    case "MobileDetections":
+                        var mobileDetectionsProvider = new MobileDetectionCacheProvider();
+                        cache = mobileDetectionsProvider.Cache;
+                        break;
+                    case "Menus":
+                        var menusProvider = new MenuCacheProvider();
+                        cache = menusProvider.Cache;
+                        break;
+                    case "ProductPages":
+                        var productPagesProvider = new ProductPageCacheProvider();
+                        cache = productPagesProvider.Cache;
+                        break;
+                    case "ProductPageGrids":
+                        var productPageGridsProvider = new ProductPageGridCacheProvider();
+                        cache = productPageGridsProvider.Cache;
+                        break;
+                    case "ProductTypeOrderRestrictions":
+                        var productTypeOrderRestrictionCacheProvider = new ProductTypeOrderRestrictionCacheProvider();
+                        cache = productTypeOrderRestrictionCacheProvider.Cache;
+                        break;
+                    case "Resources":
+                        var resourcesCacheProvider = new ResourceCacheProvider();
+                        cache = resourcesCacheProvider.Cache;
+                        break;
+                    case "Redirects":
+                        var redirectsCacheProvider = new RedirectCacheProvider();
+                        cache = redirectsCacheProvider.Cache;
+                        break;
+                    case "Scrapbooks":
+                        var scrapbookCacheProvider = new ScrapbookCacheProvider();
+                        cache = scrapbookCacheProvider.Cache;
+                        break;
+                    case "SearchProductTypes":
+                        var searchProductTypeCacheProvider = new SearchProductTypeDropDownCacheProvider();
+                        cache = searchProductTypeCacheProvider.Cache;
+                        break;
+                    case "SiteSections":
+                        var siteSectionsCacheProvider = new SiteSectionCacheProvider();
+                        cache = siteSectionsCacheProvider.Cache;
+                        break;
+                    case "Snippets":
+                        var snippetsCacheProvider = new SnippetCacheProvider();
+                        cache = snippetsCacheProvider.Cache;
+                        break;
+                    case "StockStatuses":
+                        var stockStatusesCacheProvider = new StockStatusCacheProvider();
+                        cache = stockStatusesCacheProvider.Cache;
+                        break;
+                    case "TradeAccountRequestForms":
+                        var tradeAccountRequestFormsCacheProvider = new TradeAccountRequestFormCacheProvider();
+                        cache = tradeAccountRequestFormsCacheProvider.Cache;
+                        break;
+                    case "UnsubscribePages":
+                        var unsubscribePagesCacheProvider = new UnsubscribePageCacheProvider();
+                        cache = unsubscribePagesCacheProvider.Cache;
+                        break;
+                    default:
+                        cache = null;
+                        break;
+                }
+
+                if (cache != null && cache.Any())
+                {
+                    var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+                    response.Content = new PushStreamContent(async (outputStream, httpContent, transportContext) =>
+                    {
+                        try
+                        {
+                            using (var streamWriter = new StreamWriter(outputStream, System.Text.Encoding.UTF8, 2048, leaveOpen: true))
+                            using (var jsonWriter = new JsonTextWriter(streamWriter))
+                            {
+                                await jsonWriter.WriteStartArrayAsync();
+
+                                // Pass the targeted cache instance explicitly to the streaming function
+                                foreach (var entry in CacheMetadataExtractor.GetActiveEntriesMetadata(cache))
+                                {
+                                    var token = JToken.FromObject(entry);
+                                    await token.WriteToAsync(jsonWriter);
+
+                                    await jsonWriter.FlushAsync();
+                                    await streamWriter.FlushAsync();
+                                    await outputStream.FlushAsync();
+                                }
+
+                                await jsonWriter.WriteEndArrayAsync();
+                                await jsonWriter.FlushAsync();
+                                await streamWriter.FlushAsync();
+                                await outputStream.FlushAsync();
+                            }
+                        }
+                        finally
+                        {
+                            outputStream.Close();
+                        }
+                    }, new MediaTypeHeaderValue("application/json"));
+
+                    return new ResponseMessageResult(response);
+                }
+                else
+                { 
+                    return Json("[]");
+                }
+            }
+        }
     }
 }
- 

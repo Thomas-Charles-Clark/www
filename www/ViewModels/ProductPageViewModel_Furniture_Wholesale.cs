@@ -22,12 +22,14 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop)
+            bool isShop,
+            bool verifiedBot)
         {
             var result = new ProductPageViewModel_Furniture_Wholesale(objMaster,
                 objVisitor,
                 objCacheSelect,
-                isShop);
+                isShop, 
+                verifiedBot);
 
             await result.Initialise();
 
@@ -43,11 +45,12 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop) : base(
-            objMaster,
-            objVisitor,
-            objCacheSelect,
-            isShop)
+            bool isShop,
+            bool verifiedBot) : base(objMaster,
+                                     objVisitor,
+                                     objCacheSelect,
+                                     isShop,
+                                     verifiedBot)
         {
             UseOrderFormGrouping = false;
             UseSizeButtons = false;

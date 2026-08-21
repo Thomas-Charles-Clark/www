@@ -20,7 +20,8 @@ namespace wwwDesignersGuild.ViewModels
             string redirectUrl,
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
-            bool isShop)
+            bool isShop,
+            bool verifiedBot)
         {
             objMaster.TitleTag = "404 - Designers Guild";
 
@@ -28,7 +29,8 @@ namespace wwwDesignersGuild.ViewModels
                 redirectUrl,
                 objMaster,
                 objVisitor,
-                isShop);
+                isShop,
+                verifiedBot);
 
             await result.Initialise();
 
@@ -39,12 +41,13 @@ namespace wwwDesignersGuild.ViewModels
             string redirectUrl, 
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
-            bool isShop) : base(objMaster, objVisitor)
+            bool isShop,
+            bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             RedirectURL = redirectUrl;
         }
 
-        new protected async Task Initialise()
+        protected async Task Initialise()
         {
             var resourceDefinition = new cmsResource().loadResourceFromCms(
                 LanguageID,
@@ -82,7 +85,7 @@ namespace wwwDesignersGuild.ViewModels
 
             PrefetchedResources.AddRange(resourcesResult);
 
-            await base.Initialise();
+            await base.Initialise(VerifiedBot);
         }
 
         public override string ToString()

@@ -13,7 +13,7 @@ namespace wwwDesignersGuild.Models.Cache
 {
     public class ProductPageCacheProvider
     {
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
+        public MemoryCache Cache = MvcApplication.CacheSingletons["ProductPages"];
 
 		// Static lock ensures all instances of this provider in the same w3wp.exe share it
 		private static readonly object _syncLock = new object();
@@ -25,6 +25,7 @@ namespace wwwDesignersGuild.Models.Cache
             bool tradeSwitch,
             bool? platformSwitch,
             DateTime useDate,
+			HttpResponseBase responseBase,
 			Func<cmsProductPageDefinition> factory)
 		{
 			var key = buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate);
@@ -33,15 +34,24 @@ namespace wwwDesignersGuild.Models.Cache
 			var data = (cmsProductPageDefinition)Cache[key];
 
 			if (data != null)
+			{
+				responseBase.AddHeader("DG-Cache-Hit", "true");
+
 				return data;
+			}
 
 			// Slow path: Lock to prevent multiple threads from generating the same key
 			lock (_syncLock)
 			{
 				// Necessary double-check pattern: Has another thread built it while we waited?
 				data = (cmsProductPageDefinition)Cache[key];
-				if (data != null)
+
+				responseBase.AddHeader("DG-Cache-Hit", "false");
+
+				if (data != null) 
+				{
 					return data;
+				}
 
 				// Execute the creation block passed by the caller
 				data = factory();
@@ -69,7 +79,13 @@ namespace wwwDesignersGuild.Models.Cache
 
         private string buildKey(int productPageId, byte languageId, short countryId, bool tradeSwitch, bool? platformSwitch, DateTime useDate)
         {
-            return $"PRODUCTPAGE~{productPageId}~{languageId}~{countryId}~{tradeSwitch}~{platformSwitch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+			var key = $"PRODUCTPAGE~{productPageId}~{languageId}~{countryId}~{tradeSwitch}~{platformSwitch}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+
+#if DEBUG
+			System.Diagnostics.Debug.WriteLine($"ProductPageCacheProvider.buildKey {key}");
+#endif
+
+			return key;
         }
 
         public DatabaseJSONResponse GetOrCreateTechInfo(
@@ -181,7 +197,9 @@ namespace wwwDesignersGuild.Models.Cache
 		{
 			lock (_syncLock)
 			{
-				Cache.Remove(buildKey(productPageId, languageId, countryId, tradeSwitch, platformSwitch, useDate));
+				Cache.Remove(buildKey(productPageId, languageId, countryId, tradeSwitch, true, useDate));
+				Cache.Remove(buildKey(productPageId, languageId, countryId, tradeSwitch, false, useDate));
+				Cache.Remove(buildKey(productPageId, languageId, countryId, tradeSwitch, null, useDate));
 				Cache.Remove(buildTechInfoKey(productPageId, languageId, countryId, useDate));
 				Cache.Remove(buildModularInfoKey(productPageId, languageId, countryId, useDate));
 			}

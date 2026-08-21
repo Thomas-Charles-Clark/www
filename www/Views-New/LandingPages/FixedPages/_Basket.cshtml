@@ -560,6 +560,11 @@
                     @HtmlHelperExtra.Resource("BasketProceedCheckout", l, c, d)
                 </a>
             </div>
+            <!-- ko if: getCountryId() == 236 || getCountryId() == 238 -->
+            <div class="text-end mobile-text-center">
+                @HtmlHelperExtra.Resource("FinalSaleNoReturnNoExchanges", l, c, d)
+            </div>
+            <!-- /ko -->
         </div>
         <div class="saved-for-later-wrapper" style="display: @(Model.Definition.BasketItems.Where(bi => bi.SaveForLater == true).Any() ? "block" : "none")"
              data-bind="visible: savedForLaterItems().length > 0">

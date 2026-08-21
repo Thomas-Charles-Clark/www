@@ -147,7 +147,7 @@ namespace wwwDesignersGuild.Controllers
             {
                 _ = await visitorFactory.saveImageToScrapbook(visitorDbId, memberId, objToggle.imageId, objToggle.countryId, objToggle.productPageId);
 
-                scrapbook.Images.Add(new ScrapbookImage() 
+                scrapbook.Images.Append(new ScrapbookImage() 
                 { 
                     ImageID = objToggle.imageId
                 });
@@ -157,7 +157,9 @@ namespace wwwDesignersGuild.Controllers
                 _ = await visitorFactory.removeImageFromScrapbook(visitorDbId, memberId,
                     objToggle.countryId, objToggle.imageId);
 
-                scrapbook.Images.RemoveAll(p => p.ImageID == objToggle.imageId);
+                var list = scrapbook.Images.ToList();
+                list.RemoveAll(p => p.ImageID == objToggle.imageId);
+                scrapbook.Images = list.AsEnumerable();
             }
 
             cmsScrapbook.setScrapbook(visitorDbId, memberId, objToggle.countryId, objToggle.languageId, useDate, scrapbook);
@@ -516,16 +518,6 @@ namespace wwwDesignersGuild.Controllers
             return "";
 
         }
-
-
-        [HttpPost]
-        public void keepSessionAlive()
-        {
-            //  Get the session identifier
-            var session = HttpContext.Current.Session;
-            session["keepSessionAlive"] = DateTime.Now.ToString();
-        }
-
 
         [HttpPost]
         public async Task<object> doesEmailExist(webapiEmailExist objExist)

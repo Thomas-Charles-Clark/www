@@ -21,93 +21,88 @@ namespace wwwDesignersGuild.Controllers
 
                 VisitorSelect objVisitorSelect = new VisitorSelect();
 
-                #region DETERMINE           ContentDate
+                DateTime useDate = dgFramework.DetermineContentDate(Source);
 
-                //  Determine the date to use when obtaining data from the cms
-                DateTime useDate = DateTime.Now;
-                useDate = new DateTime(useDate.Year, useDate.Month, useDate.Day);
+				var cfVerifiedBot = Request.Headers["cf-verified-bot"];
+				var cfBotScore = Request.Headers["cf-bot-score"];
+				var ja3fingerprints = Request.Headers["cf-ja3-hash"];
+				var ja4fingerprints = Request.Headers["cf-ja4-hash"];
 
-                // Only if we're not in Production mode can we travel through time...
-                if (Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["productionVersion"]) == true) { }
+				var verifiedBot = false;
+				var botScore = 100;
+
+				if (Boolean.TryParse(cfVerifiedBot, out bool v))
+				{
+					verifiedBot = v;
+				}
+
+				if (Int32.TryParse(cfBotScore, out int bs))
+				{
+					botScore = bs;
+				}
+
+				if (verifiedBot)
+				{
+					dgFramework.setVerifiedBot(ref objVisitorSelect);
+				}
                 else
-                {
-                    //  Should the "use date" be overriden?
-                    if (Request.QueryString["dateOverride"] == null) { }
-                    else
-                    {
-                        String overrideDate = Request.QueryString["dateOverride"].ToString();
-                        if (overrideDate.Length == "ddMMyyyy".Length)
-                        {
-                            bool dateConvertSuccess = DateTime.TryParseExact(overrideDate,
-                                                                                  "ddMMyyyy",
-                                                                                  CultureInfo.InvariantCulture,
-                                                                                  DateTimeStyles.None,
-                                                                                  out useDate);
-                            if (dateConvertSuccess == true) { }
-                            else
-                            {
-                                // If we've failed to parse a DateTime from the given parameter, use today's date.
-                                useDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-                            }
-                        }
-                    }
-                }
-                #endregion
+				{
+					//  Get the session identifier
+					if (Session["visitorIdFromDatabase"] == null)
+					{
+						// Looks for VisitorID using GUID in cookie
 
-                //  Get the session identifier
-                if (Session["visitorIdFromDatabase"] == null)
-                {
-                    // Looks for VisitorID using GUID in cookie
+						String cookieGuid = dgFramework.getIdentificationFromCookie();
 
-                    String cookieGuid = dgFramework.getIdentificationFromCookie();
+						objVisitorSelect = await dgFramework.identifySession(objVisitorSelect, objVisitorFactory, cookieGuid, Request.Headers["CF-IPCountry"], Request.Headers["CF-Device-Type"]);
 
-                    objVisitorSelect = await dgFramework.identifySession(objVisitorSelect, objVisitorFactory, cookieGuid, Request.Headers["CF-IPCountry"], Request.Headers["CF-Device-Type"]);
+						// The beneath four can be null...
+						Session["memberName"] = objVisitorSelect.FullName;
+						Session["memberEmail"] = objVisitorSelect.Email;
+						Session["visitorCulture"] = objVisitorSelect.Culture;
+						Session["memberTradeAccountNumber"] = objVisitorSelect.memberTradeAccountNumber;
+						Session["memberTradeAccountID"] = objVisitorSelect.memberTradeAccountID;
+						Session["memberDisplayTradePrice"] = objVisitorSelect.memberDisplayTradePrice;
+						Session["memberTradeDataSourceJson"] = objVisitorSelect.memberTradeDataSourceJson;
+						Session["visitorCreatedDT"] = objVisitorSelect.VisitorCreatedDT;
 
-                    // The beneath four can be null...
-                    Session["memberName"] = objVisitorSelect.FullName;
-                    Session["memberEmail"] = objVisitorSelect.Email;
-                    Session["visitorCulture"] = objVisitorSelect.Culture;
-                    Session["memberTradeAccountNumber"] = objVisitorSelect.memberTradeAccountNumber;
-                    Session["memberTradeAccountID"] = objVisitorSelect.memberTradeAccountID;
-                    Session["memberDisplayTradePrice"] = objVisitorSelect.memberDisplayTradePrice;
-                    Session["memberTradeDataSourceJson"] = objVisitorSelect.memberTradeDataSourceJson;
-                    Session["visitorCreatedDT"] = objVisitorSelect.VisitorCreatedDT;
+						// And identifySession may have returned a visitorDbId of -1
+						if (objVisitorSelect.visitorDbId == -1)
+						{
+							Session["loginStatus"] = dgLoginStatus.notLoggedIn.ToString();
+						}
+						else
+						{
+							// however, if identifySession didn't return -1 then store the visitorDbId in Session.
+							Session["visitorIdFromDatabase"] = objVisitorSelect.visitorDbId.ToString();
+							Session["memberIdFromDatabase"] = objVisitorSelect.memberId;
 
-                    // And identifySession may have returned a visitorDbId of -1
-                    if (objVisitorSelect.visitorDbId == -1)
-                    {
-                        Session["loginStatus"] = dgLoginStatus.notLoggedIn.ToString();
-                    }
-                    else
-                    {
-                        // however, if identifySession didn't return -1 then store the visitorDbId in Session.
-                        Session["visitorIdFromDatabase"] = objVisitorSelect.visitorDbId.ToString();
-                        Session["memberIdFromDatabase"] = objVisitorSelect.memberId;
+							if (objVisitorSelect.FullName == null && objVisitorSelect.Email == null) { }
+							else
+							{
+								Session["loginStatus"] = dgLoginStatus.previousLogin.ToString();
+							}
+						}
+					}
+					else
+					{
+						objVisitorSelect.visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
+						objVisitorSelect.memberTradeAccountNumber = (string)Session["memberTradeAccountNumber"];
+						objVisitorSelect.memberTradeAccountID = (int?)Session["memberTradeAccountID"];
+						objVisitorSelect.memberId = (Int32?)Session["memberIdFromDatabase"];
+						objVisitorSelect.Email = (string)Session["memberEmail"];
+						objVisitorSelect.memberDisplayTradePrice = (Boolean)Session["memberDisplayTradePrice"];
+						objVisitorSelect.memberTradeDataSourceJson = (string)Session["memberTradeDataSourceJson"];
+						objVisitorSelect.VisitorCreatedDT = (DateTime)Session["visitorCreatedDT"];
 
-                        if (objVisitorSelect.FullName == null && objVisitorSelect.Email == null) { }
-                        else
-                        {
-                            Session["loginStatus"] = dgLoginStatus.previousLogin.ToString();
-                        }
-                    }
-                }
-                else
-                {
-                    objVisitorSelect.visitorDbId = Convert.ToInt64(Session["visitorIdFromDatabase"].ToString());
-                    objVisitorSelect.memberTradeAccountNumber = (string)Session["memberTradeAccountNumber"];
-                    objVisitorSelect.memberTradeAccountID = (int?)Session["memberTradeAccountID"];
-                    objVisitorSelect.memberId = (Int32?)Session["memberIdFromDatabase"];
-                    objVisitorSelect.Email = (string)Session["memberEmail"];
-                    objVisitorSelect.memberDisplayTradePrice = (Boolean)Session["memberDisplayTradePrice"];
-                    objVisitorSelect.memberTradeDataSourceJson = (string)Session["memberTradeDataSourceJson"];
-                    objVisitorSelect.VisitorCreatedDT = (DateTime)Session["visitorCreatedDT"];
+						if (Session["visitorCulture"] == null) { }
+						else
+						{
+							objVisitorSelect.Culture = Session["visitorCulture"].ToString();
+						}
+					}
+				}
 
-                    if (Session["visitorCulture"] == null) { }
-                    else
-                    {
-                        objVisitorSelect.Culture = Session["visitorCulture"].ToString();
-                    }
-                }
                 // If we have a VisitorID to use, this saves the "Culture" column on [mbr].[Visitor]
                 // If not, this creates a new Visitor storing UserAgent, IP and Culture, saves the returned GUID to cookie and gives us the VisitorID
                 if (objVisitorSelect.visitorDbId == -1)

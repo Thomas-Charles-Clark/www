@@ -1878,7 +1878,7 @@ namespace wwwDesignersGuild.Models.Database
             return results.GetResult<ScrapbookImage>().ToList();
         }
 
-        internal IEnumerable<ScrapbookImage> fetchCompleteScrapbookAsync(
+        internal async Task<IEnumerable<ScrapbookImage>> fetchCompleteScrapbookAsync(
             long visitorDbId,
             int? memberId,
             short countryId,
@@ -1887,14 +1887,16 @@ namespace wwwDesignersGuild.Models.Database
         {
             var db = new databaseDataContext();
 
-            return db.Connection.Query<ScrapbookImage>("[pub].[Scrapbook_Select]", new
+            var result = await db.Connection.QueryAsync<ScrapbookImage>("[pub].[Scrapbook_Select]", new
             {
                 VisitorID = visitorDbId,
                 MemberID = memberId,
                 CountryID = countryId,
                 LanguageID = languageId,
                 Date = contentDate
-            }, null, true, 30, CommandType.StoredProcedure);
+            }, null, 30, CommandType.StoredProcedure);
+
+            return result;
         }
 
         internal Boolean saveImageToScrapbook(Int64 visitorDbId, Int64? memberId, Int64 imageId, Int16 countryId, Int32? productPageId)

@@ -1,27 +1,73 @@
-﻿using NLog;
+﻿using Microsoft.AspNet.SignalR;
+
+using NLog;
+
+using StackExchange.Profiling;
+using StackExchange.Profiling.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using System.Web.Http;
 using System.Web.SessionState;
-using wwwDesignersGuild.Models.Helper;
-using wwwDesignersGuild.Models.Database;
 using System.Web.WebPages;
-using StackExchange.Profiling;
-using StackExchange.Profiling.Mvc;
-using wwwDesignersGuild.Util;
-using Microsoft.AspNet.SignalR;
+
+using wwwDesignersGuild.Models.Database;
+using wwwDesignersGuild.Models.Helper;
 using wwwDesignersGuild.SignalR;
+using wwwDesignersGuild.Util;
 
 namespace wwwDesignersGuild
 {
-	public class MvcApplication : System.Web.HttpApplication
-	{
+    public class MvcApplication : System.Web.HttpApplication
+    {
+		// Thread-safe dictionary to store and access your singleton caches
+		public static Dictionary<string, MemoryCache> CacheSingletons { get; private set; } = new Dictionary<string, MemoryCache>();
+
+		internal static readonly List<string> cacheNames = new List<string>()
+		{
+			"Attributes",
+			"Articles",
+			"ArticleTypes",
+			"ArticleSubTypes",
+			"Banners",
+			"BraintreeErrorResponses",
+			"CareersPage",
+			"Collections",
+			"CollectionProductPageGrids",
+			"ContactDetails",
+			"Countries",
+			"CountryDropDownCountries",
+			"DotDigitalTrackingBehaviours",
+			"EmailCapturePopupForms",
+            "FilterIndexAttributeCombinations",
+			"LandingPages",
+			"LifestyleGalleryPopups",
+			"Hotspots",
+			"MobileDetections",
+			"Menus",
+            "OrderForms",
+			"ProductPages",
+			"ProductPageGrids",
+			"ProductTypeOrderRestrictions",
+			"Resources",
+            "Redirects",
+			"Scrapbooks",
+            "Searches",
+			"SearchProductTypes",
+			"SiteSections",
+			"Snippets",
+			"StockStatuses",
+			"TradeAccountRequestForms",
+			"UnsubscribePages"
+		};
+
 		private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 		#region WebApi SessionState Allow
@@ -45,8 +91,14 @@ namespace wwwDesignersGuild
 		#endregion
 
 
-		protected void Application_Start()
-		{
+        protected void Application_Start()
+        {
+			// 2. Instantiate and store each MemoryCache exactly once
+			foreach (string name in cacheNames)
+			{
+				CacheSingletons[name] = new MemoryCache(name);
+			}
+
 			GlobalConfiguration.Configure(WebApiConfig.Register);
 
 			GlobalHost.DependencyResolver.Register(typeof(IUserIdProvider), () => new UserIdProvider());
@@ -68,33 +120,34 @@ namespace wwwDesignersGuild
 
 			System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
 
-			if (Convert.ToBoolean(ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
-			{
-				MiniProfiler.Configure(new MiniProfilerOptions
-				{
-					RouteBasePath = "~/profiler",
-					PopupRenderPosition = RenderPosition.Right,  // defaults to left
-					PopupMaxTracesToShow = 20,                   // defaults to 15
-					ColorScheme = ColorScheme.Dark,              // defaults to light
-					ResultsAuthorize = request => true,
-					ResultsListAuthorize = request =>
-					{
-						// you may implement this if you need to restrict visibility of profiling lists on a per request basis
-						return true; // all requests are legit in this example
-					},
-					StackMaxLength = 2048,
-					TrackConnectionOpenClose = true,
-					//EnableDebugMode = true,
-					PopupDecimalPlaces = 4
-				}
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+            {
+                MiniProfiler.Configure(new MiniProfilerOptions
+                {
+                    RouteBasePath = "~/profiler",
+                    PopupRenderPosition = RenderPosition.Right,  // defaults to left
+                    PopupMaxTracesToShow = 10,                   // defaults to 15
+                    ColorScheme = ColorScheme.Auto,              // defaults to light
+                    ResultsAuthorize = request => request.IsLocal,
+                    ResultsListAuthorize = request =>
+                    {
+                        // you may implement this if you need to restrict visibility of profiling lists on a per request basis
+                        return true; // all requests are legit in this example
+                    },
+                    StackMaxLength = 512,
+                    TrackConnectionOpenClose = true
+                }
+                // Optional settings to control the stack trace output in the details pane, examples:
+                .ExcludeType("SessionFactory")  // Ignore any class with the name of SessionFactory)
+                .ExcludeAssembly("NHibernate")  // Ignore any assembly named NHibernate
+                .ExcludeMethod("Flush")         // Ignore any method with the name of Flush
+                .AddViewProfiling()              // Add MVC view profiling (you want this)
+                                                 // If using EntityFrameworkCore, here's where it'd go.
+                                                 // .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
+                );
+            }
 
-				.ExcludeType("SessionFactory")
-				.ExcludeAssembly("NHibernate")
-				.ExcludeMethod("Flush") // Ignore any method with the name of Flush
-				.AddViewPofiling()              // If using EntityFrameworkCore, here's where it'd go.
-												// .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
-				);
-			}
+			System.Threading.ThreadPool.SetMinThreads(1000, 1000);
 		}
 
 		protected void Application_BeginRequest()
@@ -109,9 +162,39 @@ namespace wwwDesignersGuild
 			//Response.Cache.SetExpires(DateTime.Now);
 			//Response.Cache.SetValidUntilExpires(true);
 
-			if (Convert.ToBoolean(ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["enableProfiler"]) && HtmlHelperExtra.IsNonProductionVersion)
+            {
+                // You can decide whether to profile here, or it can be done in ActionFilters, etc.
+                // We're doing it here so profiling happens ASAP to account for as much time as possible.
+                if (Request.IsLocal) // Example of conditional profiling, you could just call MiniProfiler.StartNew();
+                {
+                    MiniProfiler.StartNew();
+                }
+            }
+			
+            if (HttpContext.Current.Request.Headers["UserAgent"] == "DesignersGuild_Cache_Bust" ||
+				HttpContext.Current.Request.Headers["UserAgent"] == "DesignersGuild_Cache_Fill" ||
+				HttpContext.Current.Request.Headers["UserAgent"] == "DG_K6_FloodTest_UserAgentString/1.0")
 			{
-				MiniProfiler.StartNew();
+				var path = HttpContext.Current.Request.Url.AbsolutePath;
+
+				// Look for "cache" anywhere in the requested URL path, ignoring case
+				if (path.IndexOf("/api/cache", StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					// Tell the async module to completely ignore this request
+					HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Disabled);
+
+					// Physically remove the ASP.NET session cookie from the incoming headers
+					if (HttpContext.Current.Request.Cookies["ASP.NET_SessionId"] != null)
+					{
+						HttpContext.Current.Request.Cookies.Remove("ASP.NET_SessionId");
+					}
+				}
+
+				if (Request.UserAgent == "DesignersGuild_Cache_Fill")
+				{
+					HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.ReadOnly);
+				}
 			}
 		}
 

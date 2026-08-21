@@ -14,7 +14,7 @@ namespace wwwDesignersGuild.Models.OrderForm
 {
     public class OrderFormCacheProvider
     {
-        private ObjectCache Cache { get { return MemoryCache.Default; } }
+        public MemoryCache Cache = MvcApplication.CacheSingletons["OrderForms"];
 
 		// Static lock ensures all instances of this provider in the same w3wp.exe share it
 		private static readonly object _syncLock = new object();

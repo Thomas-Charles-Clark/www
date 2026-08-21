@@ -28,12 +28,14 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop)
+            bool isShop,
+            bool verifiedBot)
         {
             var result = new ProductPageViewModel_Furniture_Modular(objMaster,
                 objVisitor,
                 objCacheSelect,
-                isShop);
+                isShop, 
+                verifiedBot);
 
             await result.Initialise();
 
@@ -44,17 +46,19 @@ namespace wwwDesignersGuild.ViewModels
             NewMasterDefinition objMaster,
             VisitorSelect objVisitor,
             productPageCacheSelect objCacheSelect,
-            bool isShop) : base(
+            bool isShop,
+            bool verifiedBot) : base(
             objMaster,
             objVisitor,
             objCacheSelect,
-            isShop)
+            isShop,
+            verifiedBot)
         {
             UseOrderFormGrouping = true;
             UseSizeButtons = true;
         }
 
-        new protected async Task Initialise()
+        protected async Task Initialise()
         {
             var ppcms = new cmsProductPage();
 
