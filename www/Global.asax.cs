@@ -68,6 +68,44 @@ namespace wwwDesignersGuild
 			"UnsubscribePages"
 		};
 
+		public static readonly Dictionary<string, string[]> CacheKeySchemas = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+	        { "Attributes", new[] { "LanguageID" } },
+	        { "Articles", new[] { "ArticleID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "ArticleTypes", new[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "ArticleSubTypes", new[] { "ArticleTypeID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Banners", new[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch", "PlatformSwitch" } },
+	        { "BraintreeErrorResponses", new[] { "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "CareersPage", new[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Collections", new[] { "CollectionID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" } },
+	        { "CollectionProductPageGrids", new[] { "CollectionID", "LanguageID", "CountryID", "TradeSwitch", "TradeAccountID", "CountryMatched", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "ContactDetails", new[] { "TradeAccountID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Countries", Array.Empty<string>() },
+	        { "CountryDropDownCountries", Array.Empty<string>() },
+	        { "DotDigitalTrackingBehaviours", new[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "EmailCapturePopupForms", new[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "FilterIndexAttributeCombinations", Array.Empty<string>() },
+	        { "LandingPages", new[] { "PageID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" } },
+	        { "LifestyleGalleryPopups", new[] { "ProductPageID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Hotspots", new[] { "ContentID", "ContentType", "TradeAccountID", "DisplayTradePrice", "CountryID", "LanguageID", "Date", "ImageIDs", "CountryMatch" } },
+	        { "MobileDetections", new[] { "UserAgent" } },
+	        { "Menus", new[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" } },
+	        { "OrderForms", Array.Empty<string>() },
+	        { "ProductPages", new[] { "ProductPageID", "LanguageID", "CountryID", "TradeSwitch", "PlatformSwitch", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "ProductPageGrids", new[] { "PageSectionID", "LanguageID", "CountryID", "TradeSwitch", "TradeAccountID", "CountryMatch", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "ProductTypeOrderRestrictions", new[] { "TradeAccountID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Resources", new[] { "LanguageID", "CountryID" } },
+	        { "Redirects", new[] { "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Scrapbooks", new[] { "VisitorID", "MemberID", "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Searches", Array.Empty<string>() },
+	        { "SearchProductTypes", new[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "SiteSections", new[] { "PageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "Snippets", new[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "StockStatuses", new[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "TradeAccountRequestForms", new[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" } },
+	        { "UnsubscribePages", Array.Empty<string>() }
+        };
+
 		private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         #region WebApi SessionState Allow
@@ -335,6 +373,8 @@ namespace wwwDesignersGuild
             HttpContext.Current.Session.Add("backInStockReminder", null); // definitely used: if you attempt to create a BISR without being logged in you get prompted to log in. Then once logged in, the BISR should be automatically created and you informed.
             HttpContext.Current.Session.Add("countryCorrectorDismissed", false); // definitely used: country nag
             HttpContext.Current.Session.Add("tradeLoginPromptDismissed", false); // definitely used: trade login nag
-        }
+            HttpContext.Current.Session.Add("tradeOrderingAllowed", false); // definitely used: whether or not trade ordering is allowed
+
+		}
     }
 }

@@ -863,7 +863,8 @@ namespace wwwDesignersGuild.Controllers
                         ),
                         objVisitor: objVisitorSelect,
                         isShop: IsShop,
-					    verifiedBot: verifiedBot
+					    verifiedBot: verifiedBot,
+                        responseBase: Response
 					);
                 }
                 catch (PageNotFoundException)
@@ -1611,7 +1612,8 @@ namespace wwwDesignersGuild.Controllers
                     ),
                     objVisitor: objVisitorSelect,
                     isShop: IsShop,
-					verifiedBot: verifiedBot
+					verifiedBot: verifiedBot,
+                    responseBase: null
 				);
 
                 // Don't index the approached URL: it's part of the checkout

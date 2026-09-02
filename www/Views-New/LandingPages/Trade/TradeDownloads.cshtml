@@ -47,7 +47,7 @@ else
             @using (Html.BeginForm())
             {
                 @Html.Partial("~/Views-New/LandingPages/Trade/TradeDownloadFileManagerPartial.cshtml", Model)
-                @Html.Hidden("objMaster", JsonConvert.SerializeObject(Model.MasterDefinition))
+                @Html.Hidden("objMaster", JsonConvert.SerializeObject(Model.BaseViewModel.MasterDefinition))
                 @Html.Hidden("countryId", c)
                 @Html.Hidden("languageId", l)
             }

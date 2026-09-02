@@ -1,5 +1,22 @@
 ﻿@model wwwDesignersGuild.ViewModels.Trade.TradeDownloadsViewModel
 @* Checked 13/07/2022 *@
-@Html.DevExpress().FileManager(
-    wwwDesignersGuild.Models.Trade.TradeDownloadFileManagerSettings.CreateFileManagerDownloadSettings()
-).BindToFileSystemProvider(Model.FileSystemProvider).GetHtml()
+@{ 
+	var l = Model.BaseViewModel.LanguageID;
+	var c = Model.BaseViewModel.CountryID;
+	var d = Model.BaseViewModel.Date;
+}
+@if (Directory.Exists(Model.FileSystemProvider.RootFolder))
+{
+	@Html.DevExpress().FileManager(
+			wwwDesignersGuild.Models.Trade.TradeDownloadFileManagerSettings.CreateFileManagerDownloadSettings()
+		).BindToFileSystemProvider(Model.FileSystemProvider).GetHtml()
+}
+else
+{
+	<h3 class="heading-5 bold margin-bottom-30">
+		@HtmlHelperExtra.Resource("TradePricelistsUnavailable", l, c, d)
+	</h3>
+	<div data-bind="stopBinding">
+		@Html.Action("TradeContactUs", "Trade", new { objBase = Model.BaseViewModel })
+	</div>
+}

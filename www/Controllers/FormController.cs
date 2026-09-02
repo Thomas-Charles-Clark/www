@@ -366,7 +366,8 @@ namespace wwwDesignersGuild.Controllers
                                                                                                 session["memberTradeAccountID"] != null,
                                                                                                 Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                                                                                                 session["memberDisplayTradePrice"] != null && Convert.ToBoolean(session["memberDisplayTradePrice"]),
-                                                                                                session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]));
+                                                                                                session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]),
+                                                                                                null);
 
             if (objPageData.pageSectionForms.Where(p => p.PageSectionID == objForm.PageSectionID).FirstOrDefault() == null)
             {
@@ -735,7 +736,8 @@ namespace wwwDesignersGuild.Controllers
                                                                                                 session["memberTradeAccountID"] != null,
                                                                                                 Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                                                                                                 session["memberDisplayTradePrice"] != null && Convert.ToBoolean(session["memberDisplayTradePrice"]),
-                                                                                                session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]));
+                                                                                                session["memberTradeAccountID"] == null ? (int?)null : Convert.ToInt32(session["memberTradeAccountID"]),
+                                                                                                null);
 
             if (objPageData.pageSectionForms.Where(p => p.PageSectionID == objSave.PageSectionID).FirstOrDefault() == null)
             {

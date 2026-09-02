@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Vml.Spreadsheet;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
@@ -11,6 +13,7 @@ using System.Net.Http.Headers;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Http.Results;
 
 using wwwDesignersGuild.Models.Cache;
@@ -19,15 +22,16 @@ using wwwDesignersGuild.Models.Cache.General;
 using wwwDesignersGuild.Models.Cache.ProductPages;
 using wwwDesignersGuild.Models.Cache.Resources;
 using wwwDesignersGuild.Models.Country;
+using wwwDesignersGuild.Models.Database;
 using wwwDesignersGuild.Models.Redirect;
 using wwwDesignersGuild.Util;
 
 namespace wwwDesignersGuild.Controllers
 {
-	public class CacheController : ApiController
+	[CacheAuthentication]
+	public class CacheApiController : ApiController
     {
 		[HttpPost]
-        [CacheAuthentication]
         public async Task<IHttpActionResult> Purge([FromBody]PassCachePurge objPurge)
         {
             try
@@ -272,13 +276,14 @@ namespace wwwDesignersGuild.Controllers
         [HttpGet]
         public IHttpActionResult List()
         {
-            return Json(MvcApplication.cacheNames);
+            return Ok(JsonConvert.SerializeObject(MvcApplication.cacheNames, Formatting.Indented));
         }
 
         [HttpGet]
         public IHttpActionResult Inspect(string cacheName)
         {
-			var cache = (MemoryCache)null;
+            var cache = (MemoryCache)null;
+            var keyBreakdown = (string[])null;
 
             if (!MvcApplication.cacheNames.Contains(cacheName))
             {
@@ -291,127 +296,158 @@ namespace wwwDesignersGuild.Controllers
                     case "Attributes":
                         var attributesProvider = new AttributeCacheProvider();
                         cache = attributesProvider.Cache;
-                        break;
+						keyBreakdown = new string[] { "LanguageID" };
+						break;
                     case "Articles":
                         var articlesProvider = new ArticlePageCacheProvider();
                         cache = articlesProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "ArticleID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "ArticleTypes":
                         var articleTypesProvider = new ArticleTypeCacheProvider();
                         cache = articleTypesProvider.Cache;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "ArticleSubTypes":
                         var articleSubTypesProvider = new ArticleSubTypeCacheProvider();
                         cache = articleSubTypesProvider.Cache;
+                        keyBreakdown = new string[] { "ArticleTypeID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "Banners":
                         var bannersProvider = new BannerCacheProvider();
                         cache = bannersProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch", "PlatformSwitch" };
+						break;
                     case "BraintreeErrorResponses":
                         var braintreeErrorResponsesProvider = new BraintreeErrorResponseCacheProvider();
                         cache = braintreeErrorResponsesProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "CareersPage":
                         var careersPageProvider = new CareersPageCacheProvider();
                         cache = careersPageProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "Collections":
                         var collectionsProvider = new CollectionPageCacheProvider();
                         cache = collectionsProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "CollectionID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" };
+						break;
                     case "CollectionProductPageGrids":
                         var collectionProductPageGridProvider = new CollectionProductPageGridCacheProvider();
                         cache = collectionProductPageGridProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "CollectionID", "LanguageID", "CountryID", "TradeSwitch", "TradeAccountID", "CountryMatched", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "ContactDetails":
                         var contactDetailsProvider = new ContactDetailsCacheProvider();
                         cache = contactDetailsProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "TradeAccountID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "Countries":
                         var countryProvider = new CountryCacheProvider();
                         cache = countryProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { };
+						break;
                     case "CountryDropDownCountries":
                         var countryDropDownCacheProvider = new CountryDropDownCacheProvider();
                         cache = countryDropDownCacheProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { };
+						break;
                     case "DotDigitalTrackingBehaviours":
                         var dotDigitalTrackingBehaviourCacheProvider = new DotDigitalTrackingBehaviourCacheProvider();
                         cache = dotDigitalTrackingBehaviourCacheProvider.Cache;
+                        keyBreakdown = new string[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "EmailCapturePopupForms":
                         var emailCapturePopupFormsProvider = new EmailCapturePopupFormCacheProvider();
-                        cache = emailCapturePopupFormsProvider.Cache;
+                        cache = emailCapturePopupFormsProvider.Cache;   
+                        keyBreakdown = new string[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "LandingPages":
                         var landingPagesProvider = new LandingPageCacheProvider();
                         cache = landingPagesProvider.Cache;
+                        keyBreakdown = new string[] { "PageID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" };
                         break;
                     case "LifestyleGalleryPopups":
                         var lifestyleGalleryPopupsProvider = new LifestyleGalleryPopupCacheProvider();
                         cache = lifestyleGalleryPopupsProvider.Cache;
-                        break;
+                        keyBreakdown = new string[] { "ProductPageID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "Hotspots":
                         var hotspotsProvider = new HotspotCacheProvider();
                         cache = hotspotsProvider.Cache;
+                        keyBreakdown = new string[] { "ContentID", "ContentType", "TradeAccountID", "DisplayTradePrice", "CountryID", "LanguageID", "Date", "ImageIDs", "CountryMatch" };
                         break;
                     case "MobileDetections":
                         var mobileDetectionsProvider = new MobileDetectionCacheProvider();
                         cache = mobileDetectionsProvider.Cache;
+                        keyBreakdown = new string[] { "UserAgent" };
                         break;
                     case "Menus":
                         var menusProvider = new MenuCacheProvider();
                         cache = menusProvider.Cache;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day", "TradeSwitch" };
                         break;
                     case "ProductPages":
                         var productPagesProvider = new ProductPageCacheProvider();
                         cache = productPagesProvider.Cache;
+                        keyBreakdown = new string[] { "ProductPageID", "LanguageID", "CountryID", "TradeSwitch", "PlatformSwitch", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "ProductPageGrids":
                         var productPageGridsProvider = new ProductPageGridCacheProvider();
                         cache = productPageGridsProvider.Cache;
+                        keyBreakdown = new string[] { "PageSectionID", "LanguageID", "CountryID", "TradeSwitch", "TradeAccountID", "CountryMatch", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "ProductTypeOrderRestrictions":
                         var productTypeOrderRestrictionCacheProvider = new ProductTypeOrderRestrictionCacheProvider();
                         cache = productTypeOrderRestrictionCacheProvider.Cache;
+                        keyBreakdown = new string[] { "TradeAccountID", "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "Resources":
                         var resourcesCacheProvider = new ResourceCacheProvider();
                         cache = resourcesCacheProvider.Cache;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID" };
                         break;
                     case "Redirects":
                         var redirectsCacheProvider = new RedirectCacheProvider();
                         cache = redirectsCacheProvider.Cache;
+                        keyBreakdown = new string[] { "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "Scrapbooks":
                         var scrapbookCacheProvider = new ScrapbookCacheProvider();
                         cache = scrapbookCacheProvider.Cache;
+                        keyBreakdown = new string[] { "VisitorID", "MemberID", "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "SearchProductTypes":
                         var searchProductTypeCacheProvider = new SearchProductTypeDropDownCacheProvider();
                         cache = searchProductTypeCacheProvider.Cache;
+                        keyBreakdown = new string[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "SiteSections":
                         var siteSectionsCacheProvider = new SiteSectionCacheProvider();
                         cache = siteSectionsCacheProvider.Cache;
-                        break;
+						keyBreakdown = new string[] { "PageID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "Snippets":
                         var snippetsCacheProvider = new SnippetCacheProvider();
                         cache = snippetsCacheProvider.Cache;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "StockStatuses":
                         var stockStatusesCacheProvider = new StockStatusCacheProvider();
                         cache = stockStatusesCacheProvider.Cache;
+                        keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
                         break;
                     case "TradeAccountRequestForms":
                         var tradeAccountRequestFormsCacheProvider = new TradeAccountRequestFormCacheProvider();
                         cache = tradeAccountRequestFormsCacheProvider.Cache;
-                        break;
+						keyBreakdown = new string[] { "CountryID", "LanguageID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     case "UnsubscribePages":
                         var unsubscribePagesCacheProvider = new UnsubscribePageCacheProvider();
                         cache = unsubscribePagesCacheProvider.Cache;
-                        break;
+						keyBreakdown = new string[] { "LanguageID", "CountryID", "Date.Year", "Date.Month", "Date.Day" };
+						break;
                     default:
                         cache = null;
                         break;
@@ -419,47 +455,80 @@ namespace wwwDesignersGuild.Controllers
 
                 if (cache != null && cache.Any())
                 {
-                    var response = new HttpResponseMessage(HttpStatusCode.OK);
+					var response = new HttpResponseMessage(HttpStatusCode.OK);
 
-                    response.Content = new PushStreamContent(async (outputStream, httpContent, transportContext) =>
-                    {
-                        try
-                        {
-                            using (var streamWriter = new StreamWriter(outputStream, System.Text.Encoding.UTF8, 2048, leaveOpen: true))
-                            using (var jsonWriter = new JsonTextWriter(streamWriter))
-                            {
-                                await jsonWriter.WriteStartArrayAsync();
+					response.Content = new PushStreamContent(async (outputStream, httpContent, transportContext) =>
+					{
+						try
+						{
+							// Set an efficient, larger internal stream buffer (8KB)
+							using (var streamWriter = new StreamWriter(outputStream, System.Text.Encoding.UTF8, 8192, leaveOpen: true))
+							using (var jsonWriter = new JsonTextWriter(streamWriter))
+							{
+								var serializer = new JsonSerializer();
+								await streamWriter.WriteAsync("["); // Manually stream the array bounds safely
 
-                                // Pass the targeted cache instance explicitly to the streaming function
-                                foreach (var entry in CacheMetadataExtractor.GetActiveEntriesMetadata(cache))
-                                {
-                                    var token = JToken.FromObject(entry);
-                                    await token.WriteToAsync(jsonWriter);
+								bool isFirst = true;
 
-                                    await jsonWriter.FlushAsync();
-                                    await streamWriter.FlushAsync();
-                                    await outputStream.FlushAsync();
-                                }
+								// Active entries are now streamed dynamically straight out of the internal cache reflection!
+								foreach (var entry in CacheMetadataExtractor.GetActiveEntriesMetadata(cache))
+								{
+									if (!isFirst)
+									{
+										await streamWriter.WriteAsync(",");
+									}
+									isFirst = false;
 
-                                await jsonWriter.WriteEndArrayAsync();
-                                await jsonWriter.FlushAsync();
-                                await streamWriter.FlushAsync();
-                                await outputStream.FlushAsync();
-                            }
-                        }
-                        finally
-                        {
-                            outputStream.Close();
-                        }
-                    }, new MediaTypeHeaderValue("application/json"));
+									entry.KeyBreakdown = keyBreakdown;
 
-                    return new ResponseMessageResult(response);
-                }
+									// Stream directly to the output wire with zero temporary intermediate allocations
+									serializer.Serialize(jsonWriter, entry);
+								}
+
+								await streamWriter.WriteAsync("]");
+								await streamWriter.FlushAsync();
+							}
+						}
+						finally
+						{
+							outputStream.Close();
+						}
+					}, new MediaTypeHeaderValue("application/json"));
+
+					return new ResponseMessageResult(response);
+				}
                 else
                 { 
                     return Json("[]");
                 }
             }
         }
-    }
+
+
+		[HttpGet]
+		public IHttpActionResult Summarise(string cacheName)
+		{
+			// 1. Guard check and resolve the live global cache singleton using your preferred indexing
+			if (string.IsNullOrWhiteSpace(cacheName) || !MvcApplication.CacheSingletons.TryGetValue(cacheName, out var cache))
+			{
+				return BadRequest($"Cache Name Not Found: \"{cacheName}\"");
+			}
+
+			// 2. Fetch the metadata schema array instantly from the parallel lookup table
+			if (!MvcApplication.CacheKeySchemas.TryGetValue(cacheName, out var keyBreakdown))
+			{
+				keyBreakdown = Array.Empty<string>(); // Clean fallback if a name exists but lacks a formal breakdown
+			}
+
+			// 3. Process the state summary via our memory-safe extraction framework
+			var summary = CacheMetadataExtractor.GetCacheStateSummary(cacheName, keyBreakdown, cache);
+
+			if (summary == null)
+			{
+				return NotFound();
+			}
+
+			return Ok(summary);
+		}
+	}
 }

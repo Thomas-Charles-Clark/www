@@ -74,7 +74,7 @@ namespace wwwDesignersGuild.Models.Cache
 
 		private string buildKey(short countryId, byte languageId, DateTime useDate)
 		{
-			return $"EMAIL~CAPUTRE~POPUP~FORM~{countryId}~{languageId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
+			return $"EMAIL~CAPTURE~POPUP~FORM~{countryId}~{languageId}~{useDate.Year}~{useDate.Month}~{useDate.Day}";
 		}
 
 		//public cmsEmailCapturePopupForm Get(short countryId, byte languageId, DateTime useDate)

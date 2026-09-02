@@ -325,7 +325,7 @@ namespace wwwDesignersGuild.Controllers
         }
 
         [ValidateInput(false)]
-        public async Task<ActionResult> TradeDownloadFileManagerDataBindingPartial(NewMasterDefinition objMaster)
+        public async Task<ActionResult> TradeDownloadFileManagerDataBindingPartial(BaseViewModel objBase)
         {
             var loginCheck = dgFramework.checkMemberLogin(Session);
 
@@ -334,8 +334,8 @@ namespace wwwDesignersGuild.Controllers
             var tradeAccountModel = await vf.callTradeMemberSelect(
                     loginCheck.tradeAccountId.Value,
                     loginCheck.memberId.Value,
-                    objMaster.UrlBreakdown.countryDetails.CountryID,
-                    objMaster.UrlBreakdown.countryDetails.LanguageID);
+                    objBase.MasterDefinition.UrlBreakdown.countryDetails.CountryID,
+					objBase.MasterDefinition.UrlBreakdown.countryDetails.LanguageID);
 
             var user = tradeAccountModel.Users.Where(p => p.MemberID == loginCheck.memberId).SingleOrDefault();
             var admin = tradeAccountModel.Administrators.Where(p => p.MemberID == loginCheck.memberId).SingleOrDefault();
@@ -348,7 +348,7 @@ namespace wwwDesignersGuild.Controllers
                 permission,
                 $"\\\\{Framework.WebServerHostname}\\d$\\wwwroot\\Trade\\Downloads\\MERTEX\\{tradePriceListCode}\\",
                 tradeAccountModel,
-                objMaster);
+				objBase);
 
             var tradeAccountId = Convert.ToInt32(Session["memberTradeAccountID"]);
 

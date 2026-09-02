@@ -131,11 +131,11 @@ namespace wwwDesignersGuild.ViewModels
             return new HtmlString($@"<ul class=""breadcrumb"">{breadcrumbs}</ul>");
         }
 
-        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop, bool verifiedBot)
+        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop, bool verifiedBot, HttpResponseBase responseBase)
         {
             var result = new LandingPageViewModel(objMaster, objVisitor, verifiedBot);
 
-            await result.Initialise(isShop);
+            await result.Initialise(isShop, responseBase);
 
             return result;
         }
@@ -175,7 +175,7 @@ namespace wwwDesignersGuild.ViewModels
             CategoryPageProductType = null;
         }
 
-        protected async Task Initialise(bool isShop)
+        protected async Task Initialise(bool isShop, HttpResponseBase responseBase)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -194,7 +194,8 @@ namespace wwwDesignersGuild.ViewModels
                 isTrade: MasterDefinition.TradeMember,
                 countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                 displayTradePrice: Visitor.memberDisplayTradePrice,
-                tradeAccountId: Visitor.memberTradeAccountID);
+                tradeAccountId: Visitor.memberTradeAccountID,
+                responseBase: responseBase);
 
             if (!isShop)
             {

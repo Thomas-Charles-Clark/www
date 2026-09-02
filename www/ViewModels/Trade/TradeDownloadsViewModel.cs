@@ -17,29 +17,9 @@ namespace wwwDesignersGuild.ViewModels.Trade
         [JsonIgnore]
         public BaseViewModel BaseViewModel { get; set; }
 
-        [JsonIgnore]
-        public NewMasterDefinition MasterDefinition { get; set; }
-
         public bool Permission { get; set; }
 
         public TradeDownloadFileSystemProvider FileSystemProvider { get; set; }
-
-        public TradeDownloadsViewModel(bool permission, string path, TradeAccountUsersModel taum, NewMasterDefinition objMaster)
-        {
-            Permission = permission;
-            FileSystemProvider = new TradeDownloadFileSystemProvider(path);
-            TradeAccountModel = taum;
-            MasterDefinition = objMaster;
-        }
-
-        public static async Task<TradeDownloadsViewModel> CreateAsync(bool permission, string path, TradeAccountUsersModel taum, NewMasterDefinition objMaster)
-        {
-            var result = new TradeDownloadsViewModel(permission, path, taum, objMaster);
-
-            await result.Initialise();
-
-            return result;
-        }
 
         public TradeDownloadsViewModel(bool permission, string path, TradeAccountUsersModel taum, BaseViewModel objBase)
         {
@@ -60,7 +40,7 @@ namespace wwwDesignersGuild.ViewModels.Trade
 
         public async Task Initialise()
         {
-
+            await BaseViewModel.SiteCultureCheck();
         }
     }
 }
