@@ -132,9 +132,9 @@ namespace wwwDesignersGuild.ViewModels
 
         public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop, bool verifiedBot, HttpResponseBase responseBase)
         {
-		    var result = new LandingPageViewModel(objMaster, objVisitor);
+		    var result = new LandingPageViewModel(objMaster, objVisitor, verifiedBot);
 
-            await result.Initialise(isShop, responseBase);
+            await result.Initialise(isShop, verifiedBot, responseBase);
 
 		    return result;
         }
@@ -166,7 +166,7 @@ namespace wwwDesignersGuild.ViewModels
 
 
 
-        private LandingPageViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor) : base(objMaster, objVisitor)
+        private LandingPageViewModel(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool verifiedBot) : base(objMaster, objVisitor, verifiedBot)
         {
             PagingOverride = false;
             PageSections = new List<PageSectionViewModel>();
@@ -174,14 +174,14 @@ namespace wwwDesignersGuild.ViewModels
             CategoryPageProductType = null;
         }
 
-        protected async Task Initialise(bool isShop, HttpResponseBase responseBase)
+        protected async Task Initialise(bool isShop, bool verifiedBot, HttpResponseBase responseBase)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 #endif
 
-            await base.Initialise();
+            await base.Initialise(verifiedBot);
 
 			var pager = new PagerViewModel(-1, true, true, null, false, null);
 
@@ -209,10 +209,9 @@ namespace wwwDesignersGuild.ViewModels
                 countryMatch: Convert.ToBoolean(HttpContext.Current.Session["countryCheckMatched"]),
                 displayTradePrice: Visitor.memberDisplayTradePrice,
                 tradeAccountId: tradeAccountId,
-                productPageGridPage: pager.Page,
-                productPageGridPageSize: pager.PageSize);
-                tradeAccountId: Visitor.memberTradeAccountID,
-                responseBase: responseBase);
+				productPageGridPage: pager.Page,
+				productPageGridPageSize: pager.PageSize,
+				responseBase: responseBase);
 
             if (!isShop)
             {

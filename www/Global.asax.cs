@@ -179,7 +179,7 @@ namespace wwwDesignersGuild
                 .ExcludeType("SessionFactory")  // Ignore any class with the name of SessionFactory)
                 .ExcludeAssembly("NHibernate")  // Ignore any assembly named NHibernate
                 .ExcludeMethod("Flush")         // Ignore any method with the name of Flush
-                .AddViewProfiling()              // Add MVC view profiling (you want this)
+                .AddViewPofiling()              // Add MVC view profiling (you want this)
                                                  // If using EntityFrameworkCore, here's where it'd go.
                                                  // .AddEntityFramework()        // Extension method in the MiniProfiler.EntityFrameworkCore package
                 );

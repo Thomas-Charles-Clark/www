@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Web;
 
@@ -15,5 +17,5 @@ namespace wwwDesignersGuild.Models.Cache
         public TimeSpan? SlidingExpiration { get; set; }
         public DateTime? LastAccessed { get; set; }
         public long ByteCount { get; set; }
-    }
+	}
 }

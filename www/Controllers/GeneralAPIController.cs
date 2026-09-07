@@ -43,6 +43,7 @@ using wwwDesignersGuild.Models.ResourceFetch;
 using wwwDesignersGuild.Models.Search;
 using wwwDesignersGuild.Models.SearchRender;
 using wwwDesignersGuild.Models.Trade;
+using wwwDesignersGuild.Models.UPS;
 using wwwDesignersGuild.Models.Visitor;
 using wwwDesignersGuild.Util;
 using wwwDesignersGuild.ViewModels.PageSectionViewModels;
@@ -661,7 +662,8 @@ namespace wwwDesignersGuild.Controllers
 							displayTradePrice: displayTradePrice,
 							tradeAccountId: tradeAccountId,
 							productPageGridPage: dto.page,
-							productPageGridPageSize: dto.pageSize)).Result;
+							productPageGridPageSize: dto.pageSize,
+							HttpResponseBase: new HttpResponseWrapper(HttpContext.Current.Response))).Result;
 
 						var Section = Task.Run(() => ProductPageGridPageSection.CreateAsync(
 							originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,

@@ -54,6 +54,8 @@ namespace wwwDesignersGuild.Models.LandingPage
             bool countryMatch, 
             bool displayTradePrice, 
             int? tradeAccountId,
+            int? productPageGridPage,
+            int? productPageGridPageSize,
             HttpResponseBase responseBase)
         {
 #if DEBUG

@@ -13,7 +13,20 @@ namespace wwwDesignersGuild.Models.Interface
 {
     public interface ICmsLandingPageRepository
     {
-        Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, HttpResponseBase responseBase);
-        Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPageId = null, int? productPageGridPageSize = null);
+        Task<cmsLandingPageDefinition> loadLandingPageFromCms(
+            int? memberId,
+            int pageId,
+            byte languageId,
+            short countryId,
+            DateTime useDate,
+            bool isMember,
+            bool isTrade,
+            bool countryMatch,
+            bool displayTradePrice,
+            int? tradeAccountId,
+            int? productPageGridPage,
+			int? productPageGridPageSize,
+            HttpResponseBase responseBase = null
+        );
     }
 }

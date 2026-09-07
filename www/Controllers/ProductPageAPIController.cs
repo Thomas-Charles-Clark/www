@@ -198,7 +198,8 @@ namespace wwwDesignersGuild.Controllers
 				displayTradePrice: displayTradePrice,
 				tradeAccountId: tradeAccountId,
 				productPageGridPage: dto.Page,
-				productPageGridPageSize: dto.PageSize);
+				productPageGridPageSize: dto.PageSize,
+				HttpResponseBase: new HttpResponseWrapper(HttpContext.Current.Response));
 
 			var ppgCacheProvider = new ProductPageGridPageSectionCacheProvider();
 
