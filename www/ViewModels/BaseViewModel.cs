@@ -127,7 +127,14 @@ namespace wwwDesignersGuild.ViewModels
         {
             get
             {
-                return Boolean.Parse($"{HttpContext.Current.Session["tradeOrderingAllowed"]}" ?? "false");
+				if (HttpContext.Current.Session["tradeOrderingAllowed"] == null)
+                {
+                    return false;
+                }
+                else
+                {
+					return Boolean.Parse($"{HttpContext.Current.Session["tradeOrderingAllowed"]}");
+				}
             }
         }
 

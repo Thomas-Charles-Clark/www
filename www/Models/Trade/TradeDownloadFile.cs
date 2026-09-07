@@ -28,9 +28,7 @@ namespace wwwDesignersGuild.Models.Trade
             settings.CallbackRouteValues = new { Controller = "downloads", Action = "pricelists-brochures-grid" };
 
             settings.ClientSideEvents.BeginCallback = @"function (s, e) { 
-                e.customArgs['objMaster'] = getMasterDefinition();
-                e.customArgs['countryId'] = getCountryId();
-                e.customArgs['languageId'] = getLanguageId();
+                e.customArgs['objBase'] = getBase();
             }";
 
             settings.DownloadRouteValues = new { Controller = "downloads", Action = "pricelists-brochures-grid-download-file" };
@@ -78,14 +76,28 @@ namespace wwwDesignersGuild.Models.Trade
 
         public override IEnumerable<FileManagerFile> GetFiles(FileManagerFolder folder)
         {
-            return Directory.GetFiles(folder.FullName, "*.*", SearchOption.TopDirectoryOnly).Select(p =>
-                new FileManagerFile(this, Path.GetFileName(p)));
+            var files = new List<FileManagerFile>();
+
+            if (Directory.Exists(folder.FullName))
+            {
+				files = Directory.GetFiles(folder.FullName, "*.*", SearchOption.TopDirectoryOnly).Select(p =>
+				new FileManagerFile(this, Path.GetFileName(p))).ToList();
+			}
+
+            return files;
         }
 
         public override IEnumerable<FileManagerFolder> GetFolders(FileManagerFolder parentFolder)
         {
-            return Directory.EnumerateDirectories(parentFolder?.FullName ?? "", "*.*", SearchOption.AllDirectories).Where(p => !p.Contains("internal")).Select(p =>
-                new FileManagerFolder(this, Path.GetFileName(p)));
+            var directories = new List<FileManagerFolder>();
+
+            if (Directory.Exists(parentFolder?.FullName))
+            {
+                directories = Directory.EnumerateDirectories(parentFolder?.FullName ?? "", "*.*", SearchOption.AllDirectories).Where(p => !p.Contains("internal")).Select(p =>
+				new FileManagerFolder(this, Path.GetFileName(p))).ToList();
+			}
+
+            return directories;
         }
         public override bool Exists(FileManagerFile file)
         {

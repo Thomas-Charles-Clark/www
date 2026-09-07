@@ -44,7 +44,17 @@ namespace wwwDesignersGuild.Models.LandingPage
             }
         }
 
-        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, int pageId, byte languageId, short countryId, DateTime useDate, bool isMember, bool isTrade, bool countryMatch, bool displayTradePrice, int? tradeAccountId, int? productPageGridPage = null, int? productPageGridPageSize = null)
+        public async Task<cmsLandingPageDefinition> loadLandingPageFromCms(int? memberId, 
+            int pageId, 
+            byte languageId, 
+            short countryId, 
+            DateTime useDate, 
+            bool isMember, 
+            bool isTrade, 
+            bool countryMatch, 
+            bool displayTradePrice, 
+            int? tradeAccountId,
+            HttpResponseBase responseBase)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -55,7 +65,7 @@ namespace wwwDesignersGuild.Models.LandingPage
             cmsLandingPageDefinition landingPageStore;
             LandingPageCacheProvider objLandingPageCache = new LandingPageCacheProvider();
             
-            landingPageStore = objLandingPageCache.GetOrCreate(pageId, languageId, countryId, useDate, isTrade, () => {
+            landingPageStore = objLandingPageCache.GetOrCreate(pageId, languageId, countryId, useDate, isTrade, responseBase, () => {
                 var result = Task.Run(() => loadLandingPageFromCmsDatabase(memberId, pageId, languageId, countryId, useDate, isMember, isTrade, displayTradePrice, tradeAccountId)).Result;
                 return result;
             });

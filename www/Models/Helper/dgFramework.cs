@@ -1984,7 +1984,7 @@ namespace wwwDesignersGuild.Models.Helper
             bool isMobile = !mobileDetectionResult.IsTablet && mobileDetectionResult.IsMobile;
 
 #if DEBUG
-            isMobile = true;
+            isMobile = false;
 #endif
             //if (mobileDetectionResult.ScreenInchesDiagonal > 0)
             //{

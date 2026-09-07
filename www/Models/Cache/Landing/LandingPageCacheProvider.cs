@@ -24,6 +24,7 @@ namespace wwwDesignersGuild.Models.Cache
             short countryId,
             DateTime useDate,
             bool isTrade,
+			HttpResponseBase responseBase,
 			Func<cmsLandingPageDefinition> factory)
 		{
 			var key = buildKey(pageId, languageId, countryId, useDate, isTrade);
@@ -32,7 +33,16 @@ namespace wwwDesignersGuild.Models.Cache
 			var data = (cmsLandingPageDefinition)Cache[key];
 
 			if (data != null)
+			{
+				if (responseBase != null)
+				{
+					responseBase.AddHeader("DG-Cache-Hit", "true");
+				}
+
 				return data;
+			}
+
+			responseBase?.AddHeader("DG-Cache-Hit", "false");
 
 			// Slow path: Lock to prevent multiple threads from generating the same key
 			lock (_syncLock)

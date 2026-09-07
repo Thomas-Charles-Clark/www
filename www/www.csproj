@@ -480,7 +480,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AlternativeProductsController.cs" />
     <Compile Include="Controllers\BasketController.cs" />
-    <Compile Include="Controllers\CacheController.cs" />
+    <Compile Include="Controllers\CacheApiController.cs" />
     <Compile Include="Controllers\CheckoutController.cs" />
     <Compile Include="Controllers\CheckoutPartController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
@@ -517,10 +517,13 @@
     <Compile Include="Models\Basket\Basket.cs" />
     <Compile Include="Models\BootstrapBreakpoint\BootstrapBreakpoint.cs" />
     <Compile Include="Models\Breadcrumb\Breadcrumb.cs" />
+    <Compile Include="Models\Cache\CacheDescriptor.cs" />
+    <Compile Include="Models\Cache\CacheStateSummary.cs" />
     <Compile Include="Models\Cache\CacheEntryMetadata.cs" />
     <Compile Include="Models\Cache\Collection\CollectionProductPageGridCacheProvider.cs" />
     <Compile Include="Models\Cache\General\HotspotCacheProvider.cs" />
     <Compile Include="Models\Cache\Landing\SiteSectionCacheProvider.cs" />
+    <Compile Include="Models\Cache\MemoryProfiler.cs" />
     <Compile Include="Models\Cache\PassCachePurgeWrapper.cs" />
     <Compile Include="Models\Cache\ProductPages\ProductPageGridPageSectionCacheProvider.cs" />
     <Compile Include="Models\Careers\Careers.cs" />

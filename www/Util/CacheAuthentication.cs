@@ -33,7 +33,7 @@ namespace wwwDesignersGuild.Util
 
             var headers = context.Request.Headers.Select(p => new { p.Key, p.Value });
 
-			var cacheBustingHeader = headers?.Where(p => p.Key == "cacheBustingKey".ToLowerInvariant()).SingleOrDefault();
+			var cacheBustingHeader = headers?.Where(p => p.Key.ToLowerInvariant() == "cachebustingkey").SingleOrDefault();
 
 			if (String.IsNullOrEmpty(cacheBustingHeader?.Value.FirstOrDefault()))
             {

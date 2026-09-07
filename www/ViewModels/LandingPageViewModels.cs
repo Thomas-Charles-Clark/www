@@ -130,11 +130,11 @@ namespace wwwDesignersGuild.ViewModels
             return new HtmlString($@"<ul class=""breadcrumb"">{breadcrumbs}</ul>");
         }
 
-        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop)
+        public static async Task<LandingPageViewModel> CreateAsync(NewMasterDefinition objMaster, VisitorSelect objVisitor, bool isShop, bool verifiedBot, HttpResponseBase responseBase)
         {
 		    var result = new LandingPageViewModel(objMaster, objVisitor);
 
-		    await result.Initialise(isShop);
+            await result.Initialise(isShop, responseBase);
 
 		    return result;
         }
@@ -174,7 +174,7 @@ namespace wwwDesignersGuild.ViewModels
             CategoryPageProductType = null;
         }
 
-        protected async Task Initialise(bool isShop)
+        protected async Task Initialise(bool isShop, HttpResponseBase responseBase)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -211,6 +211,8 @@ namespace wwwDesignersGuild.ViewModels
                 tradeAccountId: tradeAccountId,
                 productPageGridPage: pager.Page,
                 productPageGridPageSize: pager.PageSize);
+                tradeAccountId: Visitor.memberTradeAccountID,
+                responseBase: responseBase);
 
             if (!isShop)
             {
