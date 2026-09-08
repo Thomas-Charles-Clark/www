@@ -32,6 +32,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Results;
 
 using U2.Data.ClientTypes;
 
@@ -186,6 +187,8 @@ namespace wwwDesignersGuild.Controllers
 
 			var displayTradePrice = Convert.ToBoolean(session["memberDisplayTradePrice"]);
 
+			HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, result);
+
 			var Definition = await new cmsLandingPage().loadLandingPageFromCms(
 				memberId: memberId,
 				pageId: dto.MasterDefinition.UrlBreakdown.ContentId,
@@ -199,7 +202,7 @@ namespace wwwDesignersGuild.Controllers
 				tradeAccountId: tradeAccountId,
 				productPageGridPage: dto.Page,
 				productPageGridPageSize: dto.PageSize,
-				responseBase: new HttpResponseWrapper(HttpContext.Current.Response));
+				responseBase: response);
 
 			var ppgCacheProvider = new ProductPageGridPageSectionCacheProvider();
 
