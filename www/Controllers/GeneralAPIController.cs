@@ -663,7 +663,7 @@ namespace wwwDesignersGuild.Controllers
 							tradeAccountId: tradeAccountId,
 							productPageGridPage: dto.page,
 							productPageGridPageSize: dto.pageSize,
-							HttpResponseBase: new HttpResponseWrapper(HttpContext.Current.Response))).Result;
+							responseBase: new HttpResponseWrapper(HttpContext.Current.Response))).Result;
 
 						var Section = Task.Run(() => ProductPageGridPageSection.CreateAsync(
 							originalUrlKeywords: dto.MasterDefinition.UrlBreakdown.SemanticString,

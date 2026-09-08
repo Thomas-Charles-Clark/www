@@ -134,7 +134,7 @@ namespace wwwDesignersGuild.ViewModels
         {
 		    var result = new LandingPageViewModel(objMaster, objVisitor, verifiedBot);
 
-            await result.Initialise(isShop, verifiedBot, responseBase);
+            await result.Initialise(isShop, responseBase, verifiedBot);
 
 		    return result;
         }
@@ -174,7 +174,7 @@ namespace wwwDesignersGuild.ViewModels
             CategoryPageProductType = null;
         }
 
-        protected async Task Initialise(bool isShop, bool verifiedBot, HttpResponseBase responseBase)
+        protected async Task Initialise(bool isShop, HttpResponseBase responseBase,bool verifiedBot)
         {
 #if DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();

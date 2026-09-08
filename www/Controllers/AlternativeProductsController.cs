@@ -203,8 +203,8 @@ namespace wwwDesignersGuild.Controllers
                                                                                     Convert.ToBoolean(Session["countryCheckMatched"]),
                                                                                     objVisitorSelect.memberDisplayTradePrice,
                                                                                     objVisitorSelect.memberTradeAccountID,
-                                                                                    1,
-                                                                                    48,
+                                                                                    null,
+                                                                                    null,
                                                                                     Response);
 
             basketRoutines objBasket = new basketRoutines();

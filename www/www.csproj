@@ -739,6 +739,7 @@
     <Compile Include="Models\UPS\LocatorRequest.cs" />
     <Compile Include="Models\UPS\LocatorResponse.cs" />
     <Compile Include="Models\UPS\OAuthResponse.cs" />
+    <Compile Include="Util\CacheMetadataExtractor.cs" />
     <Compile Include="ViewModels\PageSectionAnimation.cs" />
     <Compile Include="ViewModels\PageSectionViewModels\AnimationPageSection.cs" />
     <Compile Include="ViewModels\PageSectionViewModels\ArticleGrid\ArticleGridPageSection.cs" />

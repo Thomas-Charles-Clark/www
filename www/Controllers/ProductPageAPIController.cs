@@ -199,7 +199,7 @@ namespace wwwDesignersGuild.Controllers
 				tradeAccountId: tradeAccountId,
 				productPageGridPage: dto.Page,
 				productPageGridPageSize: dto.PageSize,
-				HttpResponseBase: new HttpResponseWrapper(HttpContext.Current.Response));
+				responseBase: new HttpResponseWrapper(HttpContext.Current.Response));
 
 			var ppgCacheProvider = new ProductPageGridPageSectionCacheProvider();
 
